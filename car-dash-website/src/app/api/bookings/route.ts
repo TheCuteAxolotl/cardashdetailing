@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import Twilio from "twilio";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const fromNumber = process.env.TWILIO_FROM_NUMBER;
@@ -32,6 +34,22 @@ async function sendSmsNotification(body: string) {
     )
   );
   return true;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const bookings = await prisma.booking.findMany({
+      include: { user: { select: { name: true, email: true } } },
+      orderBy: { date: "desc" },
+    });
+    return NextResponse.json(bookings, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch bookings" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
