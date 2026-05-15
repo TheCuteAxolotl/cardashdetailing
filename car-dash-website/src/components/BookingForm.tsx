@@ -21,7 +21,7 @@ export default function BookingForm({
   prefill?: { service?: string };
   onClose?: () => void;
 }) {
-  const [form, setForm] = useState<any>(() => ({ ...initialState, selectedPackage: prefill?.service || "", serviceMethod: "shop", vehicleType: "Car", interiorCondition: "Light", exteriorCondition: "Light", addOns: [] }));
+  const [form, setForm] = useState<any>(() => ({ ...initialState, selectedPackage: prefill?.service || "", serviceMethod: "shop", vehicleType: "Sedan", interiorCondition: "Light", exteriorCondition: "Light", addOns: [] }));
   const [images, setImages] = useState<File[]>([]);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -61,6 +61,7 @@ export default function BookingForm({
     { label: "Engine Bay Cleaning", price: "$49" },
     { label: "Iron Decontamination", price: "$45" },
     { label: "Clay Bar Treatment", price: "$59" },
+    { label: "Headlight Restoration", price: "$120" },
   ];
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -147,7 +148,7 @@ export default function BookingForm({
             onChange={(e) => setForm((cur: any) => ({ ...cur, vehicleType: e.target.value }))}
             className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white outline-none"
           >
-            <option>Car</option>
+            <option>Sedan</option>
             <option>SUV</option>
             <option>Truck</option>
             <option>Van</option>
