@@ -41,7 +41,7 @@ export default function Home() {
             Car Dash Detailing
           </div>
           <nav className="hidden items-center gap-8 text-sm text-slate-700 md:flex">
-            <a href="#services" className="transition hover:text-slate-900">Services</a>
+            <a href="/services" className="transition hover:text-slate-900">Services</a>
             <a href="#gallery" className="transition hover:text-slate-900">Gallery</a>
             <a href="#reviews" className="transition hover:text-slate-900">Reviews</a>
             <a href="#contact" className="transition hover:text-slate-900">Contact</a>
@@ -75,7 +75,7 @@ export default function Home() {
                 Book Now
               </a>
               <a
-                href="#services"
+                href="/services"
                 className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition duration-200 hover:border-slate-300 hover:bg-slate-50"
               >
                 View services
@@ -203,7 +203,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm">© {new Date().getFullYear()} Car Dash Detailing. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4 text-sm">
-            <a href="#services" className="transition hover:text-slate-900">Services</a>
+            <a href="/services" className="transition hover:text-slate-900">Services</a>
             <a href="#gallery" className="transition hover:text-slate-900">Gallery</a>
             <a href="#reviews" className="transition hover:text-slate-900">Reviews</a>
             <a href="#contact" className="transition hover:text-slate-900">Contact</a>
