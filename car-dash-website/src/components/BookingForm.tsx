@@ -69,75 +69,75 @@ export default function BookingForm() {
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="grid gap-6 sm:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Full name</span>
+          <span className="text-sm font-semibold text-white">Full name</span>
           <input
             name="name"
             value={form.name}
             onChange={handleChange}
             required
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Phone number</span>
+          <span className="text-sm font-semibold text-white">Phone number</span>
           <input
             name="phone"
             value={form.phone}
             onChange={handleChange}
             required
             type="tel"
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Email address</span>
+          <span className="text-sm font-semibold text-white">Email address</span>
           <input
             name="email"
             value={form.email}
             onChange={handleChange}
             type="email"
             required
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Preferred appointment</span>
+          <span className="text-sm font-semibold text-white">Preferred appointment</span>
           <input
             name="preferredDate"
             value={form.preferredDate}
             onChange={handleChange}
             placeholder="Date or time window"
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-3">
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Vehicle make</span>
+          <span className="text-sm font-semibold text-white">Vehicle make</span>
           <input
             name="vehicleMake"
             value={form.vehicleMake}
             onChange={handleChange}
             required
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Vehicle model</span>
+          <span className="text-sm font-semibold text-white">Vehicle model</span>
           <input
             name="vehicleModel"
             value={form.vehicleModel}
             onChange={handleChange}
             required
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-slate-900">Vehicle year</span>
+          <span className="text-sm font-semibold text-white">Vehicle year</span>
           <input
             name="vehicleYear"
             value={form.vehicleYear}
@@ -146,62 +146,68 @@ export default function BookingForm() {
             type="number"
             min="1900"
             max="2099"
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+            className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
           />
         </label>
       </div>
 
       <label className="space-y-2">
-        <span className="text-sm font-semibold text-slate-900">Trim, package, or style</span>
+        <span className="text-sm font-semibold text-white">Trim, package, or style</span>
         <input
           name="vehicleTrim"
           value={form.vehicleTrim}
           onChange={handleChange}
           placeholder="Example: Touring, Sport, Luxury"
-          className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+          className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
         />
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-semibold text-slate-900">Service details</span>
+        <span className="text-sm font-semibold text-white">Service details</span>
         <textarea
           name="serviceNotes"
           value={form.serviceNotes}
           onChange={handleChange}
           rows={5}
           placeholder="Describe the service you want, condition, or any special instructions."
-          className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none transition focus:border-red-900 focus:ring-2 focus:ring-red-100"
+          className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none transition focus:border-red-700 focus:ring-2 focus:ring-red-700/30"
         />
       </label>
 
       <label className="space-y-2">
-        <span className="text-sm font-semibold text-slate-900">Vehicle images (optional)</span>
+        <span className="text-sm font-semibold text-white">Vehicle images (optional)</span>
         <input
           type="file"
           accept="image/*"
           multiple
           onChange={handleFileChange}
-          className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-950 outline-none"
+          className="w-full rounded-3xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-sm text-white outline-none"
         />
-        <p className="text-xs text-slate-500">Upload up to 3 images. Optional, but helpful for accurate estimates.</p>
+        <p className="text-xs text-neutral-400">Upload up to 3 images. Optional, but helpful for accurate estimates.</p>
       </label>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-slate-950">Images attached</p>
-          <p className="text-sm text-slate-500">{images.length} file{images.length === 1 ? "" : "s"} selected</p>
+          <p className="text-sm font-semibold text-white">Images attached</p>
+          <p className="text-sm text-neutral-400">{images.length} file{images.length === 1 ? "" : "s"} selected</p>
         </div>
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="inline-flex items-center justify-center rounded-full bg-red-950 px-7 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex items-center justify-center rounded-full bg-red-700 px-7 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {status === "submitting" ? "Sending..." : "Submit booking request"}
         </button>
       </div>
 
       {status !== "idle" && (
-        <div className={`rounded-3xl border ${status === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"} px-4 py-4 text-sm`}>
+        <div
+          className={`rounded-3xl border px-4 py-4 text-sm ${
+            status === "success"
+              ? "border-neutral-700 bg-neutral-900 text-neutral-100"
+              : "border-rose-500/50 bg-rose-950 text-rose-200"
+          }`}
+        >
           {message}
         </div>
       )}
