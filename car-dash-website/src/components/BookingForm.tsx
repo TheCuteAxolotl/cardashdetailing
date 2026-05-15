@@ -14,8 +14,12 @@ const initialState = {
   preferredDate: "",
 };
 
-export default function BookingForm() {
-  const [form, setForm] = useState(initialState);
+export default function BookingForm({
+  prefill,
+}: {
+  prefill?: { service?: string };
+}) {
+  const [form, setForm] = useState(() => ({ ...initialState, selectedPackage: prefill?.service || "" }));
   const [images, setImages] = useState<File[]>([]);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -42,6 +46,11 @@ export default function BookingForm() {
         data.append(key, value as string);
       });
 
+      // include selected package if provided
+      if ((form as any).selectedPackage) {
+        data.append("selectedPackage", (form as any).selectedPackage as string);
+      }
+
       images.forEach((file) => data.append("images", file));
 
       const response = await fetch("/api/bookings", {
@@ -57,7 +66,7 @@ export default function BookingForm() {
 
       setStatus("success");
       setMessage(result.message || "Booking request submitted successfully.");
-      setForm(initialState);
+      setForm({ ...initialState, selectedPackage: prefill?.service || "" });
       setImages([]);
     } catch (error) {
       setStatus("error");
@@ -67,6 +76,11 @@ export default function BookingForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {prefill?.service && (
+        <div className="rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-2 text-sm text-neutral-300">
+          Booking: <span className="font-semibold text-white">{prefill.service}</span>
+        </div>
+      )}
       <div className="grid gap-6 sm:grid-cols-2">
         <label className="space-y-2">
           <span className="text-sm font-semibold text-white">Full name</span>

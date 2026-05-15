@@ -1,3 +1,9 @@
+"use client";
+
+import { useState } from "react";
+import BookingForm from "../../components/BookingForm";
+import Modal from "../../components/Modal";
+
 const servicePackages = [
   {
     name: "Basic Detail",
@@ -72,6 +78,14 @@ const paintCorrectionUpgrades = [
 ];
 
 export default function ServicesPage() {
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+
+  function openBooking(pkgName: string) {
+    setSelectedPackage(pkgName);
+    setShowModal(true);
+  }
+
   return (
     <div className="min-h-screen bg-[#050505] text-white">
       <main className="mx-auto max-w-7xl px-6 py-12">
@@ -112,12 +126,13 @@ export default function ServicesPage() {
               </div>
 
               <div className="mt-8 flex flex-col gap-4">
-                <a
-                  href="mailto:hello@cardashdetailing.com"
+                <button
+                  type="button"
+                  onClick={() => openBooking(pkg.name)}
                   className="inline-flex items-center justify-center rounded-full bg-red-700 px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-red-800"
                 >
                   Book Now
-                </a>
+                </button>
                 <p className="text-xs leading-5 text-neutral-400">
                   Includes professional inspection and tailored service planning for your vehicle.
                 </p>
@@ -125,6 +140,13 @@ export default function ServicesPage() {
             </article>
           ))}
         </section>
+
+        {/* Booking modal */}
+        <Modal open={showModal} onClose={() => setShowModal(false)}>
+          <div className="mx-auto max-w-2xl">
+            <BookingForm prefill={{ service: selectedPackage ?? undefined }} />
+          </div>
+        </Modal>
 
         <section className="mt-16 rounded-[2rem] border border-neutral-800 bg-neutral-950 px-8 py-10">
           <div className="grid gap-8 xl:grid-cols-[1.2fr_0.9fr] xl:items-center">
