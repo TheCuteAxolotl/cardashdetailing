@@ -143,7 +143,7 @@ export default function ServicesPage() {
 
         {/* Booking modal */}
         <Modal open={showModal} onClose={() => setShowModal(false)}>
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto w-full max-w-2xl">
             <BookingForm prefill={{ service: selectedPackage ?? undefined }} onClose={() => setShowModal(false)} />
           </div>
         </Modal>
