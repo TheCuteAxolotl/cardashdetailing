@@ -28,6 +28,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (email.toLowerCase() === OWNER_EMAIL) {
+      setError("Invalid email for registration");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -50,11 +55,8 @@ export default function RegisterPage() {
         return;
       }
 
-      if (email.toLowerCase() === OWNER_EMAIL) {
-        router.push("/owner/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      // Redirect to dashboard on successful registration
+      router.push("/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");
       console.error(err);

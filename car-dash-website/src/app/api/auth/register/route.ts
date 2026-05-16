@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword, createToken, getRoleForEmail } from "@/lib/auth";
+import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
@@ -11,6 +12,14 @@ export async function POST(request: NextRequest) {
     if (!email || !password || !name) {
       return NextResponse.json(
         { error: "Email, password, and name are required" },
+        { status: 400 }
+      );
+    }
+
+    // Prevent registering as owner
+    if (email.toLowerCase() === OWNER_EMAIL) {
+      return NextResponse.json(
+        { error: "Cannot register with this email" },
         { status: 400 }
       );
     }
