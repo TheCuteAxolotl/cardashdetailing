@@ -15,6 +15,12 @@ export default function Home() {
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
               <a
+                href="/login"
+                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition duration-200 hover:bg-neutral-200"
+              >
+                Login now
+              </a>
+              <a
                 href="/services"
                 className="inline-flex items-center justify-center rounded-full bg-red-700 px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-red-800"
               >
@@ -22,7 +28,7 @@ export default function Home() {
               </a>
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center rounded-full bg-red-700 px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-red-800"
+                className="inline-flex items-center justify-center rounded-full border border-neutral-800 bg-transparent px-6 py-3 text-sm font-semibold text-white transition duration-200 hover:border-red-700 hover:text-red-600"
               >
                 Book now
               </a>

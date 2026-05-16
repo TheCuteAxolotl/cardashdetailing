@@ -5,10 +5,11 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { status } = await request.json();
+    const params = await context.params;
 
     const booking = await prisma.booking.update({
       where: { id: params.id },
