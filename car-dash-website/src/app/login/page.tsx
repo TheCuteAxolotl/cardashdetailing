@@ -101,16 +101,6 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-
-          <div className="mt-4 pt-4 border-t border-neutral-800">
-            <p className="text-xs text-neutral-500 mb-2">Owner Login?</p>
-            <Link
-              href="/"
-              className="text-sm text-neutral-400 hover:text-neutral-300"
-            >
-              ← Back to home
-            </Link>
-          </div>
         </div>
       </div>
     </div>

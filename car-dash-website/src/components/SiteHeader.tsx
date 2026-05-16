@@ -79,9 +79,6 @@ export default function SiteHeader() {
                 <Link href="/register" className="transition hover:text-red-600">
                   Register
                 </Link>
-                <Link href="/login" className="rounded-full border border-neutral-800 bg-red-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-800">
-                  Owner Login
-                </Link>
               </>
             )}
             {!loading && user && (
@@ -136,9 +133,6 @@ export default function SiteHeader() {
                 </Link>
                 <Link href="/register" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 hover:bg-neutral-900 hover:text-red-600">
                   Register
-                </Link>
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block rounded-full border border-neutral-800 bg-red-700 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-red-800">
-                  Owner Login
                 </Link>
               </>
             )}
