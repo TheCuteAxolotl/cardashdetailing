@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { verifyPassword, createToken } from "@/lib/auth";
+import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
@@ -8,7 +9,6 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    // Validate input
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -28,7 +27,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify password
     const isValidPassword = await verifyPassword(password, user.password);
 
     if (!isValidPassword) {
@@ -38,18 +36,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create token
+    const role = user.email === OWNER_EMAIL ? "owner" : user.role;
+    if (user.email === OWNER_EMAIL && user.role !== "owner") {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role: "owner" },
+      });
+    }
+
     const token = createToken({
       id: user.id,
       email: user.email,
-      role: user.role,
+      role,
     });
 
-    // Set response with cookie
     const response = NextResponse.json(
       {
         message: "Login successful",
-        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+        user: { id: user.id, email: user.email, name: user.name, role },
       },
       { status: 200 }
     );

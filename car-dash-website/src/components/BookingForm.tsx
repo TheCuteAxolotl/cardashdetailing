@@ -12,6 +12,14 @@ const initialState = {
   vehicleTrim: "",
   serviceNotes: "",
   preferredDate: "",
+  selectedPackage: "",
+  serviceMethod: "shop",
+  vehicleType: "Sedan",
+  interiorCondition: "Light",
+  exteriorCondition: "Light",
+  addOns: [],
+  smsConsent: false,
+  policyAgreed: false,
 };
 
 export default function BookingForm({
@@ -69,15 +77,41 @@ export default function BookingForm({
     setStatus("submitting");
     setMessage("");
 
-    // Simple front-end only submission simulation
-    await new Promise((r) => setTimeout(r, 700));
+    try {
+      const payload = {
+        selectedPackage: form.selectedPackage,
+        serviceMethod: form.serviceMethod,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        vehicleMake: form.vehicleMake,
+        vehicleModel: form.vehicleModel,
+        vehicleYear: form.vehicleYear,
+        vehicleTrim: form.vehicleTrim,
+        serviceNotes: form.serviceNotes,
+        preferredDate: form.preferredDate,
+      };
 
-    setStatus("success");
-    setMessage("Booking request submitted. We’ll contact you shortly to confirm your appointment.");
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    // keep selected package and service method for confirmation, but clear other fields
-    setForm((cur: any) => ({ ...initialState, selectedPackage: cur.selectedPackage || "", serviceMethod: cur.serviceMethod || "shop", addOns: [] }));
-    setImages([]);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit booking request.");
+      }
+
+      setStatus("success");
+      setMessage(data.message || "Booking request submitted. We’ll contact you shortly.");
+      setForm({ ...initialState, selectedPackage: form.selectedPackage || "", serviceMethod: form.serviceMethod || "shop" });
+      setImages([]);
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "Unable to submit booking request.");
+    }
   };
 
   return (

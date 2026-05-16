@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { OWNER_EMAIL } from "@/lib/constants";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isOwner, setIsOwner] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -18,7 +18,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -37,11 +36,10 @@ export default function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          name, 
-          email, 
+        body: JSON.stringify({
+          name,
+          email,
           password,
-          isOwner 
         }),
       });
 
@@ -52,11 +50,10 @@ export default function RegisterPage() {
         return;
       }
 
-      // Redirect to owner setup or home
-      if (isOwner) {
-        router.push("/owner/setup");
+      if (email.toLowerCase() === OWNER_EMAIL) {
+        router.push("/owner/dashboard");
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -126,19 +123,6 @@ export default function RegisterPage() {
                 placeholder="••••••••"
                 required
               />
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="isOwner"
-                checked={isOwner}
-                onChange={(e) => setIsOwner(e.target.checked)}
-                className="w-4 h-4 rounded border-neutral-600 text-red-700"
-              />
-              <label htmlFor="isOwner" className="ml-2 text-sm">
-                Register as business owner
-              </label>
             </div>
 
             <button

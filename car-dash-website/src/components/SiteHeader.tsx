@@ -59,9 +59,16 @@ export default function SiteHeader() {
         <div className="flex items-center gap-4">
           {!loading && user ? (
             <>
-              {user.role === "owner" && (
+              {user.role === "owner" ? (
                 <Link
                   href="/owner/dashboard"
+                  className="text-sm text-neutral-300 hover:text-red-600 transition"
+                >
+                  Owner Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard"
                   className="text-sm text-neutral-300 hover:text-red-600 transition"
                 >
                   Dashboard

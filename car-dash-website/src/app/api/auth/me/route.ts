@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthToken, verifyToken } from "@/lib/auth";
+import { getAuthToken, verifyToken, getRoleForEmail } from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -36,7 +36,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ user }, { status: 200 });
+    const role = getRoleForEmail(user.email);
+    if (role !== user.role) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role },
+      });
+    }
+
+    return NextResponse.json({ user: { ...user, role } }, { status: 200 });
   } catch (error) {
     console.error("Auth error:", error);
     return NextResponse.json(

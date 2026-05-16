@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Twilio from "twilio";
 import { PrismaClient } from "@prisma/client";
+import { getAuthFromRequest } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -38,10 +39,22 @@ async function sendSmsNotification(body: string) {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = getAuthFromRequest(request);
+    if (!auth) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    const where = auth.role === "owner" ? {} : { userId: auth.id };
+
     const bookings = await prisma.booking.findMany({
+      where,
       include: { user: { select: { name: true, email: true } } },
-      orderBy: { date: "desc" },
+      orderBy: { createdAt: "desc" },
     });
+
     return NextResponse.json(bookings, { status: 200 });
   } catch (error) {
     console.error("Error fetching bookings:", error);
@@ -52,7 +65,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const name = getRequired(formData.get("name"), "name");
@@ -64,19 +77,35 @@ export async function POST(request: Request) {
     const vehicleTrim = String(formData.get("vehicleTrim") ?? "");
     const serviceNotes = String(formData.get("serviceNotes") ?? "");
     const preferredDate = String(formData.get("preferredDate") ?? "");
-    const imageFiles = formData.getAll("images").filter((value) => value instanceof File) as File[];
+    const serviceName = String(formData.get("selectedPackage") ?? "Custom Booking");
+    const serviceMethod = String(formData.get("serviceMethod") ?? "shop");
+    const auth = getAuthFromRequest(request as unknown as NextRequest);
 
-    const imageList = imageFiles.map((file) => file.name).join(", ");
-    const messageBody = `New booking request from ${name}\nPhone: ${phone}\nEmail: ${email}\nVehicle: ${vehicleYear} ${vehicleMake} ${vehicleModel} ${vehicleTrim ? `(${vehicleTrim})` : ""}\nPreferred: ${preferredDate}\nNotes: ${serviceNotes || "None"}\nImages: ${imageFiles.length} attached${imageFiles.length ? ` (${imageList})` : ""}`;
+    const booking = await prisma.booking.create({
+      data: {
+        userId: auth?.id ?? null,
+        serviceName,
+        serviceMethod,
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+        vehicleMake,
+        vehicleModel,
+        vehicleYear,
+        vehicleTrim,
+        preferredDate,
+        notes: serviceNotes,
+      },
+    });
 
-    const sent = await sendSmsNotification(messageBody);
+    const messageBody = `New booking request from ${name}\nPhone: ${phone}\nEmail: ${email}\nVehicle: ${vehicleYear} ${vehicleMake} ${vehicleModel} ${vehicleTrim ? `(${vehicleTrim})` : ""}\nPreferred: ${preferredDate}\nService: ${serviceName} (${serviceMethod})\nNotes: ${serviceNotes || "None"}`;
+    await sendSmsNotification(messageBody);
 
     return NextResponse.json({
       success: true,
-      message: sent
-        ? "Booking request sent. We’ll be in touch soon."
-        : "Booking request received. SMS notifications are not configured yet, but the request is logged.",
-    });
+      booking,
+      message: "Booking request submitted. We’ll contact you shortly.",
+    }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({

@@ -36,7 +36,7 @@ export default function LoginPage() {
       if (data.user.role === "owner") {
         router.push("/owner/dashboard");
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");

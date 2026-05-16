@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getAuthFromRequest } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -18,10 +19,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, description, price } = await request.json();
+    const auth = getAuthFromRequest(request);
+    if (!auth || auth.role !== "owner") {
+      return NextResponse.json(
+        { error: "Not authorized" },
+        { status: 403 }
+      );
+    }
+
+    const { title, description, price, image } = await request.json();
 
     const service = await prisma.service.create({
-      data: { title, description, price },
+      data: { title, description, price, image },
     });
 
     return NextResponse.json(service, { status: 201 });

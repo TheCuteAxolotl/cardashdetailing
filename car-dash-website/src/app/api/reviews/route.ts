@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getAuthFromRequest } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = getAuthFromRequest(request);
+    const approvedParam = request.nextUrl.searchParams.get("approved");
+
+    if (auth?.role === "owner" && approvedParam === null) {
+      const reviews = await prisma.review.findMany({ orderBy: { createdAt: "desc" } });
+      return NextResponse.json(reviews, { status: 200 });
+    }
+
+    const approved = approvedParam === "false" ? false : true;
     const reviews = await prisma.review.findMany({
+      where: { approved },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(reviews, { status: 200 });

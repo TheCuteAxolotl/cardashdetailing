@@ -1,14 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { hashPassword, createToken, setAuthCookie } from "@/lib/auth";
+import { hashPassword, createToken, getRoleForEmail } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name, isOwner } = await request.json();
+    const { email, password, name } = await request.json();
 
-    // Validate input
     if (!email || !password || !name) {
       return NextResponse.json(
         { error: "Email, password, and name are required" },
@@ -16,7 +15,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -28,29 +26,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
     const hashedPassword = await hashPassword(password);
+    const role = getRoleForEmail(email);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
-        role: isOwner ? "owner" : "user",
+        role,
       },
     });
 
-    // Create token
     const token = createToken({
       id: user.id,
       email: user.email,
       role: user.role,
     });
 
-    // Set cookie
     const response = NextResponse.json(
-      { message: "User created successfully", user: { id: user.id, email: user.email, name: user.name, role: user.role } },
+      {
+        message: "User created successfully",
+        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      },
       { status: 201 }
     );
 

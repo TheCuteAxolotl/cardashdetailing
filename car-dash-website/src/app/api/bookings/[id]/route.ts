@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getAuthFromRequest } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -8,6 +9,14 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = getAuthFromRequest(request);
+    if (!auth || auth.role !== "owner") {
+      return NextResponse.json(
+        { error: "Not authorized" },
+        { status: 403 }
+      );
+    }
+
     const { status } = await request.json();
     const params = await context.params;
 
