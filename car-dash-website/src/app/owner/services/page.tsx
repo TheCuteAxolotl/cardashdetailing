@@ -69,10 +69,15 @@ export default function OwnerServices() {
         }),
       });
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        throw new Error(data?.error || "Failed to create service");
-      }
+if (!response.ok) {
+  const data = await response.json().catch(() => null);
+  alert(
+    `Create failed: ${response.status} - ${
+      data?.error || "Unknown error"
+    }`
+  );
+  return;
+}
 
       setNewService({
         title: "",
