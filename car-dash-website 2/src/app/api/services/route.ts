@@ -1,0 +1,6 @@
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { getAuthFromRequest } from "@/lib/auth";
+const prisma = new PrismaClient();
+export async function GET(){try{return NextResponse.json(await prisma.service.findMany({orderBy:{createdAt:"asc"}}))}catch(e){console.error(e);return NextResponse.json({error:"Failed to fetch services"},{status:500})}}
+export async function POST(request:NextRequest){try{const auth=getAuthFromRequest(request);if(!auth||auth.role!=="owner")return NextResponse.json({error:"Your owner session expired. Log out, sign back in, and try again."},{status:403});const body=await request.json();const title=String(body.title||"").trim(),description=String(body.description||"").trim(),price=Number(body.price);if(!title||!description||!Number.isFinite(price)||price<0)return NextResponse.json({error:"Add a package name, description, and valid price."},{status:400});const service=await prisma.service.create({data:{title,description,price,image:body.image||null}});return NextResponse.json(service,{status:201})}catch(e){console.error("Error creating service:",e);return NextResponse.json({error:"The service could not be saved. Please try again."},{status:500})}}
