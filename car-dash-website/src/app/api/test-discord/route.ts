@@ -16,13 +16,13 @@ export async function GET() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        content: "<@&1547633528873943102> New detailing request received!",
-allowed_mentions: {
-  roles: ["1547633528873943102"],
-},
-      }),
-    });
+     body: JSON.stringify({
+  content:
+    "<@&1547633528873943102> New detailing request received!",
+  allowed_mentions: {
+    roles: ["1547633528873943102"],
+  },
+}),
 
     if (!response.ok) {
       const text = await response.text();
