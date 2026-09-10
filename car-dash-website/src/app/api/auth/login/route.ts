@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
 import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +34,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const role = user.email === OWNER_EMAIL ? "owner" : user.role;
+    const role =
+      user.email === OWNER_EMAIL
+        ? "owner"
+        : user.role;
+
     if (user.email === OWNER_EMAIL && user.role !== "owner") {
       await prisma.user.update({
         where: { id: user.id },
@@ -53,7 +55,12 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json(
       {
         message: "Login successful",
-        user: { id: user.id, email: user.email, name: user.name, role },
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role,
+        },
       },
       { status: 200 }
     );
@@ -63,11 +70,13 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
+      path: "/",
     });
 
     return response;
   } catch (error) {
     console.error("Login error:", error);
+
     return NextResponse.json(
       { error: "Login failed" },
       { status: 500 }
