@@ -17,7 +17,7 @@ export async function GET() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: "@everyone New detailing request received!",
+        content: "New detailing request received!",
       }),
     });
 
