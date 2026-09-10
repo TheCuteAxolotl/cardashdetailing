@@ -3,6 +3,8 @@ import Twilio from "twilio";
 import { prisma } from "@/lib/prisma";
 import { getAuthFromRequest } from "@/lib/auth";
 
+const DISCORD_USER_ID = "1547633071535165480";
+
 const twilioClient =
   process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
     ? Twilio(
@@ -26,7 +28,18 @@ function required(form: FormData, key: string) {
   return value;
 }
 
+function cleanDiscordText(value: string, maxLength = 1000) {
+  const cleaned = String(value || "").trim();
+
+  if (!cleaned) {
+    return "Not specified";
+  }
+
+  return cleaned.slice(0, maxLength);
+}
+
 async function sendDiscordNotification(data: {
+  bookingId: string;
   name: string;
   phone: string;
   email: string;
@@ -45,10 +58,10 @@ async function sendDiscordNotification(data: {
   addOns: string;
   customerNotes: string;
 }) {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL?.trim();
 
   if (!webhookUrl) {
-    console.log("Discord webhook is not configured.");
+    console.error("DISCORD_WEBHOOK_URL is missing.");
     return;
   }
 
@@ -62,94 +75,113 @@ async function sendDiscordNotification(data: {
       .filter(Boolean)
       .join(" ");
 
-    const response = await fetch(webhookUrl, {
+    const response = await fetch(`${webhookUrl}?wait=true`, {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
       },
+
       body: JSON.stringify({
+        content: `<@${DISCORD_USER_ID}> New detailing request received!`,
+
+        allowed_mentions: {
+          users: [DISCORD_USER_ID],
+        },
+
         username: "Car Dash Detailing",
+
         embeds: [
           {
-            title: "New Detailing Request",
+            title: "🚗 New Detailing Request",
+
             description:
-              "A new detailing request was submitted through the Car Dash Detailing website.",
-            color: 14423100,
+              "A customer submitted a new detailing request through cardashdetailing.com.",
+
+            color: 15548997,
+
             fields: [
               {
                 name: "Customer",
-                value: data.name || "Not provided",
+                value: cleanDiscordText(data.name),
                 inline: true,
               },
               {
                 name: "Phone",
-                value: data.phone || "Not provided",
+                value: cleanDiscordText(data.phone),
                 inline: true,
               },
               {
                 name: "Email",
-                value: data.email || "Not provided",
+                value: cleanDiscordText(data.email),
                 inline: false,
               },
               {
                 name: "Vehicle",
-                value: vehicle || "Not provided",
+                value: cleanDiscordText(vehicle),
                 inline: false,
               },
               {
                 name: "Vehicle Type",
-                value: data.vehicleType || "Not specified",
+                value: cleanDiscordText(data.vehicleType),
                 inline: true,
               },
               {
                 name: "Service",
-                value: data.serviceName || "Custom Booking",
+                value: cleanDiscordText(data.serviceName),
                 inline: true,
               },
               {
                 name: "Service Method",
-                value: data.serviceMethod || "Not specified",
+                value: cleanDiscordText(data.serviceMethod),
                 inline: true,
               },
               {
                 name: "Preferred Date",
-                value: data.preferredDate || "Not specified",
+                value: cleanDiscordText(data.preferredDate),
                 inline: true,
               },
               {
                 name: "Preferred Time",
-                value: data.preferredTime || "Not specified",
+                value: cleanDiscordText(data.preferredTime),
                 inline: true,
               },
               {
                 name: "Service Address",
-                value: data.serviceAddress || "Not specified",
+                value: cleanDiscordText(data.serviceAddress),
                 inline: false,
               },
               {
                 name: "Interior Condition",
-                value: data.interiorCondition || "Not specified",
+                value: cleanDiscordText(data.interiorCondition),
                 inline: true,
               },
               {
                 name: "Exterior Condition",
-                value: data.exteriorCondition || "Not specified",
+                value: cleanDiscordText(data.exteriorCondition),
                 inline: true,
               },
               {
                 name: "Add-ons",
-                value: data.addOns || "None",
+                value: cleanDiscordText(data.addOns),
                 inline: false,
               },
               {
                 name: "Customer Notes",
-                value: data.customerNotes || "None",
+                value: cleanDiscordText(data.customerNotes),
+                inline: false,
+              },
+              {
+                name: "Booking ID",
+                value: cleanDiscordText(data.bookingId),
                 inline: false,
               },
             ],
+
             footer: {
               text: "Car Dash Detailing • Website Booking",
             },
+
             timestamp: new Date().toISOString(),
           },
         ],
@@ -157,12 +189,19 @@ async function sendDiscordNotification(data: {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+
       console.error(
-        "Discord notification failed:",
+        "Discord webhook failed:",
         response.status,
-        await response.text()
+        response.statusText,
+        errorText
       );
+
+      return;
     }
+
+    console.log("Discord booking notification sent successfully.");
   } catch (error) {
     console.error("Discord notification error:", error);
   }
@@ -186,6 +225,7 @@ export async function GET(request: NextRequest) {
           : {
               userId: auth.id,
             },
+
       include: {
         user: {
           select: {
@@ -194,12 +234,15 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    return NextResponse.json(bookings, { status: 200 });
+    return NextResponse.json(bookings, {
+      status: 200,
+    });
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
 
@@ -231,7 +274,7 @@ export async function POST(request: NextRequest) {
     ).trim();
 
     const serviceMethod = String(
-      form.get("serviceMethod") || "shop"
+      form.get("serviceMethod") || "Not specified"
     ).trim();
 
     const preferredDate = String(
@@ -286,21 +329,27 @@ export async function POST(request: NextRequest) {
     const booking = await prisma.booking.create({
       data: {
         userId: auth?.id ?? null,
+
         serviceName,
         serviceMethod,
+
         customerName: name,
         customerEmail: email,
         customerPhone: phone,
+
         vehicleMake,
         vehicleModel,
         vehicleYear,
         vehicleTrim,
+
         preferredDate,
+
         notes: details,
       },
     });
 
     await sendDiscordNotification({
+      bookingId: booking.id,
       name,
       phone,
       email,
@@ -350,7 +399,9 @@ export async function POST(request: NextRequest) {
         message:
           "Booking request submitted. We’ll contact you shortly.",
       },
-      { status: 201 }
+      {
+        status: 201,
+      }
     );
   } catch (error) {
     console.error("Booking submission error:", error);
@@ -363,7 +414,9 @@ export async function POST(request: NextRequest) {
             ? error.message
             : "Unable to process booking request.",
       },
-      { status: 400 }
+      {
+        status: 400,
+      }
     );
   }
 }
