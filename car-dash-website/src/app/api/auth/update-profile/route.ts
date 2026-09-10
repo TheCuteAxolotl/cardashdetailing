@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getAuthToken, verifyToken } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export async function PUT(request: NextRequest) {
   try {
@@ -25,8 +23,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const { name } = await request.json();
+    const trimmedName = String(name || "").trim();
 
-    if (!name) {
+    if (!trimmedName) {
       return NextResponse.json(
         { error: "Name is required" },
         { status: 400 }
@@ -35,13 +34,19 @@ export async function PUT(request: NextRequest) {
 
     const user = await prisma.user.update({
       where: { id: decoded.id },
-      data: { name },
-      select: { id: true, email: true, name: true, role: true },
+      data: { name: trimmedName },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
     });
 
     return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
     console.error("Error updating profile:", error);
+
     return NextResponse.json(
       { error: "Failed to update profile" },
       { status: 500 }
