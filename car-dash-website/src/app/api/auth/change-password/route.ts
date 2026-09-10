@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getAuthFromRequest, hashPassword, verifyPassword } from "@/lib/auth";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import {
+  getAuthFromRequest,
+  hashPassword,
+  verifyPassword,
+} from "@/lib/auth";
 
 export async function PUT(request: NextRequest) {
   try {
     const auth = getAuthFromRequest(request);
 
     if (!auth) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
     }
 
-    const { currentPassword, newPassword, confirmPassword } = await request.json();
+    const {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    } = await request.json();
 
     if (!currentPassword || !newPassword || !confirmPassword) {
       return NextResponse.json(
@@ -37,18 +46,31 @@ export async function PUT(request: NextRequest) {
 
     if (currentPassword === newPassword) {
       return NextResponse.json(
-        { error: "Choose a new password that is different from your current password." },
+        {
+          error:
+            "Choose a new password that is different from your current password.",
+        },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { id: auth.id } });
+    const user = await prisma.user.findUnique({
+      where: {
+        id: auth.id,
+      },
+    });
 
     if (!user) {
-      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Account not found." },
+        { status: 404 }
+      );
     }
 
-    const validCurrentPassword = await verifyPassword(currentPassword, user.password);
+    const validCurrentPassword = await verifyPassword(
+      currentPassword,
+      user.password
+    );
 
     if (!validCurrentPassword) {
       return NextResponse.json(
@@ -57,16 +79,26 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const password = await hashPassword(newPassword);
+    const hashedPassword = await hashPassword(newPassword);
 
     await prisma.user.update({
-      where: { id: auth.id },
-      data: { password },
+      where: {
+        id: auth.id,
+      },
+      data: {
+        password: hashedPassword,
+      },
     });
 
-    return NextResponse.json({ message: "Password updated successfully." });
+    return NextResponse.json(
+      {
+        message: "Password updated successfully.",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Change password error:", error);
+
     return NextResponse.json(
       { error: "Unable to update password right now." },
       { status: 500 }
