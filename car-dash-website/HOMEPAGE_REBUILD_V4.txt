@@ -1,0 +1,7 @@
+CAR DASH HOMEPAGE REBUILD V4
+- Homepage completely redesigned in dark black/red/white.
+- No white homepage section.
+- One global header and one global footer only.
+- Homepage service cards are database-driven.
+- Service Book Now links include the service name in the URL.
+- Hero and recent-work images remain owner-dashboard-driven.
