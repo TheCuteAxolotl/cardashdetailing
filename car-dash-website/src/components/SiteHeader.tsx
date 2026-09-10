@@ -72,9 +72,14 @@ export default function SiteHeader() {
             <a href="/contact" className="transition hover:text-white">Contact</a>
 
             {user && !owner && (
-              <a href="/dashboard" className="text-red-400 transition hover:text-red-300">
-                Dashboard
-              </a>
+              <>
+                <a href="/dashboard" className="text-red-400 transition hover:text-red-300">
+                  Dashboard
+                </a>
+                <a href="/account" className="transition hover:text-white">
+                  Account
+                </a>
+              </>
             )}
 
             {owner && (
@@ -147,12 +152,20 @@ export default function SiteHeader() {
               )}
 
               {user && !owner && (
-                <a
-                  href="/dashboard"
-                  className="rounded-xl px-3 py-3 text-red-400 hover:bg-white/5"
-                >
-                  Dashboard
-                </a>
+                <>
+                  <a
+                    href="/dashboard"
+                    className="rounded-xl px-3 py-3 text-red-400 hover:bg-white/5"
+                  >
+                    Dashboard
+                  </a>
+                  <a
+                    href="/account"
+                    className="rounded-xl px-3 py-3 hover:bg-white/5 hover:text-white"
+                  >
+                    Account
+                  </a>
+                </>
               )}
 
               {owner && (

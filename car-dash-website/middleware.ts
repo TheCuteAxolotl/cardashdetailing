@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
   // If there is no login cookie, protect dashboard pages.
   if (
     !token &&
-    (pathname === "/dashboard" || pathname.startsWith("/owner"))
+    (pathname === "/dashboard" || pathname === "/account" || pathname.startsWith("/owner"))
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
@@ -27,5 +27,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/owner/:path*"],
+  matcher: ["/dashboard", "/account", "/owner/:path*"],
 };

@@ -104,11 +104,14 @@ export default function DashboardPage() {
         </div>
 
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950 p-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-2xl font-semibold">Your Bookings</h2>
               <p className="text-sm text-neutral-400">Review request status and appointment details.</p>
             </div>
+            <a href="/account" className="w-fit rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/70 transition hover:border-white/30 hover:text-white">
+              Account Settings
+            </a>
           </div>
 
           {bookings.length > 0 ? (
