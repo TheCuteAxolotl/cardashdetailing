@@ -1,10 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getAuthToken, verifyToken, getRoleForEmail } from "@/lib/auth";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const token = await getAuthToken();
 
@@ -26,7 +24,12 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: { id: true, email: true, name: true, role: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+      },
     });
 
     if (!user) {
@@ -37,6 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     const role = getRoleForEmail(user.email);
+
     if (role !== user.role) {
       await prisma.user.update({
         where: { id: user.id },
@@ -44,9 +48,18 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ user: { ...user, role } }, { status: 200 });
+    return NextResponse.json(
+      {
+        user: {
+          ...user,
+          role,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Auth error:", error);
+
     return NextResponse.json(
       { error: "Authentication failed" },
       { status: 500 }
