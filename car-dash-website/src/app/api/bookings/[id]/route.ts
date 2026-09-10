@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getAuthFromRequest } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export async function PUT(
   request: NextRequest,
@@ -10,6 +8,7 @@ export async function PUT(
 ) {
   try {
     const auth = getAuthFromRequest(request);
+
     if (!auth || auth.role !== "owner") {
       return NextResponse.json(
         { error: "Not authorized" },
@@ -21,13 +20,18 @@ export async function PUT(
     const params = await context.params;
 
     const booking = await prisma.booking.update({
-      where: { id: params.id },
-      data: { status },
+      where: {
+        id: params.id,
+      },
+      data: {
+        status,
+      },
     });
 
     return NextResponse.json(booking, { status: 200 });
   } catch (error) {
     console.error("Error updating booking:", error);
+
     return NextResponse.json(
       { error: "Failed to update booking" },
       { status: 500 }
