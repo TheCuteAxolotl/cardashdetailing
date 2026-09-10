@@ -16,7 +16,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Car Dash Detailing",
-  description: "Mobile auto detailing from Car Dash Detailing. Interior, exterior, paint correction, protection, and custom service packages.",
+  description:
+    "Mobile auto detailing from Car Dash Detailing. Interior, exterior, paint correction, protection, and custom service packages.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({
