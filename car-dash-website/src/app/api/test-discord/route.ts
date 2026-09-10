@@ -17,9 +17,9 @@ export async function GET() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: "<@1547633528873943102> Discord test from Car Dash Detailing",
+        content: "<@YOUR_USER_ID> Discord test from Car Dash Detailing",
 allowed_mentions: {
-  users: ["1547633528873943102"],
+  users: ["YOUR_USER_ID"],
 },
       }),
     });
