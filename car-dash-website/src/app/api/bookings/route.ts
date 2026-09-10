@@ -26,6 +26,148 @@ function required(form: FormData, key: string) {
   return value;
 }
 
+async function sendDiscordNotification(data: {
+  name: string;
+  phone: string;
+  email: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear: string;
+  vehicleTrim: string;
+  serviceName: string;
+  serviceMethod: string;
+  preferredDate: string;
+  preferredTime: string;
+  serviceAddress: string;
+  vehicleType: string;
+  interiorCondition: string;
+  exteriorCondition: string;
+  addOns: string;
+  customerNotes: string;
+}) {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+
+  if (!webhookUrl) {
+    console.log("Discord webhook is not configured.");
+    return;
+  }
+
+  try {
+    const vehicle = [
+      data.vehicleYear,
+      data.vehicleMake,
+      data.vehicleModel,
+      data.vehicleTrim,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: "Car Dash Detailing",
+        embeds: [
+          {
+            title: "New Detailing Request",
+            description:
+              "A new detailing request was submitted through the Car Dash Detailing website.",
+            color: 14423100,
+            fields: [
+              {
+                name: "Customer",
+                value: data.name || "Not provided",
+                inline: true,
+              },
+              {
+                name: "Phone",
+                value: data.phone || "Not provided",
+                inline: true,
+              },
+              {
+                name: "Email",
+                value: data.email || "Not provided",
+                inline: false,
+              },
+              {
+                name: "Vehicle",
+                value: vehicle || "Not provided",
+                inline: false,
+              },
+              {
+                name: "Vehicle Type",
+                value: data.vehicleType || "Not specified",
+                inline: true,
+              },
+              {
+                name: "Service",
+                value: data.serviceName || "Custom Booking",
+                inline: true,
+              },
+              {
+                name: "Service Method",
+                value: data.serviceMethod || "Not specified",
+                inline: true,
+              },
+              {
+                name: "Preferred Date",
+                value: data.preferredDate || "Not specified",
+                inline: true,
+              },
+              {
+                name: "Preferred Time",
+                value: data.preferredTime || "Not specified",
+                inline: true,
+              },
+              {
+                name: "Service Address",
+                value: data.serviceAddress || "Not specified",
+                inline: false,
+              },
+              {
+                name: "Interior Condition",
+                value: data.interiorCondition || "Not specified",
+                inline: true,
+              },
+              {
+                name: "Exterior Condition",
+                value: data.exteriorCondition || "Not specified",
+                inline: true,
+              },
+              {
+                name: "Add-ons",
+                value: data.addOns || "None",
+                inline: false,
+              },
+              {
+                name: "Customer Notes",
+                value: data.customerNotes || "None",
+                inline: false,
+              },
+            ],
+            footer: {
+              text: "Car Dash Detailing • Website Booking",
+            },
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(
+        "Discord notification failed:",
+        response.status,
+        await response.text()
+      );
+    }
+  } catch (error) {
+    console.error("Discord notification error:", error);
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const auth = getAuthFromRequest(request);
@@ -80,41 +222,63 @@ export async function POST(request: NextRequest) {
     const vehicleModel = required(form, "vehicleModel");
     const vehicleYear = required(form, "vehicleYear");
 
+    const vehicleTrim = String(
+      form.get("vehicleTrim") || ""
+    ).trim();
+
     const serviceName = String(
       form.get("selectedPackage") || "Custom Booking"
-    );
+    ).trim();
 
     const serviceMethod = String(
       form.get("serviceMethod") || "shop"
-    );
+    ).trim();
 
     const preferredDate = String(
       form.get("preferredDate") || ""
-    );
+    ).trim();
+
+    const preferredTime = String(
+      form.get("preferredTime") || ""
+    ).trim();
+
+    const serviceAddress = String(
+      form.get("serviceAddress") || ""
+    ).trim();
+
+    const vehicleType = String(
+      form.get("vehicleType") || "Not specified"
+    ).trim();
+
+    const interiorCondition = String(
+      form.get("interiorCondition") || "Not specified"
+    ).trim();
+
+    const exteriorCondition = String(
+      form.get("exteriorCondition") || "Not specified"
+    ).trim();
+
+    const addOns = String(
+      form.get("addOns") || "None"
+    ).trim();
+
+    const smsConsent = String(
+      form.get("smsConsent") || "false"
+    ).trim();
+
+    const customerNotes = String(
+      form.get("serviceNotes") || "None"
+    ).trim();
 
     const details = [
-      `Vehicle type: ${String(
-        form.get("vehicleType") || "Not specified"
-      )}`,
-      `Preferred time: ${String(
-        form.get("preferredTime") || "Not specified"
-      )}`,
-      `Service address: ${String(
-        form.get("serviceAddress") || "Not specified"
-      )}`,
-      `Interior condition: ${String(
-        form.get("interiorCondition") || "Not specified"
-      )}`,
-      `Exterior condition: ${String(
-        form.get("exteriorCondition") || "Not specified"
-      )}`,
-      `Add-ons: ${String(form.get("addOns") || "[]")}`,
-      `SMS consent: ${String(
-        form.get("smsConsent") || "false"
-      )}`,
-      `Customer notes: ${String(
-        form.get("serviceNotes") || "None"
-      )}`,
+      `Vehicle type: ${vehicleType}`,
+      `Preferred time: ${preferredTime || "Not specified"}`,
+      `Service address: ${serviceAddress || "Not specified"}`,
+      `Interior condition: ${interiorCondition}`,
+      `Exterior condition: ${exteriorCondition}`,
+      `Add-ons: ${addOns}`,
+      `SMS consent: ${smsConsent}`,
+      `Customer notes: ${customerNotes}`,
     ].join("\n");
 
     const auth = getAuthFromRequest(request);
@@ -130,10 +294,30 @@ export async function POST(request: NextRequest) {
         vehicleMake,
         vehicleModel,
         vehicleYear,
-        vehicleTrim: String(form.get("vehicleTrim") || ""),
+        vehicleTrim,
         preferredDate,
         notes: details,
       },
+    });
+
+    await sendDiscordNotification({
+      name,
+      phone,
+      email,
+      vehicleMake,
+      vehicleModel,
+      vehicleYear,
+      vehicleTrim,
+      serviceName,
+      serviceMethod,
+      preferredDate,
+      preferredTime,
+      serviceAddress,
+      vehicleType,
+      interiorCondition,
+      exteriorCondition,
+      addOns,
+      customerNotes,
     });
 
     if (
@@ -163,7 +347,8 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         booking,
-        message: "Booking request submitted. We’ll contact you shortly.",
+        message:
+          "Booking request submitted. We’ll contact you shortly.",
       },
       { status: 201 }
     );
