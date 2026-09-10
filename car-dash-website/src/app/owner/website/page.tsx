@@ -25,6 +25,9 @@ const fields: Array<{ key: keyof Content; label: string; area?: boolean; group: 
   { key: "contactTitle", label: "Contact headline", area: true, group: "Contact" },
   { key: "contactBody", label: "Contact description", area: true, group: "Contact" },
   { key: "footerBlurb", label: "Footer description", area: true, group: "Footer" },
+  { key: "supportButtonLabel", label: "Support button", group: "Support" },
+  { key: "supportTitle", label: "Support title", group: "Support" },
+  { key: "supportIntro", label: "Support description", area: true, group: "Support" },
 ];
 
 export default function OwnerWebsiteEditor() {

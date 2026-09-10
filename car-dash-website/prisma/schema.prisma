@@ -18,7 +18,8 @@ model User {
   role      String     @default("user") // "user" or "owner"
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  bookings  Booking[]
+  bookings       Booking[]
+  supportTickets SupportTicket[]
 }
 
 model Service {
@@ -46,6 +47,7 @@ model Booking {
   vehicleTrim    String?
   preferredDate  String?
   notes          String?
+  visitorHash    String?
   status         String   @default("pending")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -77,4 +79,43 @@ model SiteContent {
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+
+model SupportTicket {
+  id                String           @id @default(cuid())
+  userId            String?
+  user              User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name              String
+  email             String?
+  phone             String?
+  contactPreference String           @default("website")
+  subject           String
+  status            String           @default("open")
+  visitorHash       String
+  accessTokenHash   String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  messages          SupportMessage[]
+
+  @@index([userId])
+  @@index([visitorHash, createdAt])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender    String
+  body      String
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+model BlockedVisitor {
+  id             String   @id @default(cuid())
+  identifierHash String   @unique
+  label          String?
+  createdAt      DateTime @default(now())
 }

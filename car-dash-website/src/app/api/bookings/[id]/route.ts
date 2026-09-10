@@ -26,6 +26,13 @@ export async function PUT(
       data: {
         status,
       },
+      select: {
+        id: true,
+        serviceName: true,
+        status: true,
+        preferredDate: true,
+        updatedAt: true,
+      },
     });
 
     return NextResponse.json(booking, { status: 200 });
