@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { hashPassword, createToken, getRoleForEmail } from "@/lib/auth";
 import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,8 +14,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Prevent registering as owner
-    if (email.toLowerCase() === OWNER_EMAIL) {
+    if (normalizedEmail === OWNER_EMAIL.toLowerCase()) {
       return NextResponse.json(
         { error: "Cannot register with this email" },
         { status: 400 }
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -36,13 +36,13 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await hashPassword(password);
-    const role = getRoleForEmail(email);
+    const role = getRoleForEmail(normalizedEmail);
 
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
-        name,
+        name: name.trim(),
         role,
       },
     });
@@ -56,7 +56,12 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json(
       {
         message: "User created successfully",
-        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
       { status: 201 }
     );
@@ -66,11 +71,13 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
+      path: "/",
     });
 
     return response;
   } catch (error) {
     console.error("Registration error:", error);
+
     return NextResponse.json(
       { error: "Registration failed" },
       { status: 500 }
