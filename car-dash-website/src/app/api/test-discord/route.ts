@@ -17,9 +17,9 @@ export async function GET() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: "@everyone New detailing request received!",
+        content: "<@&1547633528873943102> New detailing request received!",
 allowed_mentions: {
-  parse: ["everyone"],
+  roles: ["1547633528873943102"],
 },
       }),
     });
