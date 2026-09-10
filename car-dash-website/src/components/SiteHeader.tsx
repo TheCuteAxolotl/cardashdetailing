@@ -96,15 +96,6 @@ export default function SiteHeader() {
               Contact
             </Link>
 
-            {user && (
-              <Link
-                href="/dashboard"
-                className="transition hover:text-white"
-              >
-                Dashboard
-              </Link>
-            )}
-
             {owner && (
               <Link
                 href="/owner/dashboard"
@@ -176,16 +167,6 @@ export default function SiteHeader() {
                   className="rounded-xl px-3 py-3 text-red-400 hover:bg-white/5"
                 >
                   Login
-                </Link>
-              )}
-
-              {user && (
-                <Link
-                  href="/dashboard"
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-xl px-3 py-3 hover:bg-white/5 hover:text-white"
-                >
-                  Dashboard
                 </Link>
               )}
 
