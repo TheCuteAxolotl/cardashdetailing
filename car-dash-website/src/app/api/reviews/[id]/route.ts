@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getAuthFromRequest } from "@/lib/auth";
-
-const prisma = new PrismaClient();
 
 export async function PUT(
   request: NextRequest,
@@ -10,6 +8,7 @@ export async function PUT(
 ) {
   try {
     const auth = getAuthFromRequest(request);
+
     if (!auth || auth.role !== "owner") {
       return NextResponse.json(
         { error: "Not authorized" },
@@ -21,13 +20,18 @@ export async function PUT(
     const { approved } = await request.json();
 
     const review = await prisma.review.update({
-      where: { id: params.id },
-      data: { approved },
+      where: {
+        id: params.id,
+      },
+      data: {
+        approved: Boolean(approved),
+      },
     });
 
     return NextResponse.json(review, { status: 200 });
   } catch (error) {
     console.error("Error updating review:", error);
+
     return NextResponse.json(
       { error: "Failed to update review" },
       { status: 500 }
@@ -41,6 +45,7 @@ export async function DELETE(
 ) {
   try {
     const auth = getAuthFromRequest(request);
+
     if (!auth || auth.role !== "owner") {
       return NextResponse.json(
         { error: "Not authorized" },
@@ -49,8 +54,11 @@ export async function DELETE(
     }
 
     const params = await context.params;
+
     await prisma.review.delete({
-      where: { id: params.id },
+      where: {
+        id: params.id,
+      },
     });
 
     return NextResponse.json(
@@ -59,6 +67,7 @@ export async function DELETE(
     );
   } catch (error) {
     console.error("Error deleting review:", error);
+
     return NextResponse.json(
       { error: "Failed to delete review" },
       { status: 500 }
