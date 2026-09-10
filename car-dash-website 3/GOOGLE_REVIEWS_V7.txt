@@ -1,0 +1,9 @@
+CAR DASH DETAILING — LIVE GOOGLE REVIEWS V7
+
+- Added /api/google-reviews server route using Places API (New).
+- API key stays server-side in GOOGLE_PLACES_API_KEY.
+- Uses GOOGLE_PLACE_ID from Vercel.
+- Reviews page now displays live Google rating, review count, author attribution, review text, relative publish time, and direct Google Maps review links.
+- Includes Google Maps attribution and relevance-order disclosure.
+- Falls back to the direct Google review link if the live API is unavailable.
+- Google Places response is requested with cache: no-store to avoid storing Google Places content.

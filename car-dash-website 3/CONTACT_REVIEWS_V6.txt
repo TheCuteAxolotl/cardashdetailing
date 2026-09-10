@@ -1,0 +1,7 @@
+Car Dash Detailing V6
+- Contact page changed to brand voice (no first-person copy).
+- Phone calls removed from contact flow.
+- Work email set to cardashdetailing@gmail.com.
+- Reviews page now links directly to the supplied Google review URL.
+- Public homepage/footer/service fallback first-person copy converted to brand voice.
+- Google review URL: https://g.page/r/CXj-njnM1fyvEAI/review
