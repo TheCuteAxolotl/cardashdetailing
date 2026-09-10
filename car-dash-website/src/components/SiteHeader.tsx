@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { OWNER_EMAIL } from "@/lib/constants";
 
 type User = { id: string; name: string; email: string; role: string };
