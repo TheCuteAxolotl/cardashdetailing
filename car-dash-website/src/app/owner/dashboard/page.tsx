@@ -86,6 +86,15 @@ export default function OwnerDashboard() {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <Link href="/owner/website">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
+              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+                <span className="text-2xl">✦</span>
+              </div>
+              <h2 className="text-xl font-semibold mb-2">Website Editor</h2>
+              <p className="text-neutral-400 text-sm">Change homepage wording, buttons, and public site copy</p>
+            </div>
+          </Link>
           {/* Services Management */}
           <Link href="/owner/services">
             <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
@@ -104,7 +113,7 @@ export default function OwnerDashboard() {
                 <span className="text-2xl">🖼️</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Gallery</h2>
-              <p className="text-neutral-400 text-sm">Upload and manage gallery images</p>
+              <p className="text-neutral-400 text-sm">Upload photos and place them throughout the website</p>
             </div>
           </Link>
 

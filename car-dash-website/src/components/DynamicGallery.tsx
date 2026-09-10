@@ -32,7 +32,8 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
   }, []);
 
   const visible = useMemo(() => {
-    const filtered = images.filter((img) => img.category !== "hero");
+    const publicCategories = new Set(["gallery", "before-after", "portfolio"]);
+    const filtered = images.filter((img) => publicCategories.has(img.category));
     return typeof limit === "number" ? filtered.slice(0, limit) : filtered;
   }, [images, limit]);
 

@@ -1,59 +1,55 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { SITE_DEFAULTS } from "@/lib/site-defaults";
 
 const locations = ["South Elgin", "Geneva", "St. Charles", "Naperville"];
 const workEmail = "cardashdetailing@gmail.com";
 
 export default function SiteFooter() {
+  const [blurb, setBlurb] = useState(SITE_DEFAULTS.footerBlurb);
+
+  useEffect(() => {
+    fetch("/api/site-content", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => data?.footerBlurb && setBlurb(data.footerBlurb))
+      .catch(() => undefined);
+  }, []);
+
   return (
-    <footer className="bg-[#050505] text-white">
+    <footer className="bg-[#070707] text-white">
       <div className="border-t border-white/10">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-[1.2fr_.8fr_.8fr]">
+        <div className="mx-auto grid max-w-[1480px] gap-12 px-5 py-16 sm:px-8 md:grid-cols-[1.35fr_.65fr_.65fr] lg:px-12">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-red-600 text-sm font-black">CD</span>
-              <div>
-                <p className="text-base font-black uppercase tracking-[0.2em]">Car Dash</p>
-                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-neutral-600">Detailing</p>
-              </div>
-            </div>
-            <p className="mt-5 max-w-md text-sm leading-7 text-neutral-400">
-              Mobile detailing based in South Elgin, serving surrounding areas with convenient interior, exterior, and paint-care services.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/contact" className="inline-flex rounded-full bg-red-600 px-6 py-3 text-sm font-black transition hover:bg-red-500">
-                Book Your Detail
-              </Link>
-              <a href={`mailto:${workEmail}`} className="inline-flex rounded-full border border-white/15 px-6 py-3 text-sm font-black transition hover:bg-white/5">
-                Email Us
-              </a>
+            <p className="text-xl font-semibold tracking-[-0.03em]">Car Dash Detailing</p>
+            <p className="mt-5 max-w-lg text-sm leading-7 text-white/40">{blurb}</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/contact" className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold hover:bg-red-500">Book a Detail</Link>
+              <a href={`mailto:${workEmail}`} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/65 hover:text-white">Email</a>
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-red-500">Quick Links</p>
-            <div className="mt-5 flex flex-col gap-3 text-sm font-bold text-neutral-400">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/30">Explore</p>
+            <div className="mt-5 flex flex-col gap-3 text-sm text-white/50">
               <Link href="/services" className="hover:text-white">Services</Link>
               <Link href="/gallery" className="hover:text-white">Gallery</Link>
               <Link href="/reviews" className="hover:text-white">Reviews</Link>
               <Link href="/contact" className="hover:text-white">Contact</Link>
-              <a href={`mailto:${workEmail}`} className="hover:text-white">{workEmail}</a>
+              <Link href="/login" className="hover:text-white">Login</Link>
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-red-500">Service Area</p>
-            <div className="mt-5 flex flex-col gap-3 text-sm font-bold text-neutral-400">
-              {locations.map((location) => (
-                <span key={location}>{location}, IL</span>
-              ))}
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/30">Service area</p>
+            <div className="mt-5 flex flex-col gap-3 text-sm text-white/50">
+              {locations.map((location) => <span key={location}>{location}, IL</span>)}
             </div>
           </div>
         </div>
       </div>
-
-      <div className="border-t border-white/10 px-6 py-5 text-center text-xs text-neutral-600">
-        © {new Date().getFullYear()} Car Dash Detailing. All rights reserved.
-      </div>
+      <div className="border-t border-white/10 px-6 py-5 text-center text-xs text-white/25">© {new Date().getFullYear()} Car Dash Detailing. All rights reserved.</div>
     </footer>
   );
 }

@@ -88,7 +88,7 @@ export default function OwnerGallery() {
     <div className="min-h-screen bg-[#050505] text-white">
       <header className="border-b border-neutral-800 bg-neutral-950">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <div><h1 className="text-2xl font-bold">Manage Website Photos</h1><p className="text-sm text-neutral-400">Upload, rename, feature, and remove photos.</p></div>
+          <div><h1 className="text-2xl font-bold">Website Photos</h1><p className="text-sm text-neutral-400">Upload photos and choose exactly where they appear across the website.</p></div>
           <Link href="/owner/dashboard" className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium hover:bg-red-800">Back</Link>
         </div>
       </header>
@@ -101,7 +101,7 @@ export default function OwnerGallery() {
             <p className="mt-2 text-xs text-neutral-500">Photos are automatically resized/compressed for the website.</p>
           </div>
           <div><label className="mb-2 block text-sm font-medium">Title</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="2026 Charger ceramic coating" className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" /></div>
-          <div><label className="mb-2 block text-sm font-medium">Placement</label><select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm"><option value="gallery">Gallery</option><option value="before-after">Before & After</option><option value="portfolio">Portfolio</option><option value="hero">Homepage Hero</option></select></div>
+          <div><label className="mb-2 block text-sm font-medium">Placement</label><select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm"><option value="gallery">Public Gallery</option><option value="before-after">Before & After</option><option value="portfolio">Portfolio</option><option value="hero">Homepage Hero</option><option value="home-showcase-primary">Homepage Showcase — Large</option><option value="home-showcase-secondary">Homepage Showcase — Small</option><option value="home-story">Homepage Story</option><option value="services-hero">Services Page Hero</option><option value="reviews-hero">Reviews Page Hero</option><option value="contact-hero">Contact Page Hero</option></select></div>
           <div className="md:col-span-4"><button disabled={saving} className="rounded-xl bg-red-700 px-6 py-3 font-semibold hover:bg-red-800 disabled:opacity-50">{saving ? "Processing photo…" : "Add Photo"}</button>{message && <span className="ml-4 text-sm text-neutral-300">{message}</span>}</div>
         </form>
 
@@ -112,7 +112,7 @@ export default function OwnerGallery() {
                 <img src={image.url} alt={image.title} className="h-56 w-full object-cover" />
                 <div className="space-y-3 p-4">
                   <input defaultValue={image.title} onBlur={(e) => { if (e.target.value !== image.title) updateImage(image, { title: e.target.value }).catch(() => setMessage("Rename failed.")); }} className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm" />
-                  <select value={image.category} onChange={(e) => updateImage(image, { category: e.target.value }).catch(() => setMessage("Update failed."))} className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm"><option value="gallery">Gallery</option><option value="before-after">Before & After</option><option value="portfolio">Portfolio</option><option value="hero">Homepage Hero</option></select>
+                  <select value={image.category} onChange={(e) => updateImage(image, { category: e.target.value }).catch(() => setMessage("Update failed."))} className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm"><option value="gallery">Public Gallery</option><option value="before-after">Before & After</option><option value="portfolio">Portfolio</option><option value="hero">Homepage Hero</option><option value="home-showcase-primary">Homepage Showcase — Large</option><option value="home-showcase-secondary">Homepage Showcase — Small</option><option value="home-story">Homepage Story</option><option value="services-hero">Services Page Hero</option><option value="reviews-hero">Reviews Page Hero</option><option value="contact-hero">Contact Page Hero</option></select>
                   <button onClick={() => deleteImage(image.id)} className="w-full rounded-lg bg-red-800 px-3 py-2 text-sm font-medium hover:bg-red-900">Delete</button>
                 </div>
               </article>

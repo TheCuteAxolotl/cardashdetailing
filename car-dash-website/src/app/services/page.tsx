@@ -1,29 +1,30 @@
 import Link from "next/link";
 import ServiceCards from "@/components/ServiceCards";
+import SitePhoto from "@/components/SitePhoto";
 
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-[#f4f3f0] text-black">
-      <section className="relative overflow-hidden bg-[#080808] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(220,38,38,.22),transparent_28%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-20 sm:py-24">
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-red-500">Car Dash Services</p>
-          <h1 className="mt-4 max-w-4xl text-5xl font-black tracking-[-0.05em] sm:text-6xl lg:text-7xl">
-            Pick your package. I’ll bring the detail to you.
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-neutral-300">
-            One price per package. No separate mobile, delivery, or drop-off columns. What you see is what I’m currently offering.
-          </p>
-          <Link href="/contact" className="mt-8 inline-flex rounded-full bg-red-600 px-7 py-3.5 text-sm font-black text-white hover:bg-red-500">
-            Get a Quote
-          </Link>
+    <div className="min-h-screen bg-[#080808] text-white">
+      <section className="mx-auto max-w-[1480px] px-5 pb-16 pt-14 sm:px-8 sm:pb-20 lg:px-12">
+        <div className="grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-red-500/85">Services</p>
+            <h1 className="mt-5 text-5xl font-medium leading-[.95] tracking-[-0.055em] sm:text-7xl">Packages built around what the vehicle needs.</h1>
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/45">One clear price per package. Any extra work is discussed before it is added.</p>
+            <Link href="/contact" className="mt-7 inline-flex rounded-full bg-red-600 px-6 py-3 text-sm font-semibold hover:bg-red-500">Get a Quote</Link>
+          </div>
+          <div className="overflow-hidden rounded-[1.8rem]">
+            <SitePhoto category="services-hero" className="h-[360px] w-full object-cover sm:h-[480px]" />
+          </div>
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl px-6 py-16 sm:py-20">
-        <ServiceCards variant="light" />
-        <div className="mt-10 rounded-[1.7rem] border border-black/10 bg-white p-7 text-sm leading-7 text-neutral-600">
-          Prices are based on the package shown. Heavy stains, excessive pet hair, major contamination, unusually large vehicles, or extra correction can require more work. If that applies to your vehicle, I’ll tell you before the job.
+      <main className="border-t border-white/10 bg-[#0b0b0b]">
+        <div className="mx-auto max-w-[1480px] px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+          <ServiceCards variant="dark" />
+          <div className="mt-10 border-t border-white/10 pt-7 text-sm leading-7 text-white/35">
+            Heavy stains, excessive pet hair, major contamination, unusually large vehicles, or extra correction can require more work. Any added cost is confirmed before the job begins.
+          </div>
         </div>
       </main>
     </div>
