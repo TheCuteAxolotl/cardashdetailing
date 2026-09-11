@@ -48,3 +48,16 @@ GOOGLE_PLACES_API_KEY=<restricted Places API (New) key>
 GOOGLE_PLACE_ID=ChIJOwdh_AoFD4gReP6eOczV_K8
 
 The Google key is used server-side only by `/api/google-reviews`. Do not prefix it with `NEXT_PUBLIC_`.
+
+## V3.1 Twilio SMS
+
+Add these Vercel environment variables for Production (and Preview if you test there):
+
+- `TWILIO_ACCOUNT_SID` — Sensitive
+- `TWILIO_AUTH_TOKEN` — Sensitive
+- `TWILIO_MESSAGING_SERVICE_SID` — Sensitive
+- `NEXT_PUBLIC_SITE_URL=https://cardashdetailing.com`
+
+V3.1 sends SMS only to customers who explicitly opt in. Quote-chat staff replies and final quotes send SMS only when the customer has not been active in the chat within roughly 90 seconds. New bookings send a receipt text when SMS consent is checked. Confirmed, cancelled, and completed booking status changes also send transactional updates when that booking has SMS consent.
+
+SMS failures are logged but never block quote chats or bookings.

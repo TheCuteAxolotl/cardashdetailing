@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
+import { normalizePhoneNumber } from "@/lib/twilio-sms";
 
 const select = {
   id: true, subject: true, status: true, quotedPrice: true, quoteNotes: true, acceptedAt: true,
@@ -35,6 +36,9 @@ export async function POST(request: NextRequest) {
   const smsConsent = body.smsConsent === true;
   const phone = String(body.phone || "").trim().slice(0, 40);
   if (smsConsent && !phone) return NextResponse.json({ error: "Enter a mobile number to opt in to SMS updates." }, { status: 400 });
+  if (smsConsent && !normalizePhoneNumber(phone)) {
+    return NextResponse.json({ error: "Enter a valid mobile number for SMS updates." }, { status: 400 });
+  }
   if (!message) return NextResponse.json({ error: "Tell us what you need help with." }, { status: 400 });
   if (vehicleId) {
     const owned = await prisma.vehicle.findFirst({ where: { id: vehicleId, userId: auth.id }, select: { id: true } });

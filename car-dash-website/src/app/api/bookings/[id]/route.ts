@@ -5,6 +5,34 @@ import {
   isOwnerAccount,
   isStaffAccount,
 } from "@/lib/permissions";
+import { sendTransactionalSms } from "@/lib/twilio-sms";
+
+function bookingHasSmsConsent(notes: string | null) {
+  return /(?:^|\n)SMS consent:\s*Yes(?:\n|$)/i.test(notes || "");
+}
+
+function statusSms(booking: {
+  status: string;
+  serviceName: string;
+  quotedPrice: number | null;
+  preferredDate: string | null;
+  preferredTime: string | null;
+}) {
+  const total = booking.quotedPrice && booking.quotedPrice > 0 ? ` Total: $${booking.quotedPrice.toFixed(2)}.` : "";
+  const when = [booking.preferredDate, booking.preferredTime].filter(Boolean).join(" at ");
+  const schedule = when ? ` ${when}.` : "";
+
+  if (booking.status === "confirmed") {
+    return `Car Dash Detailing: Your ${booking.serviceName} appointment is confirmed.${schedule}${total}`;
+  }
+  if (booking.status === "cancelled") {
+    return `Car Dash Detailing: Your ${booking.serviceName} booking has been cancelled.${schedule} Contact us if you need help rescheduling.`;
+  }
+  if (booking.status === "completed") {
+    return `Car Dash Detailing: Your ${booking.serviceName} appointment is marked complete.${total} Thank you for choosing Car Dash Detailing.`;
+  }
+  return null;
+}
 
 export async function PUT(
   request: NextRequest,
@@ -22,15 +50,35 @@ export async function PUT(
 
     const { status } = await request.json();
     const params = await context.params;
+    const nextStatus = String(status || "").trim().toLowerCase();
+
+    if (!["pending", "confirmed", "completed", "cancelled"].includes(nextStatus)) {
+      return NextResponse.json({ error: "Invalid booking status" }, { status: 400 });
+    }
+
+    const existing = await prisma.booking.findUnique({
+      where: { id: params.id },
+      select: { status: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
 
     const booking = await prisma.booking.update({
-      where: {
-        id: params.id,
-      },
-      data: {
-        status,
-      },
+      where: { id: params.id },
+      data: { status: nextStatus },
     });
+
+    if (existing.status !== booking.status && bookingHasSmsConsent(booking.notes)) {
+      const body = statusSms(booking);
+      if (body) {
+        await sendTransactionalSms({
+          to: booking.customerPhone,
+          body,
+        });
+      }
+    }
 
     return NextResponse.json(booking, { status: 200 });
   } catch (error) {

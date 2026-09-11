@@ -62,14 +62,6 @@ export default function OwnerSetup() {
             </div>
 
             <div className="flex gap-4">
-              <div className="text-3xl">⭐</div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Approve Reviews</h3>
-                <p className="text-neutral-400">Accept or reject customer reviews before they appear on your site</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
               <div className="text-3xl">📅</div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">Manage Bookings</h3>
@@ -102,7 +94,6 @@ export default function OwnerSetup() {
             <li>✓ Regularly update your services to reflect current pricing</li>
             <li>✓ Add high-quality images to attract more customers</li>
             <li>✓ Check your bookings daily to respond promptly to requests</li>
-            <li>✓ Approve positive reviews to build trust with potential customers</li>
             <li>✓ Keep your contact information up to date</li>
           </ul>
         </div>

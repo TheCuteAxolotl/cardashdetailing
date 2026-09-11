@@ -6,6 +6,8 @@ import {
   isStaffAccount,
 } from "@/lib/permissions";
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
+import { getQuoteSmsContact } from "@/lib/quote-sms";
+import { getPublicSiteUrl, isRecentlyActive, sendTransactionalSms } from "@/lib/twilio-sms";
 
 async function access(request: NextRequest, id: string) {
   const auth = await getCurrentAccountFromRequest(request);
@@ -132,7 +134,17 @@ export async function POST(
     }
   }
 
-  // SMS delivery is intentionally not enabled in this release.
+  // Notify opted-in customers by SMS only when staff replies and the customer is not actively in chat.
+  if (allowed.staff && !isRecentlyActive(allowed.thread.lastCustomerSeenAt)) {
+    const sms = await getQuoteSmsContact(id);
+    if (sms.consent && sms.phone) {
+      await sendTransactionalSms({
+        to: sms.phone,
+        body: `Car Dash Detailing: We replied to your quote chat. View your private conversation: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,
+      });
+    }
+  }
+
   return NextResponse.json({ success: true });
 }
 
@@ -203,6 +215,16 @@ export async function PUT(
         acceptedAt: null,
       },
     });
+
+    if (!isRecentlyActive(allowed.thread.lastCustomerSeenAt)) {
+      const sms = await getQuoteSmsContact(id);
+      if (sms.consent && sms.phone) {
+        await sendTransactionalSms({
+          to: sms.phone,
+          body: `Car Dash Detailing: Your final quote is $${quotedPrice.toFixed(2)}. Review or accept it here: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,
+        });
+      }
+    }
 
     return NextResponse.json(updated);
   }

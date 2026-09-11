@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
 import { getAuthFromRequest } from "@/lib/auth";
 import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
 import { getClientIp, hashVisitor } from "@/lib/support-security";
@@ -108,6 +109,12 @@ export async function POST(request: NextRequest) {
     const serviceAddress = String(form.get("serviceAddress") || "").trim();
     const customerNotes = String(form.get("serviceNotes") || "None").trim();
     const smsConsent = String(form.get("smsConsent") || "false") === "true";
+    if (smsConsent && !normalizePhoneNumber(phone)) {
+      return NextResponse.json(
+        { success: false, message: "Enter a valid mobile number to receive SMS updates." },
+        { status: 400 }
+      );
+    }
     const serviceId = String(form.get("serviceId") || "").trim();
     const quoteThreadId = String(form.get("quoteThreadId") || "").trim();
     const auth = getAuthFromRequest(request);
@@ -264,6 +271,14 @@ export async function POST(request: NextRequest) {
       ip,
       visitorHash,
     });
+
+    if (smsConsent) {
+      const requested = [preferredDate, preferredTime].filter(Boolean).join(" at ");
+      await sendTransactionalSms({
+        to: phone,
+        body: `Car Dash Detailing: We received your booking request for ${serviceName} (${`$${bookingTotal.toFixed(2)}`})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed.`,
+      });
+    }
 
     return NextResponse.json(
       {

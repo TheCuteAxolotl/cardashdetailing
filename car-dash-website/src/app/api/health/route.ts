@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma, databaseRuntimeInfo } from "@/lib/prisma";
+import { twilioRuntimeInfo } from "@/lib/twilio-sms";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,6 +22,7 @@ export async function GET() {
         ownerEmailConfigured: Boolean(
           process.env.OWNER_EMAIL || process.env.NEXT_PUBLIC_OWNER_EMAIL
         ),
+        twilioConfigured: twilioRuntimeInfo.configured,
       },
       {
         status: 200,
@@ -41,6 +43,7 @@ export async function GET() {
         ownerEmailConfigured: Boolean(
           process.env.OWNER_EMAIL || process.env.NEXT_PUBLIC_OWNER_EMAIL
         ),
+        twilioConfigured: twilioRuntimeInfo.configured,
       },
       {
         status: 503,

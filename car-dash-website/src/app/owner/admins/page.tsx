@@ -84,7 +84,7 @@ export default function AdminAccountsPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-red-400">Owner only</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Admin accounts</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
-              Create staff logins that can manage support and bookings only. Admins cannot edit website text, services, reviews, pictures, gallery content, owner settings, or other admin accounts.
+              Create staff logins that can manage support and bookings only. Admins cannot edit website text, services, pictures, gallery content, owner settings, or other admin accounts.
             </p>
           </div>
           <a href="/owner/dashboard" className="rounded-full border border-white/15 px-5 py-2.5 text-sm text-white/65 hover:text-white">Back to dashboard</a>
