@@ -24,7 +24,7 @@ export default function SiteFooter() {
         </div>
         <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
           <div><p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Explore</p><div className="space-y-2 text-white/65"><a href="/services" className="block hover:text-white">Services</a><a href="/gallery" className="block hover:text-white">Work</a><a href="/about" className="block hover:text-white">About</a></div></div>
-          <div><p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Help</p><div className="space-y-2 text-white/65"><a href="/faq" className="block hover:text-white">FAQ</a><a href="/reviews" className="block hover:text-white">Reviews</a><a href="/contact" className="block hover:text-white">Book</a></div></div>
+          <div><p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Help</p><div className="space-y-2 text-white/65"><a href="/faq" className="block hover:text-white">FAQ</a><a href="/reviews" className="block hover:text-white">Reviews</a><a href="/contact" className="block hover:text-white">Book</a><a href="/privacy-policy" className="block hover:text-white">Privacy Policy</a><a href="/terms-and-conditions" className="block hover:text-white">Terms and Conditions</a></div></div>
           <div className="col-span-2 sm:col-span-1"><p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Contact</p><a href="mailto:cardashdetailing@gmail.com" className="break-all text-white/65 hover:text-white">cardashdetailing@gmail.com</a></div>
         </div>
       </div>
