@@ -90,7 +90,7 @@ export default function TermsAndConditionsPage() {
             <p className="mt-3">
               You are responsible for keeping your account credentials secure and for activity performed through your account. You
               may not misuse the website, attempt unauthorized access, interfere with its operation, upload unlawful content, or use
-              quote or support chat to harass, spam, or abuse Car Dash Detailing or other users.
+              quote, booking, or support chat to harass, spam, or abuse Car Dash Detailing or other users.
             </p>
           </section>
 

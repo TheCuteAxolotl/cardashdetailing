@@ -336,7 +336,15 @@ export default function AccountPage() {
                         {detail.label}
                       </span>
                     </div>
-                    <p className="mt-5 border-t border-white/7 pt-4 text-sm leading-6 text-white/38">{detail.description}</p>
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/7 pt-4">
+                      <p className="text-sm leading-6 text-white/38">{detail.description}</p>
+                      <a
+                        href={`/booking-chat/${booking.id}`}
+                        className="rounded-full border border-red-500/35 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-500/20"
+                      >
+                        Message Car Dash
+                      </a>
+                    </div>
                   </article>
                 );
               })}

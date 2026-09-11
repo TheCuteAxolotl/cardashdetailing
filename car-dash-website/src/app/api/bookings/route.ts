@@ -4,6 +4,7 @@ import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
 import { getAuthFromRequest } from "@/lib/auth";
 import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
 import { getClientIp, hashVisitor } from "@/lib/support-security";
+import { addBookingSystemMessage, getBookingChatUrl } from "@/lib/booking-chat";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -243,6 +244,18 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const bookingChatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(auth?.id));
+
+    // Booking chat setup is additive and must never block a valid appointment request.
+    try {
+      await addBookingSystemMessage(
+        booking.id,
+        `Booking request submitted for $${bookingTotal.toFixed(2)}. Use this conversation for appointment questions and updates.`
+      );
+    } catch (error) {
+      console.error("Booking chat setup failed:", error);
+    }
+
     if (quoteThreadId && auth?.id) {
       await prisma.quoteThread.update({
         where: { id: quoteThreadId },
@@ -276,7 +289,7 @@ export async function POST(request: NextRequest) {
       const requested = [preferredDate, preferredTime].filter(Boolean).join(" at ");
       await sendTransactionalSms({
         to: phone,
-        body: `Car Dash Detailing: We received your booking request for ${serviceName} (${`$${bookingTotal.toFixed(2)}`})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed.`,
+        body: `Car Dash Detailing: We received your booking request for ${serviceName} (${`$${bookingTotal.toFixed(2)}`})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed. Message us about this booking: ${bookingChatUrl}`,
       });
     }
 
@@ -284,6 +297,7 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         booking,
+        chatUrl: bookingChatUrl,
         message: `Booking request submitted with a total of $${bookingTotal.toFixed(2)}. Car Dash will confirm the appointment shortly.`,
       },
       { status: 201 }

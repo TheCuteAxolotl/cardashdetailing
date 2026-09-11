@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-semibold text-white">Information we collect</h2>
             <p className="mt-3">
               Depending on how you use the website, we may collect information such as your name, email address, phone number,
-              account information, vehicle details, service selections, appointment preferences, service address, quote and support
+              account information, vehicle details, service selections, appointment preferences, service address, quote, booking-chat, and support
               messages, photos you choose to upload, booking history, and other information you provide to us. We may also collect
               limited technical and security information needed to operate and protect the website, such as authentication data,
               device or browser information, and network identifiers used for fraud or abuse prevention.

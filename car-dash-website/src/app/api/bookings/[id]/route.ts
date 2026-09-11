@@ -6,10 +6,7 @@ import {
   isStaffAccount,
 } from "@/lib/permissions";
 import { sendTransactionalSms } from "@/lib/twilio-sms";
-
-function bookingHasSmsConsent(notes: string | null) {
-  return /(?:^|\n)SMS consent:\s*Yes(?:\n|$)/i.test(notes || "");
-}
+import { addBookingSystemMessage, bookingHasSmsConsent, getBookingChatUrl } from "@/lib/booking-chat";
 
 function statusSms(booking: {
   status: string;
@@ -17,19 +14,19 @@ function statusSms(booking: {
   quotedPrice: number | null;
   preferredDate: string | null;
   preferredTime: string | null;
-}) {
+}, chatUrl: string) {
   const total = booking.quotedPrice && booking.quotedPrice > 0 ? ` Total: $${booking.quotedPrice.toFixed(2)}.` : "";
   const when = [booking.preferredDate, booking.preferredTime].filter(Boolean).join(" at ");
   const schedule = when ? ` ${when}.` : "";
 
   if (booking.status === "confirmed") {
-    return `Car Dash Detailing: Your ${booking.serviceName} appointment is confirmed.${schedule}${total}`;
+    return `Car Dash Detailing: Your ${booking.serviceName} appointment is confirmed.${schedule}${total} Questions or updates: ${chatUrl}`;
   }
   if (booking.status === "cancelled") {
-    return `Car Dash Detailing: Your ${booking.serviceName} booking has been cancelled.${schedule} Contact us if you need help rescheduling.`;
+    return `Car Dash Detailing: Your ${booking.serviceName} booking has been cancelled.${schedule} Message us if you need help rescheduling: ${chatUrl}`;
   }
   if (booking.status === "completed") {
-    return `Car Dash Detailing: Your ${booking.serviceName} appointment is marked complete.${total} Thank you for choosing Car Dash Detailing.`;
+    return `Car Dash Detailing: Your ${booking.serviceName} appointment is marked complete.${total} Thank you for choosing Car Dash Detailing. Questions: ${chatUrl}`;
   }
   return null;
 }
@@ -70,13 +67,25 @@ export async function PUT(
       data: { status: nextStatus },
     });
 
-    if (existing.status !== booking.status && bookingHasSmsConsent(booking.notes)) {
-      const body = statusSms(booking);
-      if (body) {
-        await sendTransactionalSms({
-          to: booking.customerPhone,
-          body,
-        });
+    if (existing.status !== booking.status) {
+      try {
+        await addBookingSystemMessage(
+          booking.id,
+          `Booking status changed to ${booking.status[0].toUpperCase() + booking.status.slice(1)}.`
+        );
+      } catch (error) {
+        console.error("Booking chat status message failed:", error);
+      }
+
+      if (bookingHasSmsConsent(booking.notes)) {
+        const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
+        const body = statusSms(booking, chatUrl);
+        if (body) {
+          await sendTransactionalSms({
+            to: booking.customerPhone,
+            body,
+          });
+        }
       }
     }
 

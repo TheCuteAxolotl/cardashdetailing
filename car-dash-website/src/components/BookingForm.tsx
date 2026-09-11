@@ -112,6 +112,7 @@ export default function BookingForm({
   const [services, setServices] = useState<Service[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [setupMessage, setSetupMessage] = useState("");
+  const [chatUrl, setChatUrl] = useState("");
 
   const set = (key: keyof FormState, value: unknown) =>
     setForm((current) => ({ ...current, [key]: value }));
@@ -289,6 +290,7 @@ export default function BookingForm({
 
       setStatus("success");
       setMessage(data.message || "Booking request submitted.");
+      setChatUrl(String(data.chatUrl || ""));
       if (quote) setQuote((current) => (current ? { ...current, status: "booked" } : current));
     } catch (error) {
       setStatus("error");
@@ -482,7 +484,15 @@ export default function BookingForm({
               : "border-red-800 bg-red-950/30 text-red-200"
           }`}
         >
-          {message}
+          <p>{message}</p>
+          {status === "success" && chatUrl && (
+            <a
+              href={chatUrl}
+              className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black transition hover:bg-white/85"
+            >
+              Open booking chat
+            </a>
+          )}
         </div>
       )}
 

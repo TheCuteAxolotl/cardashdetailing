@@ -116,7 +116,7 @@ export default function OwnerBookings() {
           <div>
             <h1 className="text-2xl font-bold">Bookings</h1>
             <p className="text-sm text-neutral-400">
-              Customer requests from the website. Completed and cancelled bookings can be permanently deleted by the owner.
+              Customer requests, exact totals, status controls, and booking conversations. Completed and cancelled bookings can be permanently deleted by the owner.
             </p>
           </div>
 
@@ -231,6 +231,12 @@ export default function OwnerBookings() {
                   </div>
 
                   <div className="flex min-w-48 flex-col gap-2">
+                  <a
+                    href={`/booking-chat/${booking.id}`}
+                    className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2 text-center text-sm font-semibold text-red-200 transition hover:bg-red-500/20"
+                  >
+                    Chat with customer
+                  </a>
                     <button
                       onClick={() => updateStatus(booking.id, "confirmed")}
                       className="rounded-lg bg-blue-700 px-4 py-2 text-sm"
