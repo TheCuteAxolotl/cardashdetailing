@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthToken, verifyToken, getRoleForEmail } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
 
 export async function GET() {
   try {
@@ -59,6 +60,13 @@ export async function GET() {
     );
   } catch (error) {
     console.error("Auth error:", error);
+
+    if (isLikelyDatabaseError(error)) {
+      return NextResponse.json(
+        { error: databaseUnavailableResponseMessage() },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       { error: "Authentication failed" },

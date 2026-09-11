@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword, createToken } from "@/lib/auth";
 import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
+import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,6 +79,13 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
+
+    if (isLikelyDatabaseError(error)) {
+      return NextResponse.json(
+        { error: databaseUnavailableResponseMessage() },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       { error: "Login failed" },

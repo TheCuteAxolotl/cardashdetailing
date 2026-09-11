@@ -13,6 +13,7 @@
 Set these in Vercel > Project > Settings > Environment Variables:
 
 DATABASE_URL=<your Postgres connection string>
+# V2.2 can also use PRISMA_DATABASE_URL or POSTGRES_URL at runtime.
 NEXTAUTH_SECRET=<long random secret>
 NEXT_PUBLIC_OWNER_EMAIL=<your owner login email>
 

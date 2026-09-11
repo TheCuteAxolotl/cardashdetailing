@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthFromRequest } from "@/lib/auth";
+import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
 
 const MAX_DATA_URL_CHARS = 1_600_000;
 
@@ -48,6 +49,13 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Error fetching images:", error);
+
+    if (isLikelyDatabaseError(error)) {
+      return NextResponse.json(
+        { error: databaseUnavailableResponseMessage() },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       { error: "Failed to fetch images" },
@@ -101,6 +109,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(image, { status: 201 });
   } catch (error) {
     console.error("Error creating image:", error);
+
+    if (isLikelyDatabaseError(error)) {
+      return NextResponse.json(
+        { error: databaseUnavailableResponseMessage() },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       { error: "Failed to create image" },
