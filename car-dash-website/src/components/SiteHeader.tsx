@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { OWNER_EMAIL } from "@/lib/constants";
 
@@ -20,6 +20,7 @@ export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
+  const menuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -38,6 +39,22 @@ export default function SiteHeader() {
     return [...groups.entries()];
   }, [services]);
 
+  const cancelMenuClose = () => {
+    if (menuCloseTimer.current) {
+      clearTimeout(menuCloseTimer.current);
+      menuCloseTimer.current = null;
+    }
+  };
+
+  const scheduleMenuClose = (menu: "services" | "explore") => {
+    cancelMenuClose();
+    menuCloseTimer.current = setTimeout(() => {
+      if (menu === "services") setServicesOpen(false);
+      if (menu === "explore") setExploreOpen(false);
+      menuCloseTimer.current = null;
+    }, 320);
+  };
+
   const logout = async () => { try { await fetch("/api/auth/logout", { method: "POST" }); } finally { window.location.assign("/"); } };
   const openSupport = () => { window.dispatchEvent(new Event("open-support")); setMenuOpen(false); };
   const owner = Boolean(user && (user.role === "owner" || user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()));
@@ -52,17 +69,17 @@ export default function SiteHeader() {
         <nav className="hidden items-center gap-6 text-[13px] font-medium text-white/50 xl:flex">
           <a href="/" className={pathname==="/"?"text-white":"hover:text-[#FF2D2D]"}>Home</a>
 
-          <div className="static" onMouseEnter={()=>{setServicesOpen(true);setExploreOpen(false)}} onMouseLeave={()=>setServicesOpen(false)}>
+          <div className="static" onMouseEnter={()=>{cancelMenuClose();setServicesOpen(true);setExploreOpen(false)}} onMouseLeave={()=>scheduleMenuClose("services")}>
             <button onClick={()=>{setServicesOpen(v=>!v);setExploreOpen(false)}} className={`py-3 ${pathname.startsWith('/services')?'text-[#FF2D2D]':'hover:text-[#FF2D2D]'}`}>Services ▾</button>
-            {servicesOpen && <div className="menu-pop absolute left-1/2 top-full max-h-[calc(100vh-96px)] w-[min(900px,calc(100vw-32px))] -translate-x-1/2 overflow-y-auto rounded-[28px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-6 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
+            {servicesOpen && <div onMouseEnter={cancelMenuClose} onMouseLeave={()=>scheduleMenuClose("services")} className="menu-pop absolute left-1/2 top-full max-h-[calc(100vh-96px)] w-[min(900px,calc(100vw-32px))] -translate-x-1/2 overflow-y-auto rounded-[28px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-6 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
               <div className="grid gap-6 md:grid-cols-3">{grouped.length ? grouped.map(([category,subs]) => <div key={category}><p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">{category}</p>{[...subs.entries()].map(([sub,items])=><div key={sub} className="mb-4"><p className="mb-1 text-xs font-semibold text-white/40">{sub}</p>{items.map(s=><a key={s.id} href={`/services#${s.id}`} className="block rounded-xl px-2 py-1.5 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{s.title}</a>)}</div>)}{category.toLowerCase().includes("marine") && <a href="/services#marine-add-ons" className="mt-1 block rounded-xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.05] px-3 py-2 text-sm text-[#FF2D2D]">Marine Add-Ons →</a>}</div>) : <><div><p className="text-[#FF2D2D]">Car Detailing</p><a href="/services" className="mt-2 block text-white/70">Package Detailing</a><a href="/services" className="mt-2 block text-white/70">Exterior Detailing</a></div><div><p className="text-[#FF2D2D]">Marine Detailing</p><a href="/services" className="mt-2 block text-white/70">Interior / Exterior</a><a href="/services" className="mt-2 block text-white/70">Buff & Polish</a><a href="/services#marine-add-ons" className="mt-2 block text-white/70">Marine Add-Ons</a></div><div><p className="text-[#FF2D2D]">Ceramic Coatings</p><a href="/services" className="mt-2 block text-white/70">Coating Packages</a><a href="/ceramic-coatings" className="mt-2 block text-white/70">Learn about coatings</a></div></>}</div>
               <div className="mt-5 flex gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Chat to a Specialist</a><a href="/services" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">View all services →</a></div>
             </div>}
           </div>
 
-          <div className="static" onMouseEnter={()=>{setExploreOpen(true);setServicesOpen(false)}} onMouseLeave={()=>setExploreOpen(false)}>
+          <div className="static" onMouseEnter={()=>{cancelMenuClose();setExploreOpen(true);setServicesOpen(false)}} onMouseLeave={()=>scheduleMenuClose("explore")}>
             <button onClick={()=>{setExploreOpen(v=>!v);setServicesOpen(false)}} className={`py-3 ${exploreActive?'text-[#FF2D2D]':'hover:text-[#FF2D2D]'}`}>Explore ▾</button>
-            {exploreOpen && <div className="menu-pop absolute left-1/2 top-full max-h-[calc(100vh-96px)] w-[min(440px,calc(100vw-32px))] -translate-x-1/2 overflow-y-auto rounded-[26px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-4 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
+            {exploreOpen && <div onMouseEnter={cancelMenuClose} onMouseLeave={()=>scheduleMenuClose("explore")} className="menu-pop absolute left-1/2 top-full max-h-[calc(100vh-96px)] w-[min(440px,calc(100vw-32px))] -translate-x-1/2 overflow-y-auto rounded-[26px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-4 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
               <p className="px-3 pb-3 pt-1 text-[10px] font-bold uppercase tracking-[.25em] text-[#FF2D2D]">Car Dash Guide</p>
               <div className="space-y-1">{exploreLinks.map(([href,label,desc])=><a key={href} href={href} className="block rounded-2xl border border-transparent px-3 py-3 hover:border-[#FF2D2D]/20 hover:bg-[#FF2D2D]/[.06]"><span className="block text-sm font-semibold text-white">{label}</span><span className="mt-1 block text-xs leading-5 text-white/38">{desc}</span></a>)}</div>
             </div>}
