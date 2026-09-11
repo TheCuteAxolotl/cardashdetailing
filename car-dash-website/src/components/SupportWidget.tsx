@@ -246,7 +246,7 @@ export default function SupportWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-[70] rounded-full border border-black/10 bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] shadow-[0_18px_50px_rgba(0,0,0,.22)] transition hover:-translate-y-0.5"
+          className="support-launcher fixed bottom-5 right-5 z-[70] rounded-full border border-black/10 bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] shadow-[0_18px_50px_rgba(0,0,0,.22)] transition hover:-translate-y-0.5"
         >
           Need help?
         </button>

@@ -111,6 +111,29 @@ summary::-webkit-details-marker {
   background: rgba(255,255,255,.06);
 }
 
+
+/* Mobile navigation is a real scroll container so long menus work on iPhone/Safari. */
+.mobile-menu-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  touch-action: pan-y;
+}
+
+/* Keep the floating help launcher from covering the mobile navigation. */
+.mobile-nav-open .support-launcher {
+  display: none !important;
+}
+
+.mobile-accordion-pop {
+  transform-origin: top center;
+  animation: mobileAccordionPop 240ms cubic-bezier(.2,.75,.2,1) both;
+}
+
+@keyframes mobileAccordionPop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Car Dash public-site finishing touches */
 img { display: block; }
 .public-glass {
