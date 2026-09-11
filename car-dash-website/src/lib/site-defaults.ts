@@ -1,4 +1,5 @@
 import { DEFAULT_PRICING_PAGES } from "@/lib/pricing-config";
+import { DEFAULT_BOOKING_PRICING } from "@/lib/booking-pricing";
 
 export const SITE_DEFAULTS = {
   heroEyebrow: "Mobile detailing",
@@ -64,6 +65,7 @@ export const SITE_DEFAULTS = {
   pricingPackagesConfig: JSON.stringify(DEFAULT_PRICING_PAGES.packages),
   pricingExteriorConfig: JSON.stringify(DEFAULT_PRICING_PAGES.exterior),
   pricingInteriorConfig: JSON.stringify(DEFAULT_PRICING_PAGES.interior),
+  bookingPricingConfig: JSON.stringify(DEFAULT_BOOKING_PRICING),
 
   footerBlurb: "Mobile detailing based in South Elgin with interior, exterior, paint correction, and protection services.",
 } as const;

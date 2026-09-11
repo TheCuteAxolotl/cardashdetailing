@@ -1,22 +1,7 @@
 "use client";
 
-const carAddOns = [
-  ["Pet hair removal", "$39"],
-  ["Seat shampoo", "$49"],
-  ["Carpet extraction", "$59"],
-  ["Heavy stain treatment", "$69"],
-  ["Leather protection", "$39"],
-  ["Odor treatment", "$49"],
-  ["Engine bay detail", "$49"],
-  ["Iron decontamination", "$45"],
-  ["Clay bar treatment", "$59"],
-  ["Hand wax", "$49"],
-  ["Ceramic sealant", "$79"],
-  ["Wheel coating", "$89"],
-  ["Exterior trim protection", "$45"],
-  ["Bug and tar removal", "$35"],
-  ["Underbody cleaning", "$30"],
-] as const;
+import { useEffect, useState } from "react";
+import { DEFAULT_BOOKING_PRICING, BookingPricingConfig, parseBookingPricingConfig } from "@/lib/booking-pricing";
 
 const pages = [
   { href: "/car-detailing-packages", eyebrow: "Complete Vehicle", title: "Car Detailing Packages", body: "Inside-and-out packages with fixed Coupe, Sedan, and Truck & SUV pricing." },
@@ -25,6 +10,17 @@ const pages = [
 ] as const;
 
 export default function ServicesPage() {
+  const [bookingPricing, setBookingPricing] = useState<BookingPricingConfig>(DEFAULT_BOOKING_PRICING);
+
+  useEffect(() => {
+    fetch("/api/site-content", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((content) => setBookingPricing(parseBookingPricingConfig(content?.bookingPricingConfig)))
+      .catch(() => setBookingPricing(DEFAULT_BOOKING_PRICING));
+  }, []);
+
+  const carAddOns = bookingPricing.addOns.filter((item) => item.active);
+
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
       <section className="border-b border-white/10 px-5 py-20 sm:px-8 sm:py-28">
@@ -57,11 +53,11 @@ export default function ServicesPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Car Detailing Add-Ons</p>
             <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">Add only what the vehicle actually needs.</h2>
-            <p className="mt-5 text-sm leading-7 text-white/45">These can be added to compatible car-detailing services. Heavier contamination or unusual restoration work may require a custom quote.</p>
+            <p className="mt-5 text-sm leading-7 text-white/45">These can be added to compatible car-detailing services. Headlight Restoration uses the add-on price shown here when booked with a detail and ${bookingPricing.headlightStandalonePrice.toFixed(0)} when booked by itself. Heavier contamination or unusual restoration work may require a custom quote.</p>
             <div className="mt-6 flex flex-wrap gap-3"><a href="/contact" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Book a Detail</a><a href="/quote" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Ask about add-ons</a></div>
           </div>
           <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0D0D0D]">
-            {carAddOns.map(([name, price], index) => <div key={name} className={`flex items-center justify-between gap-5 px-5 py-4 sm:px-6 ${index !== carAddOns.length - 1 ? "border-b border-white/8" : ""}`}><span className="text-sm text-white/70">{name}</span><span className="text-sm font-semibold text-[#FF2D2D]">{price}</span></div>)}
+            {carAddOns.map((item, index) => <div key={item.id} className={`flex items-center justify-between gap-5 px-5 py-4 sm:px-6 ${index !== carAddOns.length - 1 ? "border-b border-white/8" : ""}`}><span className="text-sm text-white/70">{item.name}</span><span className="text-sm font-semibold text-[#FF2D2D]">${item.price.toFixed(0)}</span></div>)}
           </div>
         </div>
       </section>

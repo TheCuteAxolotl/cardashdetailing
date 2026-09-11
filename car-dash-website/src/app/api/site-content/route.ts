@@ -21,8 +21,9 @@ export async function GET() {
   try {
     const rows = await prisma.siteContent.findMany();
 
+    const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const stored = Object.fromEntries(
-      rows.map((row) => [row.key, row.value])
+      rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value])
     );
 
     return NextResponse.json(
@@ -79,7 +80,7 @@ export async function PUT(request: NextRequest) {
     const rows = await prisma.siteContent.findMany();
 
     const stored = Object.fromEntries(
-      rows.map((row) => [row.key, row.value])
+      rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value])
     );
 
     return NextResponse.json(

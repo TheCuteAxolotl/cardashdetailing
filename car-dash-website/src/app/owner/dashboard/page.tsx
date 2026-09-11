@@ -100,6 +100,14 @@ export default function OwnerDashboard() {
             </div>
           </a>
 
+          <a href="/owner/booking-settings">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#FF2D2D]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#FF2D2D]/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">%</span></div>
+              <h2 className="text-xl font-semibold mb-2">Add-Ons & Discounts</h2>
+              <p className="text-neutral-400 text-sm">Set booking add-on prices and create, disable, or delete customer discount codes</p>
+            </div>
+          </a>
+
           {/* Services Management */}
           <a href="/owner/services">
             <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#FF2D2D]/45 transition cursor-pointer">

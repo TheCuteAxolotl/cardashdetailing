@@ -6,11 +6,29 @@ import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions"
 import { getClientIp, hashVisitor } from "@/lib/support-security";
 import { addBookingSystemMessage, getBookingChatUrl } from "@/lib/booking-chat";
 import { DEFAULT_PRICING_PAGES, VEHICLE_LABELS, getPackagePrice, parsePricingConfig } from "@/lib/pricing-config";
+import {
+  DEFAULT_BOOKING_PRICING,
+  DISCOUNT_CODES_KEY,
+  STANDALONE_HEADLIGHT_SERVICE_ID,
+  calculateDiscount,
+  normalizeDiscountCode,
+  parseBookingPricingConfig,
+  parseDiscountCodes,
+} from "@/lib/booking-pricing";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
   if (!value) throw new Error(`Missing required field: ${key}`);
   return value;
+}
+
+function parseStringArray(value: FormDataEntryValue | null) {
+  try {
+    const parsed = JSON.parse(String(value || "[]"));
+    return Array.isArray(parsed) ? parsed.map((item) => String(item)) : [];
+  } catch {
+    return [];
+  }
 }
 
 async function discordBooking(data: Record<string, string>) {
@@ -38,14 +56,9 @@ async function discordBooking(data: Record<string, string>) {
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content: lines.slice(0, 1950),
-        username: "Car Dash Detailing",
-      }),
+      body: JSON.stringify({ content: lines.slice(0, 1950), username: "Car Dash Detailing" }),
     });
-    if (!response.ok) {
-      console.error("Discord booking notification failed:", response.status, await response.text());
-    }
+    if (!response.ok) console.error("Discord booking notification failed:", response.status, await response.text());
   } catch (error) {
     console.error("Discord booking notification failed:", error);
   }
@@ -62,7 +75,6 @@ export async function GET(request: NextRequest) {
       include: { user: { select: { name: true, email: true } } },
       orderBy: { createdAt: "desc" },
     });
-
     return NextResponse.json(bookings);
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
@@ -75,19 +87,10 @@ export async function POST(request: NextRequest) {
     const ip = getClientIp(request);
     const visitorHash = hashVisitor(ip);
     const blocked = await prisma.blockedVisitor.findUnique({ where: { hash: visitorHash } });
-    if (blocked) {
-      return NextResponse.json(
-        { success: false, message: "Booking requests are unavailable from this connection." },
-        { status: 403 }
-      );
-    }
+    if (blocked) return NextResponse.json({ success: false, message: "Booking requests are unavailable from this connection." }, { status: 403 });
 
-    const recent = await prisma.booking.count({
-      where: { createdAt: { gte: new Date(Date.now() - 20 * 60 * 1000) } },
-    });
-    if (recent > 1000) {
-      return NextResponse.json({ success: false, message: "Please try again later." }, { status: 429 });
-    }
+    const recent = await prisma.booking.count({ where: { createdAt: { gte: new Date(Date.now() - 20 * 60 * 1000) } } });
+    if (recent > 1000) return NextResponse.json({ success: false, message: "Please try again later." }, { status: 429 });
 
     const form = await request.formData();
     const name = required(form, "name");
@@ -97,12 +100,7 @@ export async function POST(request: NextRequest) {
     const vehicleModel = required(form, "vehicleModel");
     const vehicleYear = required(form, "vehicleYear");
     const policyAgreed = String(form.get("policyAgreed") || "false") === "true";
-    if (!policyAgreed) {
-      return NextResponse.json(
-        { success: false, message: "Please confirm the booking acknowledgement before submitting." },
-        { status: 400 }
-      );
-    }
+    if (!policyAgreed) return NextResponse.json({ success: false, message: "Please confirm the booking acknowledgement before submitting." }, { status: 400 });
 
     const vehicleTrim = String(form.get("vehicleTrim") || "").trim();
     const serviceMethod = String(form.get("serviceMethod") || "Not specified").trim();
@@ -111,18 +109,20 @@ export async function POST(request: NextRequest) {
     const serviceAddress = String(form.get("serviceAddress") || "").trim();
     const customerNotes = String(form.get("serviceNotes") || "None").trim();
     const smsConsent = String(form.get("smsConsent") || "false") === "true";
-    if (smsConsent && !normalizePhoneNumber(phone)) {
-      return NextResponse.json(
-        { success: false, message: "Enter a valid mobile number to receive SMS updates." },
-        { status: 400 }
-      );
-    }
+    if (smsConsent && !normalizePhoneNumber(phone)) return NextResponse.json({ success: false, message: "Enter a valid mobile number to receive SMS updates." }, { status: 400 });
+
     const serviceId = String(form.get("serviceId") || "").trim();
     const quoteThreadId = String(form.get("quoteThreadId") || "").trim();
     const pricingPage = String(form.get("pricingPage") || "").trim();
     const packageId = String(form.get("packageId") || "").trim();
     const vehicleClass = String(form.get("vehicleClass") || "").trim();
+    const requestedAddOnIds = parseStringArray(form.get("addOns"));
+    const discountCode = normalizeDiscountCode(String(form.get("discountCode") || ""));
+    const displayedBookingTotal = Number(form.get("displayedBookingTotal"));
     const auth = getAuthFromRequest(request);
+
+    const bookingPricingRow = await prisma.siteContent.findUnique({ where: { key: "bookingPricingConfig" } });
+    const bookingPricing = parseBookingPricingConfig(bookingPricingRow?.value || JSON.stringify(DEFAULT_BOOKING_PRICING));
 
     let bookingName = name;
     let bookingEmail = email;
@@ -131,41 +131,24 @@ export async function POST(request: NextRequest) {
     let bookingVehicleYear = vehicleYear;
     let bookingVehicleTrim = vehicleTrim;
     let serviceName = "Custom Booking";
-    let bookingTotal = 0;
+    let baseTotal = 0;
     let source = "Fixed-price website booking";
     let verifiedVehicleId = String(form.get("vehicleId") || "").trim() || null;
+    let allowAddOns = false;
 
     if (quoteThreadId) {
-      if (!auth?.id) {
-        return NextResponse.json(
-          { success: false, message: "Please sign in again to book an accepted quote." },
-          { status: 401 }
-        );
-      }
+      if (!auth?.id) return NextResponse.json({ success: false, message: "Please sign in again to book an accepted quote." }, { status: 401 });
 
       const quote = await prisma.quoteThread.findFirst({
         where: { id: quoteThreadId, userId: auth.id },
         include: { service: true, vehicle: true, user: { select: { name: true, email: true } } },
       });
-
-      if (!quote) {
-        return NextResponse.json({ success: false, message: "Accepted quote not found." }, { status: 404 });
-      }
-      if (quote.status !== "accepted") {
-        return NextResponse.json(
-          { success: false, message: "This quote must be accepted before it can be booked." },
-          { status: 409 }
-        );
-      }
-      if (!quote.quotedPrice || quote.quotedPrice <= 0) {
-        return NextResponse.json(
-          { success: false, message: "This quote does not have a valid final price." },
-          { status: 409 }
-        );
-      }
+      if (!quote) return NextResponse.json({ success: false, message: "Accepted quote not found." }, { status: 404 });
+      if (quote.status !== "accepted") return NextResponse.json({ success: false, message: "This quote must be accepted before it can be booked." }, { status: 409 });
+      if (!quote.quotedPrice || quote.quotedPrice <= 0) return NextResponse.json({ success: false, message: "This quote does not have a valid final price." }, { status: 409 });
 
       serviceName = quote.service?.title || quote.subject || "Accepted Quote";
-      bookingTotal = quote.quotedPrice;
+      baseTotal = quote.quotedPrice;
       source = `Accepted specialist quote ${quote.id}`;
       bookingName = quote.user.name;
       bookingEmail = quote.user.email;
@@ -177,64 +160,79 @@ export async function POST(request: NextRequest) {
         bookingVehicleTrim = quote.vehicle.trim || "";
       }
     } else if (pricingPage && packageId && vehicleClass) {
-      if (!["packages", "exterior", "interior"].includes(pricingPage)) {
-        return NextResponse.json({ success: false, message: "That pricing page is not available." }, { status: 400 });
-      }
-
+      if (!["packages", "exterior", "interior"].includes(pricingPage)) return NextResponse.json({ success: false, message: "That pricing page is not available." }, { status: 400 });
       const key = pricingPage === "packages" ? "pricingPackagesConfig" : pricingPage === "exterior" ? "pricingExteriorConfig" : "pricingInteriorConfig";
       const fallback = pricingPage === "packages" ? DEFAULT_PRICING_PAGES.packages : pricingPage === "exterior" ? DEFAULT_PRICING_PAGES.exterior : DEFAULT_PRICING_PAGES.interior;
       const stored = await prisma.siteContent.findUnique({ where: { key } });
       const config = parsePricingConfig(stored?.value, fallback);
       const selected = getPackagePrice(config, packageId, vehicleClass);
-
-      if (!selected) {
-        return NextResponse.json({ success: false, message: "That package or vehicle price is no longer available. Please choose it again from the pricing page." }, { status: 409 });
-      }
+      if (!selected) return NextResponse.json({ success: false, message: "That package or vehicle price is no longer available. Please choose it again from the pricing page." }, { status: 409 });
       const submittedVehicleType = String(form.get("vehicleType") || "").trim();
-      if (submittedVehicleType !== VEHICLE_LABELS[selected.key]) {
-        return NextResponse.json({ success: false, message: "The selected vehicle type no longer matches this package price. Please choose the package again." }, { status: 409 });
-      }
+      if (submittedVehicleType !== VEHICLE_LABELS[selected.key]) return NextResponse.json({ success: false, message: "The selected vehicle type no longer matches this package price. Please choose the package again." }, { status: 409 });
 
       serviceName = `${selected.pkg.name} — ${VEHICLE_LABELS[selected.key]}`;
-      bookingTotal = selected.price;
+      baseTotal = selected.price;
       source = `Fixed pricing page: ${pricingPage}/${selected.pkg.id}/${selected.key}`;
+      allowAddOns = true;
+    } else if (serviceId === STANDALONE_HEADLIGHT_SERVICE_ID) {
+      serviceName = "Headlight Restoration";
+      baseTotal = bookingPricing.headlightStandalonePrice;
+      source = "Standalone Headlight Restoration";
+      allowAddOns = false;
     } else {
-      if (!serviceId) {
-        return NextResponse.json(
-          { success: false, message: "Choose a fixed-price service or pricing package before booking." },
-          { status: 400 }
-        );
-      }
-
+      if (!serviceId) return NextResponse.json({ success: false, message: "Choose a service or pricing package before booking." }, { status: 400 });
       const service = await prisma.service.findUnique({ where: { id: serviceId } });
-      if (!service || !service.active) {
-        return NextResponse.json({ success: false, message: "That service is not available." }, { status: 404 });
-      }
-      if (service.pricingType !== "fixed" || !service.price || service.price <= 0) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "This service needs an exact quote before booking. Please use Chat to a Specialist.",
-          },
-          { status: 409 }
-        );
-      }
+      if (!service || !service.active) return NextResponse.json({ success: false, message: "That service is not available." }, { status: 404 });
+      if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Chat to a Specialist." }, { status: 409 });
 
-      serviceName = service.title;
-      bookingTotal = service.price;
+      if (service.title.trim().toLowerCase() === "headlight restoration") {
+        serviceName = "Headlight Restoration";
+        baseTotal = bookingPricing.headlightStandalonePrice;
+        source = "Standalone Headlight Restoration";
+      } else {
+        serviceName = service.title;
+        baseTotal = service.price;
+        allowAddOns = !service.category.toLowerCase().includes("marine");
+      }
+    }
+
+    if (!baseTotal || baseTotal <= 0) return NextResponse.json({ success: false, message: "This booking no longer has a valid exact price." }, { status: 409 });
+
+    if (!allowAddOns && requestedAddOnIds.length > 0) return NextResponse.json({ success: false, message: "Add-ons are not available for this booking type. Refresh the booking page and try again." }, { status: 409 });
+
+    const activeAddOns = bookingPricing.addOns.filter((item) => item.active);
+    const selectedAddOns = allowAddOns ? requestedAddOnIds.map((id) => activeAddOns.find((item) => item.id === id)).filter(Boolean) : [];
+    if (allowAddOns && selectedAddOns.length !== requestedAddOnIds.length) return NextResponse.json({ success: false, message: "One of the selected add-ons changed or is no longer available. Refresh the booking page and choose the add-ons again." }, { status: 409 });
+
+    const addOnTotal = selectedAddOns.reduce((sum, item) => sum + Number(item?.price || 0), 0);
+    const subtotal = Math.round((baseTotal + addOnTotal) * 100) / 100;
+
+    let appliedDiscount = null as ReturnType<typeof parseDiscountCodes>[number] | null;
+    if (discountCode) {
+      const discountRow = await prisma.siteContent.findUnique({ where: { key: DISCOUNT_CODES_KEY } });
+      appliedDiscount = parseDiscountCodes(discountRow?.value).find((item) => item.active && item.code === discountCode) || null;
+      if (!appliedDiscount) return NextResponse.json({ success: false, message: "That discount code is no longer valid. Remove it and try again." }, { status: 409 });
+    }
+    const discountAmount = calculateDiscount(subtotal, appliedDiscount);
+    const bookingTotal = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
+
+    if (Number.isFinite(displayedBookingTotal) && Math.abs(displayedBookingTotal - bookingTotal) > 0.01) {
+      return NextResponse.json({ success: false, message: "The booking price changed before submission. Refresh the page to see the current total." }, { status: 409 });
     }
 
     if (verifiedVehicleId && auth?.id) {
-      const ownedVehicle = await prisma.vehicle.findFirst({
-        where: { id: verifiedVehicleId, userId: auth.id },
-        select: { id: true },
-      });
+      const ownedVehicle = await prisma.vehicle.findFirst({ where: { id: verifiedVehicleId, userId: auth.id }, select: { id: true } });
       if (!ownedVehicle) verifiedVehicleId = null;
     } else if (!auth?.id) {
       verifiedVehicleId = null;
     }
 
+    const addOnSummary = selectedAddOns.length ? selectedAddOns.map((item) => `${item?.name} (+$${Number(item?.price || 0).toFixed(2)})`).join(", ") : "None";
     const details = [
+      `Base service: $${baseTotal.toFixed(2)}`,
+      `Add-ons: ${addOnSummary}`,
+      `Add-ons total: $${addOnTotal.toFixed(2)}`,
+      appliedDiscount ? `Discount: ${appliedDiscount.code} (${appliedDiscount.type === "percent" ? `${appliedDiscount.amount}%` : `$${appliedDiscount.amount.toFixed(2)}`}) -$${discountAmount.toFixed(2)}` : "Discount: None",
       `Booking total: $${bookingTotal.toFixed(2)}`,
       `Booking source: ${source}`,
       quoteThreadId ? `Quote ID: ${quoteThreadId}` : null,
@@ -243,12 +241,9 @@ export async function POST(request: NextRequest) {
       `Service address: ${serviceAddress || "Not specified"}`,
       `Interior condition: ${String(form.get("interiorCondition") || "Not specified")}`,
       `Exterior condition: ${String(form.get("exteriorCondition") || "Not specified")}`,
-      `Add-ons / special needs: ${String(form.get("addOns") || "[]")}`,
       `SMS consent: ${smsConsent ? "Yes" : "No"}`,
       `Customer notes: ${customerNotes}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
+    ].filter(Boolean).join("\n");
 
     const booking = await prisma.booking.create({
       data: {
@@ -271,29 +266,15 @@ export async function POST(request: NextRequest) {
     });
 
     const bookingChatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(auth?.id));
-
-    // Booking chat setup is additive and must never block a valid appointment request.
     try {
-      await addBookingSystemMessage(
-        booking.id,
-        `Booking request submitted for $${bookingTotal.toFixed(2)}. Use this conversation for appointment questions and updates.`
-      );
+      await addBookingSystemMessage(booking.id, `Booking request submitted for $${bookingTotal.toFixed(2)}. Use this conversation for appointment questions and updates.`);
     } catch (error) {
       console.error("Booking chat setup failed:", error);
     }
 
     if (quoteThreadId && auth?.id) {
-      await prisma.quoteThread.update({
-        where: { id: quoteThreadId },
-        data: { status: "booked", lastCustomerSeenAt: new Date() },
-      });
-      await prisma.quoteMessage.create({
-        data: {
-          threadId: quoteThreadId,
-          sender: "team",
-          body: `Booking request submitted for $${bookingTotal.toFixed(2)}. Appointment confirmation will appear in your account once Car Dash confirms it.`,
-        },
-      });
+      await prisma.quoteThread.update({ where: { id: quoteThreadId }, data: { status: "booked", lastCustomerSeenAt: new Date() } });
+      await prisma.quoteMessage.create({ data: { threadId: quoteThreadId, sender: "team", body: `Booking request submitted for $${bookingTotal.toFixed(2)}. Appointment confirmation will appear in your account once Car Dash confirms it.` } });
     }
 
     await discordBooking({
@@ -301,7 +282,7 @@ export async function POST(request: NextRequest) {
       phone,
       email: bookingEmail,
       vehicle: [bookingVehicleYear, bookingVehicleMake, bookingVehicleModel, bookingVehicleTrim].filter(Boolean).join(" "),
-      service: serviceName,
+      service: `${serviceName}${selectedAddOns.length ? ` + ${selectedAddOns.map((item) => item?.name).join(", ")}` : ""}${appliedDiscount ? ` · code ${appliedDiscount.code}` : ""}`,
       total: `$${bookingTotal.toFixed(2)}`,
       preferred: [preferredDate, preferredTime].filter(Boolean).join(" · ") || "Not specified",
       source,
@@ -315,24 +296,13 @@ export async function POST(request: NextRequest) {
       const requested = [preferredDate, preferredTime].filter(Boolean).join(" at ");
       await sendTransactionalSms({
         to: phone,
-        body: `Car Dash Detailing: We received your booking request for ${serviceName} (${`$${bookingTotal.toFixed(2)}`})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed. Message us about this booking: ${bookingChatUrl}`,
+        body: `Car Dash Detailing: We received your booking request for ${serviceName} ($${bookingTotal.toFixed(2)})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed. Message us about this booking: ${bookingChatUrl}`,
       });
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-        booking,
-        chatUrl: bookingChatUrl,
-        message: `Booking request submitted with a total of $${bookingTotal.toFixed(2)}. Car Dash will confirm the appointment shortly.`,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, booking, chatUrl: bookingChatUrl, message: `Booking request submitted with a total of $${bookingTotal.toFixed(2)}. Car Dash will confirm the appointment shortly.` }, { status: 201 });
   } catch (error) {
     console.error("Booking submission error:", error);
-    return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : "Unable to process booking request." },
-      { status: 400 }
-    );
+    return NextResponse.json({ success: false, message: error instanceof Error ? error.message : "Unable to process booking request." }, { status: 400 });
   }
 }

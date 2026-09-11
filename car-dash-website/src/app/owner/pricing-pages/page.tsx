@@ -117,7 +117,7 @@ export default function OwnerPricingPages() {
       <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div><p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Owner</p><h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Pricing Pages</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">Control the separate Car Packages, Exterior, and Interior pages. Package names, exact prices, features, badges, order, and buttons are all editable here.</p></div>
-          <div className="flex gap-2"><a href="/owner/gallery" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Photos & Media</a><a href="/owner/dashboard" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Back</a></div>
+          <div className="flex flex-wrap gap-2"><a href="/owner/booking-settings" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Add-Ons & Discounts</a><a href="/owner/gallery" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Photos & Media</a><a href="/owner/dashboard" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Back</a></div>
         </div>
 
         <div className="mt-8 flex flex-wrap gap-2 rounded-[22px] border border-white/10 bg-white/[.025] p-2">
