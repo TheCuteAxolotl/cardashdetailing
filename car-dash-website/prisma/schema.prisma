@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  password     String
+  name         String
+  role         String        @default("user")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  bookings     Booking[]
+  vehicles     Vehicle[]
+  quoteThreads QuoteThread[]
+  warranties   Warranty[]
+}
+
+model Vehicle {
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nickname     String?
+  year         String
+  make         String
+  model        String
+  trim         String?
+  vehicleType  String        @default("Sedan")
+  color        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  bookings     Booking[]
+  quoteThreads QuoteThread[]
+  warranties   Warranty[]
+
+  @@index([userId, createdAt])
+}
+
+model Service {
+  id            String        @id @default(cuid())
+  title         String
+  description   String
+  price         Float         @default(0)
+  startingPrice Float?
+  maxPrice      Float?
+  pricingType   String        @default("fixed") // fixed, starting, range, quote
+  category      String        @default("Car Detailing")
+  subcategory   String        @default("General")
+  active        Boolean       @default(true)
+  sortOrder     Int           @default(0)
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  quoteThreads  QuoteThread[]
+}
+
+model Booking {
+  id             String   @id @default(cuid())
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicleId      String?
+  vehicle        Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  serviceName    String
+  serviceMethod  String   @default("shop")
+  customerName   String
+  customerEmail  String
+  customerPhone  String
+  vehicleMake    String
+  vehicleModel   String
+  vehicleYear    String
+  vehicleTrim    String?
+  preferredDate  String?
+  preferredTime  String?
+  quotedPrice    Float?
+  notes          String?
+  status         String   @default("pending")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model QuoteThread {
+  id                 String         @id @default(cuid())
+  userId             String
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicleId          String?
+  vehicle            Vehicle?       @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  serviceId          String?
+  service            Service?       @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  subject            String
+  status             String         @default("open") // open, quoted, accepted, closed
+  quotedPrice        Float?
+  quoteNotes         String?
+  acceptedAt         DateTime?
+  lastCustomerSeenAt DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  messages           QuoteMessage[]
+
+  @@index([userId, updatedAt])
+  @@index([status, updatedAt])
+}
+
+model QuoteMessage {
+  id              String      @id @default(cuid())
+  threadId        String
+  thread          QuoteThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender          String      // customer, team
+  body            String
+  attachmentsJson String?     // JSON array of small image data URLs (temporary storage strategy)
+  createdAt       DateTime    @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+model Warranty {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicleId      String
+  vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  coatingName    String
+  durationYears  Int
+  installedAt    DateTime
+  expiresAt      DateTime
+  status         String   @default("active")
+  installerNotes String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId, expiresAt])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  rating    Int
+  comment   String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  url       String
+  title     String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SupportTicket {
+  id                String           @id @default(cuid())
+  accessKeyHash     String
+  visitorHash       String
+  name              String
+  email             String?
+  phone             String?
+  contactPreference String           @default("website")
+  subject           String
+  status            String           @default("open")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  messages          SupportMessage[]
+
+  @@index([visitorHash])
+  @@index([createdAt])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender    String
+  body      String
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+}
+
+model BlockedVisitor {
+  id        String   @id @default(cuid())
+  hash      String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
