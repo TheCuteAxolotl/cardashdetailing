@@ -14,6 +14,8 @@ type Booking = {
   vehicleYear: string;
   vehicleTrim: string | null;
   preferredDate: string | null;
+  preferredTime?: string | null;
+  quotedPrice: number | null;
   notes: string | null;
   status: string;
   createdAt: string;
@@ -212,7 +214,12 @@ export default function OwnerBookings() {
 
                       <p>
                         <strong className="text-white">Preferred:</strong>{" "}
-                        {booking.preferredDate || "Not specified"}
+                        {booking.preferredDate || "Not specified"}{booking.preferredTime ? ` · ${booking.preferredTime}` : ""}
+                      </p>
+
+                      <p>
+                        <strong className="text-white">Booking total:</strong>{" "}
+                        <span className="font-semibold text-emerald-300">{booking.quotedPrice != null ? `$${booking.quotedPrice.toFixed(2)}` : "Legacy booking"}</span>
                       </p>
                     </div>
 

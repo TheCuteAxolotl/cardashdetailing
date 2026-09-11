@@ -14,6 +14,8 @@ type Booking = {
   vehicleYear: string;
   vehicleTrim: string | null;
   preferredDate: string | null;
+  preferredTime?: string | null;
+  quotedPrice: number | null;
   notes: string | null;
   status: string;
   createdAt: string;
@@ -83,7 +85,8 @@ export default function AdminBookings() {
                     <p><strong className="text-white">Email:</strong> <a href={`mailto:${b.customerEmail}`} className="underline">{b.customerEmail}</a></p>
                     <p><strong className="text-white">Vehicle:</strong> {b.vehicleYear} {b.vehicleMake} {b.vehicleModel} {b.vehicleTrim || ""}</p>
                     <p><strong className="text-white">Method:</strong> {b.serviceMethod}</p>
-                    <p><strong className="text-white">Preferred:</strong> {b.preferredDate || "Not specified"}</p>
+                    <p><strong className="text-white">Preferred:</strong> {b.preferredDate || "Not specified"}{b.preferredTime ? ` · ${b.preferredTime}` : ""}</p>
+                    <p><strong className="text-white">Booking total:</strong> <span className="font-semibold text-emerald-300">{b.quotedPrice != null ? `$${b.quotedPrice.toFixed(2)}` : "Legacy booking"}</span></p>
                   </div>
                   {b.notes && <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-neutral-900 p-4 text-xs leading-6 text-neutral-300">{b.notes}</pre>}
                 </div>

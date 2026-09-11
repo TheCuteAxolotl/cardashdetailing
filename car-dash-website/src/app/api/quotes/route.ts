@@ -32,6 +32,9 @@ export async function POST(request: NextRequest) {
   const vehicleId = String(body.vehicleId || "").trim() || null;
   const serviceId = String(body.serviceId || "").trim() || null;
   const attachments = Array.isArray(body.attachments) ? body.attachments.slice(0, 3) : [];
+  const smsConsent = body.smsConsent === true;
+  const phone = String(body.phone || "").trim().slice(0, 40);
+  if (smsConsent && !phone) return NextResponse.json({ error: "Enter a mobile number to opt in to SMS updates." }, { status: 400 });
   if (!message) return NextResponse.json({ error: "Tell us what you need help with." }, { status: 400 });
   if (vehicleId) {
     const owned = await prisma.vehicle.findFirst({ where: { id: vehicleId, userId: auth.id }, select: { id: true } });
@@ -41,7 +44,12 @@ export async function POST(request: NextRequest) {
     data: {
       userId: auth.id, vehicleId, serviceId, subject,
       lastCustomerSeenAt: new Date(),
-      messages: { create: { sender: "customer", body: message, attachmentsJson: attachments.length ? JSON.stringify(attachments) : null } },
+      messages: {
+        create: [
+          { sender: "customer", body: message, attachmentsJson: attachments.length ? JSON.stringify(attachments) : null },
+          { sender: "system", body: `SMS contact: ${phone || "Not provided"} · consent: ${smsConsent ? "Yes" : "No"}` },
+        ],
+      },
     }, select,
   });
   await notifyQuoteDiscord({

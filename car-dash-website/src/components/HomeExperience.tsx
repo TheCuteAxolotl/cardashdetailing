@@ -49,9 +49,8 @@ export default function HomeExperience() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 border-t border-white/12 pt-5 text-xs text-white/38 sm:flex-row sm:items-center sm:justify-between">
+          <div className="border-t border-white/12 pt-5 text-xs text-white/38">
             <span>Interior · Exterior · Paint Correction · Protection</span>
-            <span>South Elgin + surrounding areas</span>
           </div>
         </div>
       </section>

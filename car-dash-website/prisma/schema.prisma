@@ -76,7 +76,7 @@ model Booking {
   vehicleTrim    String?
   preferredDate  String?
   preferredTime  String?
-  quotedPrice    Float?
+  quotedPrice    Float?   // exact booking total for new V3 bookings
   notes          String?
   status         String   @default("pending")
   createdAt      DateTime @default(now())
@@ -92,7 +92,7 @@ model QuoteThread {
   serviceId          String?
   service            Service?       @relation(fields: [serviceId], references: [id], onDelete: SetNull)
   subject            String
-  status             String         @default("open") // open, quoted, accepted, closed
+  status             String         @default("open") // open, quoted, accepted, booked, closed
   quotedPrice        Float?
   quoteNotes         String?
   acceptedAt         DateTime?

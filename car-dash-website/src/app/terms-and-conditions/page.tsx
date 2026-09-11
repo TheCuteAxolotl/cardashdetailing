@@ -28,7 +28,7 @@ export default function TermsAndConditionsPage() {
           <section>
             <h2 className="text-xl font-semibold text-white">Quotes and estimates</h2>
             <p className="mt-3">
-              Website estimates are informational and may change after the vehicle or service area is inspected. A final quote is
+              Website estimates are informational and may change after the vehicle and requested work are reviewed. A final quote is
               the specific price presented by Car Dash Detailing for the described work. If the condition, requested work, or scope
               changes, we may provide a revised quote before additional work is performed.
             </p>

@@ -17,11 +17,7 @@ DATABASE_URL=<your Postgres connection string>
 NEXTAUTH_SECRET=<long random secret>
 NEXT_PUBLIC_OWNER_EMAIL=<your owner login email>
 
-Optional Twilio variables:
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_FROM_NUMBER=
-TWILIO_NOTIFY_NUMBERS=+1..., +1...
+Twilio is intentionally not enabled in V3 pre-approval. Do not add Twilio credentials yet. The public consent and legal pages are ready for A2P review first.
 
 For creating/resetting the owner locally, also set:
 OWNER_EMAIL=<same owner email>

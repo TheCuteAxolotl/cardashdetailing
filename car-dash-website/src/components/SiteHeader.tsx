@@ -38,7 +38,7 @@ export default function SiteHeader() {
   const admin = Boolean(user && user.role === "admin");
 
   return <>
-    <div className="bg-red-600 text-white"><div className="mx-auto flex max-w-[1540px] items-center justify-between border-x border-white/15 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[.24em] sm:px-8 lg:px-10"><span>South Elgin · Mobile Auto Detailing</span><a href="/estimate" className="hidden text-white/80 sm:block">Get an instant estimate ↗</a></div></div>
+    <div className="bg-red-600 text-white"><div className="mx-auto flex max-w-[1540px] items-center justify-between border-x border-white/15 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[.24em] sm:px-8 lg:px-10"><span>Mobile Auto Detailing</span><a href="/estimate" className="hidden text-white/80 sm:block">Get an instant estimate ↗</a></div></div>
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#070707]/95 text-white backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1540px] items-center justify-between gap-5 border-x border-white/10 px-5 py-4 sm:px-8 lg:px-10">
         <a href="/" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full border border-red-500/35 bg-red-600 text-[11px] font-black">CD</span><div className="leading-none"><span className="block text-[15px] font-semibold">Car Dash</span><span className="mt-1 block text-[9px] uppercase tracking-[.3em] text-white/30">Detailing</span></div></a>

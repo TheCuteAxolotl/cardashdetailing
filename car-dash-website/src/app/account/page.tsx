@@ -18,6 +18,7 @@ type Booking = {
   vehicleYear: string;
   vehicleTrim?: string | null;
   preferredDate?: string | null;
+  quotedPrice?: number | null;
   status: string;
   createdAt: string;
 };
@@ -328,6 +329,7 @@ export default function AccountPage() {
                         <div className="mt-4 grid gap-2 text-xs text-white/30 sm:grid-cols-2">
                           <p>Requested {new Date(booking.createdAt).toLocaleDateString()}</p>
                           <p>Preferred {booking.preferredDate || "Not specified"}</p>
+                          <p className="sm:col-span-2 text-emerald-300/80">Booking total: {booking.quotedPrice != null ? `$${booking.quotedPrice.toFixed(2)}` : "Legacy booking"}</p>
                         </div>
                       </div>
                       <span className={`w-fit rounded-full border px-3.5 py-2 text-xs font-semibold ${detail.className}`}>

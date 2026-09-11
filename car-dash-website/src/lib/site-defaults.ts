@@ -1,5 +1,5 @@
 export const SITE_DEFAULTS = {
-  heroEyebrow: "South Elgin · Mobile detailing",
+  heroEyebrow: "Mobile detailing",
   heroTitle: "Clean car. Better drive.",
   heroBody: "Interior, exterior, correction, and protection without overcomplicating it. Pick what the car needs, send the details, and Car Dash handles the rest.",
   heroPrimaryCta: "Book a Detail",
@@ -31,7 +31,7 @@ export const SITE_DEFAULTS = {
 
   aboutEyebrow: "About Car Dash",
   aboutTitle: "Built around convenience, clean work, and cars that actually look finished.",
-  aboutIntro: "Car Dash Detailing is a mobile detailing business based in South Elgin, serving nearby areas with interior detailing, exterior care, paint correction, and protection services.",
+  aboutIntro: "Car Dash Detailing is a mobile detailing business based in South Elgin with interior detailing, exterior care, paint correction, and protection services.",
   aboutStoryTitle: "Why Car Dash exists",
   aboutStoryBody: "The idea is simple: make professional detailing easier to book without making customers rearrange their whole day. Mobile service brings the setup to the vehicle, while the work stays focused on quality, communication, and results that make sense for the car.",
   aboutValuesTitle: "What the business is built around",
@@ -46,7 +46,7 @@ export const SITE_DEFAULTS = {
   faqTitle: "Quick answers before booking.",
   faqBody: "The common stuff customers usually want to know before sending a request.",
   faq1Question: "Do you come to the customer?",
-  faq1Answer: "Yes. Car Dash Detailing is mobile and is based in South Elgin. Availability and service range can vary by appointment.",
+  faq1Answer: "Yes. Car Dash Detailing is mobile. Appointment availability can vary by date and service.",
   faq2Question: "How long does a detail take?",
   faq2Answer: "It depends on the vehicle, condition, and package. A lighter detail can take a few hours, while correction or coating work can take much longer.",
   faq3Question: "Do prices change based on condition?",
@@ -58,7 +58,7 @@ export const SITE_DEFAULTS = {
   faq6Question: "How do booking requests work?",
   faq6Answer: "Send the vehicle and service details through the booking form. The request is reviewed, then Car Dash follows up to confirm timing, service details, and anything else needed.",
 
-  footerBlurb: "Mobile detailing based in South Elgin with interior, exterior, paint correction, and protection services for nearby areas.",
+  footerBlurb: "Mobile detailing based in South Elgin with interior, exterior, paint correction, and protection services.",
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_DEFAULTS;
