@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 
 async function access(request: NextRequest, id: string) {
   const auth = await getCurrentAccountFromRequest(request);
@@ -32,6 +33,38 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   if (!message && !attachments.length) return NextResponse.json({ error: "Message required" }, { status: 400 });
   await prisma.quoteMessage.create({ data: { threadId: id, sender: allowed.staff ? "team" : "customer", body: message || "Photo attachment", attachmentsJson: attachments.length ? JSON.stringify(attachments) : null } });
   await prisma.quoteThread.update({ where: { id }, data: allowed.staff ? {} : { lastCustomerSeenAt: new Date() } });
+
+  // Notify the same Discord channel used by bookings only when the CUSTOMER sends a reply.
+  // Owner/admin replies do not notify Discord, preventing notification loops/spam.
+  if (!allowed.staff) {
+    const details = await prisma.quoteThread.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        subject: true,
+        user: { select: { name: true, email: true } },
+        vehicle: { select: { year: true, make: true, model: true, trim: true } },
+        service: { select: { title: true } },
+      },
+    });
+
+    if (details) {
+      await notifyQuoteDiscord({
+        title: attachments.length ? "New customer quote reply + photos" : "New customer quote reply",
+        customerName: details.user.name,
+        customerEmail: details.user.email,
+        subject: details.subject,
+        message: message || "Photo attachment",
+        vehicle: details.vehicle
+          ? [details.vehicle.year, details.vehicle.make, details.vehicle.model, details.vehicle.trim].filter(Boolean).join(" ")
+          : undefined,
+        service: details.service?.title || undefined,
+        photoCount: attachments.length,
+        threadId: details.id,
+      });
+    }
+  }
+
   // Twilio hook intentionally deferred. A future SMS should only send for team replies when
   // lastCustomerSeenAt is stale (for example > 90 seconds), and link directly to /quote?thread=<id>.
   return NextResponse.json({ success: true });
@@ -52,6 +85,31 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   }
   if (body.action === "accept") {
     const updated = await prisma.quoteThread.update({ where: { id }, data: { status: "accepted", acceptedAt: new Date(), lastCustomerSeenAt: new Date() } });
+    const details = await prisma.quoteThread.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        subject: true,
+        quotedPrice: true,
+        user: { select: { name: true, email: true } },
+        vehicle: { select: { year: true, make: true, model: true, trim: true } },
+        service: { select: { title: true } },
+      },
+    });
+    if (details) {
+      await notifyQuoteDiscord({
+        title: "Quote accepted",
+        customerName: details.user.name,
+        customerEmail: details.user.email,
+        subject: details.subject,
+        vehicle: details.vehicle
+          ? [details.vehicle.year, details.vehicle.make, details.vehicle.model, details.vehicle.trim].filter(Boolean).join(" ")
+          : undefined,
+        service: details.service?.title || undefined,
+        quotedPrice: details.quotedPrice,
+        threadId: details.id,
+      });
+    }
     return NextResponse.json(updated);
   }
   return NextResponse.json({ error: "Invalid action" }, { status: 400 });

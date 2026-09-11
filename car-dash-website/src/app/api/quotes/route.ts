@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 
 const select = {
   id: true, subject: true, status: true, quotedPrice: true, quoteNotes: true, acceptedAt: true,
@@ -43,9 +44,18 @@ export async function POST(request: NextRequest) {
       messages: { create: { sender: "customer", body: message, attachmentsJson: attachments.length ? JSON.stringify(attachments) : null } },
     }, select,
   });
-  const webhook = (process.env.DISCORD_SUPPORT_WEBHOOK_URL || process.env.DISCORD_WEBHOOK_URL)?.trim();
-  if (webhook) {
-    fetch(webhook, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: "Car Dash Quotes", content: `**New quote chat**\n${auth.name} (${auth.email})\n${subject}\n${message.slice(0, 1200)}\n\nOwner inbox: https://cardashdetailing.com/owner/quotes` }) }).catch(() => {});
-  }
+  await notifyQuoteDiscord({
+    title: "New quote chat",
+    customerName: auth.name,
+    customerEmail: auth.email,
+    subject,
+    message,
+    vehicle: thread.vehicle
+      ? [thread.vehicle.year, thread.vehicle.make, thread.vehicle.model, thread.vehicle.trim].filter(Boolean).join(" ")
+      : undefined,
+    service: thread.service?.title || undefined,
+    photoCount: attachments.length,
+    threadId: thread.id,
+  });
   return NextResponse.json(thread, { status: 201 });
 }
