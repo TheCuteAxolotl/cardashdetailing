@@ -52,7 +52,13 @@ export default function AboutPage() {
         </div>
       </section>
       <section className="bg-white text-[#0D0D0D]">
-        <div className="mx-auto grid max-w-[1540px] gap-4 border-x border-black/10 px-5 py-16 sm:px-8 md:grid-cols-2 lg:px-10">
+        <div className="mx-auto grid max-w-[1540px] gap-4 border-x border-black/10 px-5 py-16 sm:px-8 md:grid-cols-3 lg:px-10">
+          <a href="/paint-correction" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
+            <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Finish Guide</p>
+            <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Paint Correction</h3>
+            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">Learn the difference between paint enhancement, two-step correction, and more involved inspection-based correction.</p>
+            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">Explore paint correction →</span>
+          </a>
           <a href="/ceramic-coatings" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
             <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Protection Guide</p>
             <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Ceramic Coatings</h3>

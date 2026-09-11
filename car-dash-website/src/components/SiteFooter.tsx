@@ -26,11 +26,11 @@ export default function SiteFooter() {
         <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
           <div>
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Explore</p>
-            <div className="space-y-2 text-white/65"><a href="/about" className="block hover:text-[#FF2D2D]">About Car Dash</a><a href="/ceramic-coatings" className="block hover:text-[#FF2D2D]">Ceramic Coatings</a><a href="/products-we-use" className="block hover:text-[#FF2D2D]">Products We Use</a><a href="/gallery" className="block hover:text-[#FF2D2D]">Gallery</a></div>
+            <div className="space-y-2 text-white/65"><a href="/about" className="block hover:text-[#FF2D2D]">About Car Dash</a><a href="/paint-correction" className="block hover:text-[#FF2D2D]">Paint Correction</a><a href="/ceramic-coatings" className="block hover:text-[#FF2D2D]">Ceramic Coatings</a><a href="/products-we-use" className="block hover:text-[#FF2D2D]">Products We Use</a><a href="/gallery" className="block hover:text-[#FF2D2D]">Gallery</a></div>
           </div>
           <div>
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Services + Help</p>
-            <div className="space-y-2 text-white/65"><a href="/services" className="block hover:text-[#FF2D2D]">Services</a><a href="/services#marine-add-ons" className="block hover:text-[#FF2D2D]">Marine Add-Ons</a><a href="/faq" className="block hover:text-[#FF2D2D]">FAQ</a><a href="/reviews" className="block hover:text-[#FF2D2D]">Reviews</a><a href="/contact" className="block hover:text-[#FF2D2D]">Book</a></div>
+            <div className="space-y-2 text-white/65"><a href="/services#car-detailing" className="block hover:text-[#FF2D2D]">Car Detailing</a><a href="/services#car-add-ons" className="block hover:text-[#FF2D2D]">Car Add-Ons</a><a href="/services#marine-detailing" className="block hover:text-[#FF2D2D]">Marine Detailing</a><a href="/services#marine-add-ons" className="block hover:text-[#FF2D2D]">Marine Add-Ons</a><a href="/faq" className="block hover:text-[#FF2D2D]">FAQ</a><a href="/reviews" className="block hover:text-[#FF2D2D]">Reviews</a><a href="/contact" className="block hover:text-[#FF2D2D]">Book</a></div>
           </div>
           <div className="col-span-2 sm:col-span-1">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Contact + Legal</p>

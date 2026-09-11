@@ -10,9 +10,14 @@ type Service = { id:string; title:string; category:string; subcategory:string; p
 const publicLinks = [["/", "Home"],["/gallery", "Gallery"],["/faq", "FAQ"],["/reviews", "Reviews"],["/contact", "Contact"]] as const;
 const exploreLinks = [
   ["/about", "About Car Dash", "Who we are and how the service works."],
+  ["/paint-correction", "Paint Correction", "How polishing, correction levels, and paint refinement work."],
   ["/ceramic-coatings", "Ceramic Coatings", "GYEON Synchro, Gtechniq, and coating care."],
   ["/products-we-use", "Products We Use", "Professional chemistry led by Koch-Chemie."],
 ] as const;
+
+function isMarineService(service: Service) {
+  return `${service.category} ${service.subcategory} ${service.title}`.toLowerCase().includes("marine");
+}
 
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
@@ -28,15 +33,10 @@ export default function SiteHeader() {
     fetch("/api/services", { cache: "no-store" }).then(r => r.ok ? r.json() : []).then(d => setServices(Array.isArray(d) ? d.filter((x:Service)=>x.active) : [])).catch(()=>setServices([]));
   }, [pathname]);
 
-  const grouped = useMemo(() => {
-    const groups = new Map<string, Map<string, Service[]>>();
-    services.forEach(s => {
-      if (!groups.has(s.category)) groups.set(s.category, new Map());
-      const subs = groups.get(s.category)!;
-      if (!subs.has(s.subcategory)) subs.set(s.subcategory, []);
-      subs.get(s.subcategory)!.push(s);
-    });
-    return [...groups.entries()];
+  const { carServices, marineServices } = useMemo(() => {
+    const marine = services.filter(isMarineService);
+    const car = services.filter((service) => !isMarineService(service));
+    return { carServices: car, marineServices: marine };
   }, [services]);
 
   const cancelMenuClose = () => {
@@ -72,14 +72,47 @@ export default function SiteHeader() {
           <div className="static" onMouseEnter={()=>{cancelMenuClose();setServicesOpen(true);setExploreOpen(false)}} onMouseLeave={()=>scheduleMenuClose("services")}>
             <button onClick={()=>{setServicesOpen(v=>!v);setExploreOpen(false)}} className={`py-3 ${pathname.startsWith('/services')?'text-[#FF2D2D]':'hover:text-[#FF2D2D]'}`}>Services ▾</button>
             {servicesOpen && <div onMouseEnter={cancelMenuClose} onMouseLeave={()=>scheduleMenuClose("services")} className="menu-pop-right absolute right-5 top-full max-h-[calc(100vh-96px)] w-[min(860px,calc(100vw-40px))] overflow-y-auto rounded-[28px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-6 shadow-[0_28px_90px_rgba(0,0,0,.55)] sm:right-8 lg:right-10">
-              <div className="grid gap-6 md:grid-cols-3">{grouped.length ? grouped.map(([category,subs]) => <div key={category}><p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">{category}</p>{[...subs.entries()].map(([sub,items])=><div key={sub} className="mb-4"><p className="mb-1 text-xs font-semibold text-white/40">{sub}</p>{items.map(s=><a key={s.id} href={`/services#${s.id}`} className="block rounded-xl px-2 py-1.5 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{s.title}</a>)}</div>)}{category.toLowerCase().includes("marine") && <a href="/services#marine-add-ons" className="mt-1 block rounded-xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.05] px-3 py-2 text-sm text-[#FF2D2D]">Marine Add-Ons →</a>}</div>) : <><div><p className="text-[#FF2D2D]">Car Detailing</p><a href="/services" className="mt-2 block text-white/70">Package Detailing</a><a href="/services" className="mt-2 block text-white/70">Exterior Detailing</a></div><div><p className="text-[#FF2D2D]">Marine Detailing</p><a href="/services" className="mt-2 block text-white/70">Interior / Exterior</a><a href="/services" className="mt-2 block text-white/70">Buff & Polish</a><a href="/services#marine-add-ons" className="mt-2 block text-white/70">Marine Add-Ons</a></div><div><p className="text-[#FF2D2D]">Ceramic Coatings</p><a href="/services" className="mt-2 block text-white/70">Coating Packages</a><a href="/ceramic-coatings" className="mt-2 block text-white/70">Learn about coatings</a></div></>}</div>
-              <div className="mt-5 flex gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Chat to a Specialist</a><a href="/services" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">View all services →</a></div>
+              <div className="grid gap-5 md:grid-cols-[1fr_1fr_.78fr]">
+                <div className="rounded-[22px] border border-white/8 bg-white/[.018] p-4">
+                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">Car Detailing</p>
+                  <div className="space-y-1">
+                    {(carServices.length ? carServices.slice(0, 8) : [
+                      {id:"car-packages",title:"Package Detailing"},
+                      {id:"car-exterior",title:"Exterior Detailing"},
+                      {id:"car-interior",title:"Interior Detailing"},
+                      {id:"car-correction",title:"Paint Correction"},
+                    ]).map((service:any)=><a key={service.id} href={carServices.length ? `/services#${service.id}` : "/services#car-detailing"} className="block rounded-xl px-2 py-1.5 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{service.title}</a>)}
+                  </div>
+                  <a href="/services#car-add-ons" className="mt-3 block rounded-xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.05] px-3 py-2 text-sm text-[#FF2D2D]">Car Add-Ons + Pricing →</a>
+                </div>
+
+                <div className="rounded-[22px] border border-white/8 bg-white/[.018] p-4">
+                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">Marine Detailing</p>
+                  <div className="space-y-1">
+                    {(marineServices.length ? marineServices.slice(0, 8) : [
+                      {id:"marine-maintenance",title:"Marine Maintenance"},
+                      {id:"marine-complete",title:"Complete Marine Detail"},
+                      {id:"marine-enhancement",title:"Marine Enhancement"},
+                      {id:"marine-ceramic",title:"Marine Ceramic Protection"},
+                    ]).map((service:any)=><a key={service.id} href={marineServices.length ? `/services#${service.id}` : "/services#marine-detailing"} className="block rounded-xl px-2 py-1.5 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{service.title}</a>)}
+                  </div>
+                  <a href="/services#marine-add-ons" className="mt-3 block rounded-xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.05] px-3 py-2 text-sm text-[#FF2D2D]">Marine Add-Ons + Pricing →</a>
+                </div>
+
+                <div className="rounded-[22px] border border-white/8 bg-[#4A5568]/10 p-4">
+                  <p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-white/35">Quick Links</p>
+                  <a href="/paint-correction" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Paint Correction Guide</a>
+                  <a href="/ceramic-coatings" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Ceramic Coatings</a>
+                  <a href="/services" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">View All Services</a>
+                </div>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Chat to a Specialist</a><a href="/services" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">View all services →</a></div>
             </div>}
           </div>
 
           <div className="static" onMouseEnter={()=>{cancelMenuClose();setExploreOpen(true);setServicesOpen(false)}} onMouseLeave={()=>scheduleMenuClose("explore")}>
             <button onClick={()=>{setExploreOpen(v=>!v);setServicesOpen(false)}} className={`py-3 ${exploreActive?'text-[#FF2D2D]':'hover:text-[#FF2D2D]'}`}>Explore ▾</button>
-            {exploreOpen && <div onMouseEnter={cancelMenuClose} onMouseLeave={()=>scheduleMenuClose("explore")} className="menu-pop absolute left-1/2 top-full max-h-[calc(100vh-96px)] w-[min(440px,calc(100vw-32px))] overflow-y-auto rounded-[26px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-4 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
+            {exploreOpen && <div onMouseEnter={cancelMenuClose} onMouseLeave={()=>scheduleMenuClose("explore")} className="menu-pop absolute left-1/2 top-full max-h-[calc(100vh-96px)] w-[min(460px,calc(100vw-32px))] overflow-y-auto rounded-[26px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-4 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
               <p className="px-3 pb-3 pt-1 text-[10px] font-bold uppercase tracking-[.25em] text-[#FF2D2D]">Car Dash Guide</p>
               <div className="space-y-1">{exploreLinks.map(([href,label,desc])=><a key={href} href={href} className="block rounded-2xl border border-transparent px-3 py-3 hover:border-[#FF2D2D]/20 hover:bg-[#FF2D2D]/[.06]"><span className="block text-sm font-semibold text-white">{label}</span><span className="mt-1 block text-xs leading-5 text-white/38">{desc}</span></a>)}</div>
             </div>}
@@ -93,7 +126,7 @@ export default function SiteHeader() {
         <div className="hidden items-center gap-2 xl:flex">{!user?<a href="/login" className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/70 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Login</a>:<button onClick={logout} className="rounded-full px-3 py-2 text-xs text-white/40 hover:bg-white/5 hover:text-white">Logout</button>}<a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-xs font-semibold text-[#0D0D0D]">Get Estimate</a></div>
         <button onClick={()=>setMenuOpen(!menuOpen)} className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2 text-xs font-semibold hover:border-[#FF2D2D]/40 hover:text-[#FF2D2D] xl:hidden">{menuOpen?"Close":"Menu"}</button>
       </div>
-      {menuOpen&&<div className="border-t border-white/10 bg-[#0D0D0D] px-5 py-4 xl:hidden"><nav className="flex flex-col text-sm text-white/65"><a href="/" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Home</a><a href="/services" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Services</a><a href="/services#marine-add-ons" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Add-Ons</a><a href="/estimate" className="rounded-xl px-3 py-3 text-[#FF2D2D] hover:bg-[#FF2D2D]/8">Get an Estimate</a><a href="/quote" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Chat to a Specialist</a><p className="px-3 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[.24em] text-white/25">Explore</p>{exploreLinks.map(([href,label])=><a key={href} href={href} className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{label}</a>)}{publicLinks.slice(1).map(([href,label])=><a key={href} href={href} className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{label}</a>)}<button onClick={openSupport} className="rounded-xl px-3 py-3 text-left hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Support</button>{!user&&<a href="/login" className="rounded-xl px-3 py-3 text-[#FF2D2D] hover:bg-[#FF2D2D]/8">Login</a>}{user&&!owner&&!admin&&<><a href="/dashboard" className="rounded-xl px-3 py-3">Dashboard</a><a href="/vehicles" className="rounded-xl px-3 py-3">Saved Vehicles</a></>}{admin&&<a href="/admin/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Admin Dashboard</a>}{owner&&<a href="/owner/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Owner Dashboard</a>}{user&&<button onClick={logout} className="rounded-xl px-3 py-3 text-left">Logout</button>}</nav></div>}
+      {menuOpen&&<div className="border-t border-white/10 bg-[#0D0D0D] px-5 py-4 xl:hidden"><nav className="flex flex-col text-sm text-white/65"><a href="/" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Home</a><p className="px-3 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[.24em] text-white/25">Services</p><a href="/services#car-detailing" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Detailing</a><a href="/services#car-add-ons" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Add-Ons</a><a href="/services#marine-detailing" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Detailing</a><a href="/services#marine-add-ons" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Add-Ons</a><a href="/estimate" className="rounded-xl px-3 py-3 text-[#FF2D2D] hover:bg-[#FF2D2D]/8">Get an Estimate</a><a href="/quote" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Chat to a Specialist</a><p className="px-3 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[.24em] text-white/25">Explore</p>{exploreLinks.map(([href,label])=><a key={href} href={href} className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{label}</a>)}{publicLinks.slice(1).map(([href,label])=><a key={href} href={href} className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{label}</a>)}<button onClick={openSupport} className="rounded-xl px-3 py-3 text-left hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Support</button>{!user&&<a href="/login" className="rounded-xl px-3 py-3 text-[#FF2D2D] hover:bg-[#FF2D2D]/8">Login</a>}{user&&!owner&&!admin&&<><a href="/dashboard" className="rounded-xl px-3 py-3">Dashboard</a><a href="/vehicles" className="rounded-xl px-3 py-3">Saved Vehicles</a></>}{admin&&<a href="/admin/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Admin Dashboard</a>}{owner&&<a href="/owner/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Owner Dashboard</a>}{user&&<button onClick={logout} className="rounded-xl px-3 py-3 text-left">Logout</button>}</nav></div>}
     </header>
   </>;
 }
