@@ -58,7 +58,7 @@ export default function ServiceCards({ limit, variant = "dark" }: Props) {
     return (
       <div className={`rounded-[24px] border p-8 ${light ? "border-black/10 bg-black/[.03]" : "border-white/10 bg-white/[.03]"}`}>
         <p className="text-lg font-semibold">Service menu is being updated.</p>
-        <a href="/quote" className="mt-5 inline-block text-sm text-red-500">Chat to a Specialist →</a>
+        <a href="/quote" className="mt-5 inline-block text-sm text-[#00F2FE]">Chat to a Specialist →</a>
       </div>
     );
   }
@@ -68,9 +68,9 @@ export default function ServiceCards({ limit, variant = "dark" }: Props) {
       {services.map((service, index) => {
         const fixed = service.pricingType === "fixed" && service.price > 0;
         return (
-          <article key={service.id} className={`group flex min-h-[430px] flex-col p-7 sm:p-8 ${light ? "bg-[#f7f5ef] text-black" : "bg-[#0d0d0d] text-white"}`}>
+          <article key={service.id} className={`group flex min-h-[430px] flex-col p-7 sm:p-8 ${light ? "bg-[#FFFFFF] text-black" : "bg-[#111318] text-white"}`}>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[10px] font-semibold uppercase tracking-[.23em] text-red-500">Service 0{index + 1}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[.23em] text-[#00F2FE]">Service 0{index + 1}</span>
               <span className={`text-xs ${light ? "text-black/35" : "text-white/35"}`}>{priceLabel(service)}</span>
             </div>
             <h3 className="mt-10 text-3xl font-semibold tracking-[-.045em]">{service.title}</h3>
@@ -78,7 +78,7 @@ export default function ServiceCards({ limit, variant = "dark" }: Props) {
             <ul className="flex-1 space-y-3">
               {lines(service.description).slice(0, 7).map((item, itemIndex) => (
                 <li key={itemIndex} className={`flex gap-3 text-sm leading-6 ${light ? "text-black/50" : "text-white/43"}`}>
-                  <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-red-500" />
+                  <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-[#00F2FE]" />
                   {item}
                 </li>
               ))}
@@ -91,7 +91,7 @@ export default function ServiceCards({ limit, variant = "dark" }: Props) {
                 {fixed ? `Book · $${service.price.toFixed(0)}` : "Get exact quote"}
               </a>
               {!fixed && service.pricingType !== "quote" && (
-                <a href={`/estimate?service=${encodeURIComponent(service.id)}`} className="text-xs text-red-400">Estimate →</a>
+                <a href={`/estimate?service=${encodeURIComponent(service.id)}`} className="text-xs text-[#00F2FE]">Estimate →</a>
               )}
             </div>
           </article>

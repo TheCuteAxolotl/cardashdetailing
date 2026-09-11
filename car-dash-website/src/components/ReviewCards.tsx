@@ -29,7 +29,7 @@ const GOOGLE_REVIEW_URL = "https://g.page/r/CXj-njnM1fyvEAI/review";
 function Stars({ rating }: { rating: number }) {
   const rounded = Math.max(0, Math.min(5, Math.round(rating)));
   return (
-    <span className="tracking-[0.14em] text-[#ff3535]" aria-label={`${rating} out of 5 stars`}>
+    <span className="tracking-[0.14em] text-[#00F2FE]" aria-label={`${rating} out of 5 stars`}>
       {"★".repeat(rounded)}
       <span className="text-white/15">{"★".repeat(5 - rounded)}</span>
     </span>
@@ -68,14 +68,14 @@ export default function ReviewCards() {
 
   if (failed || !data) {
     return (
-      <div className="rounded-[2rem] border border-red-500/20 bg-[#111111] p-8">
+      <div className="rounded-[2rem] border border-[#00F2FE]/20 bg-[#111318] p-8">
         <p className="text-xl font-black text-white">Google reviews are temporarily unavailable.</p>
         <p className="mt-3 text-neutral-400">Reviews can still be viewed or submitted directly on Google.</p>
         <a
           href={GOOGLE_REVIEW_URL}
           target="_blank"
           rel="noreferrer"
-          className="mt-5 inline-flex rounded-full bg-red-600 px-5 py-2.5 text-sm font-black text-white transition hover:bg-red-500"
+          className="mt-5 inline-flex rounded-full bg-[#00F2FE] px-5 py-2.5 text-sm font-black text-[#0D0D0D] transition hover:bg-[#67F7FF]"
         >
           Open Google Reviews
         </a>
@@ -85,9 +85,9 @@ export default function ReviewCards() {
 
   return (
     <section aria-label="Google reviews">
-      <div className="mb-7 flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-[#101010] p-7 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-7 flex flex-col gap-5 rounded-[2rem] border border-white/10 bg-[#111318] p-7 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-red-500">Live from Google Maps</p>
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-[#00F2FE]">Live from Google Maps</p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {data.rating !== null && <span className="text-4xl font-black text-white">{data.rating.toFixed(1)}</span>}
             {data.rating !== null && <Stars rating={data.rating} />}
@@ -110,7 +110,7 @@ export default function ReviewCards() {
             href={data.reviewUrl || GOOGLE_REVIEW_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex rounded-full bg-red-600 px-5 py-2.5 text-sm font-black text-white transition hover:bg-red-500"
+            className="inline-flex rounded-full bg-[#00F2FE] px-5 py-2.5 text-sm font-black text-[#0D0D0D] transition hover:bg-[#67F7FF]"
           >
             Leave a Google Review
           </a>
@@ -119,7 +119,7 @@ export default function ReviewCards() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {data.reviews.map((review) => (
-          <article key={review.id} className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[#111111] p-7">
+          <article key={review.id} className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-[#111318] p-7">
             <div className="flex items-center gap-4">
               {review.authorPhotoUrl ? (
                 <img
@@ -129,7 +129,7 @@ export default function ReviewCards() {
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600/15 text-lg font-black text-red-400">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#00F2FE]/12 text-lg font-black text-[#00F2FE]">
                   {review.author.slice(0, 1).toUpperCase()}
                 </div>
               )}
@@ -139,7 +139,7 @@ export default function ReviewCards() {
                     href={review.authorProfileUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-black text-white hover:text-red-400"
+                    className="font-black text-white hover:text-[#00F2FE]"
                   >
                     {review.author}
                   </a>
@@ -159,7 +159,7 @@ export default function ReviewCards() {
               href={review.googleMapsUri}
               target="_blank"
               rel="noreferrer"
-              className="mt-6 inline-flex w-fit text-sm font-black text-red-400 transition hover:text-red-300"
+              className="mt-6 inline-flex w-fit text-sm font-black text-[#00F2FE] transition hover:text-[#67F7FF]"
             >
               View this review on Google Maps →
             </a>

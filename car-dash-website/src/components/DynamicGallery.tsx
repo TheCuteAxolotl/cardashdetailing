@@ -55,7 +55,7 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5">
-            <p className="text-[10px] uppercase tracking-[.22em] text-red-400">
+            <p className="text-[10px] uppercase tracking-[.22em] text-[#00F2FE]">
               {img.category.replaceAll("-", " ")}
             </p>
             <h3 className="mt-1 text-lg font-semibold text-white">{img.title}</h3>

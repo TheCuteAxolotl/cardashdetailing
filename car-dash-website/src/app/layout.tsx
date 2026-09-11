@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Car Dash Detailing",
   description:
-    "Mobile auto detailing from Car Dash Detailing. Interior, exterior, paint correction, protection, and custom service packages.",
+    "Mobile auto and marine detailing from Car Dash Detailing. Interior, exterior, paint correction, ceramic coatings, marine care, and custom service packages.",
 };
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-black text-white`}
     >
-      <body className="min-h-full flex min-h-screen flex-col bg-[#050505] text-white">
+      <body className="min-h-full flex min-h-screen flex-col bg-[#0D0D0D] text-white">
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />

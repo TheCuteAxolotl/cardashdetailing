@@ -1,9 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050505;
-  --foreground: #ffffff;
-  --accent: #dc2626;
+  --background: #0D0D0D;
+  --foreground: #FFFFFF;
+  --slate: #4A5568;
+  --accent: #00F2FE;
+  --accent-soft: rgba(0, 242, 254, 0.12);
+  --accent-line: rgba(0, 242, 254, 0.28);
 }
 
 @theme inline {
@@ -41,13 +44,53 @@ summary {
   touch-action: manipulation;
 }
 
+/* V4: every interactive control feels smoother instead of snapping on hover. */
+a,
+button,
+summary {
+  transition:
+    color 280ms ease,
+    background-color 280ms ease,
+    border-color 280ms ease,
+    opacity 280ms ease,
+    filter 280ms ease,
+    transform 320ms cubic-bezier(.2,.75,.2,1),
+    box-shadow 320ms cubic-bezier(.2,.75,.2,1);
+}
+
+@media (hover: hover) {
+  a:hover,
+  button:hover,
+  summary:hover {
+    filter: brightness(1.1);
+  }
+
+  a[class*="rounded"]:hover,
+  button[class*="rounded"]:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 34px rgba(0, 242, 254, 0.12);
+  }
+
+  a[class*="border"]:hover,
+  button[class*="border"]:hover {
+    border-color: rgba(0, 242, 254, 0.42);
+  }
+}
+
+button:disabled,
+a[aria-disabled="true"] {
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
 summary::-webkit-details-marker {
   display: none;
 }
 
 ::selection {
   background: var(--accent);
-  color: white;
+  color: #0D0D0D;
 }
 
 .support-input {
@@ -59,14 +102,72 @@ summary::-webkit-details-marker {
   color: #fff;
   outline: none;
   font-size: 14px;
+  transition: border-color 240ms ease, box-shadow 240ms ease, background-color 240ms ease;
 }
 .support-input::placeholder { color: rgba(255,255,255,.24); }
-.support-input:focus { border-color: rgba(239,68,68,.55); }
+.support-input:focus {
+  border-color: rgba(0,242,254,.65);
+  box-shadow: 0 0 0 3px rgba(0,242,254,.08);
+  background: rgba(255,255,255,.06);
+}
 
 /* Car Dash public-site finishing touches */
 img { display: block; }
 .public-glass {
-  background: rgba(8,8,8,.62);
+  background: rgba(13,13,13,.68);
   border: 1px solid rgba(255,255,255,.1);
   backdrop-filter: blur(18px);
+}
+
+/* Smooth dropdown entrance used by the Services and Explore navigation. */
+.menu-pop {
+  transform-origin: top center;
+  animation: menuPop 260ms cubic-bezier(.2,.75,.2,1) both;
+}
+
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.soft-panel {
+  background: linear-gradient(145deg, rgba(74,85,104,.14), rgba(255,255,255,.025));
+  border: 1px solid rgba(255,255,255,.1);
+}
+
+.cyan-rule {
+  background: linear-gradient(90deg, transparent, rgba(0,242,254,.7), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Keep Tailwind's utility transitions from snapping back to the default 150ms. */
+a, button, summary {
+  transition-duration: 280ms !important;
+  transition-timing-function: cubic-bezier(.2,.75,.2,1) !important;
+}
+
+button,
+a[class*="rounded"] {
+  opacity: .94;
+}
+
+@media (hover: hover) {
+  button:hover,
+  a[class*="rounded"]:hover {
+    opacity: 1;
+  }
 }

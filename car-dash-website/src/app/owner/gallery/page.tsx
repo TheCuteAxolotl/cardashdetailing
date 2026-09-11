@@ -88,7 +88,7 @@ export default function OwnerGallery() {
       <header className="border-b border-neutral-800 bg-neutral-950">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
           <div><h1 className="text-2xl font-bold">Website Photos</h1><p className="text-sm text-neutral-400">Upload photos and choose exactly where they appear across the website.</p></div>
-          <a href="/owner/dashboard" className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium hover:bg-red-800">Back</a>
+          <a href="/owner/dashboard" className="rounded-lg bg-[#00F2FE] px-4 py-2 text-sm font-medium text-[#0D0D0D] hover:bg-[#67F7FF]">Back</a>
         </div>
       </header>
 
@@ -101,7 +101,7 @@ export default function OwnerGallery() {
           </div>
           <div><label className="mb-2 block text-sm font-medium">Title</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="2026 Charger ceramic coating" className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" /></div>
           <div><label className="mb-2 block text-sm font-medium">Placement</label><select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm"><option value="gallery">Public Gallery</option><option value="before-after">Before & After</option><option value="portfolio">Portfolio</option><option value="hero">Homepage — Main Background</option><option value="home-showcase-primary">Homepage — Showcase Large</option><option value="home-showcase-secondary">Homepage — Showcase Small</option><option value="home-story">Homepage — Story Photo</option><option value="home-services-bg">Homepage — Services Background</option><option value="home-cta-bg">Homepage — Booking Background</option><option value="services-hero">Services — Background</option><option value="gallery-hero">Gallery — Background</option><option value="reviews-hero">Reviews — Background</option><option value="contact-hero">Contact — Background</option><option value="about-hero">About — Background</option><option value="about-story">About — Story Photo</option><option value="about-values-bg">About — Values Background</option><option value="faq-hero">FAQ — Background</option></select></div>
-          <div className="md:col-span-4"><button disabled={saving} className="rounded-xl bg-red-700 px-6 py-3 font-semibold hover:bg-red-800 disabled:opacity-50">{saving ? "Processing photo…" : "Add Photo"}</button>{message && <span className="ml-4 text-sm text-neutral-300">{message}</span>}</div>
+          <div className="md:col-span-4"><button disabled={saving} className="rounded-xl bg-[#00F2FE] px-6 py-3 font-semibold text-[#0D0D0D] hover:bg-[#67F7FF] disabled:opacity-50">{saving ? "Processing photo…" : "Add Photo"}</button>{message && <span className="ml-4 text-sm text-neutral-300">{message}</span>}</div>
         </form>
 
         {loading ? <p className="py-12 text-neutral-400">Loading…</p> : (

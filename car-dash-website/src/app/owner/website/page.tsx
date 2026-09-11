@@ -101,7 +101,7 @@ export default function OwnerWebsiteEditor() {
       <header className="border-b border-white/10 bg-black/40">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-5 px-6 py-6">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-red-500">Owner</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#00F2FE]">Owner</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Website Editor</h1>
             <p className="mt-1 text-sm text-white/45">Edit the public wording for the homepage and every main page.</p>
           </div>
@@ -120,9 +120,9 @@ export default function OwnerWebsiteEditor() {
                     <label key={field.key} className={field.area ? "md:col-span-2" : ""}>
                       <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/40">{field.label}</span>
                       {field.area ? (
-                        <textarea value={content[field.key]} onChange={(e) => setContent({ ...content, [field.key]: e.target.value })} rows={3} className="w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm leading-6 text-white outline-none focus:border-red-500/60" />
+                        <textarea value={content[field.key]} onChange={(e) => setContent({ ...content, [field.key]: e.target.value })} rows={3} className="w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm leading-6 text-white outline-none focus:border-[#00F2FE]/60" />
                       ) : (
-                        <input value={content[field.key]} onChange={(e) => setContent({ ...content, [field.key]: e.target.value })} className="w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none focus:border-red-500/60" />
+                        <input value={content[field.key]} onChange={(e) => setContent({ ...content, [field.key]: e.target.value })} className="w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none focus:border-[#00F2FE]/60" />
                       )}
                     </label>
                   ))}
@@ -132,7 +132,7 @@ export default function OwnerWebsiteEditor() {
 
             <div className="sticky bottom-5 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#111]/95 p-4 shadow-2xl backdrop-blur">
               <p className="text-sm text-white/50">{message || "Save once when the wording looks right."}</p>
-              <button onClick={save} disabled={saving} className="rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-500 disabled:opacity-50">{saving ? "Saving…" : "Save Website"}</button>
+              <button onClick={save} disabled={saving} className="rounded-full bg-[#00F2FE] px-6 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#67F7FF] disabled:opacity-50">{saving ? "Saving…" : "Save Website"}</button>
             </div>
           </div>
         )}

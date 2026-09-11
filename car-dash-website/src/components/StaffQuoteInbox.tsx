@@ -16,7 +16,7 @@ type Thread = {
   messages: Msg[];
 };
 
-const input = "w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none focus:border-red-500/50";
+const input = "w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none focus:border-[#00F2FE]/55";
 
 export default function StaffQuoteInbox({ backHref, canDelete = false }: { backHref: string; canDelete?: boolean }) {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -130,7 +130,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
       <div className="mx-auto max-w-[1500px]">
         <div className="flex justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[.28em] text-red-400">Sales inbox</p>
+            <p className="text-xs uppercase tracking-[.28em] text-[#00F2FE]">Sales inbox</p>
             <h1 className="mt-2 text-4xl font-semibold">Specialist quote chats</h1>
             <p className="mt-2 text-white/40">Reply, send exact quotes, close conversations, and follow accepted quotes into bookings.</p>
           </div>
@@ -198,7 +198,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                         return <p key={message.id} className="text-center text-[10px] uppercase tracking-[.16em] text-white/20">{message.body}</p>;
                       }
                       return (
-                        <div key={message.id} className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.sender === "team" ? "ml-auto bg-red-600" : "bg-white/8"}`}>
+                        <div key={message.id} className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.sender === "team" ? "ml-auto bg-[#00F2FE] text-[#0D0D0D]" : "bg-white/8"}`}>
                           <p className="text-sm leading-6">{message.body}</p>
                           {message.attachmentsJson && (
                             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -219,13 +219,13 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                   ) : (
                     <form onSubmit={send} className="flex gap-2 border-t border-white/10 pt-4">
                       <input className={input} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Reply to customer…" />
-                      <button className="rounded-full bg-red-600 px-5">Send</button>
+                      <button className="rounded-full bg-[#00F2FE] px-5 text-[#0D0D0D]">Send</button>
                     </form>
                   )}
                 </div>
 
                 <aside className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                  <p className="text-xs uppercase tracking-[.22em] text-red-400">Final quote</p>
+                  <p className="text-xs uppercase tracking-[.22em] text-[#00F2FE]">Final quote</p>
                   <label className="mt-4 block text-xs text-white/45">
                     Exact price
                     <input type="number" min="1" step="0.01" className={`${input} mt-2`} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="275" />
@@ -238,7 +238,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                   <button
                     onClick={saveQuote}
                     disabled={active.status === "closed" || active.status === "booked"}
-                    className="mt-4 w-full rounded-full bg-red-600 px-5 py-3 font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                    className="mt-4 w-full rounded-full bg-[#00F2FE] px-5 py-3 font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {active.status === "accepted" ? "Send revised quote" : "Send / update quote"}
                   </button>

@@ -80,7 +80,7 @@ export default function AdminSupportPage() {
       <div className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-red-400">Staff</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#00F2FE]">Staff</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Support inbox</h1>
             <p className="mt-2 text-sm text-white/38">Reply to customer support chats and update ticket status.</p>
           </div>
@@ -101,9 +101,9 @@ export default function AdminSupportPage() {
             {selected ? <>
               <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/8 pb-5">
                 <div><h2 className="text-2xl font-semibold">{selected.subject}</h2><p className="mt-2 text-sm text-white/42">{selected.name} · {selected.contactPreference}{selected.email ? ` · ${selected.email}` : ""}{selected.phone ? ` · ${selected.phone}` : ""}</p></div>
-                <div className="flex gap-2">{["open","waiting","closed"].map((status) => <button key={status} onClick={() => setStatus(status)} className={`rounded-full px-3 py-2 text-xs capitalize ${selected.status === status ? "bg-red-600" : "border border-white/10 text-white/50"}`}>{status}</button>)}</div>
+                <div className="flex gap-2">{["open","waiting","closed"].map((status) => <button key={status} onClick={() => setStatus(status)} className={`rounded-full px-3 py-2 text-xs capitalize ${selected.status === status ? "bg-[#00F2FE] text-[#0D0D0D]" : "border border-white/10 text-white/50"}`}>{status}</button>)}</div>
               </div>
-              <div className="space-y-3 py-6">{selected.messages.map((item) => <div key={item.id} className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${item.sender === "team" ? "ml-auto bg-red-600" : "bg-white/7 text-white/75"}`}>{item.body}</div>)}</div>
+              <div className="space-y-3 py-6">{selected.messages.map((item) => <div key={item.id} className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${item.sender === "team" ? "ml-auto bg-[#00F2FE] text-[#0D0D0D]" : "bg-white/7 text-white/75"}`}>{item.body}</div>)}</div>
               <form onSubmit={sendReply} className="mt-auto flex gap-2 border-t border-white/8 pt-5"><input value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply to customer…" className="support-input"/><button className="rounded-full bg-white px-5 text-sm font-semibold text-black">Send</button></form>
             </> : <div className="grid h-full place-items-center text-white/30">Choose a conversation.</div>}
           </section>

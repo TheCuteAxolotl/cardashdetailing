@@ -81,7 +81,7 @@ export default function AdminAccountsPage() {
       <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-red-400">Owner only</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#00F2FE]">Owner only</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Admin accounts</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
               Create staff logins that can manage support and bookings only. Admins cannot edit website text, services, pictures, gallery content, owner settings, or other admin accounts.
@@ -97,7 +97,7 @@ export default function AdminAccountsPage() {
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Admin name (optional)" className="support-input" />
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Admin email" className="support-input" required />
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (8+ characters)" className="support-input" minLength={8} required />
-              <button disabled={saving} className="w-full rounded-full bg-red-600 px-5 py-3 text-sm font-semibold hover:bg-red-500 disabled:opacity-50">
+              <button disabled={saving} className="w-full rounded-full bg-[#00F2FE] px-5 py-3 text-sm font-semibold text-[#0D0D0D] hover:bg-[#67F7FF] disabled:opacity-50">
                 {saving ? "Creating…" : "Create admin account"}
               </button>
             </form>

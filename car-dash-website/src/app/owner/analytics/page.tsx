@@ -37,7 +37,7 @@ export default async function Analytics() {
       <div className="mx-auto max-w-7xl">
         <div className="flex justify-between gap-5">
           <div>
-            <p className="text-xs uppercase tracking-[.28em] text-red-400">Owner</p>
+            <p className="text-xs uppercase tracking-[.28em] text-[#00F2FE]">Owner</p>
             <h1 className="mt-2 text-4xl font-semibold">Analytics</h1>
             <p className="mt-2 text-white/40">Bookings, leads, customers, and exact booking totals.</p>
           </div>

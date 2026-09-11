@@ -51,7 +51,7 @@ export default function OwnerDashboard() {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-700"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#00F2FE]"></div>
           <p className="mt-4">Loading...</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function OwnerDashboard() {
           </div>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 rounded-lg bg-red-700 hover:bg-red-800 transition text-sm font-medium"
+            className="px-4 py-2 rounded-lg bg-[#00F2FE] text-[#0D0D0D] hover:bg-[#67F7FF] transition text-sm font-medium"
           >
             Logout
           </button>
@@ -84,8 +84,8 @@ export default function OwnerDashboard() {
       <main className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <a href="/owner/website">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">✦</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Website Editor</h2>
@@ -94,8 +94,8 @@ export default function OwnerDashboard() {
           </a>
           {/* Services Management */}
           <a href="/owner/services">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">⚙️</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Services</h2>
@@ -105,8 +105,8 @@ export default function OwnerDashboard() {
 
           {/* Images/Gallery Management */}
           <a href="/owner/gallery">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">🖼️</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Gallery</h2>
@@ -116,8 +116,8 @@ export default function OwnerDashboard() {
 
           {/* Bookings Management */}
           <a href="/owner/bookings">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">📅</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Bookings</h2>
@@ -126,40 +126,40 @@ export default function OwnerDashboard() {
           </a>
 
           <a href="/owner/quotes">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">💬</span></div>
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">💬</span></div>
               <h2 className="text-xl font-semibold mb-2">Quote Chats</h2>
               <p className="text-neutral-400 text-sm">Talk with customers, review photos, and send exact quotes</p>
             </div>
           </a>
 
           <a href="/owner/warranties">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">🛡️</span></div>
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">🛡️</span></div>
               <h2 className="text-xl font-semibold mb-2">Ceramic Warranties</h2>
               <p className="text-neutral-400 text-sm">Create and manage customer coating warranty records</p>
             </div>
           </a>
 
           <a href="/owner/analytics">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">↗</span></div>
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">↗</span></div>
               <h2 className="text-xl font-semibold mb-2">Analytics</h2>
               <p className="text-neutral-400 text-sm">Bookings, leads, customers, and accepted quote value</p>
             </div>
           </a>
 
           <a href="/owner/support">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">↗</span></div>
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">↗</span></div>
               <h2 className="text-xl font-semibold mb-2">Support</h2>
               <p className="text-neutral-400 text-sm">Reply to website support chats and block repeat spam</p>
             </div>
           </a>
 
           <a href="/owner/admins">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">👥</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Admin Accounts</h2>
@@ -169,8 +169,8 @@ export default function OwnerDashboard() {
 
           {/* Settings */}
           <a href="/owner/settings">
-            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-red-700 transition cursor-pointer">
-              <div className="rounded-2xl bg-red-700/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#00F2FE]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#00F2FE]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">⚙️</span>
               </div>
               <h2 className="text-xl font-semibold mb-2">Settings</h2>

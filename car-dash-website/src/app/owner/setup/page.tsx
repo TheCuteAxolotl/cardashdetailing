@@ -81,7 +81,7 @@ export default function OwnerSetup() {
           <div className="mt-10">
             <a
               href="/owner/dashboard"
-              className="inline-flex items-center justify-center rounded-full bg-red-700 px-8 py-4 text-base font-semibold text-white transition duration-200 hover:bg-red-800"
+              className="inline-flex items-center justify-center rounded-full bg-[#00F2FE] px-8 py-4 text-base font-semibold text-[#0D0D0D] transition duration-200 hover:bg-[#67F7FF]"
             >
               Go to Dashboard →
             </a>
