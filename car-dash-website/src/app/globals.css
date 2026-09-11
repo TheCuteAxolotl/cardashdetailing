@@ -136,6 +136,23 @@ img { display: block; }
   }
 }
 
+/* Services mega menu is anchored from the right so it stays inside laptop viewports. */
+.menu-pop-right {
+  transform-origin: top right;
+  animation: menuPopRight 260ms cubic-bezier(.2,.75,.2,1) both;
+}
+
+@keyframes menuPopRight {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .soft-panel {
   background: linear-gradient(145deg, rgba(74,85,104,.14), rgba(255,255,255,.025));
   border: 1px solid rgba(255,255,255,.1);
