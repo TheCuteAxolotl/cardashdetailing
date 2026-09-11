@@ -60,7 +60,7 @@ export default function OwnerSettings() {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#00F2FE]"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF2D2D]"></div>
           <p className="mt-4">Loading...</p>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function OwnerSettings() {
             <h1 className="text-2xl font-bold">Settings</h1>
             <p className="text-sm text-neutral-400">Manage your account</p>
           </div>
-          <a href="/owner/dashboard" className="px-4 py-2 rounded-lg bg-[#00F2FE] hover:bg-[#67F7FF] text-[#0D0D0D] transition text-sm font-medium">
+          <a href="/owner/dashboard" className="px-4 py-2 rounded-lg bg-[#FF2D2D] hover:bg-[#FF2D2D] text-[#0D0D0D] transition text-sm font-medium">
             Back
           </a>
         </div>
@@ -119,13 +119,13 @@ export default function OwnerSettings() {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-[#00F2FE]/60"
+                className="w-full px-4 py-3 rounded-lg bg-neutral-900 border border-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:border-[#FF2D2D]/60"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-[#00F2FE] hover:bg-[#67F7FF] text-[#0D0D0D] py-3 rounded-lg font-semibold transition"
+              className="w-full bg-[#FF2D2D] hover:bg-[#FF2D2D] text-[#0D0D0D] py-3 rounded-lg font-semibold transition"
             >
               Save Changes
             </button>

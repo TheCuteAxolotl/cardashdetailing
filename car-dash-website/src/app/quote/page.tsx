@@ -24,7 +24,7 @@ type Thread = {
   messages: Msg[];
 };
 
-const input = "w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 outline-none focus:border-[#00F2FE]/60";
+const input = "w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 outline-none focus:border-[#FF2D2D]/60";
 
 export default function QuotePage() {
   const [user, setUser] = useState<any>(undefined);
@@ -172,11 +172,11 @@ export default function QuotePage() {
     return (
       <main className="min-h-screen bg-[#0D0D0D] px-6 py-24 text-white">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-[#00F2FE]">Specialist Chat</p>
+          <p className="text-[#FF2D2D]">Specialist Chat</p>
           <h1 className="mt-3 text-4xl font-semibold">Sign in to start a private quote conversation.</h1>
           <p className="mt-4 text-white/45">Your chat, photos, quotes, and history stay tied to your account.</p>
           <div className="mt-7 flex justify-center gap-3">
-            <a href="/login" className="rounded-full bg-[#00F2FE] px-6 py-3 text-[#0D0D0D]">Login</a>
+            <a href="/login" className="rounded-full bg-[#FF2D2D] px-6 py-3 text-[#0D0D0D]">Login</a>
             <a href="/register" className="rounded-full border border-white/15 px-6 py-3">Create account</a>
           </div>
         </div>
@@ -188,14 +188,14 @@ export default function QuotePage() {
     <main className="min-h-screen bg-[#0D0D0D] px-4 py-8 text-white">
       <div className="mx-auto max-w-7xl">
         <div>
-          <p className="text-xs uppercase tracking-[.28em] text-[#00F2FE]">Private quote chat</p>
+          <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Private quote chat</p>
           <h1 className="mt-2 text-4xl font-semibold">Chat to a Specialist</h1>
           <p className="mt-2 text-white/40">Send photos, ask questions, receive an exact quote, accept it, then book with that exact price.</p>
         </div>
 
         <div className="mt-7 grid gap-5 lg:grid-cols-[300px_1fr]">
           <aside className="rounded-[26px] border border-white/10 bg-white/[.025] p-3">
-            <button onClick={() => setSelected("")} className="mb-3 w-full rounded-2xl bg-[#00F2FE] px-4 py-3 text-left font-semibold text-[#0D0D0D]">
+            <button onClick={() => setSelected("")} className="mb-3 w-full rounded-2xl bg-[#FF2D2D] px-4 py-3 text-left font-semibold text-[#0D0D0D]">
               + New quote chat
             </button>
             {threads.map((thread) => (
@@ -224,19 +224,19 @@ export default function QuotePage() {
                       </p>
                     </div>
                     {active.status === "accepted" && active.quotedPrice && (
-                      <a href={`/contact?quote=${encodeURIComponent(active.id)}`} className="rounded-full bg-[#00F2FE] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">
+                      <a href={`/contact?quote=${encodeURIComponent(active.id)}`} className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">
                         Book Now · ${active.quotedPrice.toFixed(2)}
                       </a>
                     )}
                   </div>
 
                   {active.quotedPrice && (
-                    <div className="mt-4 rounded-2xl border border-[#00F2FE]/20 bg-[#00F2FE]/[.05] p-4">
-                      <p className="text-xs uppercase tracking-[.2em] text-[#00F2FE]">Car Dash Final Quote</p>
+                    <div className="mt-4 rounded-2xl border border-[#FF2D2D]/20 bg-[#FF2D2D]/[.05] p-4">
+                      <p className="text-xs uppercase tracking-[.2em] text-[#FF2D2D]">Car Dash Final Quote</p>
                       <p className="mt-1 text-3xl font-semibold">${active.quotedPrice.toFixed(2)}</p>
                       {active.quoteNotes && <p className="mt-2 text-sm text-white/45">{active.quoteNotes}</p>}
                       {active.status === "quoted" && (
-                        <button onClick={accept} className="mt-3 rounded-full bg-[#00F2FE] px-5 py-2 text-sm font-semibold text-[#0D0D0D]">Accept quote</button>
+                        <button onClick={accept} className="mt-3 rounded-full bg-[#FF2D2D] px-5 py-2 text-sm font-semibold text-[#0D0D0D]">Accept quote</button>
                       )}
                       {active.status === "accepted" && (
                         <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -263,7 +263,7 @@ export default function QuotePage() {
                     return (
                       <div
                         key={message.id}
-                        className={`max-w-[82%] rounded-2xl px-4 py-3 ${message.sender === "customer" ? "ml-auto bg-white/10" : "bg-[#00F2FE] text-[#0D0D0D]"}`}
+                        className={`max-w-[82%] rounded-2xl px-4 py-3 ${message.sender === "customer" ? "ml-auto bg-white/10" : "bg-[#FF2D2D] text-[#0D0D0D]"}`}
                       >
                         <p className="text-sm leading-6">{message.body}</p>
                         {message.attachmentsJson && (
@@ -287,17 +287,17 @@ export default function QuotePage() {
                   <form onSubmit={send} className="border-t border-white/10 pt-4">
                     <div className="flex gap-2">
                       <input className={input} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Message Car Dash…" />
-                      <button className="rounded-full bg-[#00F2FE] px-5 font-semibold text-[#0D0D0D]">Send</button>
+                      <button className="rounded-full bg-[#FF2D2D] px-5 font-semibold text-[#0D0D0D]">Send</button>
                     </div>
                     <label className="mt-3 inline-block cursor-pointer text-xs text-white/45">
                       Attach up to 3 photos
                       <input type="file" accept="image/*" multiple onChange={files} className="hidden" />
                     </label>
-                    {photos.length > 0 && <span className="ml-3 text-xs text-[#67F7FF]">{photos.length} photo(s) ready</span>}
+                    {photos.length > 0 && <span className="ml-3 text-xs text-[#FF2D2D]">{photos.length} photo(s) ready</span>}
                   </form>
                 )}
 
-                {error && <p className="mt-3 text-sm text-[#67F7FF]">{error}</p>}
+                {error && <p className="mt-3 text-sm text-[#FF2D2D]">{error}</p>}
               </div>
             ) : (
               <form onSubmit={create} className="mx-auto max-w-2xl py-4">
@@ -311,7 +311,7 @@ export default function QuotePage() {
                       </option>
                     ))}
                   </select>
-                  {!vehicles.length && <a href="/vehicles" className="text-sm text-[#00F2FE]">+ Save a vehicle first</a>}
+                  {!vehicles.length && <a href="/vehicles" className="text-sm text-[#FF2D2D]">+ Save a vehicle first</a>}
 
                   <select className={input} value={serviceId} onChange={(event) => setServiceId(event.target.value)}>
                     <option value="">Service (optional)</option>
@@ -330,7 +330,7 @@ export default function QuotePage() {
                     Add photos (optional, up to 3)
                     <input type="file" accept="image/*" multiple onChange={files} className="hidden" />
                   </label>
-                  {photos.length > 0 && <p className="text-sm text-[#67F7FF]">{photos.length} photo(s) selected</p>}
+                  {photos.length > 0 && <p className="text-sm text-[#FF2D2D]">{photos.length} photo(s) selected</p>}
 
                   <div className="rounded-2xl border border-white/10 bg-white/[.025] p-4">
                     <label className="block text-sm text-white/60">
@@ -352,13 +352,13 @@ export default function QuotePage() {
                       </span>
                     </label>
                     <p className="mt-3 pl-6 text-xs text-white/35">
-                      See our <a href="/privacy-policy" className="text-[#00F2FE]">Privacy Policy</a> and{" "}
-                      <a href="/terms-and-conditions" className="text-[#00F2FE]">Terms and Conditions</a>.
+                      See our <a href="/privacy-policy" className="text-[#FF2D2D]">Privacy Policy</a> and{" "}
+                      <a href="/terms-and-conditions" className="text-[#FF2D2D]">Terms and Conditions</a>.
                     </p>
                   </div>
 
-                  {error && <p className="text-sm text-[#67F7FF]">{error}</p>}
-                  <button className="rounded-full bg-[#00F2FE] px-6 py-3 text-[#0D0D0D] font-semibold">Start private chat</button>
+                  {error && <p className="text-sm text-[#FF2D2D]">{error}</p>}
+                  <button className="rounded-full bg-[#FF2D2D] px-6 py-3 text-[#0D0D0D] font-semibold">Start private chat</button>
                 </div>
               </form>
             )}

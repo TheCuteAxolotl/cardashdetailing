@@ -173,7 +173,7 @@ export default function OwnerSupportPage() {
       <div className="mx-auto max-w-[1500px] px-5 py-8 sm:px-8 lg:px-12">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#00F2FE]">Owner</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#FF2D2D]">Owner</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Support inbox</h1>
             <p className="mt-2 text-sm text-white/38">Reply to website support chats and manage repeat spam using the identifier from Discord.</p>
           </div>
@@ -219,7 +219,7 @@ export default function OwnerSupportPage() {
                       <button
                         key={status}
                         onClick={() => setStatus(status)}
-                        className={`rounded-full px-3 py-2 text-xs capitalize ${selected.status === status ? "bg-[#00F2FE] text-[#0D0D0D]" : "border border-white/10 text-white/50"}`}
+                        className={`rounded-full px-3 py-2 text-xs capitalize ${selected.status === status ? "bg-[#FF2D2D] text-[#0D0D0D]" : "border border-white/10 text-white/50"}`}
                       >
                         {status}
                       </button>
@@ -241,7 +241,7 @@ export default function OwnerSupportPage() {
                   {selected.messages.map((supportMessage) => (
                     <div
                       key={supportMessage.id}
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${supportMessage.sender === "team" ? "ml-auto bg-[#00F2FE] text-[#0D0D0D]" : "bg-white/7 text-white/75"}`}
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${supportMessage.sender === "team" ? "ml-auto bg-[#FF2D2D] text-[#0D0D0D]" : "bg-white/7 text-white/75"}`}
                     >
                       {supportMessage.body}
                     </div>

@@ -66,12 +66,12 @@ export default function AdminBookings() {
     <div className="min-h-screen bg-[#050505] text-white">
       <header className="border-b border-neutral-800 bg-neutral-950">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <div><p className="text-[10px] font-semibold uppercase tracking-[.25em] text-[#00F2FE]">Staff</p><h1 className="mt-1 text-2xl font-bold">Bookings</h1><p className="text-sm text-neutral-400">Customer requests, exact totals, status controls, and booking conversations.</p></div>
-          <a href="/admin/dashboard" className="rounded-lg bg-[#00F2FE] px-4 py-2 text-sm font-medium text-[#0D0D0D]">Back</a>
+          <div><p className="text-[10px] font-semibold uppercase tracking-[.25em] text-[#FF2D2D]">Staff</p><h1 className="mt-1 text-2xl font-bold">Bookings</h1><p className="text-sm text-neutral-400">Customer requests, exact totals, status controls, and booking conversations.</p></div>
+          <a href="/admin/dashboard" className="rounded-lg bg-[#FF2D2D] px-4 py-2 text-sm font-medium text-[#0D0D0D]">Back</a>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-8 flex flex-wrap gap-2">{["all","pending","confirmed","completed","cancelled"].map((s)=><button key={s} onClick={()=>setFilter(s)} className={`rounded-lg px-4 py-2 text-sm font-medium ${filter===s?"bg-[#00F2FE] text-[#0D0D0D]":"bg-neutral-800"}`}>{s[0].toUpperCase()+s.slice(1)}</button>)}</div>
+        <div className="mb-8 flex flex-wrap gap-2">{["all","pending","confirmed","completed","cancelled"].map((s)=><button key={s} onClick={()=>setFilter(s)} className={`rounded-lg px-4 py-2 text-sm font-medium ${filter===s?"bg-[#FF2D2D] text-[#0D0D0D]":"bg-neutral-800"}`}>{s[0].toUpperCase()+s.slice(1)}</button>)}</div>
         {message && <p className="mb-6 rounded-xl border border-red-800 bg-red-950/30 p-4 text-red-200">{message}</p>}
         <div className="space-y-5">
           {visible.map((b)=>(
@@ -93,7 +93,7 @@ export default function AdminBookings() {
                 <div className="flex min-w-48 flex-col gap-2">
                   <a
                     href={`/booking-chat/${b.id}`}
-                    className="rounded-lg border border-[#00F2FE]/30 bg-[#00F2FE]/10 px-4 py-2 text-center text-sm font-semibold text-[#8CF9FF] transition hover:bg-[#00F2FE]/18"
+                    className="rounded-lg border border-[#FF2D2D]/30 bg-[#FF2D2D]/10 px-4 py-2 text-center text-sm font-semibold text-[#FF2D2D] transition hover:bg-[#FF2D2D]/18"
                   >
                     Chat with customer
                   </a>

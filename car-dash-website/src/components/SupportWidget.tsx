@@ -246,7 +246,7 @@ export default function SupportWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-[70] rounded-full border border-black/10 bg-[#00F2FE] px-5 py-3 text-sm font-semibold text-[#0D0D0D] shadow-[0_18px_50px_rgba(0,0,0,.22)] transition hover:-translate-y-0.5"
+          className="fixed bottom-5 right-5 z-[70] rounded-full border border-black/10 bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] shadow-[0_18px_50px_rgba(0,0,0,.22)] transition hover:-translate-y-0.5"
         >
           Need help?
         </button>
@@ -262,7 +262,7 @@ export default function SupportWidget() {
           <section className="flex max-h-[84vh] w-full max-w-[460px] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0a] text-white shadow-2xl">
             <div className="flex items-start justify-between border-b border-white/10 px-5 py-5">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[.26em] text-[#00F2FE]">
+                <p className="text-[10px] font-semibold uppercase tracking-[.26em] text-[#FF2D2D]">
                   Car Dash Support
                 </p>
                 <h2 className="mt-2 text-xl font-semibold">
@@ -294,7 +294,7 @@ export default function SupportWidget() {
                 <div className="grid gap-2 sm:grid-cols-2">
                   <a
                     href="/login"
-                    className="rounded-full bg-[#00F2FE] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#67F7FF]"
+                    className="rounded-full bg-[#FF2D2D] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]"
                   >
                     Login
                   </a>
@@ -314,7 +314,7 @@ export default function SupportWidget() {
                 </p>
                 <a
                   href={user.role === "owner" ? "/owner/support" : "/admin/support"}
-                  className="block rounded-full bg-[#00F2FE] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#67F7FF]"
+                  className="block rounded-full bg-[#FF2D2D] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]"
                 >
                   Open Support Inbox
                 </a>
@@ -360,11 +360,11 @@ export default function SupportWidget() {
                   className="support-input"
                 />
 
-                {error && <p className="text-sm text-[#8CF9FF]">{error}</p>}
+                {error && <p className="text-sm text-[#FF2D2D]">{error}</p>}
 
                 <button
                   disabled={sending}
-                  className="w-full rounded-full bg-[#00F2FE] px-5 py-3 text-sm font-semibold text-[#0D0D0D] hover:bg-[#67F7FF] disabled:opacity-50"
+                  className="w-full rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D] disabled:opacity-50"
                 >
                   {sending ? "Sending…" : "Start support chat"}
                 </button>
@@ -423,7 +423,7 @@ export default function SupportWidget() {
                           key={item.id}
                           className={`max-w-[86%] rounded-2xl px-4 py-3 text-sm leading-6 ${
                             item.sender === "team"
-                              ? "bg-[#00F2FE] text-[#0D0D0D]"
+                              ? "bg-[#FF2D2D] text-[#0D0D0D]"
                               : "ml-auto bg-white/8 text-white/80"
                           }`}
                         >
@@ -451,7 +451,7 @@ export default function SupportWidget() {
                           Send
                         </button>
                       </div>
-                      {error && <p className="mt-2 text-xs text-[#8CF9FF]">{error}</p>}
+                      {error && <p className="mt-2 text-xs text-[#FF2D2D]">{error}</p>}
                     </form>
                   </>
                 ) : (

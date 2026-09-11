@@ -122,7 +122,7 @@ export default function OwnerBookings() {
 
           <a
             href="/owner/dashboard"
-            className="rounded-lg bg-[#00F2FE] px-4 py-2 text-sm font-medium text-[#0D0D0D]"
+            className="rounded-lg bg-[#FF2D2D] px-4 py-2 text-sm font-medium text-[#0D0D0D]"
           >
             Back
           </a>
@@ -137,7 +137,7 @@ export default function OwnerBookings() {
                 key={status}
                 onClick={() => setFilter(status)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium ${
-                  filter === status ? "bg-[#00F2FE] text-[#0D0D0D]" : "bg-neutral-800"
+                  filter === status ? "bg-[#FF2D2D] text-[#0D0D0D]" : "bg-neutral-800"
                 }`}
               >
                 {status[0].toUpperCase() + status.slice(1)}
@@ -233,7 +233,7 @@ export default function OwnerBookings() {
                   <div className="flex min-w-48 flex-col gap-2">
                   <a
                     href={`/booking-chat/${booking.id}`}
-                    className="rounded-lg border border-[#00F2FE]/30 bg-[#00F2FE]/10 px-4 py-2 text-center text-sm font-semibold text-[#8CF9FF] transition hover:bg-[#00F2FE]/18"
+                    className="rounded-lg border border-[#FF2D2D]/30 bg-[#FF2D2D]/10 px-4 py-2 text-center text-sm font-semibold text-[#FF2D2D] transition hover:bg-[#FF2D2D]/18"
                   >
                     Chat with customer
                   </a>

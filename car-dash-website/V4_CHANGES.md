@@ -22,7 +22,7 @@ V4 refreshes the public site around an obsidian / slate / white / electric-cyan 
 - Obsidian Black: #0D0D0D
 - Metallic Slate: #4A5568
 - Pristine White: #FFFFFF
-- Electric Cyan: #00F2FE
+- Electric Red: #FF2D2D
 - Updated public/customer accent colors, panels, calls-to-action, links, forms, and Google review UI.
 
 ## Interaction polish

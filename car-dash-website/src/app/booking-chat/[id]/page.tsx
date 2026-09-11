@@ -119,7 +119,7 @@ export default function BookingChatPage() {
     return (
       <main className="grid min-h-screen place-items-center bg-[#050505] text-white">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#00F2FE]" />
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#FF2D2D]" />
           <p className="mt-4 text-sm text-white/40">Loading booking conversation…</p>
         </div>
       </main>
@@ -130,10 +130,10 @@ export default function BookingChatPage() {
     return (
       <main className="grid min-h-screen place-items-center bg-[#050505] px-5 text-white">
         <div className="max-w-md rounded-3xl border border-white/10 bg-white/[.025] p-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#00F2FE]">Booking chat</p>
+          <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#FF2D2D]">Booking chat</p>
           <h1 className="mt-3 text-2xl font-semibold">Conversation unavailable</h1>
           <p className="mt-3 text-sm leading-6 text-white/45">{error || "This booking chat could not be opened."}</p>
-          <a href="/login" className="mt-6 inline-block rounded-full bg-[#00F2FE] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Sign in</a>
+          <a href="/login" className="mt-6 inline-block rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Sign in</a>
         </div>
       </main>
     );
@@ -159,7 +159,7 @@ export default function BookingChatPage() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[.26em] text-[#00F2FE]">Booking conversation</p>
+            <p className="text-xs font-semibold uppercase tracking-[.26em] text-[#FF2D2D]">Booking conversation</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-[-.03em] sm:text-4xl">{booking.serviceName}</h1>
             <p className="mt-2 text-sm text-white/40">
               {staff ? `${booking.customerName} · ${booking.customerEmail}` : "Message Car Dash Detailing about this appointment."}
@@ -205,7 +205,7 @@ export default function BookingChatPage() {
                   return (
                     <div
                       key={message.id}
-                      className={`max-w-[86%] rounded-2xl px-4 py-3 ${mine ? "ml-auto bg-[#00F2FE] text-[#0D0D0D]" : "bg-white/8"}`}
+                      className={`max-w-[86%] rounded-2xl px-4 py-3 ${mine ? "ml-auto bg-[#FF2D2D] text-[#0D0D0D]" : "bg-white/8"}`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
                       <p className="mt-2 text-[10px] opacity-45">
@@ -235,11 +235,11 @@ export default function BookingChatPage() {
                 onChange={(event) => setReply(event.target.value)}
                 placeholder={staff ? "Message customer…" : "Message Car Dash Detailing…"}
                 maxLength={3000}
-                className="min-h-12 flex-1 resize-none rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-sm text-white outline-none focus:border-[#00F2FE]/60"
+                className="min-h-12 flex-1 resize-none rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-sm text-white outline-none focus:border-[#FF2D2D]/60"
               />
               <button
                 disabled={sending || !reply.trim()}
-                className="self-end rounded-full bg-[#00F2FE] px-5 py-3 text-sm font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50"
+                className="self-end rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {sending ? "Sending…" : "Send"}
               </button>
@@ -247,7 +247,7 @@ export default function BookingChatPage() {
           </section>
 
           <aside className="h-fit rounded-[28px] border border-white/10 bg-white/[.025] p-5">
-            <p className="text-xs font-semibold uppercase tracking-[.22em] text-[#00F2FE]">Booking details</p>
+            <p className="text-xs font-semibold uppercase tracking-[.22em] text-[#FF2D2D]">Booking details</p>
             <div className="mt-5 space-y-4 text-sm">
               <div>
                 <p className="text-xs text-white/30">Total</p>

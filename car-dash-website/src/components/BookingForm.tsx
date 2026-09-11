@@ -92,7 +92,7 @@ const addOnsList = [
   "Headlight Restoration",
 ];
 
-const input = "mt-2 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none focus:border-[#00F2FE]/60";
+const input = "mt-2 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none focus:border-[#FF2D2D]/60";
 
 export default function BookingForm({
   prefill,
@@ -301,7 +301,7 @@ export default function BookingForm({
   return (
     <form onSubmit={submit} className="space-y-5 text-white">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#00F2FE]">
+        <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#FF2D2D]">
           {quoteLocked ? "Accepted quote" : "Fixed-price booking"}
         </p>
         <h2 className="mt-2 text-2xl font-semibold">Request an appointment</h2>
@@ -313,15 +313,15 @@ export default function BookingForm({
       {setupMessage && (
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100">
           <p>{setupMessage}</p>
-          <a href="/quote" className="mt-3 inline-block font-semibold text-[#00F2FE] hover:text-[#67F7FF]">
+          <a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D] hover:text-[#FF2D2D]">
             Chat to a Specialist →
           </a>
         </div>
       )}
 
       {quoteLocked ? (
-        <div className="rounded-3xl border border-[#00F2FE]/25 bg-[#00F2FE]/[.055] p-5">
-          <p className="text-xs uppercase tracking-[.22em] text-[#00F2FE]">Locked booking total</p>
+        <div className="rounded-3xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-5">
+          <p className="text-xs uppercase tracking-[.22em] text-[#FF2D2D]">Locked booking total</p>
           <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xl font-semibold">{form.selectedPackage}</p>
@@ -412,7 +412,7 @@ export default function BookingForm({
             ))}
           </select>
           {form.preferredDate && slots.length === 0 && (
-            <span className="mt-2 block text-xs text-[#67F7FF]">No standard slots available. Try another date or chat with a specialist.</span>
+            <span className="mt-2 block text-xs text-[#FF2D2D]">No standard slots available. Try another date or chat with a specialist.</span>
           )}
         </label>
       </div>
@@ -453,9 +453,9 @@ export default function BookingForm({
         <input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" />
         <span>
           I understand this is a booking request with the displayed total and Car Dash will confirm availability. I agree to the{" "}
-          <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#00F2FE] hover:text-[#67F7FF]">Terms and Conditions</a>{" "}
+          <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D] hover:text-[#FF2D2D]">Terms and Conditions</a>{" "}
           and acknowledge the{" "}
-          <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#00F2FE] hover:text-[#67F7FF]">Privacy Policy</a>.
+          <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D] hover:text-[#FF2D2D]">Privacy Policy</a>.
         </span>
       </label>
 
@@ -470,9 +470,9 @@ export default function BookingForm({
         </label>
         <p className="mt-3 pl-6 text-xs leading-5 text-white/38">
           See our{" "}
-          <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#00F2FE] hover:text-[#67F7FF]">Privacy Policy</a>{" "}
+          <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D] hover:text-[#FF2D2D]">Privacy Policy</a>{" "}
           and{" "}
-          <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#00F2FE] hover:text-[#67F7FF]">Terms and Conditions</a>.
+          <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D] hover:text-[#FF2D2D]">Terms and Conditions</a>.
         </p>
       </div>
 
@@ -499,7 +499,7 @@ export default function BookingForm({
       <div className="flex gap-3">
         <button
           disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !bookingTotal || bookingTotal <= 0 || Boolean(setupMessage)}
-          className="rounded-full bg-[#00F2FE] px-6 py-3 font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal ? `Submit $${bookingTotal.toFixed(2)} booking` : "Choose a service"}
         </button>
