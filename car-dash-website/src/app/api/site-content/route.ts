@@ -66,11 +66,11 @@ export async function PUT(request: NextRequest) {
             key,
           },
           update: {
-            value: String(value ?? "").slice(0, 1200),
+            value: String(value ?? "").slice(0, 20000),
           },
           create: {
             key,
-            value: String(value ?? "").slice(0, 1200),
+            value: String(value ?? "").slice(0, 20000),
           },
         })
       )

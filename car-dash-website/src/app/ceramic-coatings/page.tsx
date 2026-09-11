@@ -1,4 +1,5 @@
 import SitePhoto from "@/components/SitePhoto";
+import PricingMediaStrip from "@/components/PricingMediaStrip";
 
 const systems = [
   {
@@ -48,6 +49,8 @@ export default function CeramicCoatingsPage() {
           ].map(([number, title, body]) => <div key={number} className="bg-[#111318] p-7 sm:p-8"><p className="text-xs font-semibold text-[#FF2D2D]">{number}</p><h3 className="mt-6 text-xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-white/42">{body}</p></div>)}
         </div>
       </section>
+
+      <section className="mx-auto max-w-[1540px] border-x border-white/10 px-5 py-14 sm:px-8 lg:px-10"><PricingMediaStrip category="ceramic-results" /></section>
 
       <section className="bg-white text-[#0D0D0D]">
         <div className="mx-auto grid max-w-[1540px] gap-10 border-x border-black/10 px-5 py-20 sm:px-8 lg:grid-cols-[1.15fr_.85fr] lg:px-10">

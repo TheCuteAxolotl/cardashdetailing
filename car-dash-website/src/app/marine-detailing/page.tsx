@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import SitePhoto from "@/components/SitePhoto";
+import PricingMediaStrip from "@/components/PricingMediaStrip";
 
 type Service = {
   id: string;
@@ -100,7 +102,9 @@ export default function MarineDetailingPage() {
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <section className="relative overflow-hidden border-b border-[#FF2D2D]/15 bg-[linear-gradient(180deg,rgba(74,85,104,.12),rgba(13,13,13,1))] px-6 py-24 text-center">
+      <section className="relative isolate overflow-hidden border-b border-[#FF2D2D]/15 px-6 py-24 text-center">
+        <SitePhoto category="marine-hero" fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(13,13,13,.78),rgba(13,13,13,.96))]" />
         <div className="absolute inset-x-0 top-0 mx-auto h-px max-w-5xl accent-rule" />
         <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Marine Detailing</p>
         <h1 className="mx-auto mt-4 max-w-4xl text-5xl font-semibold tracking-[-.05em] sm:text-7xl">Boat detailing with its own pricing, correction, and protection options.</h1>
@@ -119,6 +123,8 @@ export default function MarineDetailingPage() {
             <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Maintenance, complete detailing, gelcoat enhancement, and marine protection.</h2>
             <p className="mt-5 text-sm leading-7 text-white/45">Per-foot work, oxidation, gelcoat correction, canvas, cabins, trailers, and coatings stay on this page so marine customers see only marine information.</p>
           </div>
+
+          <PricingMediaStrip category="marine-services" className="mt-8" />
 
           {marineCategories.length ? marineCategories.map((category) => (
             <div key={category} className="mt-12">
@@ -162,6 +168,7 @@ export default function MarineDetailingPage() {
             </div>
           </div>
         </section>
+        <PricingMediaStrip category="marine-results" className="mt-12" />
       </div>
     </main>
   );

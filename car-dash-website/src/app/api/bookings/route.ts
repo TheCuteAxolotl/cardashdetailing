@@ -5,6 +5,7 @@ import { getAuthFromRequest } from "@/lib/auth";
 import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
 import { getClientIp, hashVisitor } from "@/lib/support-security";
 import { addBookingSystemMessage, getBookingChatUrl } from "@/lib/booking-chat";
+import { DEFAULT_PRICING_PAGES, VEHICLE_LABELS, getPackagePrice, parsePricingConfig } from "@/lib/pricing-config";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -118,6 +119,9 @@ export async function POST(request: NextRequest) {
     }
     const serviceId = String(form.get("serviceId") || "").trim();
     const quoteThreadId = String(form.get("quoteThreadId") || "").trim();
+    const pricingPage = String(form.get("pricingPage") || "").trim();
+    const packageId = String(form.get("packageId") || "").trim();
+    const vehicleClass = String(form.get("vehicleClass") || "").trim();
     const auth = getAuthFromRequest(request);
 
     let bookingName = name;
@@ -172,10 +176,32 @@ export async function POST(request: NextRequest) {
         bookingVehicleModel = quote.vehicle.model;
         bookingVehicleTrim = quote.vehicle.trim || "";
       }
+    } else if (pricingPage && packageId && vehicleClass) {
+      if (!["packages", "exterior", "interior"].includes(pricingPage)) {
+        return NextResponse.json({ success: false, message: "That pricing page is not available." }, { status: 400 });
+      }
+
+      const key = pricingPage === "packages" ? "pricingPackagesConfig" : pricingPage === "exterior" ? "pricingExteriorConfig" : "pricingInteriorConfig";
+      const fallback = pricingPage === "packages" ? DEFAULT_PRICING_PAGES.packages : pricingPage === "exterior" ? DEFAULT_PRICING_PAGES.exterior : DEFAULT_PRICING_PAGES.interior;
+      const stored = await prisma.siteContent.findUnique({ where: { key } });
+      const config = parsePricingConfig(stored?.value, fallback);
+      const selected = getPackagePrice(config, packageId, vehicleClass);
+
+      if (!selected) {
+        return NextResponse.json({ success: false, message: "That package or vehicle price is no longer available. Please choose it again from the pricing page." }, { status: 409 });
+      }
+      const submittedVehicleType = String(form.get("vehicleType") || "").trim();
+      if (submittedVehicleType !== VEHICLE_LABELS[selected.key]) {
+        return NextResponse.json({ success: false, message: "The selected vehicle type no longer matches this package price. Please choose the package again." }, { status: 409 });
+      }
+
+      serviceName = `${selected.pkg.name} — ${VEHICLE_LABELS[selected.key]}`;
+      bookingTotal = selected.price;
+      source = `Fixed pricing page: ${pricingPage}/${selected.pkg.id}/${selected.key}`;
     } else {
       if (!serviceId) {
         return NextResponse.json(
-          { success: false, message: "Choose a fixed-price service before booking." },
+          { success: false, message: "Choose a fixed-price service or pricing package before booking." },
           { status: 400 }
         );
       }

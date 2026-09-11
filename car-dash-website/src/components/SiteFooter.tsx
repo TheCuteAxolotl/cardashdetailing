@@ -30,7 +30,7 @@ export default function SiteFooter() {
           </div>
           <div>
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Services + Help</p>
-            <div className="space-y-2 text-white/65"><a href="/services#car-detailing" className="block hover:text-[#FF2D2D]">Car Detailing</a><a href="/services#car-add-ons" className="block hover:text-[#FF2D2D]">Car Add-Ons</a><a href="/marine-detailing" className="block hover:text-[#FF2D2D]">Marine Detailing</a><a href="/marine-detailing#marine-add-ons" className="block hover:text-[#FF2D2D]">Marine Add-Ons</a><a href="/faq" className="block hover:text-[#FF2D2D]">FAQ</a><a href="/reviews" className="block hover:text-[#FF2D2D]">Reviews</a><a href="/contact" className="block hover:text-[#FF2D2D]">Book</a></div>
+            <div className="space-y-2 text-white/65"><a href="/car-detailing-packages" className="block hover:text-[#FF2D2D]">Car Packages</a><a href="/exterior-detailing" className="block hover:text-[#FF2D2D]">Exterior Detailing</a><a href="/interior-detailing" className="block hover:text-[#FF2D2D]">Interior Detailing</a><a href="/services#car-add-ons" className="block hover:text-[#FF2D2D]">Car Add-Ons</a><a href="/marine-detailing" className="block hover:text-[#FF2D2D]">Marine Detailing</a><a href="/faq" className="block hover:text-[#FF2D2D]">FAQ</a><a href="/contact" className="block hover:text-[#FF2D2D]">Book</a></div>
           </div>
           <div className="col-span-2 sm:col-span-1">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Contact + Legal</p>

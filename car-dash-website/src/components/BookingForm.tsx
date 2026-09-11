@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { DEFAULT_PRICING_PAGES, VEHICLE_LABELS, VehicleClass, parsePricingConfig } from "@/lib/pricing-config";
 
 type FormState = {
   name: string;
@@ -54,6 +55,14 @@ type Quote = {
   vehicle: Vehicle | null;
 };
 
+type PackageSelection = {
+  pricingPage: "packages" | "exterior" | "interior";
+  packageId: string;
+  vehicleClass: VehicleClass;
+  packageName: string;
+  price: number;
+};
+
 const initialState: FormState = {
   name: "",
   phone: "",
@@ -94,6 +103,13 @@ const addOnsList = [
 
 const input = "mt-2 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none focus:border-[#FF2D2D]/60";
 
+function vehicleTypeToClass(value: string): VehicleClass {
+  const normalized = value.toLowerCase();
+  if (normalized.includes("truck") || normalized.includes("suv")) return "truckSuv";
+  if (normalized.includes("coupe")) return "coupe";
+  return "sedan";
+}
+
 export default function BookingForm({
   prefill,
   onClose,
@@ -111,6 +127,7 @@ export default function BookingForm({
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [packageSelection, setPackageSelection] = useState<PackageSelection | null>(null);
   const [setupMessage, setSetupMessage] = useState("");
   const [chatUrl, setChatUrl] = useState("");
 
@@ -127,7 +144,7 @@ export default function BookingForm({
     [services, form.serviceId]
   );
 
-  const bookingTotal = quote?.quotedPrice ?? selectedService?.price ?? null;
+  const bookingTotal = packageSelection?.price ?? quote?.quotedPrice ?? selectedService?.price ?? null;
   const quoteLocked = Boolean(quote);
 
   useEffect(() => {
@@ -160,6 +177,27 @@ export default function BookingForm({
       const params = new URLSearchParams(window.location.search);
       const quoteId = params.get("quote");
       const requestedService = params.get("service") || prefill?.service || "";
+      const pricingPage = params.get("pricingPage") as "packages" | "exterior" | "interior" | null;
+      const packageId = params.get("packageId") || "";
+      const vehicleClass = params.get("vehicleClass") as VehicleClass | null;
+
+      if (!quoteId && pricingPage && packageId && vehicleClass && ["packages", "exterior", "interior"].includes(pricingPage) && Object.prototype.hasOwnProperty.call(VEHICLE_LABELS, vehicleClass)) {
+        const contentResponse = await fetch("/api/site-content", { cache: "no-store" });
+        const content = contentResponse.ok ? await contentResponse.json() : {};
+        const key = pricingPage === "packages" ? "pricingPackagesConfig" : pricingPage === "exterior" ? "pricingExteriorConfig" : "pricingInteriorConfig";
+        const config = parsePricingConfig(content?.[key], DEFAULT_PRICING_PAGES[pricingPage]);
+        const pkg = config.packages.find((item) => item.id === packageId);
+        const price = Number(pkg?.prices?.[vehicleClass] || 0);
+        if (pkg && price > 0) {
+          if (!cancelled) {
+            setPackageSelection({ pricingPage, packageId, vehicleClass, packageName: pkg.name, price });
+            setForm((current) => ({ ...current, serviceId: "", selectedPackage: pkg.name, vehicleType: VEHICLE_LABELS[vehicleClass] }));
+          }
+          return;
+        }
+        if (!cancelled) setSetupMessage("That package price could not be loaded. Return to the pricing page and choose the package again.");
+        return;
+      }
 
       if (quoteId) {
         const quoteResponse = await fetch(`/api/quotes/${encodeURIComponent(quoteId)}`, { cache: "no-store" });
@@ -245,6 +283,12 @@ export default function BookingForm({
       return;
     }
 
+    if (packageSelection && vehicleTypeToClass(vehicle.vehicleType || "Sedan") !== packageSelection.vehicleClass) {
+      setSetupMessage(`This saved vehicle is listed as ${vehicle.vehicleType || "Sedan"}, but the selected package price is for ${VEHICLE_LABELS[packageSelection.vehicleClass]}. Return to the pricing page and choose the matching vehicle type.`);
+      return;
+    }
+
+    setSetupMessage("");
     setForm((current) => ({
       ...current,
       vehicleId: id,
@@ -252,11 +296,12 @@ export default function BookingForm({
       vehicleModel: vehicle.model,
       vehicleYear: vehicle.year,
       vehicleTrim: vehicle.trim || "",
-      vehicleType: vehicle.vehicleType || "Sedan",
+      vehicleType: packageSelection ? VEHICLE_LABELS[packageSelection.vehicleClass] : (vehicle.vehicleType || "Sedan"),
     }));
   };
 
   const chooseService = (id: string) => {
+    setPackageSelection(null);
     const service = fixedServices.find((item) => item.id === id);
     setForm((current) => ({
       ...current,
@@ -283,6 +328,11 @@ export default function BookingForm({
         body.append(key, Array.isArray(value) ? JSON.stringify(value) : String(value))
       );
       body.append("displayedBookingTotal", String(bookingTotal));
+      if (packageSelection) {
+        body.append("pricingPage", packageSelection.pricingPage);
+        body.append("packageId", packageSelection.packageId);
+        body.append("vehicleClass", packageSelection.vehicleClass);
+      }
 
       const response = await fetch("/api/bookings", { method: "POST", body });
       const data = await response.json();
@@ -302,7 +352,7 @@ export default function BookingForm({
     <form onSubmit={submit} className="space-y-5 text-white">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#FF2D2D]">
-          {quoteLocked ? "Accepted quote" : "Fixed-price booking"}
+          {quoteLocked ? "Accepted quote" : packageSelection ? "Selected pricing package" : "Fixed-price booking"}
         </p>
         <h2 className="mt-2 text-2xl font-semibold">Request an appointment</h2>
         <p className="mt-1 text-sm text-white/40">
@@ -319,6 +369,13 @@ export default function BookingForm({
         </div>
       )}
 
+      {packageSelection && !quoteLocked && (
+        <div className="rounded-3xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-5">
+          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Pricing page selection</p>
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-4"><div><h3 className="text-xl font-semibold">{packageSelection.packageName}</h3><p className="mt-1 text-sm text-white/45">{VEHICLE_LABELS[packageSelection.vehicleClass]} · fixed total</p></div><p className="text-3xl font-semibold">${packageSelection.price.toFixed(2)}</p></div>
+        </div>
+      )}
+
       {quoteLocked ? (
         <div className="rounded-3xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-5">
           <p className="text-xs uppercase tracking-[.22em] text-[#FF2D2D]">Locked booking total</p>
@@ -330,7 +387,7 @@ export default function BookingForm({
             <p className="text-4xl font-semibold">${bookingTotal?.toFixed(2)}</p>
           </div>
         </div>
-      ) : (
+      ) : packageSelection ? null : (
         <div className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
           <label className="block text-sm text-white/60">
             Fixed-price service

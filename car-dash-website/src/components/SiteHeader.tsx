@@ -73,7 +73,7 @@ export default function SiteHeader() {
   const owner = Boolean(user && (user.role === "owner" || user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()));
   const admin = Boolean(user && user.role === "admin");
   const exploreActive = exploreLinks.some(([href]) => pathname === href);
-  const servicesActive = pathname.startsWith("/services") || pathname.startsWith("/marine-detailing");
+  const servicesActive = pathname.startsWith("/services") || pathname.startsWith("/car-detailing-packages") || pathname.startsWith("/exterior-detailing") || pathname.startsWith("/interior-detailing") || pathname.startsWith("/marine-detailing");
 
   return <>
     <div className="bg-[#FF2D2D] text-[#0D0D0D]"><div className="mx-auto flex max-w-[1540px] items-center justify-between border-x border-black/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[.24em] sm:px-8 lg:px-10"><span>Mobile Auto + Marine Detailing</span><a href="/estimate" className="hidden opacity-75 sm:block">Get an instant estimate ↗</a></div></div>
@@ -90,12 +90,10 @@ export default function SiteHeader() {
                 <div className="rounded-[22px] border border-white/8 bg-white/[.018] p-4">
                   <p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">Car Detailing</p>
                   <div className="space-y-1">
-                    {(carServices.length ? carServices.slice(0, 8) : [
-                      {id:"car-packages",title:"Package Detailing"},
-                      {id:"car-exterior",title:"Exterior Detailing"},
-                      {id:"car-interior",title:"Interior Detailing"},
-                      {id:"car-correction",title:"Paint Correction"},
-                    ]).map((service:any)=><a key={service.id} href={carServices.length ? `/services#${service.id}` : "/services#car-detailing"} className="block rounded-xl px-2 py-1.5 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{service.title}</a>)}
+                    <a href="/car-detailing-packages" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Detailing Packages</a>
+                    <a href="/exterior-detailing" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Exterior Detailing</a>
+                    <a href="/interior-detailing" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Interior Detailing</a>
+                    <a href="/paint-correction" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Paint Correction</a>
                   </div>
                   <a href="/services#car-add-ons" className="mt-3 block rounded-xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.05] px-3 py-2 text-sm text-[#FF2D2D]">Car Add-Ons + Pricing →</a>
                 </div>
@@ -117,11 +115,11 @@ export default function SiteHeader() {
                   <p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-white/35">Quick Links</p>
                   <a href="/paint-correction" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Paint Correction Guide</a>
                   <a href="/ceramic-coatings" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Ceramic Coatings</a>
-                  <a href="/services" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Services</a>
+                  <a href="/car-detailing-packages" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Packages</a>
                   <a href="/marine-detailing" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Services</a>
                 </div>
               </div>
-              <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Chat to a Specialist</a><a href="/services" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Car services →</a><a href="/marine-detailing" className="px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Marine services →</a></div>
+              <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Chat to a Specialist</a><a href="/car-detailing-packages" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Car packages →</a><a href="/marine-detailing" className="px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Marine services →</a></div>
             </div>}
           </div>
 
@@ -152,7 +150,9 @@ export default function SiteHeader() {
             </button>
             {mobileServicesOpen&&<div className="mobile-accordion-pop border-t border-white/8 px-3 pb-3 pt-2">
               <p className="px-2 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[.24em] text-white/25">Car Detailing</p>
-              <a href="/services" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Detailing Services</a>
+              <a href="/car-detailing-packages" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Detailing Packages</a>
+              <a href="/exterior-detailing" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Exterior Detailing</a>
+              <a href="/interior-detailing" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Interior Detailing</a>
               <a href="/services#car-add-ons" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Add-Ons + Pricing</a>
               <p className="px-2 pb-1 pt-3 text-[10px] font-bold uppercase tracking-[.24em] text-white/25">Marine Detailing</p>
               <a href="/marine-detailing" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Detailing Services</a>

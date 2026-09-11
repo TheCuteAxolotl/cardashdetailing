@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import PublicHero from "@/components/PublicHero";
 import SitePhoto from "@/components/SitePhoto";
+import PricingMediaStrip from "@/components/PricingMediaStrip";
 import { SITE_DEFAULTS } from "@/lib/site-defaults";
 
 export default function AboutPage() {
@@ -29,6 +30,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-[1540px] border-x border-white/10 bg-[#0D0D0D] px-5 py-10 sm:px-8 lg:px-10"><PricingMediaStrip category="about-story" /></section>
 
       <section className="relative isolate overflow-hidden border-t border-white/10">
         <SitePhoto category="about-values-bg" fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-20" />

@@ -1,4 +1,5 @@
 import SitePhoto from "@/components/SitePhoto";
+import PricingMediaStrip from "@/components/PricingMediaStrip";
 
 const productGroups = [
   ["Interior", "Koch-Chemie Pol Star", "A gentle professional cleaner used for interior surfaces where controlled cleaning matters."],
@@ -32,6 +33,8 @@ export default function ProductsWeUsePage() {
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-[1540px] border-x border-white/10 px-5 py-14 sm:px-8 lg:px-10"><PricingMediaStrip category="products-gallery" /></section>
 
       <section className="bg-white text-[#0D0D0D]">
         <div className="mx-auto grid max-w-[1540px] gap-8 border-x border-black/10 px-5 py-20 sm:px-8 lg:grid-cols-3 lg:px-10">

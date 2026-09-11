@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       data: {
         url: String(url),
         title: String(title).trim().slice(0, 120),
-        category: String(category).trim().slice(0, 40),
+        category: String(category).trim().slice(0, 120),
       },
     });
 

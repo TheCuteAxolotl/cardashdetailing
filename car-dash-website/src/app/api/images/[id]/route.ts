@@ -32,7 +32,7 @@ export async function PUT(
           .slice(0, 120),
         category: String(category || "gallery")
           .trim()
-          .slice(0, 40),
+          .slice(0, 120),
       },
     });
 

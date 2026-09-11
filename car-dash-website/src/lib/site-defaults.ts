@@ -1,3 +1,5 @@
+import { DEFAULT_PRICING_PAGES } from "@/lib/pricing-config";
+
 export const SITE_DEFAULTS = {
   heroEyebrow: "Mobile detailing",
   heroTitle: "Clean car. Better drive.",
@@ -57,6 +59,11 @@ export const SITE_DEFAULTS = {
   faq5Answer: "Personal items, valuables, and anything that could get in the way of cleaning should be removed when possible. Car seats and larger items can be discussed ahead of time.",
   faq6Question: "How do booking requests work?",
   faq6Answer: "Send the vehicle and service details through the booking form. The request is reviewed, then Car Dash follows up to confirm timing, service details, and anything else needed.",
+
+
+  pricingPackagesConfig: JSON.stringify(DEFAULT_PRICING_PAGES.packages),
+  pricingExteriorConfig: JSON.stringify(DEFAULT_PRICING_PAGES.exterior),
+  pricingInteriorConfig: JSON.stringify(DEFAULT_PRICING_PAGES.interior),
 
   footerBlurb: "Mobile detailing based in South Elgin with interior, exterior, paint correction, and protection services.",
 } as const;
