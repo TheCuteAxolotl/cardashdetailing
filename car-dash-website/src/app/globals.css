@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0D0D0D;
+  --foreground: #FFFFFF;
+  --slate: #4A5568;
+  --accent: #FF2D2D;
+  --accent-soft: rgba(255, 45, 45, 0.12);
+  --accent-line: rgba(255, 45, 45, 0.28);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  background: var(--background);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+a,
+input,
+textarea,
+select,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+summary {
+  touch-action: manipulation;
+}
+
+/* V4: every interactive control feels smoother instead of snapping on hover. */
+a,
+button,
+summary {
+  transition:
+    color 280ms ease,
+    background-color 280ms ease,
+    border-color 280ms ease,
+    opacity 280ms ease,
+    filter 280ms ease,
+    transform 320ms cubic-bezier(.2,.75,.2,1),
+    box-shadow 320ms cubic-bezier(.2,.75,.2,1);
+}
+
+@media (hover: hover) {
+  a:hover,
+  button:hover,
+  summary:hover {
+    filter: brightness(1.1);
+  }
+
+  a[class*="rounded"]:hover,
+  button[class*="rounded"]:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 34px rgba(255, 45, 45, 0.12);
+  }
+
+  a[class*="border"]:hover,
+  button[class*="border"]:hover {
+    border-color: rgba(255, 45, 45, 0.42);
+  }
+}
+
+button:disabled,
+a[aria-disabled="true"] {
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: #0D0D0D;
+}
+
+.support-input {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.11);
+  background: rgba(255,255,255,.045);
+  padding: 12px 14px;
+  color: #fff;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 240ms ease, box-shadow 240ms ease, background-color 240ms ease;
+}
+.support-input::placeholder { color: rgba(255,255,255,.24); }
+.support-input:focus {
+  border-color: rgba(255,45,45,.65);
+  box-shadow: 0 0 0 3px rgba(255,45,45,.08);
+  background: rgba(255,255,255,.06);
+}
+
+
+/* Mobile navigation is a real scroll container so long menus work on iPhone/Safari. */
+.mobile-menu-scroll {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  touch-action: pan-y;
+}
+
+/* Keep the floating help launcher from covering the mobile navigation. */
+.mobile-nav-open .support-launcher {
+  display: none !important;
+}
+
+.mobile-accordion-pop {
+  transform-origin: top center;
+  animation: mobileAccordionPop 240ms cubic-bezier(.2,.75,.2,1) both;
+}
+
+@keyframes mobileAccordionPop {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Car Dash public-site finishing touches */
+img { display: block; }
+.public-glass {
+  background: rgba(13,13,13,.68);
+  border: 1px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(18px);
+}
+
+/* Smooth dropdown entrance used by the Services and Explore navigation. */
+.menu-pop {
+  transform-origin: top center;
+  animation: menuPop 260ms cubic-bezier(.2,.75,.2,1) both;
+}
+
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* Services menu is positioned by the Services trigger itself, not by the header edge. */
+.menu-pop-services {
+  transform-origin: top left;
+  animation: menuPopServices 220ms cubic-bezier(.2,.75,.2,1) both;
+}
+
+@keyframes menuPopServices {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.soft-panel {
+  background: linear-gradient(145deg, rgba(74,85,104,.14), rgba(255,255,255,.025));
+  border: 1px solid rgba(255,255,255,.1);
+}
+
+.accent-rule {
+  background: linear-gradient(90deg, transparent, rgba(255,45,45,.7), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Keep Tailwind's utility transitions from snapping back to the default 150ms. */
+a, button, summary {
+  transition-duration: 280ms !important;
+  transition-timing-function: cubic-bezier(.2,.75,.2,1) !important;
+}
+
+button,
+a[class*="rounded"] {
+  opacity: .94;
+}
+
+@media (hover: hover) {
+  button:hover,
+  a[class*="rounded"]:hover {
+    opacity: 1;
+  }
+}
