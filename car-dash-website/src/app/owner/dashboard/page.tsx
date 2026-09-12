@@ -12,6 +12,7 @@ interface User {
 export default function OwnerDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [smsUnread, setSmsUnread] = useState(0);
 
   useEffect(() => {
     // Check if user is logged in and is owner
@@ -37,6 +38,21 @@ export default function OwnerDashboard() {
 
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadUnread = () => {
+      fetch("/api/sms/inbox", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((payload) => setSmsUnread(Number(payload?.totalUnread || 0)))
+        .catch(() => setSmsUnread(0));
+    };
+
+    loadUnread();
+    const timer = window.setInterval(loadUnread, 10000);
+    return () => window.clearInterval(timer);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -138,6 +154,21 @@ export default function OwnerDashboard() {
               </div>
               <h2 className="text-xl font-semibold mb-2">Bookings</h2>
               <p className="text-neutral-400 text-sm">View and manage customer bookings</p>
+            </div>
+          </a>
+
+          <a href="/owner/messages">
+            <div className="relative rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#FF2D2D]/45 transition cursor-pointer">
+              {smsUnread > 0 && (
+                <span className="absolute right-5 top-5 rounded-full bg-[#FF2D2D] px-2.5 py-1 text-xs font-bold text-[#0D0D0D]">
+                  {smsUnread}
+                </span>
+              )}
+              <div className="rounded-2xl bg-[#FF2D2D]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+                <span className="text-2xl">✉️</span>
+              </div>
+              <h2 className="text-xl font-semibold mb-2">SMS Inbox</h2>
+              <p className="text-neutral-400 text-sm">See customer text replies and open the booking conversation to text back</p>
             </div>
           </a>
 

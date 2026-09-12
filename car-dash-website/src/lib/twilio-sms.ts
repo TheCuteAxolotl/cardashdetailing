@@ -23,6 +23,25 @@ export function getPublicSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://cardashdetailing.com").replace(/\/$/, "");
 }
 
+export function getInboundSmsWebhookUrl() {
+  return (process.env.TWILIO_INBOUND_WEBHOOK_URL || `${getPublicSiteUrl()}/api/sms/inbound`).trim();
+}
+
+export function validateTwilioWebhook(
+  signature: string | null | undefined,
+  url: string,
+  params: Record<string, string>
+) {
+  if (!authToken || !signature || !url) return false;
+
+  try {
+    return twilio.validateRequest(authToken, signature, url, params);
+  } catch (error) {
+    console.error("Twilio webhook validation failed:", error);
+    return false;
+  }
+}
+
 export function normalizePhoneNumber(raw: string | null | undefined) {
   const value = String(raw || "").trim();
   if (!value) return null;

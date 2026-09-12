@@ -20,13 +20,13 @@ function statusSms(booking: {
   const schedule = when ? ` ${when}.` : "";
 
   if (booking.status === "confirmed") {
-    return `Car Dash Detailing: Your ${booking.serviceName} appointment is confirmed.${schedule}${total} Questions or updates: ${chatUrl}`;
+    return `Car Dash Detailing: Your ${booking.serviceName} appointment is confirmed.${schedule}${total} Reply to this text with questions or updates. Booking chat: ${chatUrl}`;
   }
   if (booking.status === "cancelled") {
-    return `Car Dash Detailing: Your ${booking.serviceName} booking has been cancelled.${schedule} Message us if you need help rescheduling: ${chatUrl}`;
+    return `Car Dash Detailing: Your ${booking.serviceName} booking has been cancelled.${schedule} Reply to this text if you need help rescheduling. Booking chat: ${chatUrl}`;
   }
   if (booking.status === "completed") {
-    return `Car Dash Detailing: Your ${booking.serviceName} appointment is marked complete.${total} Thank you for choosing Car Dash Detailing. Questions: ${chatUrl}`;
+    return `Car Dash Detailing: Your ${booking.serviceName} appointment is marked complete.${total} Thank you for choosing Car Dash Detailing. Reply to this text with any questions. Booking chat: ${chatUrl}`;
   }
   return null;
 }

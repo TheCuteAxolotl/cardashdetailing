@@ -4,11 +4,10 @@ import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions"
 import {
   bookingHasSmsConsent,
   ensureBookingConversation,
-  getBookingChatUrl,
   notifyBookingChatDiscord,
   verifyBookingChatKey,
 } from "@/lib/booking-chat";
-import { isRecentlyActive, sendTransactionalSms } from "@/lib/twilio-sms";
+import { sendTransactionalSms } from "@/lib/twilio-sms";
 
 async function getAccess(request: NextRequest, bookingId: string) {
   const booking = await prisma.booking.findUnique({
@@ -66,12 +65,14 @@ export async function GET(
 
     const conversation = await ensureBookingConversation(id);
 
-    if (allowed.viewer === "customer") {
-      await prisma.bookingConversation.update({
-        where: { id: conversation.id },
-        data: { lastCustomerSeenAt: new Date() },
-      });
-    }
+    const seenAt = new Date();
+    await prisma.bookingConversation.update({
+      where: { id: conversation.id },
+      data:
+        allowed.viewer === "customer"
+          ? { lastCustomerSeenAt: seenAt }
+          : { lastStaffSeenAt: seenAt },
+    });
 
     const refreshed = await prisma.bookingConversation.findUnique({
       where: { id: conversation.id },
@@ -126,11 +127,12 @@ export async function POST(
 
     const conversation = await ensureBookingConversation(id);
 
-    await prisma.bookingMessage.create({
+    const storedMessage = await prisma.bookingMessage.create({
       data: {
         conversationId: conversation.id,
         sender: allowed.viewer === "staff" ? "team" : "customer",
         body: message,
+        channel: "web",
       },
     });
 
@@ -140,7 +142,7 @@ export async function POST(
       data:
         allowed.viewer === "customer"
           ? { lastCustomerSeenAt: now, updatedAt: now }
-          : { updatedAt: now },
+          : { lastStaffSeenAt: now, updatedAt: now },
     });
 
     if (allowed.viewer === "customer") {
@@ -159,21 +161,41 @@ export async function POST(
           .join(" "),
         message,
       });
-    } else if (
-      !isRecentlyActive(conversation.lastCustomerSeenAt) &&
-      bookingHasSmsConsent(allowed.booking.notes)
-    ) {
-      await sendTransactionalSms({
+
+      return NextResponse.json({ success: true, delivery: "website" });
+    }
+
+    // Staff replies are sent as real SMS messages when the booking has SMS consent.
+    // The same message stays in the booking conversation so the website and text thread
+    // remain synchronized.
+    if (bookingHasSmsConsent(allowed.booking.notes)) {
+      const sms = await sendTransactionalSms({
         to: allowed.booking.customerPhone,
-        body: `Car Dash Detailing: We sent you a message about your ${allowed.booking.serviceName} booking. View and reply here: ${getBookingChatUrl(
-          allowed.booking.id,
-          allowed.booking.customerEmail,
-          Boolean(allowed.booking.userId)
-        )}`,
+        body: `Car Dash Detailing: ${message}`,
+        includeOptOutLine: false,
+      });
+
+      if (sms.sent) {
+        await prisma.bookingMessage.update({
+          where: { id: storedMessage.id },
+          data: { channel: "sms", externalSid: sms.sid },
+        });
+
+        return NextResponse.json({ success: true, delivery: "sms" });
+      }
+
+      return NextResponse.json({
+        success: true,
+        delivery: "website",
+        warning: "Message was saved to the booking chat, but SMS delivery failed.",
       });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      delivery: "website",
+      warning: "Message was saved to the booking chat. This customer did not opt in to SMS updates.",
+    });
   } catch (error) {
     console.error("Booking chat send failed:", error);
     return NextResponse.json({ error: "Could not send booking message." }, { status: 500 });

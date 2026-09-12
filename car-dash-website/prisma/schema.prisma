@@ -90,6 +90,7 @@ model BookingConversation {
   bookingId          String           @unique
   booking            Booking          @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   lastCustomerSeenAt DateTime?
+  lastStaffSeenAt    DateTime?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   messages           BookingMessage[]
@@ -101,6 +102,8 @@ model BookingMessage {
   conversation   BookingConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         String              // customer, team, system
   body           String
+  channel        String              @default("web") // web, sms, system
+  externalSid    String?             @unique
   createdAt      DateTime            @default(now())
 
   @@index([conversationId, createdAt])

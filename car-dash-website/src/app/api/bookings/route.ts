@@ -296,7 +296,7 @@ export async function POST(request: NextRequest) {
       const requested = [preferredDate, preferredTime].filter(Boolean).join(" at ");
       await sendTransactionalSms({
         to: phone,
-        body: `Car Dash Detailing: We received your booking request for ${serviceName} ($${bookingTotal.toFixed(2)})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed. Message us about this booking: ${bookingChatUrl}`,
+        body: `Car Dash Detailing: We received your booking request for ${serviceName} ($${bookingTotal.toFixed(2)})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed. Reply to this text with questions or use your booking chat: ${bookingChatUrl}`,
       });
     }
 

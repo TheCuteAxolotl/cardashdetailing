@@ -26,7 +26,7 @@ export default function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [message, setMessage] = useState("");
-
+  const [arrivalSendingId, setArrivalSendingId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -56,6 +56,31 @@ export default function AdminBookings() {
     });
     if (!response.ok) return setMessage("Could not update booking status.");
     await load();
+  };
+
+  const sendArrivalUpdate = async (booking: Booking, mode: "on_the_way" | "eta") => {
+    let eta = "";
+    if (mode === "eta") {
+      eta = window.prompt("What time should the customer expect you? Example: 2:30 PM")?.trim() || "";
+      if (!eta) return;
+    }
+
+    setMessage("");
+    setArrivalSendingId(booking.id);
+    try {
+      const response = await fetch(`/api/bookings/${booking.id}/arrival`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, eta }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) return setMessage(data.error || "Could not send the arrival text.");
+      setMessage(`Arrival text sent to ${booking.customerName}.`);
+    } catch {
+      setMessage("Could not send the arrival text.");
+    } finally {
+      setArrivalSendingId(null);
+    }
   };
 
   const visible = bookings.filter((b) => filter === "all" || b.status === filter);
@@ -95,8 +120,26 @@ export default function AdminBookings() {
                     href={`/booking-chat/${b.id}`}
                     className="rounded-lg border border-[#FF2D2D]/30 bg-[#FF2D2D]/10 px-4 py-2 text-center text-sm font-semibold text-[#FF2D2D] transition hover:bg-[#FF2D2D]/18"
                   >
-                    Chat with customer
+                    Text / chat customer
                   </a>
+                  {!['completed', 'cancelled'].includes(b.status) && (
+                    <>
+                      <button
+                        onClick={() => sendArrivalUpdate(b, "on_the_way")}
+                        disabled={arrivalSendingId === b.id}
+                        className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {arrivalSendingId === b.id ? "Sending…" : "On my way SMS"}
+                      </button>
+                      <button
+                        onClick={() => sendArrivalUpdate(b, "eta")}
+                        disabled={arrivalSendingId === b.id}
+                        className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Send arrival time
+                      </button>
+                    </>
+                  )}
                   <button onClick={()=>updateStatus(b.id,"confirmed")} className="rounded-lg bg-blue-700 px-4 py-2 text-sm">Confirm</button>
                   <button onClick={()=>updateStatus(b.id,"completed")} className="rounded-lg bg-green-700 px-4 py-2 text-sm">Complete</button>
                   <button onClick={()=>updateStatus(b.id,"cancelled")} className="rounded-lg bg-red-800 px-4 py-2 text-sm">Cancel</button>

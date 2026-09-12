@@ -16,6 +16,7 @@ export function ensureBookingChatSchema() {
           "id" TEXT NOT NULL,
           "bookingId" TEXT NOT NULL,
           "lastCustomerSeenAt" TIMESTAMP(3),
+          "lastStaffSeenAt" TIMESTAMP(3),
           "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
           "updatedAt" TIMESTAMP(3) NOT NULL,
           CONSTRAINT "BookingConversation_pkey" PRIMARY KEY ("id"),
@@ -23,6 +24,11 @@ export function ensureBookingChatSchema() {
             FOREIGN KEY ("bookingId") REFERENCES "Booking"("id")
             ON DELETE CASCADE ON UPDATE CASCADE
         )
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "BookingConversation"
+        ADD COLUMN IF NOT EXISTS "lastStaffSeenAt" TIMESTAMP(3)
       `);
 
       await prisma.$executeRawUnsafe(`
@@ -36,6 +42,8 @@ export function ensureBookingChatSchema() {
           "conversationId" TEXT NOT NULL,
           "sender" TEXT NOT NULL,
           "body" TEXT NOT NULL,
+          "channel" TEXT NOT NULL DEFAULT 'web',
+          "externalSid" TEXT,
           "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
           CONSTRAINT "BookingMessage_pkey" PRIMARY KEY ("id"),
           CONSTRAINT "BookingMessage_conversationId_fkey"
@@ -45,8 +53,24 @@ export function ensureBookingChatSchema() {
       `);
 
       await prisma.$executeRawUnsafe(`
+        ALTER TABLE "BookingMessage"
+        ADD COLUMN IF NOT EXISTS "channel" TEXT NOT NULL DEFAULT 'web'
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "BookingMessage"
+        ADD COLUMN IF NOT EXISTS "externalSid" TEXT
+      `);
+
+      await prisma.$executeRawUnsafe(`
         CREATE INDEX IF NOT EXISTS "BookingMessage_conversationId_createdAt_idx"
         ON "BookingMessage"("conversationId", "createdAt")
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS "BookingMessage_externalSid_key"
+        ON "BookingMessage"("externalSid")
+        WHERE "externalSid" IS NOT NULL
       `);
     })().catch((error) => {
       schemaReady = null;
@@ -116,6 +140,7 @@ export async function addBookingSystemMessage(bookingId: string, body: string) {
       conversationId: conversation.id,
       sender: "system",
       body: body.slice(0, 3000),
+      channel: "system",
     },
   });
 }

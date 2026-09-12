@@ -25,6 +25,7 @@ type BookingMessage = {
   id: string;
   sender: string;
   body: string;
+  channel?: string;
   createdAt: string;
 };
 
@@ -45,6 +46,7 @@ export default function BookingChatPage() {
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export default function BookingChatPage() {
 
     setSending(true);
     setError("");
+    setNotice("");
 
     try {
       const response = await fetch(endpoint, {
@@ -107,6 +110,13 @@ export default function BookingChatPage() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Could not send message.");
       setReply("");
+      if (payload.warning) {
+        setNotice(payload.warning);
+      } else if (data?.viewer === "staff" && payload.delivery === "sms") {
+        setNotice("Text message sent to the customer.");
+      } else {
+        setNotice("Message sent.");
+      }
       await load(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not send message.");
@@ -208,9 +218,12 @@ export default function BookingChatPage() {
                       className={`max-w-[86%] rounded-2xl px-4 py-3 ${mine ? "ml-auto bg-[#FF2D2D] text-[#0D0D0D]" : "bg-white/8"}`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
-                      <p className="mt-2 text-[10px] opacity-45">
-                        {new Date(message.createdAt).toLocaleString()}
-                      </p>
+                      <div className="mt-2 flex items-center gap-2 text-[10px] opacity-45">
+                        <span>{new Date(message.createdAt).toLocaleString()}</span>
+                        {message.channel === "sms" && (
+                          <span className="rounded-full border border-current/30 px-1.5 py-0.5 uppercase tracking-[.12em]">SMS</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })
@@ -228,12 +241,13 @@ export default function BookingChatPage() {
             </div>
 
             {error && <p className="mb-3 rounded-2xl border border-red-500/20 bg-red-500/[.06] p-3 text-sm text-red-200">{error}</p>}
+            {notice && <p className="mb-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[.06] p-3 text-sm text-emerald-200">{notice}</p>}
 
             <form onSubmit={send} className="flex gap-2 border-t border-white/10 pt-4">
               <textarea
                 value={reply}
                 onChange={(event) => setReply(event.target.value)}
-                placeholder={staff ? "Message customer…" : "Message Car Dash Detailing…"}
+                placeholder={staff ? "Text customer…" : "Message Car Dash Detailing…"}
                 maxLength={3000}
                 className="min-h-12 flex-1 resize-none rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-sm text-white outline-none focus:border-[#FF2D2D]/60"
               />

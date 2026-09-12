@@ -27,6 +27,7 @@ export default function OwnerBookings() {
   const [filter, setFilter] = useState("all");
   const [message, setMessage] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [arrivalSendingId, setArrivalSendingId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -94,6 +95,37 @@ export default function OwnerBookings() {
       setMessage("Could not delete booking.");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+
+  const sendArrivalUpdate = async (booking: Booking, mode: "on_the_way" | "eta") => {
+    let eta = "";
+    if (mode === "eta") {
+      eta = window.prompt("What time should the customer expect you? Example: 2:30 PM")?.trim() || "";
+      if (!eta) return;
+    }
+
+    setMessage("");
+    setArrivalSendingId(booking.id);
+
+    try {
+      const response = await fetch(`/api/bookings/${booking.id}/arrival`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, eta }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setMessage(data.error || "Could not send the arrival text.");
+        return;
+      }
+
+      setMessage(`Arrival text sent to ${booking.customerName}.`);
+    } catch {
+      setMessage("Could not send the arrival text.");
+    } finally {
+      setArrivalSendingId(null);
     }
   };
 
@@ -235,8 +267,27 @@ export default function OwnerBookings() {
                     href={`/booking-chat/${booking.id}`}
                     className="rounded-lg border border-[#FF2D2D]/30 bg-[#FF2D2D]/10 px-4 py-2 text-center text-sm font-semibold text-[#FF2D2D] transition hover:bg-[#FF2D2D]/18"
                   >
-                    Chat with customer
+                    Text / chat customer
                   </a>
+
+                  {!canDelete && (
+                    <>
+                      <button
+                        onClick={() => sendArrivalUpdate(booking, "on_the_way")}
+                        disabled={arrivalSendingId === booking.id}
+                        className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-sm font-semibold text-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {arrivalSendingId === booking.id ? "Sending…" : "On my way SMS"}
+                      </button>
+                      <button
+                        onClick={() => sendArrivalUpdate(booking, "eta")}
+                        disabled={arrivalSendingId === booking.id}
+                        className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Send arrival time
+                      </button>
+                    </>
+                  )}
                     <button
                       onClick={() => updateStatus(booking.id, "confirmed")}
                       className="rounded-lg bg-blue-700 px-4 py-2 text-sm"
