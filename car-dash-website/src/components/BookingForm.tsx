@@ -387,7 +387,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
       const response = await fetch("/api/discounts/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: discountInput }),
+        body: JSON.stringify({ code: discountInput, email: form.email, phone: form.phone }),
       });
       const data = await response.json();
       if (!response.ok || !data?.valid) throw new Error(data?.message || "That code is not valid.");

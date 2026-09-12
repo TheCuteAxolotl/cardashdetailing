@@ -17,6 +17,9 @@ export type DiscountCode = {
   type: "percent" | "fixed";
   amount: number;
   active: boolean;
+  usageLimit: number | null;
+  onePerCustomer: boolean;
+  expiresAt: string | null;
 };
 
 export const STANDALONE_HEADLIGHT_SERVICE_ID = "__headlight_restoration__";
@@ -90,6 +93,9 @@ export function parseDiscountCodes(value: string | null | undefined): DiscountCo
           type,
           amount: type === "percent" ? Math.min(amount, 100) : amount,
           active: item?.active !== false,
+          usageLimit: Number.isFinite(Number(item?.usageLimit)) && Number(item?.usageLimit) > 0 ? Math.floor(Number(item.usageLimit)) : null,
+          onePerCustomer: item?.onePerCustomer === true,
+          expiresAt: /^\d{4}-\d{2}-\d{2}$/.test(String(item?.expiresAt || "")) ? String(item.expiresAt) : null,
         } as DiscountCode;
       })
       .filter((item) => item.code && item.amount > 0);
@@ -102,4 +108,36 @@ export function calculateDiscount(subtotal: number, discount: Pick<DiscountCode,
   if (!discount || subtotal <= 0) return 0;
   const raw = discount.type === "percent" ? subtotal * (discount.amount / 100) : discount.amount;
   return Math.max(0, Math.min(subtotal, Math.round(raw * 100) / 100));
+}
+
+
+export function getDiscountUsageMarker(code: string) {
+  return `Discount: ${normalizeDiscountCode(code)} (`;
+}
+
+export function extractDiscountCodeFromBookingNotes(notes: string | null | undefined) {
+  if (!notes) return null;
+  const line = notes.split("\n").find((entry) => entry.startsWith("Discount: "));
+  if (!line) return null;
+  const start = "Discount: ".length;
+  const end = line.indexOf(" (", start);
+  if (end <= start) return null;
+  return normalizeDiscountCode(line.slice(start, end));
+}
+
+function dateOnlyInChicago(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === "year")?.value || "0000";
+  const month = parts.find((part) => part.type === "month")?.value || "00";
+  const day = parts.find((part) => part.type === "day")?.value || "00";
+  return `${year}-${month}-${day}`;
+}
+
+export function isDiscountExpired(discount: Pick<DiscountCode, "expiresAt">, now = new Date()) {
+  return Boolean(discount.expiresAt && discount.expiresAt < dateOnlyInChicago(now));
 }

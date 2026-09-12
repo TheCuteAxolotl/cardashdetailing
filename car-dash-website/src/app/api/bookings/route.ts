@@ -15,6 +15,7 @@ import {
   parseBookingPricingConfig,
   parseDiscountCodes,
 } from "@/lib/booking-pricing";
+import { checkDiscountAvailability } from "@/lib/discount-usage";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -210,8 +211,17 @@ export async function POST(request: NextRequest) {
     let appliedDiscount = null as ReturnType<typeof parseDiscountCodes>[number] | null;
     if (discountCode) {
       const discountRow = await prisma.siteContent.findUnique({ where: { key: DISCOUNT_CODES_KEY } });
-      appliedDiscount = parseDiscountCodes(discountRow?.value).find((item) => item.active && item.code === discountCode) || null;
+      appliedDiscount = parseDiscountCodes(discountRow?.value).find((item) => item.code === discountCode) || null;
       if (!appliedDiscount) return NextResponse.json({ success: false, message: "That discount code is no longer valid. Remove it and try again." }, { status: 409 });
+
+      const availability = await checkDiscountAvailability(appliedDiscount, {
+        userId: auth?.id,
+        email: bookingEmail,
+        phone,
+      });
+      if (!availability.valid) {
+        return NextResponse.json({ success: false, message: availability.message || "That discount code is no longer available." }, { status: 409 });
+      }
     }
     const discountAmount = calculateDiscount(subtotal, appliedDiscount);
     const bookingTotal = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);

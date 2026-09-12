@@ -1,9 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BookingAddOn, BookingPricingConfig, DEFAULT_BOOKING_PRICING, DiscountCode, normalizeDiscountCode, parseBookingPricingConfig } from "@/lib/booking-pricing";
+import {
+  BookingAddOn,
+  BookingPricingConfig,
+  DEFAULT_BOOKING_PRICING,
+  DiscountCode,
+  isDiscountExpired,
+  normalizeDiscountCode,
+  parseBookingPricingConfig,
+} from "@/lib/booking-pricing";
 
 const input = "w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-[#FF2D2D]/60";
+
+type ManagedDiscount = DiscountCode & { usageCount?: number };
 
 function makeId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -11,7 +21,7 @@ function makeId(prefix: string) {
 
 export default function BookingSettingsPage() {
   const [pricing, setPricing] = useState<BookingPricingConfig>(DEFAULT_BOOKING_PRICING);
-  const [discounts, setDiscounts] = useState<DiscountCode[]>([]);
+  const [discounts, setDiscounts] = useState<ManagedDiscount[]>([]);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -54,14 +64,25 @@ export default function BookingSettingsPage() {
     setPricing((current) => ({ ...current, addOns: current.addOns.filter((_, i) => i !== index) }));
   };
 
-  const updateDiscount = (index: number, patch: Partial<DiscountCode>) => {
+  const updateDiscount = (index: number, patch: Partial<ManagedDiscount>) => {
     setDiscounts((current) => current.map((item, i) => (i === index ? { ...item, ...patch } : item)));
   };
 
   const addDiscount = () => {
     setDiscounts((current) => [
       ...current,
-      { id: makeId("discount"), code: "NEWCODE", label: "", type: "percent", amount: 10, active: true },
+      {
+        id: makeId("discount"),
+        code: "NEWCODE",
+        label: "",
+        type: "percent",
+        amount: 10,
+        active: true,
+        usageLimit: null,
+        onePerCustomer: false,
+        expiresAt: null,
+        usageCount: 0,
+      },
     ]);
   };
 
@@ -87,6 +108,8 @@ export default function BookingSettingsPage() {
         ...item,
         code: normalizeDiscountCode(item.code),
         amount: Math.max(0, Number(item.amount || 0)),
+        usageLimit: item.usageLimit && item.usageLimit > 0 ? Math.floor(item.usageLimit) : null,
+        expiresAt: item.expiresAt || null,
       }));
 
       const [pricingResponse, discountResponse] = await Promise.all([
@@ -148,18 +171,42 @@ export default function BookingSettingsPage() {
         </section>
 
         <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
-          <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Discount Codes</p><h2 className="mt-2 text-2xl font-semibold">Create or delete promo codes</h2><p className="mt-2 text-sm text-white/40">Codes are checked securely on the server. They are not published in the public site-content feed.</p></div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Discount Codes</p>
+            <h2 className="mt-2 text-2xl font-semibold">Promo code controls</h2>
+            <p className="mt-2 max-w-3xl text-sm text-white/40">Set an optional total usage limit, restrict a code to one booking per customer, and choose an expiration date. Leave the usage limit or expiration blank for no limit.</p>
+          </div>
           <div className="mt-6 grid gap-4">
-            {discounts.map((item, index) => (
-              <article key={item.id} className="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-2 lg:grid-cols-[1.1fr_1.4fr_160px_140px_auto_auto] lg:items-end">
-                <label className="text-sm text-white/55">Code<input className={`${input} mt-2 uppercase`} value={item.code} onChange={(e) => updateDiscount(index, { code: normalizeDiscountCode(e.target.value) })} placeholder="SAVE10" /></label>
-                <label className="text-sm text-white/55">Customer label<input className={`${input} mt-2`} value={item.label} onChange={(e) => updateDiscount(index, { label: e.target.value })} placeholder="10% off detailing" /></label>
-                <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as "percent" | "fixed" })}><option value="percent">Percent %</option><option value="fixed">Fixed $</option></select></label>
-                <label className="text-sm text-white/55">Amount<input type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} /></label>
-                <label className="flex h-12 items-center gap-2 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateDiscount(index, { active: e.target.checked })} /> Active</label>
-                <button type="button" onClick={() => deleteDiscount(index)} className="h-12 rounded-xl border border-red-500/25 px-4 text-sm text-red-300">Delete</button>
-              </article>
-            ))}
+            {discounts.map((item, index) => {
+              const usageCount = Number(item.usageCount || 0);
+              const limitReached = item.usageLimit !== null && usageCount >= item.usageLimit;
+              const expired = isDiscountExpired(item);
+              return (
+                <article key={item.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/60">Used {usageCount}{item.usageLimit !== null ? ` / ${item.usageLimit}` : " times"}</span>
+                      {item.onePerCustomer && <span className="rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-blue-200">1 per customer</span>}
+                      {item.expiresAt && <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/55">Expires {item.expiresAt}</span>}
+                      {expired && <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1.5 text-amber-200">Expired</span>}
+                      {limitReached && <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1.5 text-amber-200">Limit reached</span>}
+                    </div>
+                    <button type="button" onClick={() => deleteDiscount(index)} className="rounded-xl border border-red-500/25 px-4 py-2 text-sm text-red-300">Delete</button>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                    <label className="text-sm text-white/55">Code<input className={`${input} mt-2 uppercase`} value={item.code} onChange={(e) => updateDiscount(index, { code: normalizeDiscountCode(e.target.value) })} placeholder="SAVE10" /></label>
+                    <label className="text-sm text-white/55">Customer label<input className={`${input} mt-2`} value={item.label} onChange={(e) => updateDiscount(index, { label: e.target.value })} placeholder="10% off detailing" /></label>
+                    <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as "percent" | "fixed" })}><option value="percent">Percent %</option><option value="fixed">Fixed $</option></select></label>
+                    <label className="text-sm text-white/55">Amount<input type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} /></label>
+                    <label className="text-sm text-white/55">Total usage limit<input type="number" min="1" step="1" className={`${input} mt-2`} value={item.usageLimit ?? ""} onChange={(e) => updateDiscount(index, { usageLimit: e.target.value ? Math.max(1, Math.floor(Number(e.target.value))) : null })} placeholder="Unlimited" /></label>
+                    <label className="text-sm text-white/55">Expiration date<input type="date" className={`${input} mt-2`} value={item.expiresAt || ""} onChange={(e) => updateDiscount(index, { expiresAt: e.target.value || null })} /></label>
+                    <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.onePerCustomer} onChange={(e) => updateDiscount(index, { onePerCustomer: e.target.checked })} /> One use per customer</label>
+                    <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateDiscount(index, { active: e.target.checked })} /> Active</label>
+                  </div>
+                </article>
+              );
+            })}
             {discounts.length === 0 && <p className="rounded-2xl border border-dashed border-white/10 p-6 text-sm text-white/35">No discount codes yet.</p>}
           </div>
           <button type="button" onClick={addDiscount} className="mt-5 rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/8 px-5 py-3 text-sm font-semibold text-[#FF2D2D]">+ Create discount code</button>
