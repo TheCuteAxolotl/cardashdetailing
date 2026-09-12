@@ -8,8 +8,10 @@ import {
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 import { getQuoteSmsContact } from "@/lib/quote-sms";
 import { getPublicSiteUrl, isRecentlyActive, sendTransactionalSms } from "@/lib/twilio-sms";
+import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 
 async function access(request: NextRequest, id: string) {
+  await ensureGuestQuoteSupport();
   const auth = await getCurrentAccountFromRequest(request);
   if (!auth) return null;
 
@@ -21,6 +23,10 @@ async function access(request: NextRequest, id: string) {
       status: true,
       quotedPrice: true,
       lastCustomerSeenAt: true,
+      guestName: true,
+      guestEmail: true,
+      guestPhone: true,
+      guestVehicle: true,
     },
   });
 
@@ -82,6 +88,9 @@ export async function POST(
   const body = await request.json();
   const message = String(body.message || "").trim().slice(0, 3000);
   const attachments = Array.isArray(body.attachments) ? body.attachments.slice(0, 3) : [];
+  if (attachments.some((item) => typeof item !== "string" || !/^data:image\/(?:jpeg|png|webp);base64,/i.test(item) || item.length > 650000)) {
+    return NextResponse.json({ error: "Each quote photo must be a JPG, PNG, or WebP image under the upload limit." }, { status: 400 });
+  }
 
   if (!message && !attachments.length) {
     return NextResponse.json({ error: "Message required" }, { status: 400 });
@@ -110,6 +119,9 @@ export async function POST(
       select: {
         id: true,
         subject: true,
+        guestName: true,
+        guestEmail: true,
+        guestVehicle: true,
         user: { select: { name: true, email: true } },
         vehicle: { select: { year: true, make: true, model: true, trim: true } },
         service: { select: { title: true } },
@@ -119,15 +131,15 @@ export async function POST(
     if (details) {
       await notifyQuoteDiscord({
         title: attachments.length ? "New customer quote reply + photos" : "New customer quote reply",
-        customerName: details.user.name,
-        customerEmail: details.user.email,
+        customerName: details.user?.name || details.guestName || "Guest",
+        customerEmail: details.user?.email || details.guestEmail || undefined,
         subject: details.subject,
         message: message || "Photo attachment",
         vehicle: details.vehicle
           ? [details.vehicle.year, details.vehicle.make, details.vehicle.model, details.vehicle.trim]
               .filter(Boolean)
               .join(" ")
-          : undefined,
+          : details.guestVehicle || undefined,
         service: details.service?.title || undefined,
         photoCount: attachments.length,
         threadId: details.id,
@@ -139,9 +151,12 @@ export async function POST(
   if (allowed.staff && !isRecentlyActive(allowed.thread.lastCustomerSeenAt)) {
     const sms = await getQuoteSmsContact(id);
     if (sms.consent && sms.phone) {
+      const guestThread = !allowed.thread.userId;
       await sendTransactionalSms({
         to: sms.phone,
-        body: `Car Dash Detailing: We replied to your quote chat. View your private conversation: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,
+        body: guestThread
+          ? `Car Dash Detailing: ${message || "We replied to your exact-quote request."} Reply to this text if you have a question.`.slice(0, 1450)
+          : `Car Dash Detailing: We replied to your quote chat. View your private conversation: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,
       });
     }
   }
@@ -220,9 +235,13 @@ export async function PUT(
     if (!isRecentlyActive(allowed.thread.lastCustomerSeenAt)) {
       const sms = await getQuoteSmsContact(id);
       if (sms.consent && sms.phone) {
+        const guestThread = !allowed.thread.userId;
+        const guestEmail = allowed.thread.guestEmail || "";
         await sendTransactionalSms({
           to: sms.phone,
-          body: `Car Dash Detailing: Your final quote is $${quotedPrice.toFixed(2)}. Review or accept it here: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,
+          body: guestThread
+            ? `Car Dash Detailing: Your exact quote is $${quotedPrice.toFixed(2)}${String(body.quoteNotes || "").trim() ? ` — ${String(body.quoteNotes).trim()}` : ""}. Reply to this text to book or ask a question. Want to track it online? ${getPublicSiteUrl()}/register?claimQuoteId=${encodeURIComponent(id)}&email=${encodeURIComponent(guestEmail)}`.slice(0, 1450)
+            : `Car Dash Detailing: Your final quote is $${quotedPrice.toFixed(2)}. Review or accept it here: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,
         });
       }
     }
@@ -256,6 +275,9 @@ export async function PUT(
         id: true,
         subject: true,
         quotedPrice: true,
+        guestName: true,
+        guestEmail: true,
+        guestVehicle: true,
         user: { select: { name: true, email: true } },
         vehicle: { select: { year: true, make: true, model: true, trim: true } },
         service: { select: { title: true } },
@@ -265,14 +287,14 @@ export async function PUT(
     if (details) {
       await notifyQuoteDiscord({
         title: "Quote accepted",
-        customerName: details.user.name,
-        customerEmail: details.user.email,
+        customerName: details.user?.name || details.guestName || "Guest",
+        customerEmail: details.user?.email || details.guestEmail || undefined,
         subject: details.subject,
         vehicle: details.vehicle
           ? [details.vehicle.year, details.vehicle.make, details.vehicle.model, details.vehicle.trim]
               .filter(Boolean)
               .join(" ")
-          : undefined,
+          : details.guestVehicle || undefined,
         service: details.service?.title || undefined,
         quotedPrice: details.quotedPrice,
         threadId: details.id,
@@ -295,6 +317,7 @@ export async function DELETE(
   }
 
   const { id } = await context.params;
+  await ensureGuestQuoteSupport();
   const existing = await prisma.quoteThread.findUnique({
     where: { id },
     select: { id: true, subject: true },

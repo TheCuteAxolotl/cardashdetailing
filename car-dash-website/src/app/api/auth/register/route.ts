@@ -3,10 +3,11 @@ import { hashPassword, createToken, getRoleForEmail } from "@/lib/auth";
 import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
 import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
+import { ensureGuestQuoteSupport, normalizeEmail } from "@/lib/quote-guest";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json();
+    const { email, password, name, claimQuoteId } = await request.json();
 
     if (!email || !password || !name) {
       return NextResponse.json(
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = normalizeEmail(email);
 
     // Prevent registering as owner
     if (normalizedEmail === OWNER_EMAIL.toLowerCase()) {
@@ -47,6 +48,20 @@ export async function POST(request: NextRequest) {
         role,
       },
     });
+
+    if (claimQuoteId) {
+      await ensureGuestQuoteSupport();
+      const guestQuote = await prisma.quoteThread.findUnique({
+        where: { id: String(claimQuoteId) },
+        select: { id: true, userId: true, guestEmail: true },
+      });
+      if (guestQuote && !guestQuote.userId && normalizeEmail(guestQuote.guestEmail) === normalizedEmail) {
+        await prisma.quoteThread.update({
+          where: { id: guestQuote.id },
+          data: { userId: user.id, lastCustomerSeenAt: new Date() },
+        });
+      }
+    }
 
     const token = createToken({
       id: user.id,

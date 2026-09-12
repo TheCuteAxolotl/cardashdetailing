@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions | Car Dash Detailing",
-  description: "Terms and Conditions for Car Dash Detailing.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Terms and Conditions',
+  description: 'Terms and Conditions for Car Dash Detailing quotes, bookings, vehicle condition, results, payments, website accounts, and SMS communications.',
+  path: '/terms-and-conditions',
+});
 
-const effectiveDate = "September 11, 2026";
+const effectiveDate = "September 12, 2026";
 
 export default function TermsAndConditionsPage() {
   return (

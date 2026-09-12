@@ -5,6 +5,8 @@ import {
   notifyBookingChatDiscord,
 } from "@/lib/booking-chat";
 import { listRecentInboundSms, normalizePhoneNumber } from "@/lib/twilio-sms";
+import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
+import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 
 export type StoreInboundSmsInput = {
   from: string;
@@ -59,12 +61,21 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
   }
 
   await ensureBookingChatSchema();
+  await ensureGuestQuoteSupport();
 
   const duplicateBookingMessage = await prisma.bookingMessage.findUnique({
     where: { externalSid: messageSid },
     select: { id: true },
   });
   if (duplicateBookingMessage) {
+    return { stored: false, reason: "duplicate" as const };
+  }
+
+  const duplicateQuoteMessage = await prisma.quoteMessage.findUnique({
+    where: { externalSid: messageSid },
+    select: { id: true },
+  });
+  if (duplicateQuoteMessage) {
     return { stored: false, reason: "duplicate" as const };
   }
 
@@ -82,6 +93,53 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
     : new Date();
 
   if (!booking) {
+    const guestQuotes = await prisma.quoteThread.findMany({
+      where: {
+        userId: null,
+        guestPhone: { not: null },
+        status: { notIn: ["closed", "booked"] },
+      },
+      select: {
+        id: true,
+        subject: true,
+        guestName: true,
+        guestEmail: true,
+        guestPhone: true,
+        guestVehicle: true,
+        service: { select: { title: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: 250,
+    });
+    const quote = guestQuotes.find((item) => normalizePhoneNumber(item.guestPhone || "") === fromPhone) || null;
+
+    if (quote) {
+      await prisma.quoteMessage.create({
+        data: {
+          threadId: quote.id,
+          sender: "customer",
+          body: body.slice(0, 3000),
+          externalSid: messageSid,
+          createdAt,
+        },
+      });
+      await prisma.quoteThread.update({
+        where: { id: quote.id },
+        data: { updatedAt: new Date() },
+      });
+      await notifyQuoteDiscord({
+        title: "Guest quote SMS reply",
+        customerName: quote.guestName || "Guest",
+        customerEmail: quote.guestEmail || undefined,
+        subject: quote.subject,
+        message: `SMS reply: ${body}`,
+        vehicle: quote.guestVehicle || undefined,
+        service: quote.service?.title || undefined,
+        threadId: quote.id,
+      });
+      return { stored: true, matched: true as const, quoteThreadId: quote.id };
+    }
+
     await prisma.unmatchedSmsMessage.create({
       data: {
         fromPhone,
@@ -92,7 +150,7 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
       },
     });
 
-    console.warn(`Inbound SMS from ${fromPhone} was saved as unmatched because no booking used that phone number.`);
+    console.warn(`Inbound SMS from ${fromPhone} was saved as unmatched because no booking or guest quote used that phone number.`);
     return { stored: true, matched: false as const };
   }
 

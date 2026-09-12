@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OWNER_EMAIL } from "@/lib/constants";
 
 export default function RegisterPage() {
@@ -10,6 +10,18 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [claimQuoteId, setClaimQuoteId] = useState("");
+
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const claim = q.get("claimQuoteId") || "";
+    const prefillEmail = q.get("email") || "";
+    const prefillName = q.get("name") || "";
+    setClaimQuoteId(claim);
+    if (prefillEmail) setEmail(prefillEmail);
+    if (prefillName) setName(prefillName);
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -24,11 +36,11 @@ export default function RegisterPage() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, claimQuoteId }),
       });
       const data = await response.json();
       if (!response.ok) return setError(data.error || "Registration failed");
-      window.location.assign("/dashboard");
+      window.location.assign(claimQuoteId ? `/quote?thread=${encodeURIComponent(claimQuoteId)}` : "/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");
       console.error(err);
@@ -45,7 +57,7 @@ export default function RegisterPage() {
         <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(145deg,rgba(74,85,104,.15),rgba(255,255,255,.02))] p-7 shadow-[0_28px_90px_rgba(0,0,0,.35)] sm:p-8">
           <p className="text-[10px] font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Car Dash Account</p>
           <h1 className="mt-3 text-3xl font-bold tracking-[-.04em]">Create Account</h1>
-          <p className="mt-2 text-sm text-white/42">Keep quotes, bookings, vehicles, and messages in one place.</p>
+          <p className="mt-2 text-sm text-white/42">Keep quotes, bookings, vehicles, and messages in one place.{claimQuoteId ? " Your guest quote will be linked automatically." : ""}</p>
 
           {error && <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100">{error}</div>}
 
@@ -59,7 +71,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-white/42">Already have an account? <a href="/login" className="font-semibold text-[#FF2D2D] hover:text-[#FF2D2D]">Sign in</a></div>
+          <div className="mt-6 text-center text-sm text-white/42">Already have an account? <a href={claimQuoteId ? `/login?claimQuoteId=${encodeURIComponent(claimQuoteId)}&email=${encodeURIComponent(email)}` : "/login"} className="font-semibold text-[#FF2D2D] hover:text-[#FF2D2D]">Sign in</a></div>
         </div>
       </div>
     </div>

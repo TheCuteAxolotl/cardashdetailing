@@ -64,8 +64,8 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
       <section id="pricing" className="mx-auto max-w-7xl scroll-mt-32 px-5 pb-20 sm:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Our Packages</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Choose the vehicle. See the exact package price.</h2>
-          <p className="mt-5 text-white/45">No estimate range on these pages. The selected vehicle class controls the exact package total shown before booking.</p>
+          <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Choose the vehicle class. See the standard package price.</h2>
+          <p className="mt-5 text-white/45">These are the standard package prices for each vehicle class. If the vehicle is unusually clean, unusually dirty, or the scope is different from the standard package, use Get an Exact Quote and send photos so the job can be priced by condition.</p>
         </div>
 
         <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2 rounded-[26px] border border-white/10 bg-[#111318] p-3">
@@ -93,7 +93,7 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
                 <h3 className="mt-3 pr-20 text-3xl font-semibold tracking-[-.04em]">{pkg.name}</h3>
                 <p className="mt-4 min-h-16 text-sm leading-7 text-white/48">{pkg.description}</p>
                 <div className="mt-6 border-y border-white/10 py-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[.22em] text-white/35">Fixed price · {VEHICLE_LABELS[vehicle]}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-[.22em] text-white/35">Standard package · {VEHICLE_LABELS[vehicle]}</p>
                   <p className="mt-2 text-5xl font-semibold tracking-[-.05em]"><span className="mr-1 text-2xl text-[#FF2D2D]">$</span>{price.toFixed(0)}</p>
                 </div>
                 <ul className="mt-6 flex-1 space-y-0">
@@ -128,9 +128,9 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
 
       <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
         <div className="rounded-[34px] border border-[#FF2D2D]/20 bg-[linear-gradient(130deg,rgba(255,45,45,.08),rgba(74,85,104,.08),rgba(255,255,255,.015))] p-8 sm:p-12">
-          <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Ready to book?</p>
-          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Pick the package and your booking carries the exact price with it.</h2>
-          <div className="mt-8 flex flex-wrap gap-3"><a href="#pricing" className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D]">Choose a package</a><a href="/quote" className="rounded-full border border-white/15 px-6 py-3 font-semibold">Need something custom?</a></div>
+          <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Standard package or condition-based quote</p>
+          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Book the standard package price, or send photos for a condition-based exact quote.</h2>
+          <div className="mt-8 flex flex-wrap gap-3"><a href="#pricing" className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D]">Choose a package</a><a href="/quote" className="rounded-full border border-white/15 px-6 py-3 font-semibold">Get an Exact Quote</a></div>
         </div>
       </section>
     </main>

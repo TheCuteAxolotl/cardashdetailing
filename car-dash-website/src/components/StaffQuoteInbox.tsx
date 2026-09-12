@@ -10,7 +10,11 @@ type Thread = {
   quotedPrice: number | null;
   quoteNotes: string | null;
   lastCustomerSeenAt: string | null;
-  user: { name: string; email: string };
+  user: { name: string; email: string } | null;
+  guestName: string | null;
+  guestEmail: string | null;
+  guestPhone: string | null;
+  guestVehicle: string | null;
   vehicle: any;
   service: any;
   messages: Msg[];
@@ -119,7 +123,8 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
 
   const deleteChat = async () => {
     if (!active || !canDelete) return;
-    const okay = window.confirm(`Permanently delete this quote chat with ${active.user.name}? This cannot be undone.`);
+    const customerName = active.user?.name || active.guestName || "guest customer";
+    const okay = window.confirm(`Permanently delete this quote chat with ${customerName}? This cannot be undone.`);
     if (!okay) return;
 
     setDeleting(true);
@@ -164,7 +169,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                 className={`mb-2 w-full rounded-2xl p-4 text-left ${thread.id === selectedId ? "bg-white text-black" : "hover:bg-white/5"}`}
               >
                 <div className="flex justify-between gap-2">
-                  <span className="font-semibold">{thread.user.name}</span>
+                  <span className="font-semibold">{thread.user?.name || thread.guestName || "Guest quote"}</span>
                   <span className="text-[10px] uppercase opacity-50">{thread.status}</span>
                 </div>
                 <p className="mt-1 truncate text-sm opacity-55">{thread.subject}</p>
@@ -183,12 +188,19 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                       <div>
                         <h2 className="text-2xl font-semibold">{active.subject}</h2>
                         <p className="mt-1 text-sm text-white/40">
-                          {active.user.name} · {active.user.email}
-                          {active.vehicle ? ` · ${active.vehicle.year} ${active.vehicle.make} ${active.vehicle.model}` : ""}
+                          {active.user?.name || active.guestName || "Guest customer"} · {active.user?.email || active.guestEmail || "No email"}
+                          {active.vehicle ? ` · ${active.vehicle.year} ${active.vehicle.make} ${active.vehicle.model}` : active.guestVehicle ? ` · ${active.guestVehicle}` : ""}
                         </p>
                         <p className="mt-1 text-xs text-white/25">
-                          Customer presence: {active.lastCustomerSeenAt && Date.now() - new Date(active.lastCustomerSeenAt).getTime() < 90000 ? "currently/recently active" : "offline"}
+                          {active.user ? `Customer presence: ${active.lastCustomerSeenAt && Date.now() - new Date(active.lastCustomerSeenAt).getTime() < 90000 ? "currently/recently active" : "offline"}` : `Guest lead${active.guestPhone ? ` · ${active.guestPhone}` : ""}`}
                         </p>
+                        {!active.user && (active.guestPhone || active.guestEmail) && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {active.guestPhone && <a href={`tel:${active.guestPhone}`} className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-white/60 hover:border-[#FF2D2D]/40 hover:text-white">Call</a>}
+                            {active.guestPhone && <a href={`sms:${active.guestPhone}`} className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-white/60 hover:border-[#FF2D2D]/40 hover:text-white">Text</a>}
+                            {active.guestEmail && <a href={`mailto:${active.guestEmail}`} className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-white/60 hover:border-[#FF2D2D]/40 hover:text-white">Email</a>}
+                          </div>
+                        )}
                       </div>
                       <span className="rounded-full border border-white/10 px-3 py-1.5 text-xs uppercase text-white/50">{active.status}</span>
                     </div>

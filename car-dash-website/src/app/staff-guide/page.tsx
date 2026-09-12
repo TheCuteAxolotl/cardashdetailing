@@ -88,6 +88,7 @@ const sections: StaffGuideSection[] = [
     summary: "The goal is an accurate exact quote, not automatically charging the highest listed price.",
     points: [
       "Review the vehicle year, make, model, service requested, condition selection, notes, and every uploaded photo before quoting.",
+      "Guest quote requests do not require an account. Help the lead first; offer the customer dashboard as an optional convenience instead of making account creation a hurdle.",
       "Use the public package price as a reference, not a reason to overcharge. A cleaner SUV that normally lists at $279 can reasonably receive a lower exact quote when the work supports it.",
       "Ask follow-up questions when photos do not show the problem areas, pet hair, stains, cargo area, third row, or exterior condition clearly enough.",
       "When sending an exact quote, make clear what is included and whether any unusual condition was excluded from that price.",

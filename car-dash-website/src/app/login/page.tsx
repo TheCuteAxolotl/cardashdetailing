@@ -1,12 +1,21 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [claimQuoteId, setClaimQuoteId] = useState("");
+
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    setClaimQuoteId(q.get("claimQuoteId") || "");
+    const prefillEmail = q.get("email");
+    if (prefillEmail) setEmail(prefillEmail);
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -24,6 +33,15 @@ export default function LoginPage() {
       if (!response.ok) {
         setError(data.error || "Login failed");
         return;
+      }
+
+      if (claimQuoteId && data.user.role !== "owner" && !data.staffAccess) {
+        const claim = await fetch("/api/quotes/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quoteId: claimQuoteId }),
+        });
+        if (claim.ok) return window.location.assign(`/quote?thread=${encodeURIComponent(claimQuoteId)}`);
       }
 
       if (data.user.role === "owner") window.location.assign("/owner/dashboard");
@@ -62,7 +80,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center text-sm text-white/42">
-            Don&apos;t have an account? <a href="/register" className="font-semibold text-[#FF2D2D] hover:text-[#FF2D2D]">Create one</a>
+            Don&apos;t have an account? <a href={claimQuoteId ? `/register?claimQuoteId=${encodeURIComponent(claimQuoteId)}&email=${encodeURIComponent(email)}` : "/register"} className="font-semibold text-[#FF2D2D] hover:text-[#FF2D2D]">Create one</a>
           </div>
         </div>
       </div>

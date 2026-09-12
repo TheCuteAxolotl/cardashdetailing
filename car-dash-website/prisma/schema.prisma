@@ -124,8 +124,13 @@ model UnmatchedSmsMessage {
 
 model QuoteThread {
   id                 String         @id @default(cuid())
-  userId             String
-  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String?
+  user               User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestName          String?
+  guestEmail         String?
+  guestPhone         String?
+  guestVehicle       String?
+  guestVisitorHash   String?
   vehicleId          String?
   vehicle            Vehicle?       @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   serviceId          String?
@@ -142,6 +147,8 @@ model QuoteThread {
 
   @@index([userId, updatedAt])
   @@index([status, updatedAt])
+  @@index([guestEmail])
+  @@index([guestVisitorHash])
 }
 
 model QuoteMessage {
@@ -151,6 +158,7 @@ model QuoteMessage {
   sender          String      // customer, team
   body            String
   attachmentsJson String?     // JSON array of small image data URLs (temporary storage strategy)
+  externalSid     String?     @unique // Twilio MessageSid for inbound guest-quote SMS deduplication
   createdAt       DateTime    @default(now())
 
   @@index([threadId, createdAt])

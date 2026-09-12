@@ -134,7 +134,7 @@ export default function SiteHeader() {
                   <a href="/marine-detailing" className="block rounded-xl px-2 py-2 text-sm text-white/70 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Services</a>
                 </div>
               </div>
-              <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Chat to a Specialist</a><a href="/car-detailing-packages" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Car packages →</a><a href="/marine-detailing" className="px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Marine services →</a></div>
+              <div className="mt-5 flex flex-wrap gap-3 border-t border-white/10 pt-5"><a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-semibold text-[#0D0D0D]">Get an Estimate</a><a href="/quote" className="rounded-full border border-white/15 bg-white/[.03] px-5 py-2.5 text-sm font-semibold">Get an Exact Quote</a><a href="/car-detailing-packages" className="ml-auto px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Car packages →</a><a href="/marine-detailing" className="px-3 py-2.5 text-sm text-white/50 hover:text-[#FF2D2D]">Marine services →</a></div>
             </div>}
           </div>
 
@@ -181,7 +181,7 @@ export default function SiteHeader() {
               <a href="/marine-detailing#marine-add-ons" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Marine Add-Ons + Pricing</a>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <a href="/estimate" className="rounded-xl bg-[#FF2D2D]/10 px-3 py-3 text-[#FF2D2D]">Get an Estimate</a>
-                <a href="/quote" className="rounded-xl border border-white/10 px-3 py-3 hover:border-[#FF2D2D]/30 hover:text-[#FF2D2D]">Chat to a Specialist</a>
+                <a href="/quote" className="rounded-xl border border-white/10 px-3 py-3 hover:border-[#FF2D2D]/30 hover:text-[#FF2D2D]">Get an Exact Quote</a>
               </div>
               </div>
               </div>

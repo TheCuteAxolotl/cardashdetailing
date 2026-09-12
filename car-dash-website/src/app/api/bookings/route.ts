@@ -16,6 +16,7 @@ import {
   parseDiscountCodes,
 } from "@/lib/booking-pricing";
 import { checkDiscountAvailability } from "@/lib/discount-usage";
+import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -138,6 +139,7 @@ export async function POST(request: NextRequest) {
     let allowAddOns = false;
 
     if (quoteThreadId) {
+      await ensureGuestQuoteSupport();
       if (!auth?.id) return NextResponse.json({ success: false, message: "Please sign in again to book an accepted quote." }, { status: 401 });
 
       const quote = await prisma.quoteThread.findFirst({
@@ -147,6 +149,8 @@ export async function POST(request: NextRequest) {
       if (!quote) return NextResponse.json({ success: false, message: "Accepted quote not found." }, { status: 404 });
       if (quote.status !== "accepted") return NextResponse.json({ success: false, message: "This quote must be accepted before it can be booked." }, { status: 409 });
       if (!quote.quotedPrice || quote.quotedPrice <= 0) return NextResponse.json({ success: false, message: "This quote does not have a valid final price." }, { status: 409 });
+
+      if (!quote.user) return NextResponse.json({ success: false, message: "Please link this guest quote to your account before booking it." }, { status: 409 });
 
       serviceName = quote.service?.title || quote.subject || "Accepted Quote";
       baseTotal = quote.quotedPrice;
@@ -184,7 +188,7 @@ export async function POST(request: NextRequest) {
       if (!serviceId) return NextResponse.json({ success: false, message: "Choose a service or pricing package before booking." }, { status: 400 });
       const service = await prisma.service.findUnique({ where: { id: serviceId } });
       if (!service || !service.active) return NextResponse.json({ success: false, message: "That service is not available." }, { status: 404 });
-      if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Chat to a Specialist." }, { status: 409 });
+      if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Get an Exact Quote." }, { status: 409 });
 
       if (service.title.trim().toLowerCase() === "headlight restoration") {
         serviceName = "Headlight Restoration";

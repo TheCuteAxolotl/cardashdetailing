@@ -178,8 +178,8 @@ export default function HomeExperience() {
               </div>
               <div className="rounded-[30px] bg-[#111318] p-8 text-white">
                 <p className="text-[10px] uppercase tracking-[.27em] text-[#FF2D2D]">Clear communication</p>
-                <p className="mt-6 text-3xl font-semibold leading-[1.02] tracking-[-.045em]">Send the vehicle details. Get a clear answer. Get it handled.</p>
-                <p className="mt-5 text-sm leading-7 text-white/45">No need to guess which package fits. Vehicle size, condition, photos, and the work requested help determine what makes sense before the appointment.</p>
+                <p className="mt-6 text-3xl font-semibold leading-[1.02] tracking-[-.045em]">Send the vehicle details. We’ll tell you what it actually needs.</p>
+                <p className="mt-5 text-sm leading-7 text-white/45">Vehicle size is only one part of the job. Condition, photos, stains, pet hair, paint defects, and the work you want done help us price the actual amount of labor before the appointment.</p>
               </div>
             </div>
           </div>

@@ -90,7 +90,7 @@ export default function EstimatePage() {
               <p className="mt-2 text-sm text-white/40">for {result.service.title}</p>
               <p className="mt-6 text-sm leading-6 text-white/45">This range considers the selected service, vehicle or boat type, and the condition details you provided. Final pricing is confirmed before booking and may change after photos or an in-person inspection.</p>
               {vehicle === "marine" && <p className="mt-3 text-xs leading-5 text-white/32">Marine work can vary more because length, oxidation, waterline buildup, access, and hull condition all affect labor.</p>}
-              <a href={`/quote?service=${result.service.id}`} className="mt-6 block rounded-full bg-[#FF2D2D] px-5 py-3 text-center font-semibold text-[#0D0D0D]">Chat to a Specialist</a>
+              <a href={`/quote?service=${result.service.id}`} className="mt-6 block rounded-full bg-[#FF2D2D] px-5 py-3 text-center font-semibold text-[#0D0D0D]">Get an Exact Quote</a>
               <a href={`/contact?service=${encodeURIComponent(result.service.title)}`} className="mt-3 block rounded-full border border-white/15 bg-white/[.025] px-5 py-3 text-center text-sm">Request this service</a>
             </> : <p>Choose a service.</p>}
           </aside>

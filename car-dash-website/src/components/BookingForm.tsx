@@ -236,7 +236,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
       const service = services.find((item) => item.id === id);
       setForm((current) => ({ ...current, serviceId: id, quoteThreadId: "", selectedPackage: service?.title || "", addOns: [] }));
       if (service && (service.pricingType !== "fixed" || service.price <= 0)) {
-        setSetupMessage(`${service.title} needs an exact quote before booking. Use Chat to a Specialist and then book after accepting the final price.`);
+        setSetupMessage(`${service.title} needs an exact quote before booking. Use Get an Exact Quote and then book after accepting the final price.`);
       }
     }
   };
@@ -337,7 +337,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
         if (!match) return;
         if (!cancelled) {
           setForm((current) => ({ ...current, serviceId: match.id, selectedPackage: match.title, addOns: [] }));
-          if (match.pricingType !== "fixed" || match.price <= 0) setSetupMessage(`${match.title} needs an exact quote before booking. Use Chat to a Specialist, then book after accepting the final price.`);
+          if (match.pricingType !== "fixed" || match.price <= 0) setSetupMessage(`${match.title} needs an exact quote before booking. Use Get an Exact Quote, then book after accepting the final price.`);
         }
       }
     })();
@@ -445,7 +445,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
         <p className="mt-1 text-sm text-white/40">Choose a service, add any extras, apply a valid discount code, and see the exact total before submitting.</p>
       </div>
 
-      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D]">Chat to a Specialist →</a></div>}
+      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D]">Get an Exact Quote →</a></div>}
 
       {quoteLocked ? (
         <div className="rounded-3xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-5">

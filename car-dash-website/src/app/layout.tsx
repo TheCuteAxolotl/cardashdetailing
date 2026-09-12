@@ -4,7 +4,8 @@ import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SupportWidget from "@/components/SupportWidget";
-import { BUSINESS_PHONE } from "@/lib/constants";
+import StructuredData from "@/components/StructuredData";
+import { localBusinessSchema, SITE_URL } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,9 +18,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Car Dash Detailing",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Car Dash Detailing | Mobile Detailing in South Elgin, IL",
+    template: "%s | Car Dash Detailing",
+  },
   description:
-    "Mobile auto and marine detailing from Car Dash Detailing. Interior, exterior, paint correction, ceramic coatings, marine care, and custom service packages.",
+    "Mobile car and marine detailing based in South Elgin, Illinois. Interior detailing, exterior detailing, paint correction, ceramic coatings, and condition-based exact quotes.",
+  applicationName: "Car Dash Detailing",
+  category: "automotive detailing",
+  openGraph: {
+    siteName: "Car Dash Detailing",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: { card: "summary_large_image" },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -33,21 +47,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-black text-white`}
     >
       <body className="min-h-full flex min-h-screen flex-col bg-[#0D0D0D] text-white">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: "Car Dash Detailing",
-              url: "https://cardashdetailing.com",
-              telephone: BUSINESS_PHONE,
-              email: "cardashdetailing@gmail.com",
-              areaServed: "South Elgin, Illinois",
-              description: metadata.description,
-            }),
-          }}
-        />
+        <StructuredData data={localBusinessSchema} />
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />

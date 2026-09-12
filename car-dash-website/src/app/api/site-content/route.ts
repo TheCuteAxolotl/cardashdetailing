@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import { SITE_DEFAULTS, normalizeLegacySiteContent } from "@/lib/site-defaults";
 import { getCurrentAccountFromRequest, hasStaffPermission, isOwnerAccount } from "@/lib/permissions";
 
 const PRICING_KEYS = new Set([
@@ -21,7 +21,7 @@ export async function GET() {
     const rows = await prisma.siteContent.findMany();
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
-    return NextResponse.json({ ...SITE_DEFAULTS, ...stored }, { status: 200 });
+    return NextResponse.json(normalizeLegacySiteContent({ ...SITE_DEFAULTS, ...stored }), { status: 200 });
   } catch (error) {
     console.error("Error fetching site content:", error);
     return NextResponse.json(SITE_DEFAULTS, { status: 200 });
@@ -57,7 +57,7 @@ export async function PUT(request: NextRequest) {
 
     const rows = await prisma.siteContent.findMany();
     const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
-    return NextResponse.json({ ...SITE_DEFAULTS, ...stored }, { status: 200 });
+    return NextResponse.json(normalizeLegacySiteContent({ ...SITE_DEFAULTS, ...stored }), { status: 200 });
   } catch (error) {
     console.error("Error updating site content:", error);
     return NextResponse.json({ error: "Failed to update website content" }, { status: 500 });

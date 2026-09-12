@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Car Dash Detailing",
-  description: "Privacy Policy for Car Dash Detailing.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: 'Privacy Policy',
+  description: 'Privacy Policy for Car Dash Detailing, including quote requests, accounts, SMS consent, bookings, support, and data retention.',
+  path: '/privacy-policy',
+});
 
-const effectiveDate = "September 11, 2026";
+const effectiveDate = "September 12, 2026";
 
 export default function PrivacyPolicyPage() {
   return (

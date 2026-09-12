@@ -26,8 +26,8 @@ export default function ServicesPage() {
       <section className="border-b border-white/10 px-5 py-20 sm:px-8 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Car Detailing</p>
-          <h1 className="mt-5 max-w-5xl text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Three clear pricing pages. Pick the type of detail you actually need.</h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-white/50">Car packages, exterior work, and interior work now live on separate pages. Marine detailing stays completely separate.</p>
+          <h1 className="mt-5 max-w-5xl text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Start with the part of the vehicle you want cleaned, corrected, or protected.</h1>
+          <p className="mt-6 max-w-2xl text-base leading-8 text-white/50">Compare full-detail packages, exterior work, and interior work without digging through one long list. Paint correction, ceramic protection, and marine detailing each have their own guides too.</p>
         </div>
       </section>
 
@@ -52,9 +52,9 @@ export default function ServicesPage() {
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[.72fr_1.28fr] lg:py-20">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Car Detailing Add-Ons</p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">Add only what the vehicle actually needs.</h2>
-            <p className="mt-5 text-sm leading-7 text-white/45">These can be added to compatible car-detailing services. Headlight Restoration uses the add-on price shown here when booked with a detail and ${bookingPricing.headlightStandalonePrice.toFixed(0)} when booked by itself. Heavier contamination or unusual restoration work may require a custom quote.</p>
-            <div className="mt-6 flex flex-wrap gap-3"><a href="/contact" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Book a Detail</a><a href="/quote" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Ask about add-ons</a></div>
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">Add-ons for the jobs that need extra labor.</h2>
+            <p className="mt-5 text-sm leading-7 text-white/45">These can be added to compatible detailing services when the vehicle actually needs them. Headlight Restoration uses the add-on price shown here when booked with a detail and ${bookingPricing.headlightStandalonePrice.toFixed(0)} when booked by itself. Heavy contamination, unusual restoration work, or uncertain condition can be handled through an exact quote.</p>
+            <div className="mt-6 flex flex-wrap gap-3"><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Get an Exact Quote</a><a href="/quote" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Ask about add-ons</a></div>
           </div>
           <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0D0D0D]">
             {carAddOns.map((item, index) => <div key={item.id} className={`flex items-center justify-between gap-5 px-5 py-4 sm:px-6 ${index !== carAddOns.length - 1 ? "border-b border-white/8" : ""}`}><span className="text-sm text-white/70">{item.name}</span><span className="text-sm font-semibold text-[#FF2D2D]">${item.price.toFixed(0)}</span></div>)}
