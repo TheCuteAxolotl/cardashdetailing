@@ -5,7 +5,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 type DatabaseCandidate = {
-  name: "PRISMA_DATABASE_URL" | "POSTGRES_URL" | "DATABASE_URL";
+  name: "POOLED_DATABASE_URL" | "PRISMA_DATABASE_URL" | "POSTGRES_URL" | "DATABASE_URL";
   value: string;
 };
 
@@ -27,6 +27,7 @@ function normalizeCandidate(
 
 function chooseDatabaseUrl(): DatabaseCandidate | null {
   const candidates = [
+    normalizeCandidate("POOLED_DATABASE_URL", process.env.POOLED_DATABASE_URL),
     normalizeCandidate("DATABASE_URL", process.env.DATABASE_URL),
     normalizeCandidate("POSTGRES_URL", process.env.POSTGRES_URL),
     normalizeCandidate("PRISMA_DATABASE_URL", process.env.PRISMA_DATABASE_URL),
@@ -87,7 +88,7 @@ export const databaseRuntimeInfo = {
 
 if (!selectedDatabase && process.env.NODE_ENV === "production") {
   console.error(
-    "No usable database URL was found. Expected PRISMA_DATABASE_URL, POSTGRES_URL, or DATABASE_URL."
+    "No usable database URL was found. Expected POOLED_DATABASE_URL, PRISMA_DATABASE_URL, POSTGRES_URL, or DATABASE_URL."
   );
 }
 
