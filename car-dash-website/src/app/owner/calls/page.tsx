@@ -35,6 +35,10 @@ type CallRow = {
   status: string;
   blocked: boolean;
   durationSeconds: number | null;
+  screenAccepted: boolean;
+  voicemailRecordingSid: string | null;
+  voicemailDurationSeconds: number | null;
+  voicemailAt: string | null;
   startedAt: string;
   endedAt: string | null;
   customer: {
@@ -228,7 +232,7 @@ export default function OwnerCallsPage() {
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#FF2D2D]">Car Dash Phone</p>
             <h1 className="mt-1 text-2xl font-bold">Business Calls</h1>
-            <p className="mt-1 text-sm text-white/40">Forward your Car Dash number to your phone, keep call history, and block unwanted callers.</p>
+            <p className="mt-1 text-sm text-white/40">Forward calls, screen them before connecting, save Car Dash voicemail, keep call history, and block unwanted callers.</p>
           </div>
           <a href="/owner/dashboard" className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/75 hover:text-white">Back</a>
         </div>
@@ -265,7 +269,7 @@ export default function OwnerCallsPage() {
             )}
           </div>
           <p className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4 text-xs leading-5 text-white/45">
-            Save your Car Dash business number as a contact on your iPhone. Forwarded calls use the Car Dash number as caller ID, while the actual customer number stays visible in the call history below.
+            Save your Car Dash business number as a contact on your iPhone. When you answer, Car Dash asks you to press 1 before connecting the customer. If you do not press 1 — including when your personal voicemail answers — the customer is sent to Car Dash voicemail instead.
           </p>
         </section>
 
@@ -352,6 +356,16 @@ export default function OwnerCallsPage() {
                         </div>
                         <p className="mt-1 text-xs text-white/35">{call.fromPhone}{customer ? ` · ${customer.serviceName}${vehicle ? ` · ${vehicle}` : ""}` : ""}</p>
                         <p className="mt-2 text-xs text-white/35">{new Date(call.startedAt).toLocaleString()} · Duration {formatDuration(call.durationSeconds)}</p>
+                        {call.voicemailRecordingSid && (
+                          <div className="mt-3 rounded-xl border border-white/10 bg-black/30 p-3">
+                            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-white/45">
+                              <span className="font-semibold text-white/75">Car Dash voicemail</span>
+                              <span>· {formatDuration(call.voicemailDurationSeconds)}</span>
+                              {call.voicemailAt && <span>· {new Date(call.voicemailAt).toLocaleString()}</span>}
+                            </div>
+                            <audio controls preload="none" className="h-9 w-full" src={`/api/voice/voicemail/${call.id}`} />
+                          </div>
+                        )}
                       </div>
                       {!call.blocked && !nowBlocked && call.fromPhone.startsWith("+") && (
                         <button type="button" onClick={() => blockFromCall(call.fromPhone)} disabled={saving} className="rounded-full border border-red-500/25 px-3 py-1.5 text-xs font-semibold text-red-200 hover:bg-red-500/10 disabled:opacity-50">Block</button>

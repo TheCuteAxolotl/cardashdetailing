@@ -55,6 +55,31 @@ export function ensureCallSystemSchema() {
         CREATE INDEX IF NOT EXISTS "CallLog_fromPhone_startedAt_idx"
         ON "CallLog"("fromPhone", "startedAt")
       `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "CallLog"
+        ADD COLUMN IF NOT EXISTS "screenAccepted" BOOLEAN NOT NULL DEFAULT false
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "CallLog"
+        ADD COLUMN IF NOT EXISTS "voicemailRecordingSid" TEXT
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "CallLog"
+        ADD COLUMN IF NOT EXISTS "voicemailRecordingUrl" TEXT
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "CallLog"
+        ADD COLUMN IF NOT EXISTS "voicemailDurationSeconds" INTEGER
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "CallLog"
+        ADD COLUMN IF NOT EXISTS "voicemailAt" TIMESTAMP(3)
+      `);
     })().catch((error) => {
       schemaReady = null;
       throw error;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 import { prisma } from "@/lib/prisma";
 import { ensureCallSystemSchema } from "@/lib/call-system";
+import { getPublicSiteUrl } from "@/lib/twilio-sms";
 import { formDataToRecord, validateTwilioVoiceWebhook } from "@/lib/twilio-voice";
 
 export const runtime = "nodejs";
@@ -33,26 +34,49 @@ export async function POST(request: NextRequest) {
     const dialCallSid = String(params.DialCallSid || "").trim() || null;
     const duration = Number.parseInt(String(params.DialCallDuration || ""), 10);
 
+    const call = callSid
+      ? await prisma.callLog.findUnique({ where: { callSid } })
+      : null;
+
     if (callSid) {
       await prisma.callLog.updateMany({
         where: { callSid },
         data: {
-          status: dialStatus || "completed",
+          status: call?.screenAccepted ? dialStatus || "completed" : "voicemail",
           dialCallSid,
           durationSeconds: Number.isFinite(duration) ? duration : null,
-          endedAt: new Date(),
+          endedAt: call?.screenAccepted ? new Date() : null,
         },
       });
     }
 
-    if (["busy", "no-answer", "failed", "canceled"].includes(dialStatus)) {
-      response.say(
-        { voice: "alice" },
-        "Sorry we missed your call. Please send Car Dash Detailing a text at this same number and we will get back to you as soon as possible."
-      );
+    if (call?.screenAccepted) {
+      response.hangup();
+      return xml(response);
     }
 
-    response.hangup();
+    const voicemailAction = `${getPublicSiteUrl()}/api/voice/voicemail/complete${
+      callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
+    }`;
+    const voicemailStatus = `${getPublicSiteUrl()}/api/voice/voicemail/status${
+      callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
+    }`;
+
+    response.say(
+      { voice: "alice" },
+      "Thanks for calling Car Dash Detailing. We are unable to answer right now. Please leave your name, your vehicle, and the service you are interested in after the beep. Press pound when you are finished."
+    );
+    response.record({
+      action: voicemailAction,
+      method: "POST",
+      maxLength: 120,
+      finishOnKey: "#",
+      playBeep: true,
+      trim: "trim-silence",
+      recordingStatusCallback: voicemailStatus,
+      recordingStatusCallbackMethod: "POST",
+    });
+
     return xml(response);
   } catch (error) {
     console.error("Voice completion webhook failed:", error);

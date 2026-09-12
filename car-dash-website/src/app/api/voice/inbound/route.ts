@@ -81,6 +81,9 @@ export async function POST(request: NextRequest) {
     const actionUrl = `${getPublicSiteUrl()}/api/voice/complete${
       callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
     }`;
+    const screeningUrl = `${getPublicSiteUrl()}/api/voice/screen${
+      callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
+    }`;
 
     const dial = response.dial({
       action: actionUrl,
@@ -89,7 +92,13 @@ export async function POST(request: NextRequest) {
       answerOnBridge: true,
       ...(businessCallerId ? { callerId: businessCallerId } : {}),
     });
-    dial.number(forwardToNumber);
+    dial.number(
+      {
+        url: screeningUrl,
+        method: "POST",
+      },
+      forwardToNumber
+    );
 
     return xml(response);
   } catch (error) {
