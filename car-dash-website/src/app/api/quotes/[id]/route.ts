@@ -87,7 +87,7 @@ export async function POST(
 
   const body = await request.json();
   const message = String(body.message || "").trim().slice(0, 3000);
-  const attachments = Array.isArray(body.attachments) ? body.attachments.slice(0, 3) : [];
+  const attachments: unknown[] = Array.isArray(body.attachments) ? body.attachments.slice(0, 3) : [];
   if (attachments.some((item) => typeof item !== "string" || !/^data:image\/(?:jpeg|png|webp);base64,/i.test(item) || item.length > 650000)) {
     return NextResponse.json({ error: "Each quote photo must be a JPG, PNG, or WebP image under the upload limit." }, { status: 400 });
   }
