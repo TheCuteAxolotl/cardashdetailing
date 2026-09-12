@@ -34,7 +34,8 @@ export default function QuotePage() {
   const [selected, setSelected] = useState("");
   const [vehicleId, setVehicleId] = useState("");
   const [serviceId, setServiceId] = useState("");
-  const [subject, setSubject] = useState("Detailing quote");
+  const [subject, setSubject] = useState("Personalized detailing quote");
+  const [condition, setCondition] = useState("");
   const [body, setBody] = useState("");
   const [reply, setReply] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
@@ -116,7 +117,15 @@ export default function QuotePage() {
     const response = await fetch("/api/quotes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ vehicleId, serviceId, subject, message: body, attachments: photos, smsConsent, phone }),
+      body: JSON.stringify({
+        vehicleId,
+        serviceId,
+        subject,
+        message: `${condition ? `Vehicle condition: ${condition}.\n\n` : ""}${body}`.trim(),
+        attachments: photos,
+        smsConsent,
+        phone,
+      }),
     });
     const data = await response.json();
     if (!response.ok) {
@@ -124,6 +133,7 @@ export default function QuotePage() {
       return;
     }
     setBody("");
+    setCondition("");
     setPhotos([]);
     setSmsConsent(false);
     setPhone("");
@@ -172,9 +182,9 @@ export default function QuotePage() {
     return (
       <main className="min-h-screen bg-[#0D0D0D] px-6 py-24 text-white">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-[#FF2D2D]">Specialist Chat</p>
-          <h1 className="mt-3 text-4xl font-semibold">Sign in to start a private quote conversation.</h1>
-          <p className="mt-4 text-white/45">Your chat, photos, quotes, and history stay tied to your account.</p>
+          <p className="text-[#FF2D2D]">Get a Quote</p>
+          <h1 className="mt-3 text-4xl font-semibold">Sign in to get a personalized detailing quote.</h1>
+          <p className="mt-4 text-white/45">Vehicle size and condition can change the amount of work needed. Send the details and photos so Car Dash can quote the job fairly.</p>
           <div className="mt-7 flex justify-center gap-3">
             <a href="/login" className="rounded-full bg-[#FF2D2D] px-6 py-3 text-[#0D0D0D]">Login</a>
             <a href="/register" className="rounded-full border border-white/15 px-6 py-3">Create account</a>
@@ -188,9 +198,9 @@ export default function QuotePage() {
     <main className="min-h-screen bg-[#0D0D0D] px-4 py-8 text-white">
       <div className="mx-auto max-w-7xl">
         <div>
-          <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Private quote chat</p>
-          <h1 className="mt-2 text-4xl font-semibold">Chat to a Specialist</h1>
-          <p className="mt-2 text-white/40">Send photos, ask questions, receive an exact quote, accept it, then book with that exact price.</p>
+          <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Personalized pricing</p>
+          <h1 className="mt-2 text-4xl font-semibold">Get a Quote</h1>
+          <p className="mt-2 max-w-3xl text-white/40">Package prices are a reference for typical jobs. If your vehicle is cleaner, smaller, or needs less work, your final quote can be lower. If it needs extra work, we&apos;ll explain that before quoting it.</p>
         </div>
 
         <div className="mt-7 grid gap-5 lg:grid-cols-[300px_1fr]">
@@ -301,7 +311,8 @@ export default function QuotePage() {
               </div>
             ) : (
               <form onSubmit={create} className="mx-auto max-w-2xl py-4">
-                <h2 className="text-2xl font-semibold">Start a quote conversation</h2>
+                <h2 className="text-2xl font-semibold">Tell us about the vehicle</h2>
+                <p className="mt-2 text-sm leading-6 text-white/45">An SUV that is already in decent shape may not need the same amount of labor as a heavily used SUV. Photos help us price the actual condition instead of charging only by vehicle size.</p>
                 <div className="mt-5 grid gap-4">
                   <select className={input} value={vehicleId} onChange={(event) => setVehicleId(event.target.value)}>
                     <option value="">Select saved vehicle (optional)</option>
@@ -318,16 +329,27 @@ export default function QuotePage() {
                     {services.map((service) => <option key={service.id} value={service.id}>{service.title}</option>)}
                   </select>
 
+                  <label className="block text-sm text-white/60">
+                    Current vehicle condition
+                    <select className={`${input} mt-2`} value={condition} onChange={(event) => setCondition(event.target.value)}>
+                      <option value="">Select condition (optional)</option>
+                      <option value="Light / already fairly clean">Light / already fairly clean</option>
+                      <option value="Average / normal buildup">Average / normal buildup</option>
+                      <option value="Heavy / needs extra work">Heavy / needs extra work</option>
+                      <option value="Not sure — please judge from photos">Not sure — judge from photos</option>
+                    </select>
+                  </label>
+
                   <input className={input} value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Topic" />
                   <textarea
                     className={`${input} min-h-36`}
                     value={body}
                     onChange={(event) => setBody(event.target.value)}
-                    placeholder="Tell us what you want done, what condition the vehicle is in, and anything important we should know."
+                    placeholder="Tell us what you want done and anything important we should know (pet hair, stains, third row, recent cleaning, etc.)."
                   />
 
                   <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">
-                    Add photos (optional, up to 3)
+                    Add photos for a more accurate quote (optional, up to 3)
                     <input type="file" accept="image/*" multiple onChange={files} className="hidden" />
                   </label>
                   {photos.length > 0 && <p className="text-sm text-[#FF2D2D]">{photos.length} photo(s) selected</p>}
@@ -358,7 +380,7 @@ export default function QuotePage() {
                   </div>
 
                   {error && <p className="text-sm text-[#FF2D2D]">{error}</p>}
-                  <button className="rounded-full bg-[#FF2D2D] px-6 py-3 text-[#0D0D0D] font-semibold">Start private chat</button>
+                  <button className="rounded-full bg-[#FF2D2D] px-6 py-3 text-[#0D0D0D] font-semibold">Request My Quote</button>
                 </div>
               </form>
             )}

@@ -5,7 +5,7 @@ export const SITE_DEFAULTS = {
   heroEyebrow: "Mobile detailing",
   heroTitle: "Clean car. Better drive.",
   heroBody: "Interior, exterior, correction, and protection without overcomplicating it. Pick what the car needs, send the details, and Car Dash handles the rest.",
-  heroPrimaryCta: "Book a Detail",
+  heroPrimaryCta: "Get a Quote",
   heroSecondaryCta: "See Services",
 
   introEyebrow: "The Car Dash approach",

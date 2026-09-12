@@ -40,8 +40,8 @@ export default function HomeExperience() {
               {content.heroBody}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="/contact" className="rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
-                {content.heroPrimaryCta}
+              <a href="/quote" className="rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
+                {content.heroPrimaryCta.trim().toLowerCase() === "book a detail" ? "Get a Quote" : content.heroPrimaryCta}
               </a>
               <a href="/services" className="rounded-full border border-white/18 bg-black/20 px-6 py-3.5 text-sm font-semibold text-white/78 backdrop-blur transition hover:border-white/35 hover:text-white">
                 {content.heroSecondaryCta}
@@ -79,7 +79,7 @@ export default function HomeExperience() {
               <div className="rounded-[30px] bg-[#111318] p-8 text-white">
                 <p className="text-[10px] uppercase tracking-[.27em] text-[#FF2D2D]">Easy to book</p>
                 <p className="mt-6 text-3xl font-semibold leading-[1.02] tracking-[-.045em]">Send the vehicle details. Get a clear answer. Get it handled.</p>
-                <a href="/contact" className="mt-8 inline-flex text-sm font-semibold text-white/65 transition hover:text-white">Start a request →</a>
+                <a href="/quote" className="mt-8 inline-flex text-sm font-semibold text-white/65 transition hover:text-white">Get a personalized quote →</a>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function HomeExperience() {
           <h2 className="text-5xl font-semibold leading-[.9] tracking-[-.06em] sm:text-7xl">{content.contactTitle}</h2>
           <div>
             <p className="text-sm leading-7 text-white/78">{content.contactBody}</p>
-            <a href="/contact" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold">Book a detail</a>
+            <a href="/quote" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold">Get a Quote</a>
           </div>
         </div>
       </section>

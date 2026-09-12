@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   if (!auth) return NextResponse.json({ error: "Please log in to chat with a specialist." }, { status: 401 });
   if (isStaffAccount(auth)) return NextResponse.json({ error: "Staff should use the quote inbox." }, { status: 400 });
   const body = await request.json();
-  const subject = String(body.subject || "Detailing quote").trim().slice(0, 120);
+  const subject = String(body.subject || "Personalized detailing quote").trim().slice(0, 120);
   const message = String(body.message || "").trim().slice(0, 3000);
   const vehicleId = String(body.vehicleId || "").trim() || null;
   const serviceId = String(body.serviceId || "").trim() || null;
