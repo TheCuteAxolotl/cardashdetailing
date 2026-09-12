@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { OWNER_EMAIL } from "@/lib/constants";
 
 type User = { id: string; name: string; email: string; role: string };
@@ -78,7 +79,16 @@ export default function SiteHeader() {
     <div className="bg-[#FF2D2D] text-[#0D0D0D]"><div className="mx-auto flex max-w-[1540px] items-center justify-between border-x border-black/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[.24em] sm:px-8 lg:px-10"><span>Mobile Auto + Marine Detailing</span><a href="/estimate" className="hidden opacity-75 sm:block">Get an instant estimate ↗</a></div></div>
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0D0D0D]/95 text-white backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1540px] items-center justify-between gap-5 border-x border-white/10 px-5 py-4 sm:px-8 lg:px-10">
-        <a href="/" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full border border-[#FF2D2D]/35 bg-[#FF2D2D] text-[11px] font-black text-[#0D0D0D] shadow-[0_0_28px_rgba(255,45,45,.14)]">CD</span><div className="leading-none"><span className="block text-[15px] font-semibold">Car Dash</span><span className="mt-1 block text-[9px] uppercase tracking-[.3em] text-white/30">Detailing</span></div></a>
+        <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center">
+          <Image
+            src="/car-dash-logo.png"
+            alt="Car Dash Detailing"
+            width={420}
+            height={420}
+            priority
+            className="h-[52px] w-[52px] object-contain sm:h-[58px] sm:w-[58px]"
+          />
+        </a>
         <nav className="hidden items-center gap-6 text-[13px] font-medium text-white/50 xl:flex">
           <a href="/" className={pathname==="/"?"text-white":"hover:text-[#FF2D2D]"}>Home</a>
 
