@@ -112,7 +112,41 @@ summary::-webkit-details-marker {
 }
 
 
-/* Mobile navigation is a real scroll container so long menus work on iPhone/Safari. */
+/* Mobile navigation: keep the panel mounted so iPhone/Safari can animate both opening and closing. */
+.mobile-menu-shell {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-10px);
+  border-color: transparent;
+  will-change: max-height, opacity, transform;
+  transition:
+    max-height 420ms cubic-bezier(.22,.8,.25,1),
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(.22,.8,.25,1),
+    border-color 180ms ease,
+    visibility 0s linear 420ms;
+}
+
+.mobile-menu-shell.mobile-menu-shell-open {
+  max-height: 68vh;
+  max-height: 68dvh;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  border-color: rgba(255,255,255,.1);
+  transition:
+    max-height 420ms cubic-bezier(.22,.8,.25,1),
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(.22,.8,.25,1),
+    border-color 180ms ease,
+    visibility 0s linear 0s;
+}
+
+/* The inner panel remains the actual momentum-scroll container on iPhone/Safari. */
 .mobile-menu-scroll {
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
@@ -124,14 +158,24 @@ summary::-webkit-details-marker {
   display: none !important;
 }
 
-.mobile-accordion-pop {
-  transform-origin: top center;
-  animation: mobileAccordionPop 240ms cubic-bezier(.2,.75,.2,1) both;
+/* Natural-height accordion animation for the mobile Services and Explore sections. */
+.mobile-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: .45;
+  transition:
+    grid-template-rows 340ms cubic-bezier(.22,.8,.25,1),
+    opacity 220ms ease;
 }
 
-@keyframes mobileAccordionPop {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+.mobile-accordion.mobile-accordion-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.mobile-accordion-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Car Dash public-site finishing touches */

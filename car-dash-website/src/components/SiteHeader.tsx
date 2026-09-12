@@ -152,10 +152,15 @@ export default function SiteHeader() {
           {staff&&<a href="/admin/dashboard" className="text-[#FF2D2D]">Staff</a>}{owner&&<a href="/owner/dashboard" className="text-[#FF2D2D]">Owner</a>}
         </nav>
         <div className="hidden items-center gap-2 xl:flex">{!user?<a href="/login" className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/70 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Login</a>:<a href="/account" className="rounded-full border border-white/10 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/65 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Account</a>}<a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-xs font-semibold text-[#0D0D0D]">Get Estimate</a></div>
-        <button onClick={()=>setMenuOpen(!menuOpen)} className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2 text-xs font-semibold hover:border-[#FF2D2D]/40 hover:text-[#FF2D2D] xl:hidden">{menuOpen?"Close":"Menu"}</button>
+        <button aria-expanded={menuOpen} aria-controls="mobile-site-menu" onClick={()=>setMenuOpen(!menuOpen)} className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2 text-xs font-semibold hover:border-[#FF2D2D]/40 hover:text-[#FF2D2D] xl:hidden">{menuOpen?"Close":"Menu"}</button>
       </div>
 
-      {menuOpen&&<div className="mobile-menu-scroll max-h-[68dvh] overflow-y-auto overscroll-contain border-t border-white/10 bg-[#0D0D0D] px-5 py-4 pb-24 xl:hidden">
+      <div
+        id="mobile-site-menu"
+        aria-hidden={!menuOpen}
+        className={`mobile-menu-shell border-t bg-[#0D0D0D] xl:hidden ${menuOpen ? "mobile-menu-shell-open" : ""}`}
+      >
+        <div className="mobile-menu-scroll max-h-[68dvh] overflow-y-auto overscroll-contain px-5 py-4 pb-24">
         <nav className="flex flex-col text-sm text-white/65">
           <a href="/" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Home</a>
 
@@ -163,7 +168,9 @@ export default function SiteHeader() {
             <button type="button" aria-expanded={mobileServicesOpen} onClick={()=>setMobileServicesOpen(v=>!v)} className="flex w-full items-center justify-between px-4 py-4 text-left font-semibold text-white">
               <span>Services</span><span className={`text-[#FF2D2D] transition-transform duration-300 ${mobileServicesOpen?'rotate-180':''}`}>⌄</span>
             </button>
-            {mobileServicesOpen&&<div className="mobile-accordion-pop border-t border-white/8 px-3 pb-3 pt-2">
+            <div className={`mobile-accordion ${mobileServicesOpen ? "mobile-accordion-open" : ""}`}>
+              <div className="mobile-accordion-inner">
+              <div className="border-t border-white/8 px-3 pb-3 pt-2">
               <p className="px-2 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[.24em] text-white/25">Car Detailing</p>
               <a href="/car-detailing-packages" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Car Detailing Packages</a>
               <a href="/exterior-detailing" className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Exterior Detailing</a>
@@ -176,16 +183,22 @@ export default function SiteHeader() {
                 <a href="/estimate" className="rounded-xl bg-[#FF2D2D]/10 px-3 py-3 text-[#FF2D2D]">Get an Estimate</a>
                 <a href="/quote" className="rounded-xl border border-white/10 px-3 py-3 hover:border-[#FF2D2D]/30 hover:text-[#FF2D2D]">Chat to a Specialist</a>
               </div>
-            </div>}
+              </div>
+              </div>
+            </div>
           </div>
 
           <div className="mt-3 overflow-hidden rounded-[20px] border border-white/10 bg-white/[.018]">
             <button type="button" aria-expanded={mobileExploreOpen} onClick={()=>setMobileExploreOpen(v=>!v)} className="flex w-full items-center justify-between px-4 py-4 text-left font-semibold text-white">
               <span>Explore</span><span className={`text-[#FF2D2D] transition-transform duration-300 ${mobileExploreOpen?'rotate-180':''}`}>⌄</span>
             </button>
-            {mobileExploreOpen&&<div className="mobile-accordion-pop border-t border-white/8 px-3 pb-3 pt-2">
-              {exploreLinks.map(([href,label,desc])=><a key={href} href={href} className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8"><span className="block text-white/80">{label}</span><span className="mt-1 block text-xs leading-5 text-white/32">{desc}</span></a>)}
-            </div>}
+            <div className={`mobile-accordion ${mobileExploreOpen ? "mobile-accordion-open" : ""}`}>
+              <div className="mobile-accordion-inner">
+                <div className="border-t border-white/8 px-3 pb-3 pt-2">
+                  {exploreLinks.map(([href,label,desc])=><a key={href} href={href} className="block rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8"><span className="block text-white/80">{label}</span><span className="mt-1 block text-xs leading-5 text-white/32">{desc}</span></a>)}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="mt-3 grid gap-1">
@@ -198,7 +211,8 @@ export default function SiteHeader() {
             {user&&<a href="/account" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Account</a>}
           </div>
         </nav>
-      </div>}
+        </div>
+      </div>
     </header>
   </>;
 }
