@@ -235,3 +235,28 @@ model BlockedVisitor {
   reason    String?
   createdAt DateTime @default(now())
 }
+
+model BlockedCaller {
+  id          String   @id @default(cuid())
+  phoneNumber String   @unique
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model CallLog {
+  id              String    @id @default(cuid())
+  callSid         String    @unique
+  fromPhone       String
+  toPhone         String?
+  status          String    @default("received")
+  blocked         Boolean   @default(false)
+  dialCallSid     String?
+  durationSeconds Int?
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
+
+  @@index([startedAt])
+  @@index([fromPhone, startedAt])
+}
