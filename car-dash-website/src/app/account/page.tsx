@@ -58,6 +58,10 @@ export default function AccountPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleteMessage, setDeleteMessage] = useState("");
+  const [deleteSaving, setDeleteSaving] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -152,6 +156,41 @@ export default function AccountPage() {
       setPasswordMessage("Unable to update password right now.");
     } finally {
       setPasswordSaving(false);
+    }
+  };
+
+  const deleteAccount = async (event: FormEvent) => {
+    event.preventDefault();
+    setDeleteMessage("");
+
+    if (deleteConfirmation !== "DELETE") {
+      setDeleteMessage("Type DELETE exactly to confirm account deletion.");
+      return;
+    }
+
+    setDeleteSaving(true);
+
+    try {
+      const response = await fetch("/api/auth/delete-account", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: deletePassword,
+          confirmation: deleteConfirmation,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setDeleteMessage(data.error || "Unable to delete your account.");
+        return;
+      }
+
+      window.location.replace("/");
+    } catch {
+      setDeleteMessage("Unable to delete your account right now.");
+    } finally {
+      setDeleteSaving(false);
     }
   };
 
@@ -293,6 +332,56 @@ export default function AccountPage() {
               </button>
             </form>
           </section>
+
+          {user.role === "user" && (
+            <section className="rounded-[28px] border border-red-500/20 bg-red-500/[0.035] p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-red-300/70">Danger zone</p>
+              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Delete account</h2>
+              <p className="mt-2 text-sm leading-6 text-white/40">
+                Permanently delete your Car Dash account and account-linked data, including saved vehicles, booking history,
+                quote conversations, and warranty records. This cannot be undone.
+              </p>
+
+              <form onSubmit={deleteAccount} className="mt-7 space-y-4">
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Current password"
+                  value={deletePassword}
+                  onChange={(event) => setDeletePassword(event.target.value)}
+                  required
+                  className="w-full rounded-2xl border border-red-400/15 bg-black/20 px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-red-400/55"
+                />
+                <label className="block">
+                  <span className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-white/35">
+                    Type DELETE to confirm
+                  </span>
+                  <input
+                    value={deleteConfirmation}
+                    onChange={(event) => setDeleteConfirmation(event.target.value)}
+                    placeholder="DELETE"
+                    autoComplete="off"
+                    required
+                    className="w-full rounded-2xl border border-red-400/15 bg-black/20 px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-red-400/55"
+                  />
+                </label>
+
+                {deleteMessage && (
+                  <p className="rounded-2xl border border-red-400/15 bg-red-500/[0.06] px-4 py-3 text-sm text-red-100/75">
+                    {deleteMessage}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={deleteSaving || deleteConfirmation !== "DELETE" || !deletePassword}
+                  className="rounded-full border border-red-400/35 bg-red-500/10 px-5 py-3 text-sm font-semibold text-red-200 transition hover:border-red-400/60 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {deleteSaving ? "Deleting account…" : "Permanently Delete Account"}
+                </button>
+              </form>
+            </section>
+          )}
         </div>
 
         <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">

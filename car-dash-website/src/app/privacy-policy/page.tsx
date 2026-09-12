@@ -94,6 +94,11 @@ export default function PrivacyPolicyPage() {
               reply STOP to unsubscribe at any time. You may contact us to ask questions about your information or request updates
               to information you have provided, subject to legal and recordkeeping requirements.
             </p>
+            <p className="mt-3">
+              Signed-in customers can also permanently delete their account from the Account page. Account deletion removes the
+              account and data directly linked to it. Information submitted outside the account system, such as certain support
+              requests or public reviews, may be retained when needed for legitimate business, security, or legal purposes.
+            </p>
           </section>
 
           <section>
