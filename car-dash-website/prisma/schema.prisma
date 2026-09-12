@@ -19,6 +19,8 @@ model User {
   vehicles     Vehicle[]
   quoteThreads QuoteThread[]
   warranties   Warranty[]
+  customRoleAssignments CustomRoleAssignment[]
+  permissionOverrides UserPermissionOverride[]
 }
 
 model Vehicle {
@@ -264,4 +266,41 @@ model CallLog {
 
   @@index([startedAt])
   @@index([fromPhone, startedAt])
+}
+
+
+model CustomRole {
+  id              String                 @id @default(cuid())
+  name            String                 @unique
+  description     String?
+  permissionsJson String                 @default("[]")
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  assignments     CustomRoleAssignment[]
+}
+
+model CustomRoleAssignment {
+  id        String     @id @default(cuid())
+  userId    String
+  roleId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      CustomRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model UserPermissionOverride {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission String
+  allowed    Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, permission])
+  @@index([userId])
 }

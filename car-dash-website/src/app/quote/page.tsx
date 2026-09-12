@@ -182,7 +182,7 @@ export default function QuotePage() {
     return (
       <main className="min-h-screen bg-[#0D0D0D] px-6 py-24 text-white">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-[#FF2D2D]">Get a Quote</p>
+          <p className="text-[#FF2D2D]">Get an Exact Quote</p>
           <h1 className="mt-3 text-4xl font-semibold">Sign in to get a personalized detailing quote.</h1>
           <p className="mt-4 text-white/45">Vehicle size and condition can change the amount of work needed. Send the details and photos so Car Dash can quote the job fairly.</p>
           <div className="mt-7 flex justify-center gap-3">
@@ -199,7 +199,7 @@ export default function QuotePage() {
       <div className="mx-auto max-w-7xl">
         <div>
           <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Personalized pricing</p>
-          <h1 className="mt-2 text-4xl font-semibold">Get a Quote</h1>
+          <h1 className="mt-2 text-4xl font-semibold">Get an Exact Quote</h1>
           <p className="mt-2 max-w-3xl text-white/40">Package prices are a reference for typical jobs. If your vehicle is cleaner, smaller, or needs less work, your final quote can be lower. If it needs extra work, we&apos;ll explain that before quoting it.</p>
         </div>
 

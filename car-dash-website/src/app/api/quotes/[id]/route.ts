@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getCurrentAccountFromRequest,
   isOwnerAccount,
-  isStaffAccount,
+  hasStaffPermission,
 } from "@/lib/permissions";
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 import { getQuoteSmsContact } from "@/lib/quote-sms";
@@ -25,9 +25,10 @@ async function access(request: NextRequest, id: string) {
   });
 
   if (!thread) return null;
-  if (!isStaffAccount(auth) && thread.userId !== auth.id) return null;
+  const staff = hasStaffPermission(auth, "quoteChats");
+  if (!staff && thread.userId !== auth.id) return null;
 
-  return { auth, thread, staff: isStaffAccount(auth) };
+  return { auth, thread, staff };
 }
 
 export async function GET(

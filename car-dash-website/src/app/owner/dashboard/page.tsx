@@ -25,7 +25,7 @@ export default function OwnerDashboard() {
         }
         const data = await response.json();
         if (data.user.role !== "owner") {
-          window.location.assign("/");
+          window.location.assign(data.staffAccess ? "/admin/dashboard" : "/");
           return;
         }
         setUser(data.user);
@@ -99,6 +99,14 @@ export default function OwnerDashboard() {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+          <a href="/staff-guide">
+            <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#FF2D2D]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#FF2D2D]/10 p-4 w-12 h-12 flex items-center justify-center mb-4"><span className="text-2xl">◎</span></div>
+              <h2 className="text-xl font-semibold mb-2">Staff Guide</h2>
+              <p className="text-neutral-400 text-sm">Rules, professionalism standards, support scripts, call handling, quote chat, booking chat, and SMS guidance</p>
+            </div>
+          </a>
           <a href="/owner/website">
             <div className="rounded-3xl border border-neutral-800 bg-neutral-950 p-8 hover:border-[#FF2D2D]/45 transition cursor-pointer">
               <div className="rounded-2xl bg-[#FF2D2D]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
@@ -219,8 +227,8 @@ export default function OwnerDashboard() {
               <div className="rounded-2xl bg-[#FF2D2D]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
                 <span className="text-2xl">👥</span>
               </div>
-              <h2 className="text-xl font-semibold mb-2">Admin Accounts</h2>
-              <p className="text-neutral-400 text-sm">Create or delete staff accounts with bookings and support access only</p>
+              <h2 className="text-xl font-semibold mb-2">Staff & Accounts</h2>
+              <p className="text-neutral-400 text-sm">Manage customers, Admin access, custom roles, dashboard permissions, and account information</p>
             </div>
           </a>
 

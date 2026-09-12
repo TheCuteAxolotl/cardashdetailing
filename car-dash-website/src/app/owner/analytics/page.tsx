@@ -1,8 +1,25 @@
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { getPermissionSnapshotForUser } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
 export default async function Analytics() {
+  const tokenUser = await getCurrentUser();
+  if (!tokenUser) redirect("/login");
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: tokenUser.id },
+    select: { id: true, email: true, role: true, name: true },
+  });
+  if (!dbUser) redirect("/login");
+
+  const access = await getPermissionSnapshotForUser(dbUser);
+  if (access.role !== "owner" && !access.permissions.includes("analytics")) {
+    redirect(access.staffAccess ? "/admin/dashboard" : "/dashboard");
+  }
+
   const [bookings, quoteCount, acceptedQuotes, users] = await Promise.all([
     prisma.booking.findMany({ select: { status: true, quotedPrice: true, createdAt: true } }),
     prisma.quoteThread.count(),
@@ -37,11 +54,11 @@ export default async function Analytics() {
       <div className="mx-auto max-w-7xl">
         <div className="flex justify-between gap-5">
           <div>
-            <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Owner</p>
+            <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">{access.role === "owner" ? "Owner" : "Staff"}</p>
             <h1 className="mt-2 text-4xl font-semibold">Analytics</h1>
             <p className="mt-2 text-white/40">Bookings, leads, customers, and exact booking totals.</p>
           </div>
-          <a href="/owner/dashboard" className="h-fit rounded-full border border-white/15 px-5 py-3 text-sm">Back</a>
+          <a href={access.role === "owner" ? "/owner/dashboard" : "/admin/dashboard"} className="h-fit rounded-full border border-white/15 px-5 py-3 text-sm">Back</a>
         </div>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map(([key, value]) => (
@@ -52,7 +69,7 @@ export default async function Analytics() {
           ))}
         </div>
         <p className="mt-6 text-xs text-white/25">
-          Booking values use the exact total saved with each new booking. Payment processing is still separate and can be connected later.
+          Booking values use the exact total saved with each new booking. Payment processing is separate.
         </p>
       </div>
     </main>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission, isStaffAccount } from "@/lib/permissions";
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
   if (!auth) return NextResponse.json({ error: "Login required" }, { status: 401 });
   const threads = await prisma.quoteThread.findMany({
-    where: isStaffAccount(auth) ? {} : { userId: auth.id },
+    where: hasStaffPermission(auth, "quoteChats") ? {} : { userId: auth.id },
     select, orderBy: { updatedAt: "desc" }, take: 100,
   });
   return NextResponse.json(threads);

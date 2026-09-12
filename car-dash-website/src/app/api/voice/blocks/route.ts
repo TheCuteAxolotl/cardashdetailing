@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureCallSystemSchema } from "@/lib/call-system";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
 import { forwardToNumber, voiceNumber } from "@/lib/twilio-voice";
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await getCurrentAccountFromRequest(request);
-    if (!isOwnerAccount(auth)) {
-      return NextResponse.json({ error: "Owner access required." }, { status: 403 });
+    if (!hasStaffPermission(auth, "businessPhone")) {
+      return NextResponse.json({ error: "Business Phone access required." }, { status: 403 });
     }
 
     await ensureCallSystemSchema();
@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const auth = await getCurrentAccountFromRequest(request);
-    if (!isOwnerAccount(auth)) {
-      return NextResponse.json({ error: "Owner access required." }, { status: 403 });
+    if (!hasStaffPermission(auth, "businessPhone")) {
+      return NextResponse.json({ error: "Business Phone access required." }, { status: 403 });
     }
 
     await ensureCallSystemSchema();

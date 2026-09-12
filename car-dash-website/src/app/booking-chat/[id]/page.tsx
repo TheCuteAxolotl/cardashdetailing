@@ -152,9 +152,9 @@ export default function BookingChatPage() {
   const { booking, viewer, authRole } = data;
   const staff = viewer === "staff";
   const backHref = staff
-    ? authRole === "admin"
-      ? "/admin/bookings"
-      : "/owner/bookings"
+    ? authRole === "owner"
+      ? "/owner/bookings"
+      : "/admin/bookings"
     : authRole === "guest"
       ? "/"
       : "/account";

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import {
   bookingHasSmsConsent,
   ensureBookingConversation,
@@ -36,7 +36,7 @@ async function getAccess(request: NextRequest, bookingId: string) {
   if (!booking) return null;
 
   const auth = await getCurrentAccountFromRequest(request);
-  if (isStaffAccount(auth)) {
+  if (hasStaffPermission(auth, "bookings")) {
     return { booking, viewer: "staff" as const, authRole: auth?.role || "staff" };
   }
 

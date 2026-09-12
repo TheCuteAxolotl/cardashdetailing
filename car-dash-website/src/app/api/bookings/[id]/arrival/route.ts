@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bookingHasSmsConsent, ensureBookingConversation } from "@/lib/booking-chat";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
 
 export async function POST(
@@ -10,7 +10,7 @@ export async function POST(
 ) {
   try {
     const auth = await getCurrentAccountFromRequest(request);
-    if (!isStaffAccount(auth)) {
+    if (!hasStaffPermission(auth, "bookings")) {
       return NextResponse.json({ error: "Staff access required." }, { status: 403 });
     }
 

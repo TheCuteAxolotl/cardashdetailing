@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 export async function GET() {
   try {
@@ -15,7 +15,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const auth = await getCurrentAccountFromRequest(request);
-    if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Owner login required" }, { status: 403 });
+    if (!hasStaffPermission(auth, "services")) return NextResponse.json({ error: "Services dashboard access required" }, { status: 403 });
     const body = await request.json();
     const title = String(body.title || "").trim();
     const description = String(body.description || "").trim();

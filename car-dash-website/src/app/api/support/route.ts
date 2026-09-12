@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import {
   cleanText,
   getClientIp,
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (isStaffAccount(auth)) {
+    if (hasStaffPermission(auth, "support")) {
       const tickets = await prisma.supportTicket.findMany({
         select: ticketSelect,
         orderBy: { updatedAt: "desc" },
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (isStaffAccount(auth)) {
+    if (hasStaffPermission(auth, "support")) {
       return NextResponse.json(
         { error: "Staff accounts should use the staff Support Inbox." },
         { status: 400 }

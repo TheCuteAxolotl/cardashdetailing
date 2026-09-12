@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { syncRecentInboundSmsFromTwilio } from "@/lib/inbound-sms";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
     const auth = await getCurrentAccountFromRequest(request);
-    if (!isStaffAccount(auth)) {
+    if (!hasStaffPermission(auth, "smsInbox")) {
       return NextResponse.json({ error: "Staff access required." }, { status: 403 });
     }
 

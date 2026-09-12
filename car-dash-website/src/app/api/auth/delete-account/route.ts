@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 import {
   getAuthFromRequest,
   getRoleForEmail,
-  isStaffRole,
   verifyPassword,
 } from "@/lib/auth";
+import { getPermissionSnapshotForUser } from "@/lib/permissions";
 import {
   databaseUnavailableResponseMessage,
   isLikelyDatabaseError,
@@ -57,7 +57,13 @@ export async function DELETE(request: NextRequest) {
     }
 
     const effectiveRole = getRoleForEmail(user.email, user.role);
-    if (isStaffRole(effectiveRole)) {
+    const access = await getPermissionSnapshotForUser({
+      id: user.id,
+      email: user.email,
+      role: effectiveRole,
+      name: "",
+    });
+    if (access.staffAccess) {
       return NextResponse.json(
         { error: "Staff accounts cannot be deleted from the customer account page." },
         { status: 403 }

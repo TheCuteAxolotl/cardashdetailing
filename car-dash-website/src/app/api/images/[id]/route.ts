@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthFromRequest } from "@/lib/auth";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
-function ownerOnly(request: NextRequest) {
-  const auth = getAuthFromRequest(request);
-  return Boolean(auth && auth.role === "owner");
+async function canManageGallery(request: NextRequest) {
+  const auth = await getCurrentAccountFromRequest(request);
+  return hasStaffPermission(auth, "gallery");
 }
 
 export async function PUT(
@@ -12,7 +12,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!ownerOnly(request)) {
+    if (!(await canManageGallery(request))) {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }
@@ -52,7 +52,7 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!ownerOnly(request)) {
+    if (!(await canManageGallery(request))) {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }

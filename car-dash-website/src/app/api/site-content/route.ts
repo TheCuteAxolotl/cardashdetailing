@@ -1,101 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthFromRequest } from "@/lib/auth";
-import { OWNER_EMAIL } from "@/lib/constants";
 import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import { getCurrentAccountFromRequest, hasStaffPermission, isOwnerAccount } from "@/lib/permissions";
 
-function isOwner(request: NextRequest) {
-  const auth = getAuthFromRequest(request);
+const PRICING_KEYS = new Set([
+  "pricingPackagesConfig",
+  "pricingExteriorConfig",
+  "pricingInteriorConfig",
+  "bookingPricingConfig",
+]);
 
-  if (!auth) {
-    return false;
-  }
-
-  return (
-    auth.role === "owner" ||
-    auth.email.toLowerCase() === OWNER_EMAIL.toLowerCase()
-  );
+function canEditKey(auth: Awaited<ReturnType<typeof getCurrentAccountFromRequest>>, key: string) {
+  if (isOwnerAccount(auth)) return true;
+  if (PRICING_KEYS.has(key)) return hasStaffPermission(auth, "pricing");
+  return hasStaffPermission(auth, "website");
 }
 
 export async function GET() {
   try {
     const rows = await prisma.siteContent.findMany();
-
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
-    const stored = Object.fromEntries(
-      rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value])
-    );
-
-    return NextResponse.json(
-      {
-        ...SITE_DEFAULTS,
-        ...stored,
-      },
-      { status: 200 }
-    );
+    const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
+    return NextResponse.json({ ...SITE_DEFAULTS, ...stored }, { status: 200 });
   } catch (error) {
     console.error("Error fetching site content:", error);
-
-    // Keep the public site usable even if the database is temporarily unavailable.
     return NextResponse.json(SITE_DEFAULTS, { status: 200 });
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    if (!isOwner(request)) {
-      return NextResponse.json(
-        { error: "Owner login required" },
-        { status: 403 }
-      );
-    }
+    const auth = await getCurrentAccountFromRequest(request);
+    if (!auth) return NextResponse.json({ error: "Login required" }, { status: 401 });
 
     const body = await request.json();
+    const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
+    const entries = Object.entries(body).filter(([key]) => allowedKeys.has(key));
 
-    const allowedKeys = new Set(
-      Object.keys(SITE_DEFAULTS)
-    );
+    const writableEntries = entries.filter(([key]) => canEditKey(auth, key));
+    if (!writableEntries.length) {
+      return NextResponse.json({ error: "This account does not have access to edit that website section." }, { status: 403 });
+    }
 
-    const entries = Object.entries(body).filter(([key]) =>
-      allowedKeys.has(key)
-    );
-
+    // Some editors submit the entire site-content object even when the staff member
+    // only has access to one section. Ignore fields outside that account's permission
+    // instead of rejecting the whole save. The owner can still edit every key.
     await prisma.$transaction(
-      entries.map(([key, value]) =>
+      writableEntries.map(([key, value]) =>
         prisma.siteContent.upsert({
-          where: {
-            key,
-          },
-          update: {
-            value: String(value ?? "").slice(0, 20000),
-          },
-          create: {
-            key,
-            value: String(value ?? "").slice(0, 20000),
-          },
+          where: { key },
+          update: { value: String(value ?? "").slice(0, 20000) },
+          create: { key, value: String(value ?? "").slice(0, 20000) },
         })
       )
     );
 
     const rows = await prisma.siteContent.findMany();
-
-    const stored = Object.fromEntries(
-      rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value])
-    );
-
-    return NextResponse.json(
-      {
-        ...SITE_DEFAULTS,
-        ...stored,
-      },
-      { status: 200 }
-    );
+    const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
+    return NextResponse.json({ ...SITE_DEFAULTS, ...stored }, { status: 200 });
   } catch (error) {
     console.error("Error updating site content:", error);
-
-    return NextResponse.json(
-      { error: "Failed to update website content" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update website content" }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
 import { getAuthFromRequest } from "@/lib/auth";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { getClientIp, hashVisitor } from "@/lib/support-security";
 import { addBookingSystemMessage, getBookingChatUrl } from "@/lib/booking-chat";
 import { DEFAULT_PRICING_PAGES, VEHICLE_LABELS, getPackagePrice, parsePricingConfig } from "@/lib/pricing-config";
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     const auth = await getCurrentAccountFromRequest(request);
     if (!auth) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-    const staff = isStaffAccount(auth);
+    const staff = hasStaffPermission(auth, "bookings");
     const bookings = await prisma.booking.findMany({
       where: staff ? {} : { userId: auth.id },
       include: { user: { select: { name: true, email: true } } },

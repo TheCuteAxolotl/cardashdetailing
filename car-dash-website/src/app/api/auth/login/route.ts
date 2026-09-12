@@ -3,6 +3,7 @@ import { verifyPassword, createToken } from "@/lib/auth";
 import { OWNER_EMAIL } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
 import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
+import { getPermissionSnapshotForUser } from "@/lib/permissions";
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,6 +50,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const access = await getPermissionSnapshotForUser({ ...user, role });
+
     const token = createToken({
       id: user.id,
       email: user.email,
@@ -64,6 +67,9 @@ export async function POST(request: NextRequest) {
           name: user.name,
           role,
         },
+        permissions: access.permissions,
+        customRoles: access.customRoles,
+        staffAccess: access.staffAccess,
       },
       { status: 200 }
     );

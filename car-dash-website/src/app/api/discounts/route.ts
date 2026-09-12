@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { DISCOUNT_CODES_KEY, DiscountCode, normalizeDiscountCode, parseDiscountCodes } from "@/lib/booking-pricing";
 import { getDiscountUsageCounts } from "@/lib/discount-usage";
 
@@ -39,7 +39,7 @@ async function withUsageCounts(discounts: DiscountCode[]) {
 
 export async function GET(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Owner login required" }, { status: 403 });
+  if (!hasStaffPermission(auth, "pricing")) return NextResponse.json({ error: "Pricing dashboard access required" }, { status: 403 });
   const row = await prisma.siteContent.findUnique({ where: { key: DISCOUNT_CODES_KEY } });
   const discounts = parseDiscountCodes(row?.value);
   return NextResponse.json({ discounts: await withUsageCounts(discounts) });
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Owner login required" }, { status: 403 });
+  if (!hasStaffPermission(auth, "pricing")) return NextResponse.json({ error: "Pricing dashboard access required" }, { status: 403 });
   try {
     const body = await request.json();
     const discounts = sanitizeDiscounts(body?.discounts);

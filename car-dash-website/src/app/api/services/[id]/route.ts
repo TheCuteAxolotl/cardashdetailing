@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
@@ -10,7 +10,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Owner login required" }, { status: 403 });
+  if (!hasStaffPermission(auth, "services")) return NextResponse.json({ error: "Services dashboard access required" }, { status: 403 });
   const { id } = await context.params;
   const body = await request.json();
   const startingPrice = body.startingPrice === "" || body.startingPrice == null ? null : Number(body.startingPrice);
@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
 export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Owner login required" }, { status: 403 });
+  if (!hasStaffPermission(auth, "services")) return NextResponse.json({ error: "Services dashboard access required" }, { status: 403 });
   const { id } = await context.params;
   await prisma.service.delete({ where: { id } });
   return NextResponse.json({ message: "Service deleted" });

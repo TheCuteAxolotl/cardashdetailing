@@ -34,7 +34,7 @@ export default function AdminBookings() {
       if (!response.ok) return window.location.assign("/login");
       const data = await response.json();
       if (data.user.role === "owner") return window.location.assign("/owner/bookings");
-      if (data.user.role !== "admin") return window.location.assign("/");
+      if (!data.permissions?.includes("bookings")) return window.location.assign(data.staffAccess ? "/admin/dashboard" : "/dashboard");
     })();
   }, []);
 

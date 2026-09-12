@@ -78,6 +78,7 @@ export default function OwnerCallsPage() {
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
   const [query, setQuery] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
 
   const load = useCallback(async (quiet = false) => {
     if (!quiet) setLoading(true);
@@ -86,7 +87,9 @@ export default function OwnerCallsPage() {
       const auth = await fetch("/api/auth/me", { cache: "no-store" });
       if (!auth.ok) return window.location.assign("/login");
       const authPayload = await auth.json();
-      if (authPayload.user.role !== "owner") return window.location.assign("/");
+      const owner = authPayload.user.role === "owner";
+      if (!owner && !authPayload.permissions?.includes("businessPhone")) return window.location.assign(authPayload.staffAccess ? "/admin/dashboard" : "/dashboard");
+      setIsOwner(owner);
 
       const [callsResponse, blocksResponse, connectionResponse] = await Promise.all([
         fetch("/api/voice/calls", { cache: "no-store" }),
@@ -234,7 +237,7 @@ export default function OwnerCallsPage() {
             <h1 className="mt-1 text-2xl font-bold">Business Calls</h1>
             <p className="mt-1 text-sm text-white/40">Forward calls, screen them before connecting, save Car Dash voicemail, keep call history, and block unwanted callers.</p>
           </div>
-          <a href="/owner/dashboard" className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/75 hover:text-white">Back</a>
+          <a href={isOwner ? "/owner/dashboard" : "/admin/dashboard"} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/75 hover:text-white">Back</a>
         </div>
       </header>
 
@@ -257,7 +260,7 @@ export default function OwnerCallsPage() {
                 {connection?.expectedUrl && <p className="break-all sm:col-span-2">Voice webhook: {connection.expectedUrl}</p>}
               </div>
             </div>
-            {!connection?.healthy && (
+            {!connection?.healthy && isOwner && (
               <button
                 type="button"
                 onClick={repairConnection}

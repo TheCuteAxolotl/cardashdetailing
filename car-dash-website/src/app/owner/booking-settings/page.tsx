@@ -30,8 +30,12 @@ export default function BookingSettingsPage() {
       try {
         const authResponse = await fetch("/api/auth/me", { cache: "no-store" });
         const authData = authResponse.ok ? await authResponse.json() : null;
-        if (!authData?.user || authData.user.role !== "owner") {
-          window.location.assign(authData?.user ? "/" : "/login");
+        if (!authData?.user) {
+          window.location.assign("/login");
+          return;
+        }
+        if (authData.user.role !== "owner" && !authData.permissions?.includes("pricing")) {
+          window.location.assign(authData.staffAccess ? "/admin/dashboard" : "/dashboard");
           return;
         }
         const [contentResponse, discountsResponse] = await Promise.all([

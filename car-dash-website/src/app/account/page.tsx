@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { STAFF_PERMISSIONS } from "@/lib/access-control";
 
 type User = {
   id: string;
@@ -49,6 +50,9 @@ const statusDetails: Record<string, { label: string; description: string; classN
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [staffAccess, setStaffAccess] = useState(false);
+  const [staffPermissions, setStaffPermissions] = useState<string[]>([]);
+  const [customRoles, setCustomRoles] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [profileMessage, setProfileMessage] = useState("");
@@ -79,13 +83,19 @@ export default function AccountPage() {
           window.location.assign("/owner/dashboard");
           return;
         }
+        const hasStaffAccess = Boolean(authData.staffAccess);
+        setStaffAccess(hasStaffAccess);
+        setStaffPermissions(Array.isArray(authData.permissions) ? authData.permissions : []);
+        setCustomRoles(Array.isArray(authData.customRoles) ? authData.customRoles : []);
 
         setUser(currentUser);
         setName(currentUser.name);
 
-        const bookingResponse = await fetch("/api/bookings", { cache: "no-store" });
-        if (bookingResponse.ok) {
-          setBookings(await bookingResponse.json());
+        if (!hasStaffAccess) {
+          const bookingResponse = await fetch("/api/bookings", { cache: "no-store" });
+          if (bookingResponse.ok) {
+            setBookings(await bookingResponse.json());
+          }
         }
       } catch (error) {
         console.error(error);
@@ -224,16 +234,18 @@ export default function AccountPage() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FF2D2D]">Account</p>
               <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-6xl">
-                Everything about your detail, in one place.
+                {staffAccess ? "Your Car Dash account and staff access." : "Everything about your detail, in one place."}
               </h1>
               <p className="mt-5 max-w-2xl text-sm leading-7 text-white/42 sm:text-base">
-                View your account information, follow the status of your detailing requests, and manage your password.
+                {staffAccess
+                  ? "Manage your profile and password, review the permissions assigned to you, or return to the Staff Dashboard."
+                  : "View your account information, follow the status of your detailing requests, and manage your password."}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               {user.role !== "owner" && (
-                <a href="/dashboard" className="rounded-full border border-white/14 px-5 py-3 text-sm font-semibold text-white/70 transition hover:border-white/30 hover:text-white">
-                  Dashboard
+                <a href={staffAccess ? "/admin/dashboard" : "/dashboard"} className="rounded-full border border-white/14 px-5 py-3 text-sm font-semibold text-white/70 transition hover:border-white/30 hover:text-white">
+                  {staffAccess ? "Staff Dashboard" : "Dashboard"}
                 </a>
               )}
               <a href="/contact" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
@@ -349,7 +361,7 @@ export default function AccountPage() {
             </form>
           </section>
 
-          {user.role === "user" && (
+          {user.role === "user" && !staffAccess && (
             <section className="rounded-[28px] border border-red-500/20 bg-red-500/[0.035] p-6 sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-red-300/70">Danger zone</p>
               <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Delete account</h2>
@@ -400,6 +412,39 @@ export default function AccountPage() {
           )}
         </div>
 
+        {staffAccess ? (
+          <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#FF2D2D]">Staff access</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your Car Dash permissions</h2>
+            <p className="mt-2 text-sm leading-6 text-white/35">Your dashboard access is controlled by the Owner. Changes take effect the next time a protected panel or API is opened.</p>
+
+            <div className="mt-7 rounded-2xl border border-white/8 bg-black/20 p-5">
+              <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/28">Assigned roles</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {user.role === "admin" && <span className="rounded-full border border-[#FF2D2D]/25 bg-[#FF2D2D]/10 px-3 py-1.5 text-xs font-semibold text-[#FF2D2D]">Admin</span>}
+                {customRoles.map((role) => <span key={role.id} className="rounded-full border border-white/10 bg-white/[.035] px-3 py-1.5 text-xs font-semibold text-white/65">{role.name}</span>)}
+                {user.role !== "admin" && !customRoles.length && <span className="text-sm text-white/30">Direct permissions only</span>}
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {STAFF_PERMISSIONS.map((permission) => {
+                const allowed = staffPermissions.includes(permission.key);
+                return (
+                  <div key={permission.key} className={`rounded-2xl border p-4 ${allowed ? "border-emerald-400/15 bg-emerald-400/[.045]" : "border-white/[.06] bg-black/15"}`}>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold">{permission.label}</p>
+                      <span className={`rounded-full px-2 py-1 text-[9px] font-bold uppercase ${allowed ? "bg-emerald-400/10 text-emerald-200" : "bg-white/5 text-white/25"}`}>{allowed ? "Access" : "No access"}</span>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-white/30">{permission.description}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <a href="/admin/dashboard" className="mt-7 inline-flex rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Open Staff Dashboard</a>
+          </section>
+        ) : (
         <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -462,6 +507,7 @@ export default function AccountPage() {
             </div>
           )}
         </section>
+        )}
       </div>
     </main>
   );

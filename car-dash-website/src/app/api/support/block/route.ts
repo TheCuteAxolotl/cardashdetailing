@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthFromRequest } from "@/lib/auth";
+import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
 import { cleanText, normalizeBlockIdentifier } from "@/lib/support-security";
 
 export async function POST(request: NextRequest) {
-  const auth = getAuthFromRequest(request);
-  if (!auth || auth.role !== "owner") return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  const auth = await getCurrentAccountFromRequest(request);
+  if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   const body = await request.json();
   const identifier = cleanText(body.identifier, 200);
   const reason = cleanText(body.reason, 300);

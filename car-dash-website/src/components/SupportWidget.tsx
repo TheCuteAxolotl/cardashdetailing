@@ -8,6 +8,8 @@ type User = {
   name: string;
   email: string;
   role: string;
+  staffAccess?: boolean;
+  permissions?: string[];
 };
 
 type Message = {
@@ -32,7 +34,7 @@ type Ticket = {
 
 export default function SupportWidget() {
   const pathname = usePathname();
-  const hideLauncher = pathname === "/login" || pathname === "/register" || pathname === "/contact" || pathname === "/estimate" || pathname === "/quote" || pathname.startsWith("/booking-chat") || pathname.startsWith("/owner") || pathname.startsWith("/admin");
+  const hideLauncher = pathname === "/login" || pathname === "/register" || pathname === "/contact" || pathname === "/estimate" || pathname === "/quote" || pathname.startsWith("/booking-chat") || pathname.startsWith("/owner") || pathname.startsWith("/admin") || pathname.startsWith("/staff-guide");
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -61,7 +63,7 @@ export default function SupportWidget() {
       }
 
       const data = await response.json();
-      const current = data?.user || null;
+      const current = data?.user ? { ...data.user, staffAccess: Boolean(data.staffAccess), permissions: Array.isArray(data.permissions) ? data.permissions : [] } : null;
       setUser(current);
       setAuthChecked(true);
       return current as User | null;
@@ -143,14 +145,14 @@ export default function SupportWidget() {
 
     (async () => {
       const current = await loadAuth();
-      if (current && current.role !== "owner" && current.role !== "admin") {
+      if (current && !current.staffAccess) {
         await loadTickets();
       }
     })();
   }, [open]);
 
   useEffect(() => {
-    if (!open || !user || user.role === "owner" || user.role === "admin" || !selectedId) return;
+    if (!open || !user || user.staffAccess || !selectedId) return;
 
     loadSelectedTicket(selectedId);
 
@@ -306,17 +308,17 @@ export default function SupportWidget() {
                   </a>
                 </div>
               </div>
-            ) : user.role === "owner" || user.role === "admin" ? (
+            ) : user.staffAccess ? (
               <div className="space-y-4 p-6">
                 <h3 className="text-lg font-semibold">Staff account</h3>
                 <p className="text-sm leading-6 text-white/45">
                   Customer support conversations are managed from the staff support inbox.
                 </p>
                 <a
-                  href={user.role === "owner" ? "/owner/support" : "/admin/support"}
+                  href={user.role === "owner" ? "/owner/support" : user.permissions?.includes("support") ? "/admin/support" : "/admin/dashboard"}
                   className="block rounded-full bg-[#FF2D2D] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]"
                 >
-                  Open Support Inbox
+                  {user.role === "owner" || user.permissions?.includes("support") ? "Open Support Inbox" : "Open Staff Dashboard"}
                 </a>
               </div>
             ) : creatingNew ? (

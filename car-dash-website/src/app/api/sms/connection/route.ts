@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentAccountFromRequest, isOwnerAccount, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, isOwnerAccount, hasStaffPermission } from "@/lib/permissions";
 import {
   getMessagingServiceInboundStatus,
   repairMessagingServiceInboundWebhook,
@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isStaffAccount(auth)) {
+  if (!hasStaffPermission(auth, "smsInbox")) {
     return NextResponse.json({ error: "Staff access required." }, { status: 403 });
   }
 

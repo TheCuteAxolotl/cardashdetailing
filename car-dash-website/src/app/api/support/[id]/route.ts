@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isOwnerAccount, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, isOwnerAccount, hasStaffPermission } from "@/lib/permissions";
 import { cleanText, hashSupportAccount } from "@/lib/support-security";
 
 async function canAccess(request: NextRequest, id: string) {
   const auth = await getCurrentAccountFromRequest(request);
 
   if (!auth) return null;
-  if (isStaffAccount(auth)) return { staff: true, auth };
+  if (hasStaffPermission(auth, "support")) return { staff: true, auth };
 
   const ticket = await prisma.supportTicket.findUnique({
     where: { id },
@@ -171,7 +171,7 @@ export async function PUT(
 ) {
   const auth = await getCurrentAccountFromRequest(request);
 
-  if (!isStaffAccount(auth)) {
+  if (!hasStaffPermission(auth, "support")) {
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 

@@ -138,7 +138,10 @@ export default function StaffSmsInbox({
       if (payload.user.role === "owner" && role === "admin") {
         return window.location.assign("/owner/messages");
       }
-      if (payload.user.role !== role) return window.location.assign("/");
+      if (role === "owner" && payload.user.role !== "owner") return window.location.assign("/admin/dashboard");
+      if (role === "admin" && !payload.permissions?.includes("smsInbox")) {
+        return window.location.assign(payload.staffAccess ? "/admin/dashboard" : "/dashboard");
+      }
       await Promise.all([load(), loadConnection()]);
       await syncReplies(true);
     })();

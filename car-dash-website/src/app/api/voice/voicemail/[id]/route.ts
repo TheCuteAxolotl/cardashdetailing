@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureCallSystemSchema } from "@/lib/call-system";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 export const runtime = "nodejs";
 
@@ -10,8 +10,8 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(auth)) {
-    return NextResponse.json({ error: "Owner access required." }, { status: 403 });
+  if (!hasStaffPermission(auth, "businessPhone")) {
+    return NextResponse.json({ error: "Business Phone access required." }, { status: 403 });
   }
 
   await ensureCallSystemSchema();

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureBookingChatSchema } from "@/lib/booking-chat";
-import { getCurrentAccountFromRequest, isStaffAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await getCurrentAccountFromRequest(request);
-    if (!isStaffAccount(auth)) {
+    if (!hasStaffPermission(auth, "smsInbox")) {
       return NextResponse.json({ error: "Staff access required." }, { status: 403 });
     }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthFromRequest } from "@/lib/auth";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
 
 const MAX_DATA_URL_CHARS = 1_600_000;
@@ -66,9 +66,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = getAuthFromRequest(request);
+    const auth = await getCurrentAccountFromRequest(request);
 
-    if (!auth || auth.role !== "owner") {
+    if (!hasStaffPermission(auth, "gallery")) {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }

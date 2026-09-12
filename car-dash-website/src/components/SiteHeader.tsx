@@ -23,6 +23,7 @@ function isMarineService(service: Service) {
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
   const [services, setServices] = useState<Service[]>([]);
+  const [staffAccess, setStaffAccess] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
@@ -32,7 +33,7 @@ export default function SiteHeader() {
   const pathname = usePathname();
 
   useEffect(() => {
-    fetch("/api/auth/me", { cache: "no-store" }).then(async r => r.ok ? r.json() : null).then(d => setUser(d?.user || null)).catch(() => setUser(null));
+    fetch("/api/auth/me", { cache: "no-store" }).then(async r => r.ok ? r.json() : null).then(d => { setUser(d?.user || null); setStaffAccess(Boolean(d?.staffAccess)); }).catch(() => { setUser(null); setStaffAccess(false); });
     fetch("/api/services", { cache: "no-store" }).then(r => r.ok ? r.json() : []).then(d => setServices(Array.isArray(d) ? d.filter((x:Service)=>x.active) : [])).catch(()=>setServices([]));
   }, [pathname]);
 
@@ -71,7 +72,7 @@ export default function SiteHeader() {
 
   const openSupport = () => { window.dispatchEvent(new Event("open-support")); setMenuOpen(false); };
   const owner = Boolean(user && (user.role === "owner" || user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()));
-  const admin = Boolean(user && user.role === "admin");
+  const staff = Boolean(user && !owner && staffAccess);
   const exploreActive = exploreLinks.some(([href]) => pathname === href);
   const servicesActive = pathname.startsWith("/services") || pathname.startsWith("/car-detailing-packages") || pathname.startsWith("/exterior-detailing") || pathname.startsWith("/interior-detailing") || pathname.startsWith("/marine-detailing");
 
@@ -147,8 +148,8 @@ export default function SiteHeader() {
 
           {publicLinks.slice(1).map(([href,label])=><a key={href} href={href} className={pathname===href?"text-white":"hover:text-[#FF2D2D]"}>{label}</a>)}
           <button onClick={openSupport} className="hover:text-[#FF2D2D]">Support</button>
-          {user&&!owner&&!admin&&<><a href="/dashboard" className="text-white/80 hover:text-[#FF2D2D]">Dashboard</a><a href="/vehicles" className="text-white/80 hover:text-[#FF2D2D]">Vehicles</a></>}
-          {admin&&<a href="/admin/dashboard" className="text-[#FF2D2D]">Admin</a>}{owner&&<a href="/owner/dashboard" className="text-[#FF2D2D]">Owner</a>}
+          {user&&!owner&&!staff&&<><a href="/dashboard" className="text-white/80 hover:text-[#FF2D2D]">Dashboard</a><a href="/vehicles" className="text-white/80 hover:text-[#FF2D2D]">Vehicles</a></>}
+          {staff&&<a href="/admin/dashboard" className="text-[#FF2D2D]">Staff</a>}{owner&&<a href="/owner/dashboard" className="text-[#FF2D2D]">Owner</a>}
         </nav>
         <div className="hidden items-center gap-2 xl:flex">{!user?<a href="/login" className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/70 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Login</a>:<a href="/account" className="rounded-full border border-white/10 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/65 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Account</a>}<a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-xs font-semibold text-[#0D0D0D]">Get Estimate</a></div>
         <button onClick={()=>setMenuOpen(!menuOpen)} className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2 text-xs font-semibold hover:border-[#FF2D2D]/40 hover:text-[#FF2D2D] xl:hidden">{menuOpen?"Close":"Menu"}</button>
@@ -191,8 +192,8 @@ export default function SiteHeader() {
             {publicLinks.slice(1).map(([href,label])=><a key={href} href={href} className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">{label}</a>)}
             <button onClick={openSupport} className="rounded-xl px-3 py-3 text-left hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Support</button>
             {!user&&<a href="/login" className="rounded-xl px-3 py-3 text-[#FF2D2D] hover:bg-[#FF2D2D]/8">Login</a>}
-            {user&&!owner&&!admin&&<><a href="/dashboard" className="rounded-xl px-3 py-3">Dashboard</a><a href="/vehicles" className="rounded-xl px-3 py-3">Saved Vehicles</a></>}
-            {admin&&<a href="/admin/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Admin Dashboard</a>}
+            {user&&!owner&&!staff&&<><a href="/dashboard" className="rounded-xl px-3 py-3">Dashboard</a><a href="/vehicles" className="rounded-xl px-3 py-3">Saved Vehicles</a></>}
+            {staff&&<a href="/admin/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Staff Dashboard</a>}
             {owner&&<a href="/owner/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Owner Dashboard</a>}
             {user&&<a href="/account" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Account</a>}
           </div>

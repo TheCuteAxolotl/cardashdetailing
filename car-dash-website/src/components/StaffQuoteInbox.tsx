@@ -26,6 +26,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
   const [notes, setNotes] = useState("");
   const [msg, setMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
 
   const load = async () => {
     const response = await fetch("/api/quotes", { cache: "no-store" });
@@ -44,10 +45,23 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
   };
 
   useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/auth/me", { cache: "no-store" });
+      if (!response.ok) return window.location.assign("/login");
+      const payload = await response.json();
+      if (payload.user?.role !== "owner" && !payload.permissions?.includes("quoteChats")) {
+        return window.location.assign(payload.staffAccess ? "/admin/dashboard" : "/dashboard");
+      }
+      setAuthorized(true);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!authorized) return;
     load();
     const timer = setInterval(load, 5000);
     return () => clearInterval(timer);
-  }, [selectedId]);
+  }, [selectedId, authorized]);
 
   const active = useMemo(() => threads.find((thread) => thread.id === selectedId) || null, [threads, selectedId]);
   const readOnly = Boolean(active && ["closed", "booked"].includes(active.status));
@@ -124,6 +138,10 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
       setDeleting(false);
     }
   };
+
+  if (!authorized) {
+    return <main className="min-h-screen bg-[#070707] p-10 text-white">Checking quote access…</main>;
+  }
 
   return (
     <main className="min-h-screen bg-[#070707] px-5 py-8 text-white">

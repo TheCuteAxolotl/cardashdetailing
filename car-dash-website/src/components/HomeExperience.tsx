@@ -41,7 +41,7 @@ export default function HomeExperience() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="/quote" className="rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
-                {content.heroPrimaryCta.trim().toLowerCase() === "book a detail" ? "Get a Quote" : content.heroPrimaryCta}
+                {["book a detail", "get a quote"].includes(content.heroPrimaryCta.trim().toLowerCase()) ? "Get an Exact Quote" : content.heroPrimaryCta}
               </a>
               <a href="/services" className="rounded-full border border-white/18 bg-black/20 px-6 py-3.5 text-sm font-semibold text-white/78 backdrop-blur transition hover:border-white/35 hover:text-white">
                 {content.heroSecondaryCta}
@@ -136,7 +136,7 @@ export default function HomeExperience() {
           <h2 className="text-5xl font-semibold leading-[.9] tracking-[-.06em] sm:text-7xl">{content.contactTitle}</h2>
           <div>
             <p className="text-sm leading-7 text-white/78">{content.contactBody}</p>
-            <a href="/quote" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold">Get a Quote</a>
+            <a href="/quote" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold">Get an Exact Quote</a>
           </div>
         </div>
       </section>

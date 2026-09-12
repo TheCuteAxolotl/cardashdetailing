@@ -18,7 +18,7 @@ export default function AdminSupportPage() {
       if (!response.ok) return window.location.assign("/login");
       const data = await response.json();
       if (data.user.role === "owner") return window.location.assign("/owner/support");
-      if (data.user.role !== "admin") return window.location.assign("/");
+      if (!data.permissions?.includes("support")) return window.location.assign(data.staffAccess ? "/admin/dashboard" : "/dashboard");
     })();
   }, []);
 

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 export async function GET(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
   if (!auth) return NextResponse.json({ error: "Login required" }, { status: 401 });
-  const warranties = await prisma.warranty.findMany({ where: isOwnerAccount(auth) ? {} : { userId: auth.id }, include: { vehicle: true, user: { select: { name: true, email: true } } }, orderBy: { installedAt: "desc" } });
+  const warranties = await prisma.warranty.findMany({ where: hasStaffPermission(auth, "warranties") ? {} : { userId: auth.id }, include: { vehicle: true, user: { select: { name: true, email: true } } }, orderBy: { installedAt: "desc" } });
   return NextResponse.json(warranties);
 }
 
 export async function POST(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(auth)) return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+  if (!hasStaffPermission(auth, "warranties")) return NextResponse.json({ error: "Warranty dashboard access required" }, { status: 403 });
   const body = await request.json();
   const vehicle = await prisma.vehicle.findUnique({ where: { id: String(body.vehicleId || "") } });
   if (!vehicle) return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });

@@ -27,7 +27,7 @@ export default function LoginPage() {
       }
 
       if (data.user.role === "owner") window.location.assign("/owner/dashboard");
-      else if (data.user.role === "admin") window.location.assign("/admin/dashboard");
+      else if (data.staffAccess) window.location.assign("/admin/dashboard");
       else window.location.assign("/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");

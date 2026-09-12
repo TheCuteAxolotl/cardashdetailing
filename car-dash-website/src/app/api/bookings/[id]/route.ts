@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   getCurrentAccountFromRequest,
   isOwnerAccount,
-  isStaffAccount,
+  hasStaffPermission,
 } from "@/lib/permissions";
 import { sendTransactionalSms } from "@/lib/twilio-sms";
 import { addBookingSystemMessage, bookingHasSmsConsent, getBookingChatUrl } from "@/lib/booking-chat";
@@ -38,7 +38,7 @@ export async function PUT(
   try {
     const auth = await getCurrentAccountFromRequest(request);
 
-    if (!isStaffAccount(auth)) {
+    if (!hasStaffPermission(auth, "bookings")) {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }
