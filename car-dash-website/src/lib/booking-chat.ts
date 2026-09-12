@@ -72,6 +72,28 @@ export function ensureBookingChatSchema() {
         ON "BookingMessage"("externalSid")
         WHERE "externalSid" IS NOT NULL
       `);
+
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "UnmatchedSmsMessage" (
+          "id" TEXT NOT NULL,
+          "fromPhone" TEXT NOT NULL,
+          "toPhone" TEXT,
+          "body" TEXT NOT NULL,
+          "externalSid" TEXT NOT NULL,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          CONSTRAINT "UnmatchedSmsMessage_pkey" PRIMARY KEY ("id")
+        )
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS "UnmatchedSmsMessage_externalSid_key"
+        ON "UnmatchedSmsMessage"("externalSid")
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        CREATE INDEX IF NOT EXISTS "UnmatchedSmsMessage_createdAt_idx"
+        ON "UnmatchedSmsMessage"("createdAt")
+      `);
     })().catch((error) => {
       schemaReady = null;
       throw error;

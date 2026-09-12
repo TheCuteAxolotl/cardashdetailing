@@ -70,8 +70,14 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    const unmatched = await prisma.unmatchedSmsMessage.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+
     return NextResponse.json({
       conversations: rows,
+      unmatched,
       totalUnread: rows.reduce((sum, row) => sum + row.unreadCount, 0),
     });
   } catch (error) {

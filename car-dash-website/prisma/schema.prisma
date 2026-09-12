@@ -109,6 +109,17 @@ model BookingMessage {
   @@index([conversationId, createdAt])
 }
 
+model UnmatchedSmsMessage {
+  id          String   @id @default(cuid())
+  fromPhone   String
+  toPhone     String?
+  body        String
+  externalSid String   @unique
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model QuoteThread {
   id                 String         @id @default(cuid())
   userId             String
