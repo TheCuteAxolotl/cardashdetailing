@@ -17,8 +17,8 @@ export const SITE_DEFAULTS = {
   storyBody: "Glass, trim, crevices, wheels, interior touch points, paint clarity, and protection all add up. The goal is a result that looks right up close, not just from across the driveway.",
 
   servicesEyebrow: "Services",
-  servicesTitle: "Pick a package. Add only what the car actually needs.",
-  servicesBody: "Pricing stays simple. If the vehicle needs extra work, that gets discussed before anything gets added.",
+  servicesTitle: "Three ways to get the vehicle handled.",
+  servicesBody: "Start with the kind of work you need. Each section has its own packages, pricing, photos, and details so it is easy to compare.",
 
   galleryEyebrow: "Recent work",
   galleryTitle: "Real cars. Real results.",

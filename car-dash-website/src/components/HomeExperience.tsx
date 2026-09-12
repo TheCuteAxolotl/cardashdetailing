@@ -4,13 +4,44 @@ import { useEffect, useState } from "react";
 import { SITE_DEFAULTS } from "@/lib/site-defaults";
 import SitePhoto from "@/components/SitePhoto";
 import DynamicGallery from "@/components/DynamicGallery";
-import ServiceCards from "@/components/ServiceCards";
+import ReviewCards from "@/components/ReviewCards";
 import SocialLinks from "@/components/SocialLinks";
 
 type Content = Record<keyof typeof SITE_DEFAULTS, string>;
 
+const SERVICE_GROUPS = [
+  {
+    eyebrow: "Car detailing",
+    title: "Interior + exterior detailing",
+    body: "Full-detail packages, interior resets, exterior care, and maintenance options for daily drivers, SUVs, trucks, and enthusiast vehicles.",
+    href: "/car-detailing-packages",
+    link: "View car detailing",
+    category: "pricing-car-packages-hero",
+    fallbackCategory: "home-showcase-primary",
+  },
+  {
+    eyebrow: "Paint + protection",
+    title: "Correction + ceramic protection",
+    body: "Paint enhancement, defect correction, and ceramic protection when the goal is more gloss, clarity, and longer-lasting protection.",
+    href: "/paint-correction",
+    link: "Explore paint + protection",
+    category: "paint-correction-hero",
+    fallbackCategory: "home-showcase-secondary",
+  },
+  {
+    eyebrow: "Marine detailing",
+    title: "Boat cleaning + protection",
+    body: "Marine interior, hull, deck, maintenance, enhancement, and protection services built around the condition of the boat.",
+    href: "/marine-detailing",
+    link: "View marine detailing",
+    category: "marine-hero",
+    fallbackCategory: "home-services-bg",
+  },
+] as const;
+
 export default function HomeExperience() {
   const [content, setContent] = useState<Content>({ ...SITE_DEFAULTS });
+  const [showFloatingQuote, setShowFloatingQuote] = useState(false);
 
   useEffect(() => {
     fetch("/api/site-content", { cache: "no-store" })
@@ -19,8 +50,37 @@ export default function HomeExperience() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const updateFloatingQuote = () => {
+      const revealPoint = Math.max(520, window.innerHeight * 0.68);
+      setShowFloatingQuote(window.scrollY > revealPoint);
+    };
+
+    updateFloatingQuote();
+    window.addEventListener("scroll", updateFloatingQuote, { passive: true });
+    window.addEventListener("resize", updateFloatingQuote);
+
+    return () => {
+      window.removeEventListener("scroll", updateFloatingQuote);
+      window.removeEventListener("resize", updateFloatingQuote);
+    };
+  }, []);
+
   return (
     <div className="bg-[#0D0D0D] text-white">
+      <a
+        href="/quote"
+        aria-label="Get an Exact Quote"
+        className={`fixed bottom-5 right-[8.65rem] z-[69] rounded-full border border-white/10 bg-[#0D0D0D] px-4 py-3 text-xs font-semibold text-white shadow-[0_18px_50px_rgba(0,0,0,.28)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-black sm:right-[9.35rem] sm:px-5 sm:text-sm ${
+          showFloatingQuote
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-3 opacity-0"
+        }`}
+      >
+        <span className="sm:hidden">Exact Quote</span>
+        <span className="hidden sm:inline">Get an Exact Quote</span>
+      </a>
+
       <section className="relative isolate min-h-[88vh] overflow-hidden border-b border-white/10">
         <SitePhoto category="hero" className="absolute inset-0 -z-30 h-full w-full object-cover" />
         <div className="absolute inset-0 -z-20 bg-[linear-gradient(90deg,rgba(0,0,0,.94)_0%,rgba(0,0,0,.78)_44%,rgba(0,0,0,.28)_100%)]" />
@@ -55,6 +115,46 @@ export default function HomeExperience() {
         </div>
       </section>
 
+      <section className="bg-[#F4F4F2] text-black">
+        <div className="mx-auto max-w-[1540px] border-x border-black/10 px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[.3em] text-[#FF2D2D]">{content.servicesEyebrow}</p>
+              <h2 className="mt-4 max-w-4xl text-4xl font-semibold leading-[.94] tracking-[-.055em] sm:text-6xl">{content.servicesTitle}</h2>
+            </div>
+            <p className="max-w-lg text-sm leading-7 text-black/52">{content.servicesBody}</p>
+          </div>
+
+          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            {SERVICE_GROUPS.map((service) => (
+              <a
+                key={service.title}
+                href={service.href}
+                className="group overflow-hidden rounded-[30px] border border-black/10 bg-white shadow-[0_16px_50px_rgba(0,0,0,.05)] transition duration-300 hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_24px_70px_rgba(0,0,0,.10)]"
+              >
+                <div className="relative h-64 overflow-hidden bg-[#111] sm:h-72">
+                  <SitePhoto
+                    category={service.category}
+                    fallbackCategory={service.fallbackCategory}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent" />
+                  <p className="absolute bottom-5 left-5 text-[10px] font-semibold uppercase tracking-[.25em] text-white/80">{service.eyebrow}</p>
+                </div>
+                <div className="p-7 sm:p-8">
+                  <h3 className="text-3xl font-semibold leading-[1] tracking-[-.045em]">{service.title}</h3>
+                  <p className="mt-5 text-sm leading-7 text-black/52">{service.body}</p>
+                  <span className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-black">
+                    {service.link}
+                    <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="bg-[#FFFFFF] text-black">
         <div className="mx-auto max-w-[1540px] border-x border-black/10 px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
           <div className="grid gap-10 lg:grid-cols-[.35fr_1.65fr]">
@@ -77,27 +177,12 @@ export default function HomeExperience() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               </div>
               <div className="rounded-[30px] bg-[#111318] p-8 text-white">
-                <p className="text-[10px] uppercase tracking-[.27em] text-[#FF2D2D]">Easy to book</p>
+                <p className="text-[10px] uppercase tracking-[.27em] text-[#FF2D2D]">Clear communication</p>
                 <p className="mt-6 text-3xl font-semibold leading-[1.02] tracking-[-.045em]">Send the vehicle details. Get a clear answer. Get it handled.</p>
-                <a href="/quote" className="mt-8 inline-flex text-sm font-semibold text-white/65 transition hover:text-white">Get a personalized quote →</a>
+                <p className="mt-5 text-sm leading-7 text-white/45">No need to guess which package fits. Vehicle size, condition, photos, and the work requested help determine what makes sense before the appointment.</p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="relative isolate overflow-hidden border-y border-white/10 bg-[#0D0D0D]">
-        <SitePhoto category="home-services-bg" fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25" />
-        <div className="absolute inset-0 -z-10 bg-black/82" />
-        <div className="mx-auto max-w-[1540px] border-x border-white/10 px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
-          <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-[.28em] text-[#FF2D2D]">{content.servicesEyebrow}</p>
-              <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-.055em] sm:text-6xl">{content.servicesTitle}</h2>
-            </div>
-            <p className="max-w-lg text-sm leading-7 text-white/48">{content.servicesBody}</p>
-          </div>
-          <div className="mt-12"><ServiceCards limit={3} variant="dark" /></div>
         </div>
       </section>
 
@@ -129,15 +214,17 @@ export default function HomeExperience() {
         </div>
       </section>
 
-      <section className="relative isolate overflow-hidden bg-[#FF2D2D] text-white">
-        <SitePhoto category="home-cta-bg" fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-35" />
-        <div className="absolute inset-0 -z-10 bg-[#0D0D0D]/72 mix-blend-multiply" />
-        <div className="mx-auto grid max-w-[1540px] gap-8 border-x border-white/20 px-5 py-20 sm:px-8 lg:grid-cols-[1.2fr_.8fr] lg:items-end lg:px-10">
-          <h2 className="text-5xl font-semibold leading-[.9] tracking-[-.06em] sm:text-7xl">{content.contactTitle}</h2>
-          <div>
-            <p className="text-sm leading-7 text-white/78">{content.contactBody}</p>
-            <a href="/quote" className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold">Get an Exact Quote</a>
+      <section className="border-t border-white/10 bg-[#0D0D0D]">
+        <div className="mx-auto max-w-[1540px] border-x border-white/10 px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
+          <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-[.28em] text-[#FF2D2D]">{content.reviewsEyebrow}</p>
+              <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">{content.reviewsTitle}</h2>
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/45">{content.reviewsBody}</p>
+            </div>
+            <a href="/reviews" className="text-sm text-white/45 transition hover:text-white">See the review page →</a>
           </div>
+          <ReviewCards />
         </div>
       </section>
 
