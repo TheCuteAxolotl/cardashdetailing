@@ -1,7 +1,7 @@
 type QuoteDiscordPayload = {
   title: string;
   customerName: string;
-  customerEmail: string;
+  customerEmail?: string;
   subject: string;
   message?: string;
   vehicle?: string;
