@@ -159,13 +159,13 @@ img { display: block; }
   }
 }
 
-/* Services mega menu is anchored from the right so it stays inside laptop viewports. */
-.menu-pop-right {
-  transform-origin: top right;
-  animation: menuPopRight 260ms cubic-bezier(.2,.75,.2,1) both;
+/* Services mega menu is anchored directly below the Services trigger. */
+.menu-pop-services {
+  transform-origin: top left;
+  animation: menuPopServices 260ms cubic-bezier(.2,.75,.2,1) both;
 }
 
-@keyframes menuPopRight {
+@keyframes menuPopServices {
   from {
     opacity: 0;
     transform: translateY(-8px) scale(.985);
