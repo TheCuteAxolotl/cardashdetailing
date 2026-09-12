@@ -159,6 +159,15 @@ export default function AccountPage() {
     }
   };
 
+
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      window.location.assign("/");
+    }
+  };
+
   const deleteAccount = async (event: FormEvent) => {
     event.preventDefault();
     setDeleteMessage("");
@@ -230,6 +239,13 @@ export default function AccountPage() {
               <a href="/contact" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
                 Request a Detail
               </a>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-full border border-white/14 px-5 py-3 text-sm font-semibold text-white/55 transition hover:border-red-400/35 hover:bg-red-500/[0.06] hover:text-red-200"
+              >
+                Log Out
+              </button>
             </div>
           </div>
         </div>

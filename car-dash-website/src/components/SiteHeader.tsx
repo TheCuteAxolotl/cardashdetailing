@@ -68,7 +68,6 @@ export default function SiteHeader() {
     }, 320);
   };
 
-  const logout = async () => { try { await fetch("/api/auth/logout", { method: "POST" }); } finally { window.location.assign("/"); } };
   const openSupport = () => { window.dispatchEvent(new Event("open-support")); setMenuOpen(false); };
   const owner = Boolean(user && (user.role === "owner" || user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()));
   const admin = Boolean(user && user.role === "admin");
@@ -141,7 +140,7 @@ export default function SiteHeader() {
           {user&&!owner&&!admin&&<><a href="/dashboard" className="text-white/80 hover:text-[#FF2D2D]">Dashboard</a><a href="/vehicles" className="text-white/80 hover:text-[#FF2D2D]">Vehicles</a></>}
           {admin&&<a href="/admin/dashboard" className="text-[#FF2D2D]">Admin</a>}{owner&&<a href="/owner/dashboard" className="text-[#FF2D2D]">Owner</a>}
         </nav>
-        <div className="hidden items-center gap-2 xl:flex">{!user?<a href="/login" className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/70 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Login</a>:<button onClick={logout} className="rounded-full px-3 py-2 text-xs text-white/40 hover:bg-white/5 hover:text-white">Logout</button>}<a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-xs font-semibold text-[#0D0D0D]">Get Estimate</a></div>
+        <div className="hidden items-center gap-2 xl:flex">{!user?<a href="/login" className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/70 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Login</a>:<a href="/account" className="rounded-full border border-white/10 bg-white/[.025] px-4 py-2.5 text-xs font-semibold text-white/65 hover:border-[#FF2D2D]/40 hover:bg-[#FF2D2D]/10 hover:text-[#FF2D2D]">Account</a>}<a href="/estimate" className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-xs font-semibold text-[#0D0D0D]">Get Estimate</a></div>
         <button onClick={()=>setMenuOpen(!menuOpen)} className="rounded-full border border-white/15 bg-white/[.025] px-4 py-2 text-xs font-semibold hover:border-[#FF2D2D]/40 hover:text-[#FF2D2D] xl:hidden">{menuOpen?"Close":"Menu"}</button>
       </div>
 
@@ -185,7 +184,7 @@ export default function SiteHeader() {
             {user&&!owner&&!admin&&<><a href="/dashboard" className="rounded-xl px-3 py-3">Dashboard</a><a href="/vehicles" className="rounded-xl px-3 py-3">Saved Vehicles</a></>}
             {admin&&<a href="/admin/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Admin Dashboard</a>}
             {owner&&<a href="/owner/dashboard" className="rounded-xl px-3 py-3 text-[#FF2D2D]">Owner Dashboard</a>}
-            {user&&<button onClick={logout} className="rounded-xl px-3 py-3 text-left">Logout</button>}
+            {user&&<a href="/account" className="rounded-xl px-3 py-3 hover:bg-[#FF2D2D]/8 hover:text-[#FF2D2D]">Account</a>}
           </div>
         </nav>
       </div>}
