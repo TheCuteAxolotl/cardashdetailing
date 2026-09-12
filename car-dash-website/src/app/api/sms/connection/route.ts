@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   const result = await repairMessagingServiceInboundWebhook();
   if (!result.ok) {
-    return NextResponse.json({ error: result.error, ...result }, { status: 502 });
+    return NextResponse.json({ ...result, error: result.error }, { status: 502 });
   }
 
   return NextResponse.json({ success: true, ...result });
