@@ -83,9 +83,14 @@ export default function SiteHeader() {
         <nav className="hidden items-center gap-6 text-[13px] font-medium text-white/50 xl:flex">
           <a href="/" className={pathname==="/"?"text-white":"hover:text-[#FF2D2D]"}>Home</a>
 
-          <div className="relative" onMouseEnter={()=>{cancelMenuClose();setServicesOpen(true);setExploreOpen(false)}} onMouseLeave={()=>scheduleMenuClose("services")}>
+          <div className="relative flex items-center" onMouseEnter={()=>{cancelMenuClose();setServicesOpen(true);setExploreOpen(false)}} onMouseLeave={()=>scheduleMenuClose("services")}>
             <button onClick={()=>{setServicesOpen(v=>!v);setExploreOpen(false)}} className={`py-3 ${servicesActive?'text-[#FF2D2D]':'hover:text-[#FF2D2D]'}`}>Services ▾</button>
-            {servicesOpen && <div onMouseEnter={cancelMenuClose} onMouseLeave={()=>scheduleMenuClose("services")} className="menu-pop-services absolute left-0 top-full max-h-[calc(100vh-96px)] w-[min(860px,calc(100vw-40px))] overflow-y-auto rounded-[28px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-6 shadow-[0_28px_90px_rgba(0,0,0,.55)]">
+            {servicesOpen && <div
+              onMouseEnter={cancelMenuClose}
+              onMouseLeave={()=>scheduleMenuClose("services")}
+              style={{ left: 0, right: "auto", top: "100%" }}
+              className="menu-pop-services absolute z-[100] max-h-[calc(100vh-96px)] w-[760px] max-w-[calc(100vw-32px)] overflow-y-auto rounded-[28px] border border-[#FF2D2D]/15 bg-[#0D0D0D]/98 p-6 shadow-[0_28px_90px_rgba(0,0,0,.55)]"
+            >
               <div className="grid gap-5 md:grid-cols-[1fr_1fr_.78fr]">
                 <div className="rounded-[22px] border border-white/8 bg-white/[.018] p-4">
                   <p className="mb-3 text-[10px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">Car Detailing</p>

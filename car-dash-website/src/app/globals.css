@@ -159,16 +159,16 @@ img { display: block; }
   }
 }
 
-/* Services mega menu is anchored directly below the Services trigger. */
+/* Services menu is positioned by the Services trigger itself, not by the header edge. */
 .menu-pop-services {
   transform-origin: top left;
-  animation: menuPopServices 260ms cubic-bezier(.2,.75,.2,1) both;
+  animation: menuPopServices 220ms cubic-bezier(.2,.75,.2,1) both;
 }
 
 @keyframes menuPopServices {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(.985);
+    transform: translateY(-6px) scale(.99);
   }
   to {
     opacity: 1;
