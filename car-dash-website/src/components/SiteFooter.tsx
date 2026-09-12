@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 import SocialLinks from "@/components/SocialLinks";
 
 export default function SiteFooter() {
@@ -34,7 +35,7 @@ export default function SiteFooter() {
           </div>
           <div className="col-span-2 sm:col-span-1">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[.23em] text-white/28">Contact + Legal</p>
-            <div className="space-y-2 text-white/65"><a href="mailto:cardashdetailing@gmail.com" className="block break-all hover:text-[#FF2D2D]">cardashdetailing@gmail.com</a><a href="/privacy-policy" className="block hover:text-[#FF2D2D]">Privacy Policy</a><a href="/terms-and-conditions" className="block hover:text-[#FF2D2D]">Terms and Conditions</a></div>
+            <div className="space-y-2 text-white/65"><a href={`tel:${BUSINESS_PHONE}`} className="block hover:text-[#FF2D2D]">{BUSINESS_PHONE_DISPLAY}</a><a href="mailto:cardashdetailing@gmail.com" className="block break-all hover:text-[#FF2D2D]">cardashdetailing@gmail.com</a><a href="/privacy-policy" className="block hover:text-[#FF2D2D]">Privacy Policy</a><a href="/terms-and-conditions" className="block hover:text-[#FF2D2D]">Terms and Conditions</a></div>
           </div>
         </div>
       </div>

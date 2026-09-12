@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Terms and Conditions | Car Dash Detailing",
@@ -108,7 +109,9 @@ export default function TermsAndConditionsPage() {
               Questions about these Terms and Conditions can be sent to{" "}
               <a className="text-[#FF2D2D] hover:text-[#FF2D2D]" href="mailto:cardashdetailing@gmail.com">
                 cardashdetailing@gmail.com
-              </a>.
+              </a>{" "}
+              or by calling{" "}
+              <a className="text-[#FF2D2D] hover:text-[#FF2D2D]" href={`tel:${BUSINESS_PHONE}`}>{BUSINESS_PHONE_DISPLAY}</a>.
             </p>
           </section>
         </div>

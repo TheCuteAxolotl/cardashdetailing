@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { OWNER_EMAIL } from "@/lib/constants";
+import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY, OWNER_EMAIL } from "@/lib/constants";
 
 type User = { id: string; name: string; email: string; role: string };
 type Service = { id:string; title:string; category:string; subcategory:string; pricingType:string; active:boolean };
@@ -76,7 +76,7 @@ export default function SiteHeader() {
   const servicesActive = pathname.startsWith("/services") || pathname.startsWith("/car-detailing-packages") || pathname.startsWith("/exterior-detailing") || pathname.startsWith("/interior-detailing") || pathname.startsWith("/marine-detailing");
 
   return <>
-    <div className="bg-[#FF2D2D] text-[#0D0D0D]"><div className="mx-auto flex max-w-[1540px] items-center justify-between border-x border-black/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[.24em] sm:px-8 lg:px-10"><span>Mobile Auto + Marine Detailing</span><a href="/estimate" className="hidden opacity-75 sm:block">Get an instant estimate ↗</a></div></div>
+    <div className="bg-[#FF2D2D] text-[#0D0D0D]"><div className="mx-auto flex max-w-[1540px] items-center justify-center border-x border-black/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[.18em] sm:justify-between sm:px-8 sm:tracking-[.24em] lg:px-10"><span className="hidden sm:block">Mobile Auto + Marine Detailing</span><div className="flex items-center gap-4 sm:gap-6"><a href={`tel:${BUSINESS_PHONE}`} className="transition-opacity hover:opacity-65">Call {BUSINESS_PHONE_DISPLAY}</a><a href="/estimate" className="hidden opacity-75 md:block">Get an instant estimate ↗</a></div></div></div>
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0D0D0D]/95 text-white backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1540px] items-center justify-between gap-5 border-x border-white/10 px-5 py-4 sm:px-8 lg:px-10">
         <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center">
