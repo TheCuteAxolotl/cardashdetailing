@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import HomeExperience from "@/components/HomeExperience";
 import StructuredData from "@/components/StructuredData";
 import { absoluteUrl, pageMetadata, SITE_URL } from "@/lib/seo";
+import { getSiteContent } from "@/lib/site-content";
 
 export const metadata: Metadata = pageMetadata({
   title: "Mobile Detailing in South Elgin, IL",
@@ -31,11 +32,13 @@ const websiteSchema = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const content = await getSiteContent();
+
   return (
     <>
       <StructuredData data={websiteSchema} />
-      <HomeExperience />
+      <HomeExperience initialContent={content} />
     </>
   );
 }

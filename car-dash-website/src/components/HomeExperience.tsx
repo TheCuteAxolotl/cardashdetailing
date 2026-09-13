@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import type { SiteContent } from "@/lib/site-defaults";
 import SitePhoto from "@/components/SitePhoto";
 import DynamicGallery from "@/components/DynamicGallery";
 import ReviewCards from "@/components/ReviewCards";
 import SocialLinks from "@/components/SocialLinks";
-
-type Content = Record<keyof typeof SITE_DEFAULTS, string>;
 
 const SERVICE_GROUPS = [
   {
@@ -39,16 +37,9 @@ const SERVICE_GROUPS = [
   },
 ] as const;
 
-export default function HomeExperience() {
-  const [content, setContent] = useState<Content>({ ...SITE_DEFAULTS });
+export default function HomeExperience({ initialContent }: { initialContent: SiteContent }) {
+  const content = initialContent;
   const [showFloatingQuote, setShowFloatingQuote] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/site-content", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : SITE_DEFAULTS))
-      .then((d) => setContent({ ...SITE_DEFAULTS, ...d }))
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     const updateFloatingQuote = () => {

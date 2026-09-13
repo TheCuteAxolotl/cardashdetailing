@@ -1,24 +1,14 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import PublicHero from "@/components/PublicHero";
 import SitePhoto from "@/components/SitePhoto";
 import PricingMediaStrip from "@/components/PricingMediaStrip";
-import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import { getSiteContent } from "@/lib/site-content";
 
-export default function AboutPage() {
-  const [content, setContent] = useState<Record<string, string>>({ ...SITE_DEFAULTS });
-
-  useEffect(() => {
-    fetch("/api/site-content", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : SITE_DEFAULTS))
-      .then((data) => setContent({ ...SITE_DEFAULTS, ...data }))
-      .catch(() => {});
-  }, []);
+export default async function AboutPage() {
+  const content = await getSiteContent();
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
-      <PublicHero imageCategory="about-hero" eyebrowKey="aboutEyebrow" titleKey="aboutTitle" bodyKey="aboutIntro" action={<a href="/quote" className="inline-flex rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]">Get an Exact Quote</a>} />
+      <PublicHero content={content} imageCategory="about-hero" eyebrowKey="aboutEyebrow" titleKey="aboutTitle" bodyKey="aboutIntro" action={<a href="/quote" className="inline-flex rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]">Get an Exact Quote</a>} />
 
       <section className="bg-[#FFFFFF] text-black">
         <div className="mx-auto grid max-w-[1540px] border-x border-black/10 lg:grid-cols-[1.05fr_.95fr]">

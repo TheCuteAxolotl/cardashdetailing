@@ -6,6 +6,7 @@ import SiteFooter from "@/components/SiteFooter";
 import SupportWidget from "@/components/SupportWidget";
 import StructuredData from "@/components/StructuredData";
 import { localBusinessSchema, SITE_URL } from "@/lib/seo";
+import { getSiteContent } from "@/lib/site-content";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,11 +37,13 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteContent = await getSiteContent();
+
   return (
     <html
       lang="en"
@@ -50,7 +53,7 @@ export default function RootLayout({
         <StructuredData data={localBusinessSchema} />
         <SiteHeader />
         <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <SiteFooter blurb={siteContent.footerBlurb} />
         <SupportWidget />
       </body>
     </html>

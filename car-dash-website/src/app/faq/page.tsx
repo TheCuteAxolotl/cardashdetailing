@@ -1,18 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import PublicHero from "@/components/PublicHero";
-import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import { getSiteContent } from "@/lib/site-content";
 
-export default function FAQPage() {
-  const [content, setContent] = useState<Record<string, string>>({ ...SITE_DEFAULTS });
-
-  useEffect(() => {
-    fetch("/api/site-content", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : SITE_DEFAULTS))
-      .then((data) => setContent({ ...SITE_DEFAULTS, ...data }))
-      .catch(() => {});
-  }, []);
+export default async function FAQPage() {
+  const content = await getSiteContent();
 
   const items = [1, 2, 3, 4, 5, 6].map((n) => ({
     question: content[`faq${n}Question`],
@@ -21,7 +11,7 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
-      <PublicHero imageCategory="faq-hero" eyebrowKey="faqEyebrow" titleKey="faqTitle" bodyKey="faqBody" action={<a href="/contact" className="inline-flex rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]">Still need help?</a>} />
+      <PublicHero content={content} imageCategory="faq-hero" eyebrowKey="faqEyebrow" titleKey="faqTitle" bodyKey="faqBody" action={<a href="/contact" className="inline-flex rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]">Still need help?</a>} />
       <main className="mx-auto max-w-[1180px] px-5 py-14 sm:px-8 lg:py-20">
         <div className="overflow-hidden rounded-[30px] border border-white/10 bg-[#0b0b0b]">
           {items.map((item, index) => (

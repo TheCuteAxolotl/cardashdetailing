@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import StructuredData from "@/components/StructuredData";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
-import { SITE_DEFAULTS, normalizeLegacySiteContent } from "@/lib/site-defaults";
-import { prisma } from "@/lib/prisma";
+import { getSiteContent } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
 
@@ -20,31 +19,17 @@ const breadcrumbs = breadcrumbSchema([
 ]);
 
 async function getFaqSchema() {
-  const keys = Array.from({ length: 6 }, (_, index) => index + 1).flatMap((number) => [
-    `faq${number}Question`,
-    `faq${number}Answer`,
-  ]);
-
-  let content: Record<string, string> = { ...SITE_DEFAULTS };
-  try {
-    const rows = await prisma.siteContent.findMany({ where: { key: { in: keys } } });
-    content = normalizeLegacySiteContent({
-      ...SITE_DEFAULTS,
-      ...Object.fromEntries(rows.map((row) => [row.key, row.value])),
-    });
-  } catch {
-    // The visible FAQ page also falls back to SITE_DEFAULTS when the database is unavailable.
-  }
+  const content = await getSiteContent();
 
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: [1, 2, 3, 4, 5, 6].map((number) => ({
       "@type": "Question",
-      name: content[`faq${number}Question`],
+      name: content[`faq${number}Question` as keyof typeof content],
       acceptedAnswer: {
         "@type": "Answer",
-        text: content[`faq${number}Answer`],
+        text: content[`faq${number}Answer` as keyof typeof content],
       },
     })),
   };

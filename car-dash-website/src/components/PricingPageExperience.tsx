@@ -1,18 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import PricingMediaStrip from "@/components/PricingMediaStrip";
 import SitePhoto from "@/components/SitePhoto";
-import { DEFAULT_PRICING_PAGES, PricingPageConfig, VEHICLE_LABELS, VehicleClass, parsePricingConfig } from "@/lib/pricing-config";
-import { SITE_DEFAULTS } from "@/lib/site-defaults";
+import { PricingPageConfig, VEHICLE_LABELS, VehicleClass } from "@/lib/pricing-config";
 
 type PageKind = "packages" | "exterior" | "interior";
-
-const contentKeys: Record<PageKind, keyof typeof SITE_DEFAULTS> = {
-  packages: "pricingPackagesConfig",
-  exterior: "pricingExteriorConfig",
-  interior: "pricingInteriorConfig",
-};
 
 const slugs: Record<PageKind, string> = {
   packages: "car-packages",
@@ -26,18 +19,11 @@ const pageLabels: Record<PageKind, string> = {
   interior: "Interior Detailing",
 };
 
-export default function PricingPageExperience({ kind }: { kind: PageKind }) {
-  const fallback = DEFAULT_PRICING_PAGES[kind];
-  const [config, setConfig] = useState<PricingPageConfig>(fallback);
+export default function PricingPageExperience({ kind, initialConfig }: { kind: PageKind; initialConfig: PricingPageConfig }) {
+  const [config] = useState<PricingPageConfig>(initialConfig);
   const [vehicle, setVehicle] = useState<VehicleClass>("sedan");
   const slug = slugs[kind];
 
-  useEffect(() => {
-    fetch("/api/site-content", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : SITE_DEFAULTS))
-      .then((content) => setConfig(parsePricingConfig(content?.[contentKeys[kind]], fallback)))
-      .catch(() => setConfig(fallback));
-  }, [kind, fallback]);
 
   const packageCount = useMemo(() => config.packages.length, [config.packages.length]);
 

@@ -1,19 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { SITE_DEFAULTS } from "@/lib/site-defaults";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 import SocialLinks from "@/components/SocialLinks";
 
-export default function SiteFooter() {
-  const [blurb, setBlurb] = useState(SITE_DEFAULTS.footerBlurb);
-
-  useEffect(() => {
-    fetch("/api/site-content", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => data?.footerBlurb && setBlurb(data.footerBlurb))
-      .catch(() => {});
-  }, []);
+export default function SiteFooter({ blurb }: { blurb: string }) {
 
   return (
     <footer className="border-t border-white/10 bg-[#0D0D0D] text-white">

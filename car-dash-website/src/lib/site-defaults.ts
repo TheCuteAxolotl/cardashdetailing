@@ -70,6 +70,7 @@ export const SITE_DEFAULTS = {
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_DEFAULTS;
+export type SiteContent = Record<SiteContentKey, string>;
 
 // Only replace copy that exactly matches an older Car Dash default. Owner-written custom
 // content is left untouched, so upgrading the site never silently overwrites a custom edit.

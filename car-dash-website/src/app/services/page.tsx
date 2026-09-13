@@ -1,7 +1,5 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { DEFAULT_BOOKING_PRICING, BookingPricingConfig, parseBookingPricingConfig } from "@/lib/booking-pricing";
+import { parseBookingPricingConfig } from "@/lib/booking-pricing";
+import { getSiteContent } from "@/lib/site-content";
 
 const pages = [
   { href: "/car-detailing-packages", eyebrow: "Complete Vehicle", title: "Car Detailing Packages", body: "Interior + exterior packages with pricing for coupes, sedans, trucks, and SUVs." },
@@ -9,15 +7,9 @@ const pages = [
   { href: "/interior-detailing", eyebrow: "Cabin + Interior", title: "Interior Detailing", body: "Interior refreshes, full details, and deeper cleaning when the cabin needs more work." },
 ] as const;
 
-export default function ServicesPage() {
-  const [bookingPricing, setBookingPricing] = useState<BookingPricingConfig>(DEFAULT_BOOKING_PRICING);
-
-  useEffect(() => {
-    fetch("/api/site-content", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((content) => setBookingPricing(parseBookingPricingConfig(content?.bookingPricingConfig)))
-      .catch(() => setBookingPricing(DEFAULT_BOOKING_PRICING));
-  }, []);
+export default async function ServicesPage() {
+  const content = await getSiteContent();
+  const bookingPricing = parseBookingPricingConfig(content.bookingPricingConfig);
 
   const carAddOns = bookingPricing.addOns.filter((item) => item.active);
 

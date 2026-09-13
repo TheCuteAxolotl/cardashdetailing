@@ -16,6 +16,8 @@ import {
   calculateDiscount,
   parseBookingPricingConfig,
 } from "@/lib/booking-pricing";
+import type { SiteContent } from "@/lib/site-defaults";
+
 
  type PricingKind = "packages" | "exterior" | "interior";
 
@@ -125,7 +127,7 @@ function formatPricingType(service: Service) {
   return "quote required";
 }
 
-export default function BookingForm({ prefill, onClose }: { prefill?: { service?: string }; onClose?: () => void }) {
+export default function BookingForm({ prefill, onClose, initialSiteContent }: { prefill?: { service?: string }; onClose?: () => void; initialSiteContent?: SiteContent }) {
   const [form, setForm] = useState<FormState>({ ...initialState, selectedPackage: prefill?.service || "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -134,12 +136,14 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
   const [services, setServices] = useState<Service[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [packageSelection, setPackageSelection] = useState<PackageSelection | null>(null);
-  const [pricingConfigs, setPricingConfigs] = useState<PricingConfigs>({
-    packages: DEFAULT_PRICING_PAGES.packages,
-    exterior: DEFAULT_PRICING_PAGES.exterior,
-    interior: DEFAULT_PRICING_PAGES.interior,
-  });
-  const [bookingPricing, setBookingPricing] = useState<BookingPricingConfig>(DEFAULT_BOOKING_PRICING);
+  const [pricingConfigs, setPricingConfigs] = useState<PricingConfigs>(() => ({
+    packages: parsePricingConfig(initialSiteContent?.pricingPackagesConfig, DEFAULT_PRICING_PAGES.packages),
+    exterior: parsePricingConfig(initialSiteContent?.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior),
+    interior: parsePricingConfig(initialSiteContent?.pricingInteriorConfig, DEFAULT_PRICING_PAGES.interior),
+  }));
+  const [bookingPricing, setBookingPricing] = useState<BookingPricingConfig>(() =>
+    initialSiteContent ? parseBookingPricingConfig(initialSiteContent.bookingPricingConfig) : DEFAULT_BOOKING_PRICING
+  );
   const [setupMessage, setSetupMessage] = useState("");
   const [chatUrl, setChatUrl] = useState("");
   const [discountInput, setDiscountInput] = useState("");
@@ -244,15 +248,18 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      const contentRequest = initialSiteContent
+        ? Promise.resolve(null)
+        : fetch("/api/site-content", { cache: "no-store" });
       const [servicesResponse, authResponse, contentResponse] = await Promise.all([
         fetch("/api/services", { cache: "no-store" }),
         fetch("/api/auth/me", { cache: "no-store" }),
-        fetch("/api/site-content", { cache: "no-store" }),
+        contentRequest,
       ]);
 
       const serviceData = servicesResponse.ok ? await servicesResponse.json() : [];
       const loadedServices: Service[] = Array.isArray(serviceData) ? serviceData : [];
-      const content = contentResponse.ok ? await contentResponse.json() : {};
+      const content = initialSiteContent ?? (contentResponse?.ok ? await contentResponse.json() : {});
       const loadedPricing: PricingConfigs = {
         packages: parsePricingConfig(content?.pricingPackagesConfig, DEFAULT_PRICING_PAGES.packages),
         exterior: parsePricingConfig(content?.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior),
@@ -343,7 +350,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
     })();
 
     return () => { cancelled = true; };
-  }, [prefill?.service]);
+  }, [prefill?.service, initialSiteContent]);
 
   useEffect(() => {
     if (!form.preferredDate) { setSlots([]); return; }
