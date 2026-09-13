@@ -17,6 +17,8 @@ import {
 } from "@/lib/booking-pricing";
 import { checkDiscountAvailability } from "@/lib/discount-usage";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
+import { createBookingWithSlotProtection, BookingSlotConflictError, BookingSlotUnavailableError } from "@/lib/booking-slot";
+import { isDateString, normalizeBookingTime } from "@/lib/booking-availability";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -108,6 +110,9 @@ export async function POST(request: NextRequest) {
     const serviceMethod = String(form.get("serviceMethod") || "Not specified").trim();
     const preferredDate = String(form.get("preferredDate") || "").trim();
     const preferredTime = String(form.get("preferredTime") || "").trim();
+    if (!isDateString(preferredDate) || !normalizeBookingTime(preferredTime)) {
+      return NextResponse.json({ success: false, message: "Choose an available booking date and time." }, { status: 400 });
+    }
     const serviceAddress = String(form.get("serviceAddress") || "").trim();
     const customerNotes = String(form.get("serviceNotes") || "None").trim();
     const smsConsent = String(form.get("smsConsent") || "false") === "true";
@@ -259,8 +264,8 @@ export async function POST(request: NextRequest) {
       `Customer notes: ${customerNotes}`,
     ].filter(Boolean).join("\n");
 
-    const booking = await prisma.booking.create({
-      data: {
+    const booking = await createBookingWithSlotProtection(
+      {
         userId: auth?.id ?? null,
         vehicleId: verifiedVehicleId,
         serviceName,
@@ -273,11 +278,12 @@ export async function POST(request: NextRequest) {
         vehicleYear: bookingVehicleYear,
         vehicleTrim: bookingVehicleTrim,
         preferredDate,
-        preferredTime: preferredTime || null,
+        preferredTime,
         quotedPrice: bookingTotal,
         notes: details,
       },
-    });
+      { enforcePublicAvailability: true }
+    );
 
     const bookingChatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(auth?.id));
     try {
@@ -317,6 +323,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, booking, chatUrl: bookingChatUrl, message: `Booking request submitted with a total of $${bookingTotal.toFixed(2)}. Car Dash will confirm the appointment shortly.` }, { status: 201 });
   } catch (error) {
     console.error("Booking submission error:", error);
+    if (error instanceof BookingSlotConflictError || error instanceof BookingSlotUnavailableError) {
+      return NextResponse.json({ success: false, message: error.message }, { status: 409 });
+    }
     return NextResponse.json({ success: false, message: error instanceof Error ? error.message : "Unable to process booking request." }, { status: 400 });
   }
 }

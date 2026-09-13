@@ -6,23 +6,23 @@ import { usePathname } from "next/navigation";
 
 type AccessState = "checking" | "allowed" | "redirecting";
 
-const SHARED_OWNER_ROUTES: Array<{ prefix: string; permission: string }> = [
-  { prefix: "/owner/calls", permission: "businessPhone" },
-  { prefix: "/owner/warranties", permission: "warranties" },
-  { prefix: "/owner/analytics", permission: "analytics" },
-  { prefix: "/owner/services", permission: "services" },
-  { prefix: "/owner/gallery", permission: "gallery" },
-  { prefix: "/owner/website", permission: "website" },
-  { prefix: "/owner/pricing-pages", permission: "pricing" },
-  { prefix: "/owner/booking-settings", permission: "pricing" },
+const SHARED_OWNER_ROUTES: Array<{ prefix: string; permissions: string[] }> = [
+  { prefix: "/owner/calls", permissions: ["businessPhone"] },
+  { prefix: "/owner/warranties", permissions: ["warranties"] },
+  { prefix: "/owner/analytics", permissions: ["analytics"] },
+  { prefix: "/owner/services", permissions: ["services"] },
+  { prefix: "/owner/gallery", permissions: ["gallery"] },
+  { prefix: "/owner/website", permissions: ["website"] },
+  { prefix: "/owner/pricing-pages", permissions: ["pricing"] },
+  { prefix: "/owner/booking-settings", permissions: ["pricing", "bookings"] },
 ];
 
 export default function OwnerLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [state, setState] = useState<AccessState>("checking");
 
-  const requiredPermission = useMemo(
-    () => SHARED_OWNER_ROUTES.find((item) => pathname.startsWith(item.prefix))?.permission || null,
+  const requiredPermissions = useMemo(
+    () => SHARED_OWNER_ROUTES.find((item) => pathname.startsWith(item.prefix))?.permissions || null,
     [pathname]
   );
 
@@ -50,7 +50,7 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (requiredPermission && permissions.includes(requiredPermission)) {
+        if (requiredPermissions && requiredPermissions.some((permission) => permissions.includes(permission))) {
           if (!cancelled) setState("allowed");
           return;
         }
@@ -70,7 +70,7 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [requiredPermission]);
+  }, [requiredPermissions]);
 
   if (state !== "allowed") {
     return (
