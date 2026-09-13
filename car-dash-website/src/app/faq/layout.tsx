@@ -21,15 +21,24 @@ const breadcrumbs = breadcrumbSchema([
 async function getFaqSchema() {
   const content = await getSiteContent();
 
+  const faqItems = [
+    { question: content.faq1Question, answer: content.faq1Answer },
+    { question: content.faq2Question, answer: content.faq2Answer },
+    { question: content.faq3Question, answer: content.faq3Answer },
+    { question: content.faq4Question, answer: content.faq4Answer },
+    { question: content.faq5Question, answer: content.faq5Answer },
+    { question: content.faq6Question, answer: content.faq6Answer },
+  ];
+
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: [1, 2, 3, 4, 5, 6].map((number) => ({
+    mainEntity: faqItems.map((item) => ({
       "@type": "Question",
-      name: content[`faq${number}Question` as keyof typeof content],
+      name: item.question,
       acceptedAnswer: {
         "@type": "Answer",
-        text: content[`faq${number}Answer` as keyof typeof content],
+        text: item.answer,
       },
     })),
   };

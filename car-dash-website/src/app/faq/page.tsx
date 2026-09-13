@@ -4,10 +4,14 @@ import { getSiteContent } from "@/lib/site-content";
 export default async function FAQPage() {
   const content = await getSiteContent();
 
-  const items = [1, 2, 3, 4, 5, 6].map((n) => ({
-    question: content[`faq${n}Question`],
-    answer: content[`faq${n}Answer`],
-  }));
+  const items = [
+    { question: content.faq1Question, answer: content.faq1Answer },
+    { question: content.faq2Question, answer: content.faq2Answer },
+    { question: content.faq3Question, answer: content.faq3Answer },
+    { question: content.faq4Question, answer: content.faq4Answer },
+    { question: content.faq5Question, answer: content.faq5Answer },
+    { question: content.faq6Question, answer: content.faq6Answer },
+  ];
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
