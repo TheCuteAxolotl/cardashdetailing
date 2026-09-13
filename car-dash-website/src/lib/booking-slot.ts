@@ -10,6 +10,19 @@ import {
 
 const ACTIVE_STATUSES = ["pending", "confirmed"];
 
+function dateInTimeZone(timezone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const year = parts.find((part) => part.type === "year")?.value || "";
+  const month = parts.find((part) => part.type === "month")?.value || "";
+  const day = parts.find((part) => part.type === "day")?.value || "";
+  return `${year}-${month}-${day}`;
+}
+
 export class BookingSlotConflictError extends Error {
   constructor(message = "That booking time was just taken. Please choose another time.") {
     super(message);
@@ -54,6 +67,7 @@ async function slotIsPubliclyConfigured(
 ) {
   const row = await tx.siteContent.findUnique({ where: { key: BOOKING_AVAILABILITY_KEY } });
   const config = parseBookingAvailabilityConfig(row?.value);
+  if (date < dateInTimeZone(config.timezone)) return false;
   return isConfiguredBookingSlot(config, date, normalizedTime);
 }
 

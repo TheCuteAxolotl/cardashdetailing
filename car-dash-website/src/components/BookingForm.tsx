@@ -17,6 +17,7 @@ import {
   parseBookingPricingConfig,
 } from "@/lib/booking-pricing";
 import type { SiteContent } from "@/lib/site-defaults";
+import BookingDatePicker from "@/components/BookingDatePicker";
 
 
  type PricingKind = "packages" | "exterior" | "interior";
@@ -413,6 +414,11 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
     event.preventDefault();
     setStatus("submitting");
     setMessage("");
+    if (!form.preferredDate || !form.preferredTime) {
+      setStatus("error");
+      setMessage("Choose an available date and time before submitting.");
+      return;
+    }
     if (bookingTotal == null || bookingTotal < 0 || !baseTotal) {
       setStatus("error");
       setMessage("Choose a fixed-price service or book from an accepted quote so the appointment has an exact total.");
@@ -495,7 +501,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="text-sm text-white/60">Preferred date<input type="date" className={input} value={form.preferredDate} onChange={(event) => set("preferredDate", event.target.value)} required /></label>
+        <div className="text-sm text-white/60"><p>Preferred date</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
         <label className="text-sm text-white/60">Available time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#FF2D2D]">No standard times available. Try another date or message us.</span>}</label>
       </div>
 
@@ -534,7 +540,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       {status !== "idle" && <div className={`rounded-2xl border p-4 text-sm ${status === "success" ? "border-green-800 bg-green-950/30 text-green-200" : "border-red-800 bg-red-950/30 text-red-200"}`}><p>{message}</p>{status === "success" && chatUrl && <a href={chatUrl} className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black">Open booking chat</a>}</div>}
 
       <div className="flex gap-3">
-        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Submit $${bookingTotal.toFixed(2)} booking` : "Choose a service"}</button>
+        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Submit $${bookingTotal.toFixed(2)} booking` : "Choose a service"}</button>
         {onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-6 py-3">Close</button>}
       </div>
     </form>
