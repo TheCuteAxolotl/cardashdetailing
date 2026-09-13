@@ -442,7 +442,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
       <div>
         <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#FF2D2D]">{quoteLocked ? "Accepted quote" : packageSelection ? "Selected pricing package" : "Fixed-price booking"}</p>
         <h2 className="mt-2 text-2xl font-semibold">Request an appointment</h2>
-        <p className="mt-1 text-sm text-white/40">Choose a service, add any extras, apply a valid discount code, and see the exact total before submitting.</p>
+        <p className="mt-1 text-sm text-white/40">Pick the service, add any extras, use a discount code if you have one, and you’ll see the total before you submit.</p>
       </div>
 
       {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D]">Get an Exact Quote →</a></div>}
@@ -489,12 +489,12 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="text-sm text-white/60">Preferred date<input type="date" className={input} value={form.preferredDate} onChange={(event) => set("preferredDate", event.target.value)} required /></label>
-        <label className="text-sm text-white/60">Available time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#FF2D2D]">No standard slots available. Try another date or chat with a specialist.</span>}</label>
+        <label className="text-sm text-white/60">Available time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#FF2D2D]">No standard times available. Try another date or message us.</span>}</label>
       </div>
 
       {allowCarAddOns && (
         <section className="rounded-[26px] border border-white/10 bg-white/[.025] p-5">
-          <div><p className="text-sm font-semibold">Car Detailing Add-Ons</p><p className="mt-1 text-xs text-white/35">Every selected add-on is added to the booking total immediately. Headlight Restoration is ${bookingPricing.addOns.find((item) => item.id === "headlight-restoration")?.price.toFixed(0) || "80"} with a detail, or ${bookingPricing.headlightStandalonePrice.toFixed(0)} when booked alone.</p></div>
+          <div><p className="text-sm font-semibold">Car Detailing Add-Ons</p><p className="mt-1 text-xs text-white/35">Add-ons are added to the total as you select them. Headlight Restoration is ${bookingPricing.addOns.find((item) => item.id === "headlight-restoration")?.price.toFixed(0) || "80"} with a detail, or ${bookingPricing.headlightStandalonePrice.toFixed(0)} by itself.</p></div>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm transition ${form.addOns.includes(item.id) ? "border-[#FF2D2D]/35 bg-[#FF2D2D]/8 text-white" : "border-white/10 bg-black/20 text-white/55"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-[#FF2D2D]">+${item.price.toFixed(2)}</strong></label>)}</div>
         </section>
       )}
@@ -513,7 +513,7 @@ export default function BookingForm({ prefill, onClose }: { prefill?: { service?
             {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/50"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
             {addOnTotal > 0 && <div className="flex justify-between text-white/65"><span>Add-ons subtotal</span><span>+${addOnTotal.toFixed(2)}</span></div>}
             {discountAmount > 0 && <div className="flex justify-between text-green-300"><span>Discount {appliedDiscount?.code ? `(${appliedDiscount.code})` : ""}</span><span>−${discountAmount.toFixed(2)}</span></div>}
-            <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/30">Exact booking total</p><p className="mt-1 text-xs text-white/35">Verified again when submitted</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
+            <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/30">Exact booking total</p><p className="mt-1 text-xs text-white/35">We check it again when you submit</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
           </div>
         </section>
       )}

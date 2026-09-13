@@ -224,13 +224,13 @@ export default function QuotePage() {
         <main className="min-h-screen bg-[#0D0D0D] px-5 py-20 text-white sm:px-8">
           <div className="mx-auto max-w-2xl rounded-[32px] border border-emerald-500/20 bg-emerald-500/[.05] p-7 sm:p-10">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-emerald-300">Quote request received</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-[-.05em]">You&apos;re in. No account required.</h1>
-            <p className="mt-5 text-base leading-8 text-white/55">Car Dash now has your vehicle details and photos. We&apos;ll review the actual condition before pricing the job. Reference: <span className="font-semibold text-white">#{guestSubmitted.id.slice(-7)}</span>.</p>
+            <h1 className="mt-4 text-4xl font-semibold tracking-[-.05em]">Quote request sent. No account needed.</h1>
+            <p className="mt-5 text-base leading-8 text-white/55">We have your vehicle details and photos. We’ll look everything over before we price the job. Reference: <span className="font-semibold text-white">#{guestSubmitted.id.slice(-7)}</span>.</p>
             <div className="mt-8 rounded-2xl border border-white/10 bg-black/25 p-5">
-              <h2 className="text-lg font-semibold">Want the customer dashboard too?</h2>
-              <p className="mt-2 text-sm leading-6 text-white/45">Creating an account is optional. It lets you track this quote online, save vehicles, see bookings, and keep ceramic coating warranties in one place.</p>
+              <h2 className="text-lg font-semibold">Want to save this to an account?</h2>
+              <p className="mt-2 text-sm leading-6 text-white/45">You do not need an account, but making one lets you track this quote, save your vehicles, see bookings, and keep warranty info in one place.</p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <a href={`/register?claimQuoteId=${claim}&email=${email}&name=${name}`} className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Create account + save quote</a>
+                <a href={`/register?claimQuoteId=${claim}&email=${email}&name=${name}`} className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Create account + save this quote</a>
                 <a href={`/login?claimQuoteId=${claim}&email=${email}`} className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Already have an account?</a>
               </div>
             </div>
@@ -246,7 +246,7 @@ export default function QuotePage() {
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">No login required</p>
             <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get an Exact Quote</h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what condition it&apos;s in, and what you want done. An SUV that is already fairly clean may need less labor than the standard SUV price suggests. Photos help us price the vehicle in front of us.</p>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. If you can, add a few photos. A clean SUV may be less work than the standard SUV price, while pet hair, stains, or heavier buildup can make it more.</p>
           </div>
 
           <form onSubmit={create} className="mt-10 rounded-[30px] border border-white/10 bg-white/[.025] p-5 sm:p-8">
@@ -268,9 +268,9 @@ export default function QuotePage() {
             </div>
 
             <div className="mt-5 grid gap-4">
-              <label className="text-sm text-white/65">Current condition<select className={`${input} mt-2`} value={condition} onChange={(e)=>setCondition(e.target.value)}><option value="">Select condition</option><option value="Light / already fairly clean">Light / already fairly clean</option><option value="Average / normal buildup">Average / normal buildup</option><option value="Heavy / needs extra work">Heavy / needs extra work</option><option value="Not sure — please judge from photos">Not sure — judge from photos</option></select></label>
+              <label className="text-sm text-white/65">How dirty is it right now?<select className={`${input} mt-2`} value={condition} onChange={(e)=>setCondition(e.target.value)}><option value="">Select condition</option><option value="Light / already fairly clean">Light / already fairly clean</option><option value="Average / normal buildup">Average / normal buildup</option><option value="Heavy / needs extra work">Heavy / needs extra work</option><option value="Not sure — please judge from photos">Not sure — judge from photos</option></select></label>
               <textarea className={`${input} min-h-36`} value={body} onChange={(e)=>setBody(e.target.value)} placeholder="What do you want done? Mention things like stains, pet hair, a third row, recent cleaning, paint scratches, oxidation, or anything else we should know." required />
-              <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/45 hover:border-[#FF2D2D]/35">Add up to 3 photos for a more accurate quote<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
+              <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/45 hover:border-[#FF2D2D]/35">Add up to 3 photos so we can quote it better<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
               {photos.length > 0 && <p className="text-sm text-[#FF2D2D]">{photos.length} photo(s) ready</p>}
 
               <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -294,7 +294,7 @@ export default function QuotePage() {
         <div>
           <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Condition-based pricing</p>
           <h1 className="mt-2 text-4xl font-semibold">Get an Exact Quote</h1>
-          <p className="mt-2 max-w-3xl text-white/40">Your saved account makes it faster to reuse vehicles and keep the full quote conversation in one place. Package prices are references for typical jobs; condition can move the final quote lower or higher.</p>
+          <p className="mt-2 max-w-3xl text-white/40">Since you’re signed in, you can reuse saved vehicles and keep the whole quote conversation here. Package prices are the normal starting point, but the vehicle’s condition can move the final price up or down.</p>
         </div>
 
         <div className="mt-7 grid gap-5 lg:grid-cols-[300px_1fr]">
@@ -317,16 +317,16 @@ export default function QuotePage() {
               </div>
             ) : (
               <form onSubmit={create} className="mx-auto max-w-2xl py-4">
-                <h2 className="text-2xl font-semibold">Tell us about the vehicle</h2>
-                <p className="mt-2 text-sm leading-6 text-white/45">A cleaner SUV may need less labor than a heavily used SUV. Photos help us price the actual condition instead of charging only by vehicle size.</p>
+                <h2 className="text-2xl font-semibold">Tell us about your vehicle</h2>
+                <p className="mt-2 text-sm leading-6 text-white/45">A clean SUV may take less work than one with stains, pet hair, or heavy buildup. Photos help us price your actual vehicle instead of going only by size.</p>
                 <div className="mt-5 grid gap-4">
                   <select className={input} value={vehicleId} onChange={(e)=>setVehicleId(e.target.value)}><option value="">Select saved vehicle (optional)</option>{vehicles.map((vehicle)=><option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select>
                   {!vehicles.length && <a href="/vehicles" className="text-sm text-[#FF2D2D]">+ Save a vehicle first</a>}
                   <select className={input} value={serviceId} onChange={(e)=>setServiceId(e.target.value)}><option value="">Service (optional)</option>{services.map((service)=><option key={service.id} value={service.id}>{service.title}</option>)}</select>
-                  <label className="block text-sm text-white/60">Current vehicle condition<select className={`${input} mt-2`} value={condition} onChange={(e)=>setCondition(e.target.value)}><option value="">Select condition (optional)</option><option value="Light / already fairly clean">Light / already fairly clean</option><option value="Average / normal buildup">Average / normal buildup</option><option value="Heavy / needs extra work">Heavy / needs extra work</option><option value="Not sure — please judge from photos">Not sure — judge from photos</option></select></label>
+                  <label className="block text-sm text-white/60">How dirty is it right now?<select className={`${input} mt-2`} value={condition} onChange={(e)=>setCondition(e.target.value)}><option value="">Select condition (optional)</option><option value="Light / already fairly clean">Light / already fairly clean</option><option value="Average / normal buildup">Average / normal buildup</option><option value="Heavy / needs extra work">Heavy / needs extra work</option><option value="Not sure — please judge from photos">Not sure — judge from photos</option></select></label>
                   <input className={input} value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Topic" />
                   <textarea className={`${input} min-h-36`} value={body} onChange={(e)=>setBody(e.target.value)} placeholder="Tell us what you want done and anything important we should know (pet hair, stains, third row, recent cleaning, etc.)." required />
-                  <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">Add photos for a more accurate quote (optional, up to 3)<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
+                  <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">Add photos so we can quote it better (optional, up to 3)<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
                   {photos.length>0&&<p className="text-sm text-[#FF2D2D]">{photos.length} photo(s) selected</p>}
                   <div className="rounded-2xl border border-white/10 bg-white/[.025] p-4"><label className="block text-sm text-white/60">Mobile number for quote and appointment texts (optional)<input type="tel" className={`${input} mt-2`} value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="(630) 555-0123" /></label><label className="mt-4 flex items-start gap-3 text-sm text-white/60"><input type="checkbox" checked={smsConsent} onChange={(e)=>setSmsConsent(e.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs text-white/35">See our <a href="/privacy-policy" className="text-[#FF2D2D]">Privacy Policy</a> and <a href="/terms-and-conditions" className="text-[#FF2D2D]">Terms and Conditions</a>.</p></div>
                   {error&&<p className="text-sm text-[#FF2D2D]">{error}</p>}

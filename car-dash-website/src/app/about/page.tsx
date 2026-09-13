@@ -59,20 +59,20 @@ export default function AboutPage() {
           <a href="/paint-correction" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
             <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Finish Guide</p>
             <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Paint Correction</h3>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">Learn the difference between paint enhancement, two-step correction, and more involved inspection-based correction.</p>
-            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">Explore paint correction →</span>
+            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See the difference between a one-step enhancement, two-step correction, and heavier correction work.</p>
+            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See paint correction →</span>
           </a>
           <a href="/ceramic-coatings" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
             <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Protection Guide</p>
             <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Ceramic Coatings</h3>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">Learn how Car Dash approaches coating preparation and the GYEON Synchro and Gtechniq systems used for protection.</p>
-            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">Explore coatings →</span>
+            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See how we prep the paint and the GYEON and Gtechniq coatings we use.</p>
+            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See ceramic coatings →</span>
           </a>
           <a href="/products-we-use" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
-            <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Process + Chemistry</p>
+            <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Products + Process</p>
             <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Products We Use</h3>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See why Koch-Chemie is a core part of the detailing setup and how product choice changes by surface and condition.</p>
-            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See the product approach →</span>
+            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See the Koch-Chemie, GYEON, Gtechniq, and correction products we actually use on different surfaces.</p>
+            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See the products we use →</span>
           </a>
         </div>
       </section>

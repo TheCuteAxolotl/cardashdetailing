@@ -50,8 +50,8 @@ export default function EstimatePage() {
     <main className="min-h-screen bg-[#0D0D0D] px-6 py-14 text-white">
       <div className="mx-auto max-w-5xl">
         <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Instant Estimate</p>
-        <h1 className="mt-3 text-5xl font-semibold tracking-[-.05em]">Get a useful price range in under a minute.</h1>
-        <p className="mt-4 max-w-2xl text-white/45">This is a planning estimate, not a final quote. For exact pricing, send photos and chat with a specialist.</p>
+        <h1 className="mt-3 text-5xl font-semibold tracking-[-.05em]">Get a quick price range before you send a quote request.</h1>
+        <p className="mt-4 max-w-2xl text-white/45">This is only an estimate. For an exact price, send us the vehicle info and a few photos.</p>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(145deg,rgba(74,85,104,.12),rgba(255,255,255,.025))] p-6">
@@ -88,8 +88,8 @@ export default function EstimatePage() {
               <p className="text-xs uppercase tracking-[.25em] text-[#FF2D2D]">Estimated range</p>
               <p className="mt-3 text-4xl font-semibold">${result.lo}–${result.hi}</p>
               <p className="mt-2 text-sm text-white/40">for {result.service.title}</p>
-              <p className="mt-6 text-sm leading-6 text-white/45">This range considers the selected service, vehicle or boat type, and the condition details you provided. Final pricing is confirmed before booking and may change after photos or an in-person inspection.</p>
-              {vehicle === "marine" && <p className="mt-3 text-xs leading-5 text-white/32">Marine work can vary more because length, oxidation, waterline buildup, access, and hull condition all affect labor.</p>}
+              <p className="mt-6 text-sm leading-6 text-white/45">This range uses the service, vehicle or boat type, and condition you selected. We’ll confirm the real price before booking after we see photos or inspect it in person if needed.</p>
+              {vehicle === "marine" && <p className="mt-3 text-xs leading-5 text-white/32">Boat pricing can vary more because length, oxidation, waterline buildup, access, and hull condition can change the amount of work a lot.</p>}
               <a href={`/quote?service=${result.service.id}`} className="mt-6 block rounded-full bg-[#FF2D2D] px-5 py-3 text-center font-semibold text-[#0D0D0D]">Get an Exact Quote</a>
               <a href={`/contact?service=${encodeURIComponent(result.service.title)}`} className="mt-3 block rounded-full border border-white/15 bg-white/[.025] px-5 py-3 text-center text-sm">Request this service</a>
             </> : <p>Choose a service.</p>}

@@ -57,7 +57,7 @@ export default function ServiceCards({ limit, variant = "dark" }: Props) {
   if (!services.length) {
     return (
       <div className={`rounded-[24px] border p-8 ${light ? "border-black/10 bg-black/[.03]" : "border-white/10 bg-white/[.03]"}`}>
-        <p className="text-lg font-semibold">Service menu is being updated.</p>
+        <p className="text-lg font-semibold">We’re updating the service menu.</p>
         <a href="/quote" className="mt-5 inline-block text-sm text-[#FF2D2D]">Get an Exact Quote →</a>
       </div>
     );

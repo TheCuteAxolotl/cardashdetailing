@@ -1,10 +1,10 @@
 const services = [
-  { href: "/car-detailing-packages", title: "Full Detailing", body: "Interior + exterior packages for cars, SUVs, and trucks." },
-  { href: "/interior-detailing", title: "Interior Detailing", body: "Vacuuming, surfaces, seats, carpets, stains, and interior resets." },
-  { href: "/exterior-detailing", title: "Exterior Detailing", body: "Hand washing, wheels, decontamination, gloss, and protection." },
-  { href: "/paint-correction", title: "Paint Correction", body: "Improve swirls, haze, oxidation, and other correctable paint defects." },
-  { href: "/ceramic-coatings", title: "Ceramic Coatings", body: "Longer-term paint protection with proper preparation and coating care." },
-  { href: "/marine-detailing", title: "Marine Detailing", body: "Interior, hull, oxidation, maintenance, and marine protection work." },
+  { href: "/car-detailing-packages", title: "Full Detailing", body: "Full interior + exterior packages for cars, SUVs, and trucks." },
+  { href: "/interior-detailing", title: "Interior Detailing", body: "Vacuuming, seats, carpets, stains, surfaces, and deeper interior cleaning." },
+  { href: "/exterior-detailing", title: "Exterior Detailing", body: "Hand washing, wheels, decontamination, gloss, and paint protection." },
+  { href: "/paint-correction", title: "Paint Correction", body: "Reduce swirls, haze, oxidation, and other correctable paint defects." },
+  { href: "/ceramic-coatings", title: "Ceramic Coatings", body: "Longer-term paint protection after the paint has been cleaned and prepped." },
+  { href: "/marine-detailing", title: "Marine Detailing", body: "Interior, hull, oxidation, maintenance, and protection for boats." },
 ];
 
 export default function RelatedServiceLinks({ currentPath }: { currentPath?: string }) {
@@ -15,7 +15,7 @@ export default function RelatedServiceLinks({ currentPath }: { currentPath?: str
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[.26em] text-[#FF2D2D]">Related services</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">Compare the work your vehicle actually needs.</h2>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">Not sure which service fits your vehicle?</h2>
           </div>
           <a href="/quote" className="inline-flex w-fit rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Get an Exact Quote</a>
         </div>

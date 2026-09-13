@@ -52,7 +52,7 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
           <p className="mt-6 max-w-2xl text-base leading-8 text-white/55 sm:text-lg">{config.body}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#pricing" className="rounded-full bg-[#FF2D2D] px-6 py-3 text-sm font-semibold text-[#0D0D0D]">View Packages</a>
-            <a href="/quote" className="rounded-full border border-white/15 bg-black/25 px-6 py-3 text-sm font-semibold">Ask a Specialist</a>
+            <a href="/quote" className="rounded-full border border-white/15 bg-black/25 px-6 py-3 text-sm font-semibold">Ask About Your Vehicle</a>
           </div>
         </div>
       </section>
@@ -63,9 +63,9 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
 
       <section id="pricing" className="mx-auto max-w-7xl scroll-mt-32 px-5 pb-20 sm:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Our Packages</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Choose the vehicle class. See the standard package price.</h2>
-          <p className="mt-5 text-white/45">These are the standard package prices for each vehicle class. If the vehicle is unusually clean, unusually dirty, or the scope is different from the standard package, use Get an Exact Quote and send photos so the job can be priced by condition.</p>
+          <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Packages</p>
+          <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Pick your vehicle size to see the standard price.</h2>
+          <p className="mt-5 text-white/45">These are the normal package prices. If your vehicle is much cleaner or dirtier than average, or you need something outside the package, send us a few photos and we’ll quote it first.</p>
         </div>
 
         <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2 rounded-[26px] border border-white/10 bg-[#111318] p-3">
@@ -119,7 +119,7 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
       <section className="border-y border-white/10 bg-[#111318]/70">
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
-            <div><p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Recent Results</p><h2 className="mt-3 text-4xl font-semibold tracking-[-.05em]">Photos can be managed from Owner → Photos & Media.</h2></div>
+            <div><p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Recent Work</p><h2 className="mt-3 text-4xl font-semibold tracking-[-.05em]">See more of the work we’ve done recently.</h2></div>
             <a href="/gallery" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">View Gallery</a>
           </div>
           <PricingMediaStrip category={`pricing-${slug}-results`} className="mt-8" />
@@ -128,8 +128,8 @@ export default function PricingPageExperience({ kind }: { kind: PageKind }) {
 
       <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
         <div className="rounded-[34px] border border-[#FF2D2D]/20 bg-[linear-gradient(130deg,rgba(255,45,45,.08),rgba(74,85,104,.08),rgba(255,255,255,.015))] p-8 sm:p-12">
-          <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Standard package or condition-based quote</p>
-          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Book the standard package price, or send photos for a condition-based exact quote.</h2>
+          <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Package price or exact quote</p>
+          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Know what you want? Book the package. Not sure? Send us photos and we’ll quote your vehicle.</h2>
           <div className="mt-8 flex flex-wrap gap-3"><a href="#pricing" className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D]">Choose a package</a><a href="/quote" className="rounded-full border border-white/15 px-6 py-3 font-semibold">Get an Exact Quote</a></div>
         </div>
       </section>

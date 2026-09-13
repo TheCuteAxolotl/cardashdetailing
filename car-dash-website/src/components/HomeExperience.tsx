@@ -13,7 +13,7 @@ const SERVICE_GROUPS = [
   {
     eyebrow: "Car detailing",
     title: "Interior + exterior detailing",
-    body: "Full-detail packages, interior resets, exterior care, and maintenance options for daily drivers, SUVs, trucks, and enthusiast vehicles.",
+    body: "Full details, interior cleaning, exterior work, and maintenance options for cars, SUVs, trucks, and weekend vehicles.",
     href: "/car-detailing-packages",
     link: "View car detailing",
     category: "pricing-car-packages-hero",
@@ -22,16 +22,16 @@ const SERVICE_GROUPS = [
   {
     eyebrow: "Paint + protection",
     title: "Correction + ceramic protection",
-    body: "Paint enhancement, defect correction, and ceramic protection when the goal is more gloss, clarity, and longer-lasting protection.",
+    body: "Paint enhancement, swirl and defect correction, and ceramic coating when you want the paint to look better and stay protected longer.",
     href: "/paint-correction",
-    link: "Explore paint + protection",
+    link: "View paint + protection",
     category: "paint-correction-hero",
     fallbackCategory: "home-showcase-secondary",
   },
   {
     eyebrow: "Marine detailing",
     title: "Boat cleaning + protection",
-    body: "Marine interior, hull, deck, maintenance, enhancement, and protection services built around the condition of the boat.",
+    body: "Interior, hull, deck, oxidation, maintenance, and protection work based on the boat and what it needs.",
     href: "/marine-detailing",
     link: "View marine detailing",
     category: "marine-hero",
@@ -178,8 +178,8 @@ export default function HomeExperience() {
               </div>
               <div className="rounded-[30px] bg-[#111318] p-8 text-white">
                 <p className="text-[10px] uppercase tracking-[.27em] text-[#FF2D2D]">Clear communication</p>
-                <p className="mt-6 text-3xl font-semibold leading-[1.02] tracking-[-.045em]">Send the vehicle details. We’ll tell you what it actually needs.</p>
-                <p className="mt-5 text-sm leading-7 text-white/45">Vehicle size is only one part of the job. Condition, photos, stains, pet hair, paint defects, and the work you want done help us price the actual amount of labor before the appointment.</p>
+                <p className="mt-6 text-3xl font-semibold leading-[1.02] tracking-[-.045em]">Send us the car info and a few photos. We’ll tell you what makes sense.</p>
+                <p className="mt-5 text-sm leading-7 text-white/45">A clean SUV should not be priced like one full of pet hair and stains. Size still matters, but the condition and the work you want done are what help us give you a fair quote.</p>
               </div>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function HomeExperience() {
         <div className="mx-auto flex max-w-[1540px] flex-col gap-6 border-x border-black/10 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[.25em] text-black/35">Follow Car Dash</p>
-            <p className="mt-2 text-lg font-semibold">Work, updates, and reviews.</p>
+            <p className="mt-2 text-lg font-semibold">Recent work, updates, and customer reviews.</p>
           </div>
           <SocialLinks light />
         </div>

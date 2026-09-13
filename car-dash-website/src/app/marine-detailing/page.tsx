@@ -107,8 +107,8 @@ export default function MarineDetailingPage() {
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(13,13,13,.78),rgba(13,13,13,.96))]" />
         <div className="absolute inset-x-0 top-0 mx-auto h-px max-w-5xl accent-rule" />
         <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Marine Detailing</p>
-        <h1 className="mx-auto mt-4 max-w-4xl text-5xl font-semibold tracking-[-.05em] sm:text-7xl">Boat detailing with its own pricing, correction, and protection options.</h1>
-        <p className="mx-auto mt-6 max-w-2xl text-white/45">Marine work is completely separate from automotive detailing and is priced around boat length, condition, oxidation, access, and the work required.</p>
+        <h1 className="mx-auto mt-4 max-w-4xl text-5xl font-semibold tracking-[-.05em] sm:text-7xl">Boat detailing from maintenance cleaning to oxidation and protection.</h1>
+        <p className="mx-auto mt-6 max-w-2xl text-white/45">Boat jobs are priced separately from cars because length, condition, oxidation, access, and the amount of work can change the price a lot.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <a href="#marine-services" className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D]">Marine Services</a>
           <a href="#marine-add-ons" className="rounded-full border border-white/15 bg-white/[.025] px-6 py-3 font-semibold">Marine Add-Ons</a>
@@ -120,8 +120,8 @@ export default function MarineDetailingPage() {
         <div className="mx-auto max-w-7xl px-6 py-20">
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Marine Services</p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Maintenance, complete detailing, gelcoat enhancement, and marine protection.</h2>
-            <p className="mt-5 text-sm leading-7 text-white/45">Per-foot work, oxidation, gelcoat correction, canvas, cabins, trailers, and coatings stay on this page so marine customers see only marine information.</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Maintenance cleaning, full details, gelcoat correction, and protection.</h2>
+            <p className="mt-5 text-sm leading-7 text-white/45">This page covers the boat work: per-foot services, oxidation, gelcoat correction, canvas, cabins, trailers, and protection.</p>
           </div>
 
           <PricingMediaStrip category="marine-services" className="mt-8" />
@@ -131,7 +131,7 @@ export default function MarineDetailingPage() {
               <p className="text-xs font-bold uppercase tracking-[.24em] text-white/35">{category}</p>
               <ServiceGrid services={items.filter((item) => item.category === category)} />
             </div>
-          )) : <p className="mt-8 text-white/40">Marine services are being updated. The add-on menu below is still available for planning and quote requests.</p>}
+          )) : <p className="mt-8 text-white/40">We’re updating the marine service list right now. You can still use the add-ons below or send us a quote request.</p>}
         </div>
       </section>
 
@@ -140,8 +140,8 @@ export default function MarineDetailingPage() {
           <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
             <div className="lg:sticky lg:top-32">
               <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Marine Add-Ons</p>
-              <h2 className="mt-4 text-4xl font-semibold leading-[.95] tracking-[-.05em] sm:text-5xl">Build the boat detail around what it actually needs.</h2>
-              <p className="mt-5 max-w-lg text-sm leading-7 text-white/45">Per-foot options make heavier marine work easier to price without forcing every boat into the same package.</p>
+              <h2 className="mt-4 text-4xl font-semibold leading-[.95] tracking-[-.05em] sm:text-5xl">Add what the boat needs.</h2>
+              <p className="mt-5 max-w-lg text-sm leading-7 text-white/45">A lot of marine work is priced per foot because a 20-foot boat and a 30-foot boat are not the same job.</p>
               <div className="mt-6 flex flex-wrap gap-3"><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Request a marine quote</a><a href="/contact" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Book marine service</a></div>
             </div>
 
@@ -163,7 +163,7 @@ export default function MarineDetailingPage() {
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-xs leading-5 text-white/30">These examples are planning figures, not guaranteed quotes. Final marine pricing depends on inspection and condition.</p>
+                <p className="mt-4 text-xs leading-5 text-white/30">These are rough starting examples, not guaranteed prices. We’ll confirm the final marine price after seeing the boat and its condition.</p>
               </div>
             </div>
           </div>
