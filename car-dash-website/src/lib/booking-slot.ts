@@ -39,7 +39,7 @@ export class BookingSlotUnavailableError extends Error {
 
 async function lockSlot(tx: Prisma.TransactionClient, date: string, normalizedTime: string) {
   const key = `car-dash-booking:${date}:${normalizedTime}`;
-  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${key}))`;
+  await tx.$queryRaw<Array<{ lockResult: string | null }>>`SELECT pg_advisory_xact_lock(hashtext(${key}))::text AS "lockResult"`;
 }
 
 async function slotIsTaken(
