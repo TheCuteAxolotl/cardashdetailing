@@ -10,7 +10,8 @@ export const STATIC_MEDIA_PLACEMENTS: MediaPlacement[] = [
   { value: "before-after", label: "Public Gallery → Before & After", group: "Public Gallery" },
   { value: "portfolio", label: "Public Gallery → Portfolio", group: "Public Gallery" },
 
-  { value: "hero", label: "Homepage → Main Hero Photo", group: "Homepage", photoOnly: true },
+  { value: "home-360", label: "Homepage → 360 Hero Viewer → Rotation Frames", group: "Homepage", photoOnly: true },
+  { value: "hero", label: "Global Fallback → Hero Photo", group: "Fallback Media", photoOnly: true },
   { value: "home-showcase-primary", label: "Homepage → Work Showcase → Primary", group: "Homepage" },
   { value: "home-showcase-secondary", label: "Homepage → Work Showcase → Secondary", group: "Homepage" },
   { value: "home-story", label: "Homepage → Work Showcase → Story", group: "Homepage" },
@@ -80,6 +81,7 @@ export function getMediaPlacementPath(category: string): string | null {
   if (category.startsWith("pricing-exterior-")) return "/exterior-detailing";
   if (category.startsWith("pricing-interior-")) return "/interior-detailing";
   if (category.startsWith("service-")) return "/#specialty-prices";
-  if (category === "hero" || category.startsWith("home-")) return "/";
+  if (category.startsWith("home-")) return "/";
+  if (category === "hero") return null;
   return null;
 }

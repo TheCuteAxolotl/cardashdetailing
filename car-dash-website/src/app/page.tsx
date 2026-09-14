@@ -77,6 +77,19 @@ export default async function Home() {
   }
 
 
+
+  let hero360Frames: Array<{ id: string; url: string; title: string; category: string }> = [];
+  try {
+    hero360Frames = await prisma.galleryImage.findMany({
+      where: { category: "home-360" },
+      orderBy: { createdAt: "asc" },
+      take: 36,
+      select: { id: true, url: true, title: true, category: true },
+    });
+  } catch (error) {
+    console.error("Error loading homepage 360 frames:", error);
+  }
+
   let pricingMedia: Array<{ id: string; url: string; title: string; category: string }> = [];
   try {
     pricingMedia = await prisma.galleryImage.findMany({
@@ -96,7 +109,7 @@ export default async function Home() {
   return (
     <>
       <StructuredData data={websiteSchema} />
-      <HomeExperience initialContent={content} pricingConfigs={pricingConfigs} bookingPricing={bookingPricing} services={services} pricingMedia={pricingMedia} />
+      <HomeExperience initialContent={content} pricingConfigs={pricingConfigs} bookingPricing={bookingPricing} services={services} pricingMedia={pricingMedia} hero360Frames={hero360Frames} />
     </>
   );
 }

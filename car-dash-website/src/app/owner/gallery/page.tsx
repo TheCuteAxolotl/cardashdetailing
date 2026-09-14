@@ -134,7 +134,9 @@ export default function OwnerGallery() {
       if (mode === "photo") {
         if (!file) throw new Error("Choose a photo first.");
         url = await fileToCompressedDataUrl(file);
-        fallbackTitle = file.name.replace(/\.[^.]+$/, "");
+        fallbackTitle = category === "home-360"
+          ? `Frame ${String(media.filter((item) => item.category === "home-360").length + 1).padStart(2, "0")}`
+          : file.name.replace(/\.[^.]+$/, "");
       } else if (mode === "video-file") {
         if (!file) throw new Error("Choose a video first.");
         url = await videoFileToDataUrl(file);
@@ -170,7 +172,7 @@ export default function OwnerGallery() {
   const updateMedia = async (item: MediaItem, updates: Partial<MediaItem>) => {
     const nextCategory = updates.category ?? item.category;
     if (placementByValue.get(nextCategory)?.photoOnly && getMediaKind(item.url) !== "image") {
-      throw new Error("Hero placements only accept photos.");
+      throw new Error("That placement only accepts photos.");
     }
     const response = await fetch(`/api/images/${item.id}`, {
       method: "PUT",
@@ -218,7 +220,7 @@ export default function OwnerGallery() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-6 rounded-2xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.045] p-4 text-sm leading-6 text-white/60">
-          <strong className="text-white">Every placement below is connected to a real public page now.</strong> You can use photos or videos for page media, package proof, and individual services. Hero spots are photo-only. Package items like “Foam + hand wash” can still have their own tap-to-enlarge proof.
+          <strong className="text-white">Every placement below is connected to a real public page now.</strong> The Homepage 360 Hero Viewer is photo-only and loops through frames in upload order. If you have not added any 360 frames yet, that hero media area stays intentionally blank. Other page media can use photos or videos, and package items like “Foam + hand wash” can still have their own tap-to-enlarge proof.
         </div>
 
         <form onSubmit={addMedia} className="grid gap-4 rounded-3xl border border-neutral-800 bg-neutral-950 p-6 md:grid-cols-4">
@@ -243,12 +245,12 @@ export default function OwnerGallery() {
               <>
                 <label className="mb-2 block text-sm font-medium">{mode === "photo" ? "Photo" : "Video clip"}</label>
                 <input id="gallery-file" type="file" accept={mode === "photo" ? "image/*" : "video/mp4,video/webm,video/quicktime,video/*"} onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" required />
-                <p className="mt-2 text-xs text-neutral-500">{mode === "photo" ? "Photos are resized/compressed automatically." : "Direct video uploads are limited to 2.5 MB. Use a video link for anything larger."}</p>
+                <p className="mt-2 text-xs text-neutral-500">{category === "home-360" ? "Upload the 360 frames in order as you move around the car/interior. About 8 photos works; 12–24 looks smoother (up to 36 frames). Customers can drag or swipe through them in a loop." : mode === "photo" ? "Photos are resized/compressed automatically." : "Direct video uploads are limited to 2.5 MB. Use a video link for anything larger."}</p>
               </>
             )}
           </div>
 
-          <div><label className="mb-2 block text-sm font-medium">Label</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Before, After, Hand wash…" className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" /></div>
+          <div><label className="mb-2 block text-sm font-medium">Label</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === "home-360" ? "Frame 01 (optional)" : "Before, After, Hand wash…"} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" /></div>
           <div className="md:col-span-3"><label className="mb-2 block text-sm font-medium">Where should it appear?</label><PlacementSelect value={category} onChange={(value) => { setCategory(value); if (placementByValue.get(value)?.photoOnly) { setMode("photo"); setVideoUrl(""); setFile(null); const input = document.getElementById("gallery-file") as HTMLInputElement | null; if (input) input.value = ""; } }} /><p className="mt-2 text-[11px] leading-4 text-neutral-500">Current destination: {placementByValue.get(category)?.label || category}{getMediaPlacementPath(category) && <> · <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer" className="text-[#FF2D2D] hover:underline">Open page ↗</a></>}</p></div>
           <div className="flex items-end"><button disabled={saving} className="w-full rounded-xl bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D] disabled:opacity-50">{saving ? "Processing…" : "Add Media"}</button></div>
           {message && <div className="md:col-span-4 text-sm text-neutral-300">{message}</div>}

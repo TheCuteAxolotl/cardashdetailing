@@ -1,13 +1,13 @@
 import type { SiteContent } from "@/lib/site-defaults";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import type { BookingPricingConfig } from "@/lib/booking-pricing";
-import SitePhoto from "@/components/SitePhoto";
 import DynamicGallery from "@/components/DynamicGallery";
 import ReviewCards from "@/components/ReviewCards";
 import BookingForm from "@/components/BookingForm";
 import SimplePricingHub, { type PublicServiceSummary } from "@/components/SimplePricingHub";
 import type { MediaItem } from "@/lib/media";
 import PageMediaBand from "@/components/PageMediaBand";
+import Hero360Viewer from "@/components/Hero360Viewer";
 
  type PricingKind = "packages" | "interior" | "exterior";
 
@@ -17,9 +17,10 @@ type Props = {
   bookingPricing: BookingPricingConfig;
   services: PublicServiceSummary[];
   pricingMedia?: MediaItem[];
+  hero360Frames?: MediaItem[];
 };
 
-export default function HomeExperience({ initialContent: content, pricingConfigs, bookingPricing, services, pricingMedia = [] }: Props) {
+export default function HomeExperience({ initialContent: content, pricingConfigs, bookingPricing, services, pricingMedia = [], hero360Frames = [] }: Props) {
   return (
     <div className="bg-[#F4F3EF] text-[#111]">
       <section className="border-b border-black/8 bg-[#0D0D0D] text-white">
@@ -46,12 +47,16 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
           </div>
 
           <div className="relative min-h-[300px] overflow-hidden rounded-[28px] bg-black sm:min-h-[390px] lg:min-h-[480px]">
-            <SitePhoto category="hero" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
-            <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/12 bg-black/55 p-4 backdrop-blur-md sm:flex sm:items-center sm:justify-between sm:gap-4">
-              <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Mobile service</p><p className="mt-1 text-sm font-semibold">South Elgin + surrounding areas</p></div>
-              <a href="#book" className="mt-3 inline-flex text-sm font-semibold text-white sm:mt-0">Check availability →</a>
-            </div>
+            <Hero360Viewer frames={hero360Frames} className="absolute inset-0 h-full w-full" />
+            {hero360Frames.length > 0 && (
+              <>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+                <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/12 bg-black/55 p-4 backdrop-blur-md sm:flex sm:items-center sm:justify-between sm:gap-4">
+                  <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Mobile service</p><p className="mt-1 text-sm font-semibold">South Elgin + surrounding areas</p></div>
+                  <a href="#book" className="mt-3 inline-flex text-sm font-semibold text-white sm:mt-0">Check availability →</a>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

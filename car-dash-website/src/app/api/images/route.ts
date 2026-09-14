@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     if (isPhotoOnlyMediaCategory(String(category)) && mediaKind !== "image") {
       return NextResponse.json(
-        { error: "That placement is a hero photo spot. Choose a photo instead of a video." },
+        { error: "That placement only accepts photos. Choose a photo instead of a video." },
         { status: 400 }
       );
     }
