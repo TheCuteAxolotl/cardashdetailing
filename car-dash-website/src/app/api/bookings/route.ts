@@ -19,6 +19,7 @@ import { checkDiscountAvailability } from "@/lib/discount-usage";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 import { createBookingWithSlotProtection, BookingSlotConflictError, BookingSlotUnavailableError } from "@/lib/booking-slot";
 import { isDateString, normalizeBookingTime } from "@/lib/booking-availability";
+import { embedBookingPhotos } from "@/lib/booking-photos";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -97,6 +98,10 @@ export async function POST(request: NextRequest) {
     if (recent > 1000) return NextResponse.json({ success: false, message: "Please try again later." }, { status: 429 });
 
     const form = await request.formData();
+    const attachments = parseStringArray(form.get("attachments")).slice(0, 3);
+    if (attachments.some((item) => !/^data:image\/(?:jpeg|png|webp);base64,/i.test(item) || item.length > 650000)) {
+      return NextResponse.json({ success: false, message: "Booking photos must be JPG, PNG, or WebP images and small enough to upload." }, { status: 400 });
+    }
     const name = required(form, "name");
     const phone = required(form, "phone");
     const email = required(form, "email");
@@ -247,7 +252,7 @@ export async function POST(request: NextRequest) {
     }
 
     const addOnSummary = selectedAddOns.length ? selectedAddOns.map((item) => `${item?.name} (+$${Number(item?.price || 0).toFixed(2)})`).join(", ") : "None";
-    const details = [
+    const detailsText = [
       `Base service: $${baseTotal.toFixed(2)}`,
       `Add-ons: ${addOnSummary}`,
       `Add-ons total: $${addOnTotal.toFixed(2)}`,
@@ -263,6 +268,7 @@ export async function POST(request: NextRequest) {
       `SMS consent: ${smsConsent ? "Yes" : "No"}`,
       `Customer notes: ${customerNotes}`,
     ].filter(Boolean).join("\n");
+    const details = embedBookingPhotos(detailsText, attachments);
 
     const booking = await createBookingWithSlotProtection(
       {
@@ -307,7 +313,7 @@ export async function POST(request: NextRequest) {
       preferred: [preferredDate, preferredTime].filter(Boolean).join(" · ") || "Not specified",
       source,
       address: serviceAddress,
-      notes: customerNotes,
+      notes: `${customerNotes}${attachments.length ? ` · ${attachments.length} vehicle photo${attachments.length === 1 ? "" : "s"} attached` : ""}`,
       ip,
       visitorHash,
     });

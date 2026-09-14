@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 
 type Booking = {
   id: string;
@@ -113,7 +114,7 @@ export default function AdminBookings() {
                     <p><strong className="text-white">Preferred:</strong> {b.preferredDate || "Not specified"}{b.preferredTime ? ` · ${b.preferredTime}` : ""}</p>
                     <p><strong className="text-white">Booking total:</strong> <span className="font-semibold text-emerald-300">{b.quotedPrice != null ? `$${b.quotedPrice.toFixed(2)}` : "Legacy booking"}</span></p>
                   </div>
-                  {b.notes && <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-neutral-900 p-4 text-xs leading-6 text-neutral-300">{b.notes}</pre>}
+                  <BookingPhotoEvidence notes={b.notes} />
                 </div>
                 <div className="flex min-w-48 flex-col gap-2">
                   <a

@@ -5,6 +5,8 @@ import type { PricingPageConfig, VehicleClass } from "@/lib/pricing-config";
 import { VEHICLE_LABELS } from "@/lib/pricing-config";
 import PackageMediaEvidence from "@/components/PackageMediaEvidence";
 import type { MediaItem } from "@/lib/media";
+import PackageConditionGuide from "@/components/PackageConditionGuide";
+import { getPackageConditionGuide } from "@/lib/package-condition-guide";
 
 type PageKind = "packages" | "exterior" | "interior";
 
@@ -73,6 +75,12 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
                   </a>
                 ))}
               </div>
+
+              <PackageConditionGuide
+                copy={getPackageConditionGuide(kind, pkg.id, pkg.description)}
+                packageName={pkg.name}
+                media={mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}-condition`)}
+              />
 
               <PackageMediaEvidence
                 packageMedia={mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}`)}

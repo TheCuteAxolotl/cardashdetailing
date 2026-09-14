@@ -128,6 +128,35 @@ function formatPricingType(service: Service) {
   return "quote required";
 }
 
+async function compressBookingPhoto(file: File) {
+  if (!file.type.startsWith("image/")) throw new Error("Please choose image files only.");
+  const source = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = URL.createObjectURL(file);
+  });
+
+  const maxDimension = 1400;
+  const ratio = Math.min(1, maxDimension / Math.max(source.naturalWidth, source.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(source.naturalWidth * ratio));
+  canvas.height = Math.max(1, Math.round(source.naturalHeight * ratio));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Could not prepare that photo.");
+  ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+  URL.revokeObjectURL(source.src);
+
+  let quality = 0.8;
+  let result = canvas.toDataURL("image/jpeg", quality);
+  while (result.length > 580000 && quality > 0.42) {
+    quality -= 0.08;
+    result = canvas.toDataURL("image/jpeg", quality);
+  }
+  if (result.length > 650000) throw new Error("One of those photos is still too large. Try a smaller photo.");
+  return result;
+}
+
 export default function BookingForm({ prefill, onClose, initialSiteContent }: { prefill?: { service?: string }; onClose?: () => void; initialSiteContent?: SiteContent }) {
   const [form, setForm] = useState<FormState>({ ...initialState, selectedPackage: prefill?.service || "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -151,6 +180,8 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
   const [discountMessage, setDiscountMessage] = useState("");
   const [discountLoading, setDiscountLoading] = useState(false);
+  const [bookingPhotos, setBookingPhotos] = useState<string[]>([]);
+  const [photoMessage, setPhotoMessage] = useState("");
 
   const set = (key: keyof FormState, value: unknown) => setForm((current) => ({ ...current, [key]: value }));
 
@@ -387,6 +418,23 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
     set("addOns", form.addOns.includes(id) ? form.addOns.filter((value) => value !== id) : [...form.addOns, id]);
   };
 
+  const chooseBookingPhotos = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPhotoMessage("");
+    const files = [...(event.target.files || [])].slice(0, 3);
+    if (!files.length) {
+      setBookingPhotos([]);
+      return;
+    }
+    try {
+      const prepared = await Promise.all(files.map(compressBookingPhoto));
+      setBookingPhotos(prepared);
+      setPhotoMessage(`${prepared.length} photo${prepared.length === 1 ? "" : "s"} ready to send with your booking.`);
+    } catch (error) {
+      setBookingPhotos([]);
+      setPhotoMessage(error instanceof Error ? error.message : "Could not prepare those photos.");
+    }
+  };
+
   const applyDiscount = async () => {
     if (!discountInput.trim()) { setDiscountMessage("Enter a discount code."); return; }
     setDiscountLoading(true);
@@ -430,6 +478,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       Object.entries(form).forEach(([key, value]) => body.append(key, Array.isArray(value) ? JSON.stringify(value) : String(value)));
       body.append("displayedBookingTotal", String(bookingTotal));
       body.append("discountCode", appliedDiscount?.code || "");
+      body.append("attachments", JSON.stringify(bookingPhotos));
       if (packageSelection) {
         body.append("pricingPage", packageSelection.pricingPage);
         body.append("packageId", packageSelection.packageId);
@@ -455,7 +504,8 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       <div className="border-b border-white/10 pb-5">
         <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Appointment</p>
         <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Book your detail</h2>
-        <p className="mt-2 text-sm leading-6 text-white/42">Choose the service, enter the car, pick an open time, and submit. That’s it.</p>
+        <p className="mt-2 text-sm leading-6 text-white/42">Choose the service, enter the car, pick an open time, and submit. You can attach photos too.</p>
+        <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#FF2D2D]">Get a free photo quote →</a></p>
       </div>
 
       {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D]">Get an Exact Quote →</a></div>}
@@ -535,6 +585,16 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
                 {discountMessage && <p className={`mt-2 text-xs ${appliedDiscount ? "text-green-300" : "text-red-300"}`}>{discountMessage}</p>}
               </details>
             )}
+
+            <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+              <summary className="cursor-pointer text-sm font-semibold">Attach photos <span className="ml-2 text-xs font-normal text-white/35">Optional · up to 3</span></summary>
+              <div className="mt-4">
+                <p className="text-xs leading-5 text-white/40">Show us stains, pet hair, paint condition, scratches, or anything you want us to see before the appointment.</p>
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/*" multiple onChange={chooseBookingPhotos} className="mt-3 w-full rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-white/60" />
+                {photoMessage && <p className="mt-2 text-xs text-white/45">{photoMessage}</p>}
+                {bookingPhotos.length > 0 && <div className="mt-3 grid grid-cols-3 gap-2">{bookingPhotos.map((src, index) => <img key={index} src={src} alt={`Vehicle upload ${index + 1}`} className="h-24 w-full rounded-xl object-cover" />)}</div>}
+              </div>
+            </details>
 
             <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
               <summary className="cursor-pointer text-sm font-semibold">Add a note</summary>

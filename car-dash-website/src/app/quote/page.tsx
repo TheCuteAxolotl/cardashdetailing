@@ -86,7 +86,12 @@ export default function QuotePage() {
 
     const query = new URLSearchParams(location.search);
     const serviceFromUrl = query.get("service");
+    const packageFromUrl = query.get("package");
     if (serviceFromUrl) setServiceId((current) => current || serviceFromUrl);
+    if (packageFromUrl) {
+      setSubject((current) => current === "Exact detailing quote" ? `Free photo quote — ${packageFromUrl}` : current);
+      setBody((current) => current || `I'm not sure if ${packageFromUrl} is the right fit for my vehicle. Please take a look at the photos and recommend the best option.`);
+    }
 
     const me = await fetch("/api/auth/me", { cache: "no-store" }).catch(() => null);
     if (!me?.ok) {
@@ -246,7 +251,7 @@ export default function QuotePage() {
         <div className="mx-auto max-w-4xl">
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">No login required</p>
-            <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get an Exact Quote</h1>
+            <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get a Free Exact Quote</h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. If you can, add a few photos. A clean SUV may be less work than the standard SUV price, while pet hair, stains, or heavier buildup can make it more.</p>
           </div>
 
@@ -282,7 +287,7 @@ export default function QuotePage() {
               </div>
 
               {error && <p className="rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-100">{error}</p>}
-              <button disabled={submitting} className="rounded-full bg-[#FF2D2D] px-6 py-3.5 font-semibold text-[#0D0D0D] disabled:opacity-50">{submitting ? "Sending…" : "Send My Exact Quote Request"}</button>
+              <button disabled={submitting} className="rounded-full bg-[#FF2D2D] px-6 py-3.5 font-semibold text-[#0D0D0D] disabled:opacity-50">{submitting ? "Sending…" : "Send My Free Quote Request"}</button>
               <p className="text-center text-xs text-white/30">Already a customer? <a href="/login" className="text-white/60 hover:text-white">Sign in</a> to keep the quote in your dashboard.</p>
             </div>
           </form>
@@ -296,7 +301,7 @@ export default function QuotePage() {
       <div className="mx-auto max-w-7xl">
         <div>
           <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Condition-based pricing</p>
-          <h1 className="mt-2 text-4xl font-semibold">Get an Exact Quote</h1>
+          <h1 className="mt-2 text-4xl font-semibold">Get a Free Exact Quote</h1>
           <p className="mt-2 max-w-3xl text-white/40">Since you’re signed in, you can reuse saved vehicles and keep the whole quote conversation here. Package prices are the normal starting point, but the vehicle’s condition can move the final price up or down.</p>
         </div>
 

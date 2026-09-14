@@ -63,6 +63,11 @@ function dynamicPackagePlacements(configs: PricingConfigs): Placement[] {
         label: `${label} → ${pkg.name} → Before/After + Package Media`,
         group: label,
       },
+      {
+        value: `pricing-${slug}-pkg-${pkg.id}-condition`,
+        label: `${label} → ${pkg.name} → When Should I Get This? → Dirty Before Examples`,
+        group: label,
+      },
       ...pkg.features.map((feature, index) => ({
         value: `pricing-${slug}-pkg-${pkg.id}-feature-${index + 1}`,
         label: `${label} → ${pkg.name} → Included Item → ${feature}`,
@@ -220,7 +225,7 @@ export default function OwnerGallery() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-6 rounded-2xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.045] p-4 text-sm leading-6 text-white/60">
-          <strong className="text-white">Every placement below is connected to a real public page now.</strong> The Homepage 360 Hero Viewer is photo-only and loops through frames in upload order. If you have not added any 360 frames yet, that hero media area stays intentionally blank. Other page media can use photos or videos, and package items like “Foam + hand wash” can still have their own tap-to-enlarge proof.
+          <strong className="text-white">Every placement below is connected to a real public page now.</strong> The Homepage 360 Hero Viewer is photo-only and loops through frames in upload order. If you have not added any 360 frames yet, that hero media area stays intentionally blank. Other page media can use photos or videos, package items like “Foam + hand wash” can still have their own tap-to-enlarge proof, and every package now has a “When should I get this?” dirty-before example placement.
         </div>
 
         <form onSubmit={addMedia} className="grid gap-4 rounded-3xl border border-neutral-800 bg-neutral-950 p-6 md:grid-cols-4">

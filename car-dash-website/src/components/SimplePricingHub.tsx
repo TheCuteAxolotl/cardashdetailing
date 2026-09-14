@@ -4,6 +4,8 @@ import type { BookingPricingConfig } from "@/lib/booking-pricing";
 import PackageMediaEvidence from "@/components/PackageMediaEvidence";
 import type { MediaItem } from "@/lib/media";
 import ServiceMediaEvidence from "@/components/ServiceMediaEvidence";
+import PackageConditionGuide from "@/components/PackageConditionGuide";
+import { getPackageConditionGuide } from "@/lib/package-condition-guide";
 
 export type PublicServiceSummary = {
   id: string;
@@ -93,6 +95,12 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
                       </a>
                     ))}
                   </div>
+
+                  <PackageConditionGuide
+                    copy={getPackageConditionGuide(kind, pkg.id, pkg.description)}
+                    packageName={pkg.name}
+                    media={mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}-condition`)}
+                  />
 
                   <PackageMediaEvidence
                     packageMedia={mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}`)}

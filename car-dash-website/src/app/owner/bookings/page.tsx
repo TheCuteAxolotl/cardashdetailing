@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
+import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#FF2D2D]/60";
 
@@ -312,7 +313,7 @@ export default function OwnerBookings() {
                       </div>
                     )}
 
-                    {booking.notes && <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-neutral-900 p-4 text-xs leading-6 text-neutral-300">{booking.notes}</pre>}
+                    <BookingPhotoEvidence notes={booking.notes} />
                   </div>
 
                   <div className="flex min-w-48 flex-col gap-2">
