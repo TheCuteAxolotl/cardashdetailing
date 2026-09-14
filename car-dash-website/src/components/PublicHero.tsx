@@ -16,16 +16,17 @@ export default async function PublicHero({ imageCategory, eyebrowKey, titleKey, 
   const resolvedContent = content ?? (await getSiteContent());
 
   return (
-    <section className="relative isolate min-h-[560px] overflow-hidden border-b border-white/10 bg-black text-white sm:min-h-[620px]">
-      <SitePhoto category={imageCategory} fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover" />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(0,0,0,.93)_0%,rgba(0,0,0,.72)_48%,rgba(0,0,0,.35)_100%)]" />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.68))]" />
-      <div className="mx-auto flex min-h-[560px] max-w-[1540px] items-end border-x border-white/10 px-5 py-14 sm:min-h-[620px] sm:px-8 sm:py-20 lg:px-10">
-        <div className="max-w-4xl">
-          <p className="text-[10px] font-semibold uppercase tracking-[.3em] text-[#FF2D2D]">{resolvedContent[eyebrowKey]}</p>
-          <h1 className="mt-5 text-5xl font-semibold leading-[.9] tracking-[-.065em] sm:text-7xl lg:text-[6.5rem]">{resolvedContent[titleKey]}</h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-white/55 sm:text-lg">{resolvedContent[bodyKey]}</p>
-          {action && <div className="mt-8">{action}</div>}
+    <section className="border-b border-black/8 bg-[#F4F3EF] text-[#111]">
+      <div className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[.82fr_1.18fr] lg:items-stretch">
+        <div className="flex flex-col justify-center py-5 lg:py-10">
+          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">{resolvedContent[eyebrowKey]}</p>
+          <h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[.93] tracking-[-.06em] sm:text-6xl">{resolvedContent[titleKey]}</h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-black/52">{resolvedContent[bodyKey]}</p>
+          {action && <div className="mt-6">{action}</div>}
+        </div>
+        <div className="relative min-h-[300px] overflow-hidden rounded-[26px] bg-black sm:min-h-[390px]">
+          <SitePhoto category={imageCategory} fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
         </div>
       </div>
     </section>

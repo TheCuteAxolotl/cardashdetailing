@@ -451,98 +451,123 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const databaseServices = services.filter((service) => service.active && service.title.trim().toLowerCase() !== "headlight restoration");
 
   return (
-    <form onSubmit={submit} className="space-y-5 text-white">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#FF2D2D]">{quoteLocked ? "Accepted quote" : packageSelection ? "Selected pricing package" : "Fixed-price booking"}</p>
-        <h2 className="mt-2 text-2xl font-semibold">Request an appointment</h2>
-        <p className="mt-1 text-sm text-white/40">Pick the service, add any extras, use a discount code if you have one, and you’ll see the total before you submit.</p>
+    <form onSubmit={submit} className="space-y-6 text-white">
+      <div className="border-b border-white/10 pb-5">
+        <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Appointment</p>
+        <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Book your detail</h2>
+        <p className="mt-2 text-sm leading-6 text-white/42">Choose the service, enter the car, pick an open time, and submit. That’s it.</p>
       </div>
 
       {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D]">Get an Exact Quote →</a></div>}
 
-      {quoteLocked ? (
-        <div className="rounded-3xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-5">
-          <p className="text-xs uppercase tracking-[.22em] text-[#FF2D2D]">Accepted quote</p>
-          <div className="mt-2 flex flex-wrap items-end justify-between gap-4"><div><p className="text-xl font-semibold">{form.selectedPackage}</p><p className="mt-1 text-xs text-white/35">Quote #{form.quoteThreadId.slice(-7)}</p></div><p className="text-3xl font-semibold">${Number(baseTotal || 0).toFixed(2)}</p></div>
+      <section>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Pick what you want done.</p></div></div>
+
+        {quoteLocked ? (
+          <div className="rounded-2xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-4">
+            <p className="text-xs uppercase tracking-[.18em] text-[#FF2D2D]">Accepted quote</p>
+            <div className="mt-2 flex flex-wrap items-end justify-between gap-4"><div><p className="text-lg font-semibold">{form.selectedPackage}</p><p className="mt-1 text-xs text-white/35">Quote #{form.quoteThreadId.slice(-7)}</p></div><p className="text-2xl font-semibold">${Number(baseTotal || 0).toFixed(2)}</p></div>
+          </div>
+        ) : (
+          <label className="block text-sm text-white/55">
+            Service or package
+            <select className={input} value={serviceChoiceValue} onChange={(event) => chooseBookingOption(event.target.value)} required>
+              <option value="">Choose a service</option>
+              <optgroup label="Full Detailing">{pricingConfigs.packages.packages.map((pkg) => <option key={`packages-${pkg.id}`} value={`package:packages:${pkg.id}`}>{pkg.name}</option>)}</optgroup>
+              <optgroup label="Interior Only">{pricingConfigs.interior.packages.map((pkg) => <option key={`interior-${pkg.id}`} value={`package:interior:${pkg.id}`}>{pkg.name}</option>)}</optgroup>
+              <optgroup label="Exterior Only">{pricingConfigs.exterior.packages.map((pkg) => <option key={`exterior-${pkg.id}`} value={`package:exterior:${pkg.id}`}>{pkg.name}</option>)}</optgroup>
+              <optgroup label="Standalone"><option value={`service:${STANDALONE_HEADLIGHT_SERVICE_ID}`}>Headlight Restoration — ${bookingPricing.headlightStandalonePrice.toFixed(0)}</option></optgroup>
+              {databaseServices.length > 0 && <optgroup label="Other Services">{databaseServices.map((service) => <option key={service.id} value={`service:${service.id}`}>{service.title} — {formatPricingType(service)}</option>)}</optgroup>}
+            </select>
+          </label>
+        )}
+
+        {packageSelection && !quoteLocked && (
+          <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.025] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">{packageSelection.packageName}</p><p className="mt-1 text-xs text-white/35">Choose vehicle size</p></div><p className="text-2xl font-semibold">${packageSelection.price.toFixed(0)}</p></div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#FF2D2D]/55 bg-[#FF2D2D]/10 text-white" : "border-white/10 bg-black/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
+          </div>
+        )}
+      </section>
+
+      <section className="border-t border-white/8 pt-6">
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">2</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Just enough info to know who and what we’re booking.</p></div></div>
+
+        {vehicles.length > 0 && !quoteLocked && <label className="mb-4 block text-sm text-white/55">Saved vehicle<select className={input} value={form.vehicleId} onChange={(event) => chooseVehicle(event.target.value)}><option value="">Enter vehicle manually</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select></label>}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm text-white/55">Name<input className={input} value={form.name} onChange={(event) => set("name", event.target.value)} required /></label>
+          <label className="text-sm text-white/55">Phone<input className={input} value={form.phone} onChange={(event) => set("phone", event.target.value)} required /></label>
+          <label className="text-sm text-white/55 sm:col-span-2">Email<input type="email" className={input} value={form.email} onChange={(event) => set("email", event.target.value)} required /></label>
         </div>
-      ) : (
-        <label className="block text-sm text-white/60">
-          Service or package
-          <select className={input} value={serviceChoiceValue} onChange={(event) => chooseBookingOption(event.target.value)} required>
-            <option value="">Choose a service</option>
-            <optgroup label="Car Detailing Packages">{pricingConfigs.packages.packages.map((pkg) => <option key={`packages-${pkg.id}`} value={`package:packages:${pkg.id}`}>{pkg.name}</option>)}</optgroup>
-            <optgroup label="Exterior Detailing">{pricingConfigs.exterior.packages.map((pkg) => <option key={`exterior-${pkg.id}`} value={`package:exterior:${pkg.id}`}>{pkg.name}</option>)}</optgroup>
-            <optgroup label="Interior Detailing">{pricingConfigs.interior.packages.map((pkg) => <option key={`interior-${pkg.id}`} value={`package:interior:${pkg.id}`}>{pkg.name}</option>)}</optgroup>
-            <optgroup label="Standalone Services"><option value={`service:${STANDALONE_HEADLIGHT_SERVICE_ID}`}>Headlight Restoration — ${bookingPricing.headlightStandalonePrice.toFixed(2)}</option></optgroup>
-            {databaseServices.length > 0 && <optgroup label="Other Services">{databaseServices.map((service) => <option key={service.id} value={`service:${service.id}`}>{service.title} — {formatPricingType(service)}</option>)}</optgroup>}
-          </select>
-        </label>
-      )}
 
-      {packageSelection && !quoteLocked && (
-        <div className="rounded-3xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-5">
-          <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Package selection</p><h3 className="mt-2 text-xl font-semibold">{packageSelection.packageName}</h3></div><p className="text-3xl font-semibold">${packageSelection.price.toFixed(2)}</p></div>
-          <div className="mt-4"><p className="text-xs uppercase tracking-[.18em] text-white/35">Vehicle size</p><div className="mt-2 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${packageSelection.vehicleClass === key ? "border-[#FF2D2D]/55 bg-[#FF2D2D]/10" : "border-white/10 bg-black/20 text-white/55"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div></div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <label className="text-sm text-white/55">Year<input className={input} value={form.vehicleYear} onChange={(event) => set("vehicleYear", event.target.value)} required /></label>
+          <label className="text-sm text-white/55">Make<input className={input} value={form.vehicleMake} onChange={(event) => set("vehicleMake", event.target.value)} required /></label>
+          <label className="text-sm text-white/55">Model<input className={input} value={form.vehicleModel} onChange={(event) => set("vehicleModel", event.target.value)} required /></label>
         </div>
-      )}
+      </section>
 
-      {vehicles.length > 0 && !quoteLocked && <label className="block text-sm text-white/60">Saved vehicle<select className={input} value={form.vehicleId} onChange={(event) => chooseVehicle(event.target.value)}><option value="">Enter vehicle manually</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select></label>}
+      <section className="border-t border-white/8 pt-6">
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates are unavailable. Booked times are removed.</p></div></div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
+          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#FF2D2D]">No times left on this day. Choose another date.</span>}</label>
+        </div>
+      </section>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="text-sm text-white/60">Name<input className={input} value={form.name} onChange={(event) => set("name", event.target.value)} required /></label>
-        <label className="text-sm text-white/60">Phone<input className={input} value={form.phone} onChange={(event) => set("phone", event.target.value)} required /></label>
-        <label className="text-sm text-white/60 sm:col-span-2">Email<input type="email" className={input} value={form.email} onChange={(event) => set("email", event.target.value)} required /></label>
-      </div>
+      {(allowCarAddOns || baseTotal != null) && (
+        <section className="border-t border-white/8 pt-6">
+          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">4</span><div><h3 className="font-semibold">Optional</h3><p className="text-xs text-white/35">Only open these if you need them.</p></div></div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <label className="text-sm text-white/60">Year<input className={input} value={form.vehicleYear} onChange={(event) => set("vehicleYear", event.target.value)} required /></label>
-        <label className="text-sm text-white/60">Make<input className={input} value={form.vehicleMake} onChange={(event) => set("vehicleMake", event.target.value)} required /></label>
-        <label className="text-sm text-white/60">Model<input className={input} value={form.vehicleModel} onChange={(event) => set("vehicleModel", event.target.value)} required /></label>
-      </div>
+          <div className="space-y-3">
+            {allowCarAddOns && (
+              <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+                <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#FF2D2D]/35 bg-[#FF2D2D]/8 text-white" : "border-white/10 bg-black/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
+              </details>
+            )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="text-sm text-white/60"><p>Preferred date</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
-        <label className="text-sm text-white/60">Available time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#FF2D2D]">No standard times available. Try another date or message us.</span>}</label>
-      </div>
+            {baseTotal != null && (
+              <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+                <summary className="cursor-pointer text-sm font-semibold">Have a discount code?</summary>
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"><label className="flex-1 text-sm text-white/55">Discount code<input className={`${input} uppercase`} value={discountInput} onChange={(e) => setDiscountInput(e.target.value)} placeholder="Enter code" /></label><button type="button" onClick={applyDiscount} disabled={discountLoading} className="rounded-xl border border-white/12 px-4 py-3 text-sm font-semibold disabled:opacity-50">{discountLoading ? "Checking…" : "Apply"}</button>{appliedDiscount && <button type="button" onClick={() => { setAppliedDiscount(null); setDiscountInput(""); setDiscountMessage(""); }} className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/50">Remove</button>}</div>
+                {discountMessage && <p className={`mt-2 text-xs ${appliedDiscount ? "text-green-300" : "text-red-300"}`}>{discountMessage}</p>}
+              </details>
+            )}
 
-      {allowCarAddOns && (
-        <section className="rounded-[26px] border border-white/10 bg-white/[.025] p-5">
-          <div><p className="text-sm font-semibold">Car Detailing Add-Ons</p><p className="mt-1 text-xs text-white/35">Add-ons are added to the total as you select them. Headlight Restoration is ${bookingPricing.addOns.find((item) => item.id === "headlight-restoration")?.price.toFixed(0) || "80"} with a detail, or ${bookingPricing.headlightStandalonePrice.toFixed(0)} by itself.</p></div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm transition ${form.addOns.includes(item.id) ? "border-[#FF2D2D]/35 bg-[#FF2D2D]/8 text-white" : "border-white/10 bg-black/20 text-white/55"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-[#FF2D2D]">+${item.price.toFixed(2)}</strong></label>)}</div>
+            <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+              <summary className="cursor-pointer text-sm font-semibold">Add a note</summary>
+              <label className="mt-4 block text-sm text-white/55">Anything we should know?<textarea className={`${input} min-h-24`} value={form.serviceNotes} onChange={(event) => set("serviceNotes", event.target.value)} placeholder="Stains, pet hair, parking notes, anything important…" /></label>
+            </details>
+          </div>
         </section>
       )}
 
       {baseTotal != null && (
-        <section className="rounded-[26px] border border-white/10 bg-black/35 p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <label className="flex-1 text-sm text-white/60">Discount code<input className={`${input} uppercase`} value={discountInput} onChange={(e) => setDiscountInput(e.target.value)} placeholder="Enter code" /></label>
-            <button type="button" onClick={applyDiscount} disabled={discountLoading} className="rounded-2xl border border-[#FF2D2D]/35 bg-[#FF2D2D]/8 px-5 py-3 text-sm font-semibold text-[#FF2D2D] disabled:opacity-50">{discountLoading ? "Checking…" : "Apply Code"}</button>
-            {appliedDiscount && <button type="button" onClick={() => { setAppliedDiscount(null); setDiscountInput(""); setDiscountMessage(""); }} className="rounded-2xl border border-white/10 px-5 py-3 text-sm text-white/55">Remove</button>}
-          </div>
-          {discountMessage && <p className={`mt-2 text-xs ${appliedDiscount ? "text-green-300" : "text-red-300"}`}>{discountMessage}</p>}
-
-          <div className="mt-5 space-y-2 border-t border-white/10 pt-5 text-sm">
-            <div className="flex justify-between text-white/55"><span>Service / package</span><span>${Number(baseTotal).toFixed(2)}</span></div>
-            {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/50"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
-            {addOnTotal > 0 && <div className="flex justify-between text-white/65"><span>Add-ons subtotal</span><span>+${addOnTotal.toFixed(2)}</span></div>}
+        <section className="rounded-[22px] border border-white/10 bg-black/35 p-5">
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between text-white/48"><span>Service</span><span>${Number(baseTotal).toFixed(2)}</span></div>
+            {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/42"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
             {discountAmount > 0 && <div className="flex justify-between text-green-300"><span>Discount {appliedDiscount?.code ? `(${appliedDiscount.code})` : ""}</span><span>−${discountAmount.toFixed(2)}</span></div>}
-            <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/30">Exact booking total</p><p className="mt-1 text-xs text-white/35">We check it again when you submit</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
+            <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/28">Total</p><p className="mt-1 text-xs text-white/32">Checked again when you submit</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
           </div>
         </section>
       )}
 
-      <label className="block text-sm text-white/60">Notes<textarea className={`${input} min-h-28`} value={form.serviceNotes} onChange={(event) => set("serviceNotes", event.target.value)} placeholder="Anything we should know?" /></label>
+      <section className="space-y-3 border-t border-white/8 pt-6">
+        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request with the displayed total and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Privacy Policy</a>.</span></label>
 
-      <label className="flex items-start gap-3 text-sm text-white/55"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request with the displayed total and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Privacy Policy</a>.</span></label>
-
-      <div className="rounded-2xl border border-white/10 bg-white/[.025] p-4"><label className="flex items-start gap-3 text-sm text-white/60"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span>I agree to receive transactional and customer-care text messages from Car Dash Detailing about my quote, booking, appointment, and service updates. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/38">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Terms and Conditions</a>.</p></div>
+        <div className="rounded-2xl border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Terms and Conditions</a>.</p></div>
+      </section>
 
       {status !== "idle" && <div className={`rounded-2xl border p-4 text-sm ${status === "success" ? "border-green-800 bg-green-950/30 text-green-200" : "border-red-800 bg-red-950/30 text-red-200"}`}><p>{message}</p>{status === "success" && chatUrl && <a href={chatUrl} className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black">Open booking chat</a>}</div>}
 
-      <div className="flex gap-3">
-        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D] disabled:cursor-not-allowed disabled:opacity-50">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Submit $${bookingTotal.toFixed(2)} booking` : "Choose a service"}</button>
-        {onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-6 py-3">Close</button>}
+      <div className="flex flex-wrap gap-3">
+        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="min-w-[180px] rounded-full bg-[#FF2D2D] px-6 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Book for $${bookingTotal.toFixed(2)}` : "Choose a service"}</button>
+        {onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-6 py-3.5">Close</button>}
       </div>
     </form>
   );
+
 }

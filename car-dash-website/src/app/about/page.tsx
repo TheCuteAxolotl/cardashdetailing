@@ -1,69 +1,79 @@
 import PublicHero from "@/components/PublicHero";
 import SitePhoto from "@/components/SitePhoto";
-import PricingMediaStrip from "@/components/PricingMediaStrip";
 import { getSiteContent } from "@/lib/site-content";
 
 export default async function AboutPage() {
   const content = await getSiteContent();
+  const values = [
+    [content.aboutValue1Title, content.aboutValue1Body],
+    [content.aboutValue2Title, content.aboutValue2Body],
+    [content.aboutValue3Title, content.aboutValue3Body],
+  ];
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white">
-      <PublicHero content={content} imageCategory="about-hero" eyebrowKey="aboutEyebrow" titleKey="aboutTitle" bodyKey="aboutIntro" action={<a href="/quote" className="inline-flex rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]">Get an Exact Quote</a>} />
+    <div className="min-h-screen bg-[#F4F3EF] text-[#111]">
+      <PublicHero
+        content={content}
+        imageCategory="about-hero"
+        eyebrowKey="aboutEyebrow"
+        titleKey="aboutTitle"
+        bodyKey="aboutIntro"
+        action={
+          <div className="flex flex-wrap gap-3">
+            <a href="/#prices" className="inline-flex rounded-full bg-[#111] px-5 py-3 text-sm font-semibold text-white">See prices</a>
+            <a href="/#book" className="inline-flex rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-white">Book now</a>
+          </div>
+        }
+      />
 
-      <section className="bg-[#FFFFFF] text-black">
-        <div className="mx-auto grid max-w-[1540px] border-x border-black/10 lg:grid-cols-[1.05fr_.95fr]">
-          <div className="min-h-[520px]"><SitePhoto category="about-story" fallbackCategory="home-story" className="h-full min-h-[520px] w-full object-cover" /></div>
-          <div className="flex flex-col justify-center border-t border-black/10 px-5 py-16 sm:px-8 lg:border-l lg:border-t-0 lg:px-12 lg:py-24">
-            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#FF2D2D]">About</p>
-            <h2 className="mt-5 text-4xl font-semibold leading-[.95] tracking-[-.055em] sm:text-6xl">{content.aboutStoryTitle}</h2>
-            <p className="mt-7 max-w-xl text-base leading-8 text-black/52">{content.aboutStoryBody}</p>
+      <section className="border-b border-black/8 bg-white">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
+          <div className="overflow-hidden rounded-[28px] bg-[#111]">
+            <SitePhoto category="about-story" fallbackCategory="home-story" className="aspect-[4/3] h-full w-full object-cover" />
+          </div>
+          <div className="lg:pl-6">
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">About Car Dash</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-[.98] tracking-[-.05em] sm:text-5xl">{content.aboutStoryTitle}</h2>
+            <p className="mt-5 max-w-xl text-base leading-8 text-black/55">{content.aboutStoryBody}</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a href="/gallery" className="rounded-full border border-black/12 bg-[#F4F3EF] px-5 py-3 text-sm font-semibold">See our work</a>
+              <a href="/reviews" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Read reviews</a>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1540px] border-x border-white/10 bg-[#0D0D0D] px-5 py-10 sm:px-8 lg:px-10"><PricingMediaStrip category="about-story" /></section>
-
-      <section className="relative isolate overflow-hidden border-t border-white/10">
-        <SitePhoto category="about-values-bg" fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-20" />
-        <div className="absolute inset-0 -z-10 bg-black/86" />
-        <div className="mx-auto max-w-[1540px] border-x border-white/10 px-5 py-20 sm:px-8 lg:px-10">
-          <p className="text-[10px] uppercase tracking-[.28em] text-[#FF2D2D]">The basics</p>
-          <h2 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">{content.aboutValuesTitle}</h2>
-          <div className="mt-12 grid gap-px overflow-hidden rounded-[28px] border border-white/10 bg-white/10 md:grid-cols-3">
-            {[
-              [content.aboutValue1Title, content.aboutValue1Body],
-              [content.aboutValue2Title, content.aboutValue2Body],
-              [content.aboutValue3Title, content.aboutValue3Body],
-            ].map(([title, body], index) => (
-              <article key={title} className="bg-[#111318] p-7 sm:p-8">
-                <p className="text-xs font-semibold text-[#FF2D2D]">0{index + 1}</p>
-                <h3 className="mt-7 text-2xl font-semibold tracking-[-.035em]">{title}</h3>
-                <p className="mt-4 text-sm leading-7 text-white/45">{body}</p>
+      <section className="bg-[#0D0D0D] text-white">
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
+          <div className="grid gap-5 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">How we work</p>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">{content.aboutValuesTitle}</h2>
+            </div>
+            <p className="max-w-2xl text-sm leading-7 text-white/45">Simple service, clear communication, and work we can stand behind. You should know what you are paying for before the appointment starts.</p>
+          </div>
+          <div className="mt-8 grid overflow-hidden rounded-[26px] border border-white/10 md:grid-cols-3">
+            {values.map(([title, body], index) => (
+              <article key={title} className={`p-6 sm:p-7 ${index ? "border-t border-white/10 md:border-l md:border-t-0" : ""}`}>
+                <p className="text-xs font-bold text-[#FF2D2D]">0{index + 1}</p>
+                <h3 className="mt-4 text-xl font-semibold">{title}</h3>
+                <p className="mt-3 text-sm leading-7 text-white/45">{body}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
-      <section className="bg-white text-[#0D0D0D]">
-        <div className="mx-auto grid max-w-[1540px] gap-4 border-x border-black/10 px-5 py-16 sm:px-8 md:grid-cols-3 lg:px-10">
-          <a href="/paint-correction" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
-            <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Finish Guide</p>
-            <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Paint Correction</h3>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See the difference between a one-step enhancement, two-step correction, and heavier correction work.</p>
-            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See paint correction →</span>
-          </a>
-          <a href="/ceramic-coatings" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
-            <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Protection Guide</p>
-            <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Ceramic Coatings</h3>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See how we prep the paint and the GYEON and Gtechniq coatings we use.</p>
-            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See ceramic coatings →</span>
-          </a>
-          <a href="/products-we-use" className="group rounded-[28px] border border-black/10 bg-[#F7F9FA] p-7 hover:border-[#FF2D2D]/60">
-            <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#4A5568]">Products + Process</p>
-            <h3 className="mt-4 text-3xl font-semibold tracking-[-.04em]">Products We Use</h3>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-black/52">See the Koch-Chemie, GYEON, Gtechniq, and correction products we actually use on different surfaces.</p>
-            <span className="mt-6 inline-flex text-sm font-semibold text-[#FF2D2D]">See the products we use →</span>
-          </a>
+
+      <section className="bg-[#F4F3EF]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 sm:px-8 sm:py-16 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Ready when you are</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">See the price, then pick a time.</h2>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a href="/#prices" className="rounded-full border border-black/12 bg-white px-5 py-3 text-sm font-semibold">See all prices</a>
+            <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Book now</a>
+          </div>
         </div>
       </section>
     </div>

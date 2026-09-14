@@ -44,36 +44,23 @@ summary {
   touch-action: manipulation;
 }
 
-/* V4: every interactive control feels smoother instead of snapping on hover. */
+/* Public UI motion is intentionally subtle so the site feels fast and simple. */
 a,
 button,
 summary {
   transition:
-    color 280ms ease,
-    background-color 280ms ease,
-    border-color 280ms ease,
-    opacity 280ms ease,
-    filter 280ms ease,
-    transform 320ms cubic-bezier(.2,.75,.2,1),
-    box-shadow 320ms cubic-bezier(.2,.75,.2,1);
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 @media (hover: hover) {
-  a:hover,
-  button:hover,
-  summary:hover {
-    filter: brightness(1.1);
-  }
-
   a[class*="rounded"]:hover,
   button[class*="rounded"]:hover {
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 12px 34px rgba(255, 45, 45, 0.12);
-  }
-
-  a[class*="border"]:hover,
-  button[class*="border"]:hover {
-    border-color: rgba(255, 45, 45, 0.42);
+    transform: translateY(-1px);
   }
 }
 
@@ -235,23 +222,5 @@ img { display: block; }
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/* Keep Tailwind's utility transitions from snapping back to the default 150ms. */
-a, button, summary {
-  transition-duration: 280ms !important;
-  transition-timing-function: cubic-bezier(.2,.75,.2,1) !important;
-}
-
-button,
-a[class*="rounded"] {
-  opacity: .94;
-}
-
-@media (hover: hover) {
-  button:hover,
-  a[class*="rounded"]:hover {
-    opacity: 1;
   }
 }

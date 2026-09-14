@@ -28,12 +28,12 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
   );
 
   if (loading) {
-    return <div className="h-72 animate-pulse rounded-[24px] bg-white/5" />;
+    return <div className="h-72 animate-pulse rounded-[24px] border border-black/8 bg-black/[.04]" />;
   }
 
   if (!visible.length) {
     return (
-      <div className="rounded-[24px] border border-dashed border-white/15 p-8 text-sm text-white/35">
+      <div className="rounded-[24px] border border-dashed border-black/15 bg-white p-8 text-sm text-black/45">
         Gallery photos will show here after they’re added from the Owner Dashboard.
       </div>
     );

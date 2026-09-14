@@ -1,23 +1,29 @@
 import BookingForm from "@/components/BookingForm";
-import PublicHero from "@/components/PublicHero";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 import { getSiteContent } from "@/lib/site-content";
-
-const EMAIL = "cardashdetailing@gmail.com";
 
 export default async function ContactPage() {
   const content = await getSiteContent();
 
   return (
-    <div className="min-h-screen bg-[#080808] text-white">
-      <PublicHero content={content} imageCategory="contact-hero" eyebrowKey="contactEyebrow" titleKey="contactTitle" bodyKey="contactBody" action={<div className="flex flex-wrap gap-3"><a href={`tel:${BUSINESS_PHONE}`} className="inline-flex rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-semibold text-[#0D0D0D] transition hover:brightness-95">Call {BUSINESS_PHONE_DISPLAY}</a><a href={`sms:${BUSINESS_PHONE}`} className="inline-flex rounded-full border border-white/18 bg-black/25 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur hover:border-white/35 hover:text-white">Text us</a><a href={`mailto:${EMAIL}`} className="inline-flex rounded-full border border-white/18 bg-black/25 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur hover:border-white/35 hover:text-white">Email us</a></div>} />
-      <main className="relative isolate overflow-hidden">
-        <div className="mx-auto max-w-5xl px-5 py-14 sm:px-8 lg:py-20">
-          <div className="rounded-[30px] border border-white/10 bg-white/[.025] p-5 shadow-2xl sm:p-8">
-            <BookingForm initialSiteContent={content} />
+    <main className="min-h-screen bg-[#0D0D0D] text-white">
+      <section className="border-b border-white/8">
+        <div className="mx-auto grid max-w-7xl gap-5 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[.72fr_1.28fr] lg:items-end">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Book a detail</p>
+            <h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.055em] sm:text-6xl">Choose the service, day, and time.</h1>
+          </div>
+          <div>
+            <p className="max-w-2xl text-base leading-7 text-white/50">No account needed. Pick a fixed-price service, choose an open appointment, and see the total before you submit.</p>
+            <div className="mt-5 flex flex-wrap gap-3"><a href="/#prices" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">See all prices</a><a href={`tel:${BUSINESS_PHONE}`} className="rounded-full bg-white px-5 py-3 text-sm font-bold text-[#111]">Call {BUSINESS_PHONE_DISPLAY}</a><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold">Exact quote</a></div>
           </div>
         </div>
-      </main>
-    </div>
+      </section>
+      <section className="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-14">
+        <div className="rounded-[28px] border border-white/10 bg-[#151515] p-5 shadow-[0_24px_70px_rgba(0,0,0,.28)] sm:p-7">
+          <BookingForm initialSiteContent={content} />
+        </div>
+      </section>
+    </main>
   );
 }

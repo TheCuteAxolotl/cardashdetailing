@@ -1,57 +1,66 @@
+import SimplePricingHub from "@/components/SimplePricingHub";
+import { DEFAULT_PRICING_PAGES, parsePricingConfig } from "@/lib/pricing-config";
 import { parseBookingPricingConfig } from "@/lib/booking-pricing";
 import { getSiteContent } from "@/lib/site-content";
-
-const pages = [
-  { href: "/car-detailing-packages", eyebrow: "Complete Vehicle", title: "Car Detailing Packages", body: "Interior + exterior packages with pricing for coupes, sedans, trucks, and SUVs." },
-  { href: "/exterior-detailing", eyebrow: "Paint + Exterior", title: "Exterior Detailing", body: "Exterior washes, decontamination, protection, and paint enhancement." },
-  { href: "/interior-detailing", eyebrow: "Cabin + Interior", title: "Interior Detailing", body: "Interior refreshes, full details, and deeper cleaning when the cabin needs more work." },
-] as const;
+import { prisma } from "@/lib/prisma";
 
 export default async function ServicesPage() {
   const content = await getSiteContent();
+  const configs = {
+    packages: parsePricingConfig(content.pricingPackagesConfig, DEFAULT_PRICING_PAGES.packages),
+    interior: parsePricingConfig(content.pricingInteriorConfig, DEFAULT_PRICING_PAGES.interior),
+    exterior: parsePricingConfig(content.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior),
+  };
   const bookingPricing = parseBookingPricingConfig(content.bookingPricingConfig);
 
-  const carAddOns = bookingPricing.addOns.filter((item) => item.active);
+  let services: Array<{
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    startingPrice: number | null;
+    maxPrice: number | null;
+    pricingType: string;
+    category: string;
+    subcategory: string;
+  }> = [];
+
+  try {
+    services = await prisma.service.findMany({
+      where: { active: true },
+      orderBy: [{ category: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        price: true,
+        startingPrice: true,
+        maxPrice: true,
+        pricingType: true,
+        category: true,
+        subcategory: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error loading services page pricing:", error);
+  }
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <section className="border-b border-white/10 px-5 py-20 sm:px-8 sm:py-28">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Car Detailing</p>
-          <h1 className="mt-5 max-w-5xl text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Tell us what you want done. We’ll point you to the right service.</h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-white/50">You can start with a full detail, interior, or exterior package. Paint correction, ceramic coating, and marine detailing have their own pages when you need something more specific.</p>
+    <main className="min-h-screen bg-[#F4F3EF] text-[#111]">
+      <section className="border-b border-black/8 bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
+          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">All prices</p>
+          <div className="mt-3 grid gap-5 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
+            <h1 className="max-w-4xl text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Everything in one place.</h1>
+            <div>
+              <p className="max-w-2xl text-base leading-7 text-black/52">Compare the prices, tap the package that fits your vehicle, and go straight to booking. You do not need to open a separate page for every service.</p>
+              <div className="mt-5 flex flex-wrap gap-3"><a href="/#book" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">Book now</a><a href="/quote" className="rounded-full border border-black/12 bg-white px-5 py-3 text-sm font-semibold">Get an exact quote</a></div>
+            </div>
+          </div>
         </div>
       </section>
-
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
-        <div className="grid gap-6 lg:grid-cols-3">
-          {pages.map((page) => (
-            <a key={page.href} href={page.href} className="group rounded-[30px] border border-white/10 bg-[#111318] p-7 transition duration-300 hover:-translate-y-1 hover:border-[#FF2D2D]/35 hover:bg-[#FF2D2D]/[.035]">
-              <p className="text-[11px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">{page.eyebrow}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-.04em]">{page.title}</h2>
-              <p className="mt-4 text-sm leading-7 text-white/45">{page.body}</p>
-              <span className="mt-8 inline-block text-sm font-semibold text-white/70 group-hover:text-[#FF2D2D]">View pricing →</span>
-            </a>
-          ))}
-        </div>
-        <div className="mt-6 rounded-[28px] border border-white/10 bg-white/[.02] p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
-          <div><p className="text-xs font-bold uppercase tracking-[.25em] text-[#FF2D2D]">Marine Detailing</p><h2 className="mt-2 text-2xl font-semibold">Boat detailing has its own services and pricing.</h2></div>
-          <a href="/marine-detailing" className="mt-5 inline-flex rounded-full border border-white/15 px-5 py-3 text-sm font-semibold sm:mt-0">Marine Detailing →</a>
-        </div>
-      </section>
-
-      <section id="car-add-ons" className="scroll-mt-32 border-t border-white/10 bg-[#111318]/60">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[.72fr_1.28fr] lg:py-20">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Car Detailing Add-Ons</p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">Add-ons when the car needs a little more work.</h2>
-            <p className="mt-5 text-sm leading-7 text-white/45">Add these when your vehicle needs them. Headlight Restoration uses the add-on price shown here with a detail and costs ${bookingPricing.headlightStandalonePrice.toFixed(0)} by itself. For heavy contamination or anything outside the normal menu, send us photos for an exact quote.</p>
-            <div className="mt-6 flex flex-wrap gap-3"><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Get an Exact Quote</a><a href="/quote" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Ask us about add-ons</a></div>
-          </div>
-          <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0D0D0D]">
-            {carAddOns.map((item, index) => <div key={item.id} className={`flex items-center justify-between gap-5 px-5 py-4 sm:px-6 ${index !== carAddOns.length - 1 ? "border-b border-white/8" : ""}`}><span className="text-sm text-white/70">{item.name}</span><span className="text-sm font-semibold text-[#FF2D2D]">${item.price.toFixed(0)}</span></div>)}
-          </div>
-        </div>
+        <SimplePricingHub configs={configs} bookingPricing={bookingPricing} services={services} />
       </section>
     </main>
   );

@@ -248,7 +248,7 @@ export default function AccountPage() {
                   {staffAccess ? "Staff Dashboard" : "Dashboard"}
                 </a>
               )}
-              <a href="/contact" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
+              <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
                 Request a Detail
               </a>
               <button
@@ -503,7 +503,7 @@ export default function AccountPage() {
             <div className="mt-8 rounded-3xl border border-dashed border-white/10 px-6 py-12 text-center">
               <p className="text-lg font-semibold">No detail requests yet.</p>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-white/35">When you request a service while signed in, its status will appear here.</p>
-              <a href="/contact" className="mt-6 inline-block rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">Request a Detail</a>
+              <a href="/#book" className="mt-6 inline-block rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">Request a Detail</a>
             </div>
           )}
         </section>

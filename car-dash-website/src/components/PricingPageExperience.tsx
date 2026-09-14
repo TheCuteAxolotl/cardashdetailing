@@ -1,122 +1,90 @@
-"use client";
-
-import { useMemo, useState } from "react";
 import PricingMediaStrip from "@/components/PricingMediaStrip";
-import SitePhoto from "@/components/SitePhoto";
-import { PricingPageConfig, VEHICLE_LABELS, VehicleClass } from "@/lib/pricing-config";
+import type { PricingPageConfig, VehicleClass } from "@/lib/pricing-config";
+import { VEHICLE_LABELS } from "@/lib/pricing-config";
 
 type PageKind = "packages" | "exterior" | "interior";
 
-const slugs: Record<PageKind, string> = {
-  packages: "car-packages",
-  exterior: "exterior",
-  interior: "interior",
-};
-
 const pageLabels: Record<PageKind, string> = {
-  packages: "Car Detailing Packages",
-  exterior: "Exterior Detailing",
-  interior: "Interior Detailing",
+  packages: "Full detail",
+  exterior: "Exterior only",
+  interior: "Interior only",
 };
 
-export default function PricingPageExperience({ kind, initialConfig }: { kind: PageKind; initialConfig: PricingPageConfig }) {
-  const [config] = useState<PricingPageConfig>(initialConfig);
-  const [vehicle, setVehicle] = useState<VehicleClass>("sedan");
-  const slug = slugs[kind];
+function bookingHref(kind: PageKind, packageId: string, vehicleClass: VehicleClass) {
+  return `/?pricingPage=${encodeURIComponent(kind)}&packageId=${encodeURIComponent(packageId)}&vehicleClass=${encodeURIComponent(vehicleClass)}#book`;
+}
 
-
-  const packageCount = useMemo(() => config.packages.length, [config.packages.length]);
-
+export default function PricingPageExperience({ kind, initialConfig: config }: { kind: PageKind; initialConfig: PricingPageConfig }) {
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <section className="relative isolate overflow-hidden border-b border-white/10">
-        <SitePhoto category={`pricing-${slug}-hero`} fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover" />
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(13,13,13,.97)_0%,rgba(13,13,13,.82)_52%,rgba(13,13,13,.58)_100%)]" />
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
-          <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">{config.eyebrow}</p>
-          <h1 className="mt-5 max-w-5xl text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">{config.title}</h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-white/55 sm:text-lg">{config.body}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href="#pricing" className="rounded-full bg-[#FF2D2D] px-6 py-3 text-sm font-semibold text-[#0D0D0D]">View Packages</a>
-            <a href="/quote" className="rounded-full border border-white/15 bg-black/25 px-6 py-3 text-sm font-semibold">Ask About Your Vehicle</a>
+    <main className="min-h-screen bg-[#F4F3EF] text-[#111]">
+      <section className="border-b border-black/8 bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
+          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">{pageLabels[kind]}</p>
+          <div className="mt-3 grid gap-6 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
+            <h1 className="max-w-4xl text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">{config.title}</h1>
+            <div>
+              <p className="max-w-2xl text-base leading-7 text-black/52">{config.body}</p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <a href="#pricing" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a>
+                <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Book now</a>
+                <a href="/quote" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Exact quote</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
-        <PricingMediaStrip category={`pricing-${slug}-intro`} />
+      <section className="mx-auto max-w-7xl px-5 pt-8 sm:px-8 sm:pt-10">
+        <PricingMediaStrip category={`pricing-${kind === "packages" ? "car-packages" : kind}-intro`} />
       </section>
 
-      <section id="pricing" className="mx-auto max-w-7xl scroll-mt-32 px-5 pb-20 sm:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Packages</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Pick your vehicle size to see the standard price.</h2>
-          <p className="mt-5 text-white/45">These are the normal package prices. If your vehicle is much cleaner or dirtier than average, or you need something outside the package, send us a few photos and we’ll quote it first.</p>
+      <section id="pricing" className="mx-auto max-w-7xl scroll-mt-28 px-5 py-12 sm:px-8 sm:py-16">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Standard prices</p>
+            <h2 className="mt-2 text-4xl font-semibold tracking-[-.05em]">Pick your vehicle size.</h2>
+          </div>
+          <a href="/#prices" className="text-sm font-semibold text-black/45">See every service + price →</a>
         </div>
 
-        <div className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2 rounded-[26px] border border-white/10 bg-[#111318] p-3">
-          {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setVehicle(key)}
-              className={`min-w-[145px] flex-1 rounded-[20px] border px-5 py-4 text-sm font-semibold transition duration-300 ${vehicle === key ? "border-[#FF2D2D]/55 bg-[#FF2D2D]/10 text-white shadow-[0_0_32px_rgba(255,45,45,.10)]" : "border-white/10 bg-black/15 text-white/55 hover:border-[#FF2D2D]/30 hover:text-white"}`}
-            >
-              {VEHICLE_LABELS[key]}
-            </button>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {config.packages.map((pkg) => (
+            <article key={pkg.id} className={`rounded-[26px] border p-5 sm:p-6 ${pkg.featured ? "border-[#FF2D2D]/35 bg-[#fff8f7] shadow-[0_18px_50px_rgba(0,0,0,.07)]" : "border-black/10 bg-white"}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#FF2D2D]">{pkg.tier}</p>
+                  <h3 className="mt-2 text-2xl font-semibold tracking-[-.035em]">{pkg.name}</h3>
+                </div>
+                {pkg.badge && <span className="rounded-full bg-[#FF2D2D] px-3 py-1.5 text-[10px] font-bold text-white">{pkg.badge}</span>}
+              </div>
+              <p className="mt-3 min-h-12 text-sm leading-6 text-black/48">{pkg.description}</p>
+
+              <div className="mt-5 overflow-hidden rounded-2xl border border-black/10 bg-[#F7F7F5]">
+                {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
+                  <a key={vehicleClass} href={bookingHref(kind, pkg.id, vehicleClass)} className={`flex min-h-14 items-center justify-between gap-4 px-4 py-3 hover:bg-white ${index ? "border-t border-black/8" : ""}`}>
+                    <span className="text-sm font-medium text-black/60">{VEHICLE_LABELS[vehicleClass]}</span>
+                    <span className="flex items-center gap-3"><strong className="text-lg">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong><span className="text-xs font-semibold text-[#FF2D2D]">Book →</span></span>
+                  </a>
+                ))}
+              </div>
+
+              <details className="mt-4 rounded-2xl border border-black/8 bg-black/[.02] px-4 py-3">
+                <summary className="cursor-pointer text-sm font-semibold text-black/65">What’s included</summary>
+                <ul className="mt-3 space-y-2 pb-1 text-sm leading-5 text-black/48">
+                  {pkg.features.map((feature) => <li key={feature} className="flex gap-2"><span className="text-[#FF2D2D]">✓</span><span>{feature}</span></li>)}
+                </ul>
+              </details>
+            </article>
           ))}
         </div>
 
-        <div className={`mt-12 grid gap-6 ${packageCount >= 3 ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
-          {config.packages.map((pkg) => {
-            const price = Number(pkg.prices?.[vehicle] || 0);
-            const bookingHref = `/contact?pricingPage=${encodeURIComponent(kind)}&packageId=${encodeURIComponent(pkg.id)}&vehicleClass=${encodeURIComponent(vehicle)}`;
-            return (
-              <article key={pkg.id} className={`relative flex min-h-full flex-col overflow-hidden rounded-[32px] border p-6 sm:p-7 ${pkg.featured ? "border-[#FF2D2D]/45 bg-[linear-gradient(180deg,rgba(255,45,45,.07),rgba(74,85,104,.08)_24%,rgba(255,255,255,.02))] shadow-[0_22px_70px_rgba(0,0,0,.32)]" : "border-white/10 bg-[#111318]"}`}>
-                {pkg.badge && <span className="absolute right-5 top-5 rounded-full bg-[#FF2D2D] px-4 py-2 text-[10px] font-black uppercase tracking-[.18em] text-[#0D0D0D]">{pkg.badge}</span>}
-                <PricingMediaStrip category={`pricing-${slug}-pkg-${pkg.id}`} className="mb-6" />
-                <p className="text-[11px] font-bold uppercase tracking-[.24em] text-[#FF2D2D]">{pkg.tier}</p>
-                <h3 className="mt-3 pr-20 text-3xl font-semibold tracking-[-.04em]">{pkg.name}</h3>
-                <p className="mt-4 min-h-16 text-sm leading-7 text-white/48">{pkg.description}</p>
-                <div className="mt-6 border-y border-white/10 py-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[.22em] text-white/35">Standard package · {VEHICLE_LABELS[vehicle]}</p>
-                  <p className="mt-2 text-5xl font-semibold tracking-[-.05em]"><span className="mr-1 text-2xl text-[#FF2D2D]">$</span>{price.toFixed(0)}</p>
-                </div>
-                <ul className="mt-6 flex-1 space-y-0">
-                  {pkg.features.map((feature) => (
-                    <li key={feature} className="flex gap-3 border-b border-white/[.07] py-3 text-sm leading-6 text-white/68 last:border-b-0">
-                      <span className="font-black text-[#FF2D2D]">✓</span><span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a href={bookingHref} className={`mt-7 block rounded-[20px] px-5 py-4 text-center text-sm font-bold transition duration-300 hover:-translate-y-0.5 ${pkg.featured ? "bg-[#FF2D2D] text-[#0D0D0D] shadow-[0_0_30px_rgba(255,45,45,.13)]" : "border border-white/15 bg-white/[.035] text-white hover:border-[#FF2D2D]/35 hover:bg-[#FF2D2D]/8"}`}>
-                  {pkg.ctaLabel} →
-                </a>
-              </article>
-            );
-          })}
-        </div>
-
-        <div className="mt-8 rounded-[26px] border border-white/10 bg-white/[.025] px-6 py-5 text-sm leading-7 text-white/45">
-          <span className="font-semibold text-white/75">Pricing note:</span> {config.priceNote}
-        </div>
+        <div className="mt-6 rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm leading-6 text-black/50"><strong className="text-black/75">Pricing note:</strong> {config.priceNote}</div>
       </section>
 
-      <section className="border-y border-white/10 bg-[#111318]/70">
-        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div><p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Recent Work</p><h2 className="mt-3 text-4xl font-semibold tracking-[-.05em]">See more of the work we’ve done recently.</h2></div>
-            <a href="/gallery" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">View Gallery</a>
-          </div>
-          <PricingMediaStrip category={`pricing-${slug}-results`} className="mt-8" />
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8">
-        <div className="rounded-[34px] border border-[#FF2D2D]/20 bg-[linear-gradient(130deg,rgba(255,45,45,.08),rgba(74,85,104,.08),rgba(255,255,255,.015))] p-8 sm:p-12">
-          <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Package price or exact quote</p>
-          <h2 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-.05em] sm:text-6xl">Know what you want? Book the package. Not sure? Send us photos and we’ll quote your vehicle.</h2>
-          <div className="mt-8 flex flex-wrap gap-3"><a href="#pricing" className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D]">Choose a package</a><a href="/quote" className="rounded-full border border-white/15 px-6 py-3 font-semibold">Get an Exact Quote</a></div>
+      <section className="border-t border-black/8 bg-[#111] text-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Ready?</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Choose a price and book an open time.</h2></div>
+          <div className="flex gap-3"><a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold">Book now</a><a href="/quote" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Exact quote</a></div>
         </div>
       </section>
     </main>
