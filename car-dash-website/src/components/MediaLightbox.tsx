@@ -28,9 +28,14 @@ export function MediaVisual({ item, thumbnail = false, className = "" }: { item:
     return <iframe src={embed || undefined} title={item.title} className={className} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />;
   }
 
-  if (kind === "vimeo") {
+  if (kind === "vimeo" || kind === "instagram") {
     if (thumbnail) {
-      return <div className={`relative flex items-center justify-center bg-[#151515] ${className}`}><span className="text-xs font-semibold uppercase tracking-[.18em] text-white/45">Video</span><PlayBadge /></div>;
+      return (
+        <div className={`relative flex items-center justify-center bg-[#151515] ${className}`}>
+          <span className="text-xs font-semibold uppercase tracking-[.18em] text-white/45">{kind === "instagram" ? "Instagram" : "Video"}</span>
+          <PlayBadge />
+        </div>
+      );
     }
     const embed = getMediaEmbedUrl(item.url);
     return <iframe src={embed || undefined} title={item.title} className={className} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />;

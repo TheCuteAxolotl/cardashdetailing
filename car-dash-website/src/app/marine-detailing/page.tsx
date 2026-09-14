@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import PricingMediaStrip from "@/components/PricingMediaStrip";
+import SitePhoto from "@/components/SitePhoto";
+import PageMediaBand from "@/components/PageMediaBand";
 
  type Service = {
   id: string;
@@ -57,9 +59,9 @@ export default function MarineDetailingPage() {
   return (
     <main className="min-h-screen bg-[#F4F3EF] text-[#111]">
       <section className="border-b border-black/8 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-6 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
-          <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Marine detailing</p><h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Boat cleaning, correction, and protection.</h1></div>
-          <div><p className="max-w-2xl text-base leading-7 text-black/52">Marine pricing depends a lot on length, condition, oxidation, access, and the work you want done. Current marine services and prices are listed below.</p><div className="mt-5 flex flex-wrap gap-3"><a href="#marine-prices" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Marine quote</a><a href="/#book" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Book</a></div></div>
+        <div className="mx-auto grid max-w-7xl gap-7 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
+          <div className="flex flex-col justify-center py-3 lg:py-8"><p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Marine detailing</p><h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Boat cleaning, correction, and protection.</h1><p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Marine pricing depends a lot on length, condition, oxidation, access, and the work you want done. Current marine services and prices are listed below.</p><div className="mt-5 flex flex-wrap gap-3"><a href="#marine-prices" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Marine quote</a><a href="/#book" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Book</a></div></div>
+          <div className="relative min-h-[300px] overflow-hidden rounded-[26px] bg-black sm:min-h-[380px]"><SitePhoto category="marine-hero" fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" /></div>
         </div>
       </section>
 
@@ -89,6 +91,7 @@ export default function MarineDetailingPage() {
 
         <div className="mt-8 rounded-[24px] border border-black/10 bg-[#111] p-6 text-white"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#FF2D2D]">Pricing note</p><p className="mt-3 max-w-4xl text-sm leading-7 text-white/48">Final marine pricing can change with oxidation, mold, waterline buildup, accessibility, wet sanding, coating prep, and the overall condition of the boat. We confirm anything outside the listed service before starting.</p></div>
       </section>
+      <PageMediaBand categories={["marine-results"]} theme="light" className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16" />
     </main>
   );
 }

@@ -1,4 +1,6 @@
 import PricingMediaStrip from "@/components/PricingMediaStrip";
+import SitePhoto from "@/components/SitePhoto";
+import PageMediaBand from "@/components/PageMediaBand";
 import type { PricingPageConfig, VehicleClass } from "@/lib/pricing-config";
 import { VEHICLE_LABELS } from "@/lib/pricing-config";
 import PackageMediaEvidence from "@/components/PackageMediaEvidence";
@@ -20,18 +22,20 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
   return (
     <main className="min-h-screen bg-[#F4F3EF] text-[#111]">
       <section className="border-b border-black/8 bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20">
-          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">{pageLabels[kind]}</p>
-          <div className="mt-3 grid gap-6 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
-            <h1 className="max-w-4xl text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">{config.title}</h1>
-            <div>
-              <p className="max-w-2xl text-base leading-7 text-black/52">{config.body}</p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <a href="#pricing" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a>
-                <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Book now</a>
-                <a href="/quote" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Exact quote</a>
-              </div>
+        <div className="mx-auto grid max-w-7xl gap-7 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
+          <div className="flex flex-col justify-center py-3 lg:py-8">
+            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">{pageLabels[kind]}</p>
+            <h1 className="mt-3 max-w-4xl text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">{config.title}</h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-black/52">{config.body}</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <a href="#pricing" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a>
+              <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Book now</a>
+              <a href="/quote" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Exact quote</a>
             </div>
+          </div>
+          <div className="relative min-h-[300px] overflow-hidden rounded-[26px] bg-black sm:min-h-[380px]">
+            <SitePhoto category={`pricing-${kind === "packages" ? "car-packages" : kind}-hero`} fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           </div>
         </div>
       </section>
@@ -83,6 +87,8 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
 
         <div className="mt-6 rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm leading-6 text-black/50"><strong className="text-black/75">Pricing note:</strong> {config.priceNote}</div>
       </section>
+
+      <PageMediaBand categories={[`pricing-${kind === "packages" ? "car-packages" : kind}-results`]} theme="light" className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16" />
 
       <section className="border-t border-black/8 bg-[#111] text-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-8">

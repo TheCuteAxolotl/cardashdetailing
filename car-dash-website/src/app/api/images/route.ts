@@ -2,21 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
+import { getMediaKind } from "@/lib/media";
+import { isPhotoOnlyMediaCategory } from "@/lib/media-placements";
 
 const MAX_IMAGE_DATA_URL_CHARS = 1_600_000;
 const MAX_VIDEO_DATA_URL_CHARS = 3_600_000;
-
-function isSupportedVideoUrl(value: string) {
-  if (!/^https?:\/\//i.test(value)) return false;
-  try {
-    const url = new URL(value);
-    const host = url.hostname.replace(/^www\./, "").toLowerCase();
-    if (["youtube.com", "m.youtube.com", "youtu.be", "vimeo.com", "player.vimeo.com"].includes(host)) return true;
-    return /\.(mp4|webm|mov|m4v|ogv|ogg)$/i.test(url.pathname);
-  } catch {
-    return false;
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -100,11 +90,19 @@ export async function POST(request: NextRequest) {
     const mediaUrl = String(url).trim();
     const isImageData = mediaUrl.startsWith("data:image/");
     const isVideoData = mediaUrl.startsWith("data:video/");
-    const isExternalVideo = isSupportedVideoUrl(mediaUrl);
+    const mediaKind = getMediaKind(mediaUrl);
+    const isExternalMedia = /^https?:\/\//i.test(mediaUrl) && mediaKind !== "image";
 
-    if (!isImageData && !isVideoData && !isExternalVideo) {
+    if (!isImageData && !isVideoData && !isExternalMedia) {
       return NextResponse.json(
-        { error: "Upload a photo/video, or use a YouTube, Vimeo, or direct video link" },
+        { error: "Upload a photo/video, or use a YouTube, Vimeo, Instagram, or direct video link" },
+        { status: 400 }
+      );
+    }
+
+    if (isPhotoOnlyMediaCategory(String(category)) && mediaKind !== "image") {
+      return NextResponse.json(
+        { error: "That placement is a hero photo spot. Choose a photo instead of a video." },
         { status: 400 }
       );
     }

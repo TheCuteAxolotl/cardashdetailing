@@ -52,7 +52,7 @@ export default function ProductsWeUsePage() {
 
       <section className="bg-[#0D0D0D] text-white">
         <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-          <PricingMediaStrip category="products-gallery" />
+          <PricingMediaStrip category="products-gallery" theme="dark" />
           <p className="mt-6 max-w-4xl text-xs leading-6 text-white/35">Brand names are shown so customers can see the type of professional products used during service. Product selection can change as vehicle needs and professional product lines evolve. Car Dash Detailing does not imply sponsorship or endorsement by the brands listed.</p>
         </div>
       </section>

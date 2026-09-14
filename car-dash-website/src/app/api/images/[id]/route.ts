@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import { getMediaKind } from "@/lib/media";
+import { isPhotoOnlyMediaCategory } from "@/lib/media-placements";
 
 async function canManageGallery(request: NextRequest) {
   const auth = await getCurrentAccountFromRequest(request);
@@ -21,6 +23,15 @@ export async function PUT(
 
     const { title, category } = await request.json();
     const params = await context.params;
+    const nextCategory = String(category || "gallery").trim().slice(0, 120);
+
+    if (isPhotoOnlyMediaCategory(nextCategory)) {
+      const existing = await prisma.galleryImage.findUnique({ where: { id: params.id }, select: { url: true } });
+      if (!existing) return NextResponse.json({ error: "Media not found" }, { status: 404 });
+      if (getMediaKind(existing.url) !== "image") {
+        return NextResponse.json({ error: "Hero placements only accept photos." }, { status: 400 });
+      }
+    }
 
     const image = await prisma.galleryImage.update({
       where: {
@@ -30,9 +41,7 @@ export async function PUT(
         title: String(title || "Untitled")
           .trim()
           .slice(0, 120),
-        category: String(category || "gallery")
-          .trim()
-          .slice(0, 120),
+        category: nextCategory,
       },
     });
 

@@ -80,7 +80,12 @@ export default async function Home() {
   let pricingMedia: Array<{ id: string; url: string; title: string; category: string }> = [];
   try {
     pricingMedia = await prisma.galleryImage.findMany({
-      where: { category: { startsWith: "pricing-" } },
+      where: {
+        OR: [
+          { category: { startsWith: "pricing-" } },
+          { category: { startsWith: "service-" } },
+        ],
+      },
       orderBy: { createdAt: "desc" },
       select: { id: true, url: true, title: true, category: true },
     });

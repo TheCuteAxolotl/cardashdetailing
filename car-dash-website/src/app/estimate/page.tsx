@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import PageMediaBand from "@/components/PageMediaBand";
 
 type Service = { id:string; title:string; price:number; startingPrice:number|null; maxPrice:number|null; pricingType:string; category:string; active:boolean };
 
@@ -52,6 +53,8 @@ export default function EstimatePage() {
         <p className="text-xs font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Instant Estimate</p>
         <h1 className="mt-3 text-5xl font-semibold tracking-[-.05em]">Get a quick price range before you send a quote request.</h1>
         <p className="mt-4 max-w-2xl text-white/45">This is only an estimate. For an exact price, send us the vehicle info and a few photos.</p>
+
+        <PageMediaBand categories={["estimate-media"]} theme="dark" compact className="mt-8" />
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(145deg,rgba(74,85,104,.12),rgba(255,255,255,.025))] p-6">

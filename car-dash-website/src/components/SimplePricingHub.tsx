@@ -3,6 +3,7 @@ import { VEHICLE_LABELS } from "@/lib/pricing-config";
 import type { BookingPricingConfig } from "@/lib/booking-pricing";
 import PackageMediaEvidence from "@/components/PackageMediaEvidence";
 import type { MediaItem } from "@/lib/media";
+import ServiceMediaEvidence from "@/components/ServiceMediaEvidence";
 
 export type PublicServiceSummary = {
   id: string;
@@ -143,6 +144,9 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
                       <span className="rounded-full bg-black/[.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[.12em] text-black/42">{service.category}</span>
                     </div>
                     <p className="mt-1 line-clamp-2 max-w-3xl text-sm leading-6 text-black/45">{service.description}</p>
+                    <div className="mt-3">
+                      <ServiceMediaEvidence items={mediaItems.filter((item) => item.category === `service-${service.id}`)} />
+                    </div>
                   </div>
                   <strong className="text-xl text-[#111]">{servicePrice(service)}</strong>
                   <a href={href} className={`rounded-full px-4 py-2.5 text-center text-xs font-bold ${canBook ? "bg-[#111] text-white" : "border border-black/12 text-[#111]"}`}>{canBook ? "Book" : "Get quote"}</a>

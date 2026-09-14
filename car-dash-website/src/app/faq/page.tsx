@@ -1,4 +1,5 @@
 import PublicHero from "@/components/PublicHero";
+import PageMediaBand from "@/components/PageMediaBand";
 import { getSiteContent } from "@/lib/site-content";
 
 export default async function FAQPage() {
@@ -22,6 +23,7 @@ export default async function FAQPage() {
         bodyKey="faqBody"
         action={<a href="/#book" className="inline-flex rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-white">Book now</a>}
       />
+      <PageMediaBand categories={["faq-media"]} theme="light" compact className="mx-auto max-w-5xl px-5 pt-10 sm:px-8" />
       <main className="mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-16">
         <div className="overflow-hidden rounded-[26px] border border-black/10 bg-white">
           {items.map((item, index) => (

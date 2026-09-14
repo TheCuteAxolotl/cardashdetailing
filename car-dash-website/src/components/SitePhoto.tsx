@@ -27,9 +27,9 @@ export default function SitePhoto({
     if (fallbackCategory && fallbackCategory !== category) {
       query.append("category", fallbackCategory);
     }
-    query.set("limit", "12");
+    query.set("limit", "50");
 
-    fetch(`/api/images?${query.toString()}`)
+    fetch(`/api/images?${query.toString()}`, { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : []))
       .then((items: GalleryImage[]) => {
         if (cancelled) return;
@@ -64,7 +64,8 @@ export default function SitePhoto({
       src={image.url}
       alt={alt || image.title}
       className={className}
-      loading={category === "hero" ? "eager" : "lazy"}
+      loading={category === "hero" || category.endsWith("-hero") ? "eager" : "lazy"}
+      fetchPriority={category === "hero" || category.endsWith("-hero") ? "high" : "auto"}
     />
   );
 }

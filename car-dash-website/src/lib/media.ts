@@ -5,7 +5,7 @@ export type MediaItem = {
   category: string;
 };
 
-export type MediaKind = "image" | "video" | "youtube" | "vimeo";
+export type MediaKind = "image" | "video" | "youtube" | "vimeo" | "instagram";
 
 export function getYouTubeId(raw: string): string | null {
   try {
@@ -36,12 +36,30 @@ export function getVimeoId(raw: string): string | null {
   }
 }
 
+
+export function getInstagramEmbedUrl(raw: string): string | null {
+  try {
+    const url = new URL(raw);
+    const host = url.hostname.replace(/^www\./, "").toLowerCase();
+    if (host !== "instagram.com") return null;
+    const parts = url.pathname.split("/").filter(Boolean);
+    const kind = parts[0];
+    const shortcode = parts[1];
+    if (!["p", "reel", "reels", "tv"].includes(kind || "") || !shortcode) return null;
+    const normalizedKind = kind === "reels" ? "reel" : kind;
+    return `https://www.instagram.com/${normalizedKind}/${encodeURIComponent(shortcode)}/embed/`;
+  } catch {
+    return null;
+  }
+}
+
 export function getMediaKind(raw: string): MediaKind {
   const value = String(raw || "").trim();
   if (value.startsWith("data:image/")) return "image";
   if (value.startsWith("data:video/")) return "video";
   if (getYouTubeId(value)) return "youtube";
   if (getVimeoId(value)) return "vimeo";
+  if (getInstagramEmbedUrl(value)) return "instagram";
 
   try {
     const url = new URL(value);
@@ -63,6 +81,8 @@ export function getMediaEmbedUrl(raw: string): string | null {
   if (youtubeId) return `https://www.youtube.com/embed/${encodeURIComponent(youtubeId)}?rel=0`;
   const vimeoId = getVimeoId(raw);
   if (vimeoId) return `https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}`;
+  const instagramEmbed = getInstagramEmbedUrl(raw);
+  if (instagramEmbed) return instagramEmbed;
   return null;
 }
 
@@ -75,7 +95,7 @@ export function getMediaThumbnailUrl(raw: string): string | null {
 export function isSupportedExternalVideoUrl(raw: string) {
   const value = String(raw || "").trim();
   if (!/^https?:\/\//i.test(value)) return false;
-  if (getYouTubeId(value) || getVimeoId(value)) return true;
+  if (getYouTubeId(value) || getVimeoId(value) || getInstagramEmbedUrl(value)) return true;
   try {
     const url = new URL(value);
     return /\.(mp4|webm|mov|m4v|ogv|ogg)$/i.test(url.pathname);

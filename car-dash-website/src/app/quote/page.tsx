@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import PageMediaBand from "@/components/PageMediaBand";
 
 type Vehicle = {
   id: string;
@@ -248,6 +249,8 @@ export default function QuotePage() {
             <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get an Exact Quote</h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. If you can, add a few photos. A clean SUV may be less work than the standard SUV price, while pet hair, stains, or heavier buildup can make it more.</p>
           </div>
+
+          <PageMediaBand categories={["quote-media"]} theme="dark" compact className="mt-8" />
 
           <form onSubmit={create} className="mt-10 rounded-[30px] border border-white/10 bg-white/[.025] p-5 sm:p-8">
             <div className="grid gap-5 md:grid-cols-2">

@@ -14,7 +14,7 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
     ["gallery", "before-after", "portfolio"].forEach((category) => query.append("category", category));
     query.set("limit", String(typeof limit === "number" ? Math.max(limit, 1) : 30));
 
-    fetch(`/api/images?${query.toString()}`)
+    fetch(`/api/images?${query.toString()}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
       .then((d) => setItems(Array.isArray(d) ? d : []))
       .catch(() => setItems([]))

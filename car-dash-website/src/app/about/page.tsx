@@ -1,5 +1,6 @@
 import PublicHero from "@/components/PublicHero";
 import SitePhoto from "@/components/SitePhoto";
+import PageMediaBand from "@/components/PageMediaBand";
 import { getSiteContent } from "@/lib/site-content";
 
 export default async function AboutPage() {
@@ -52,6 +53,7 @@ export default async function AboutPage() {
             </div>
             <p className="max-w-2xl text-sm leading-7 text-white/45">Simple service, clear communication, and work we can stand behind. You should know what you are paying for before the appointment starts.</p>
           </div>
+          <PageMediaBand categories={["about-values-bg"]} theme="dark" compact className="mt-8" />
           <div className="mt-8 grid overflow-hidden rounded-[26px] border border-white/10 md:grid-cols-3">
             {values.map(([title, body], index) => (
               <article key={title} className={`p-6 sm:p-7 ${index ? "border-t border-white/10 md:border-l md:border-t-0" : ""}`}>

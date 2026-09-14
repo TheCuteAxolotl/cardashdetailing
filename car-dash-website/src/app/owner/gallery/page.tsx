@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { DEFAULT_PRICING_PAGES, PricingPageConfig, parsePricingConfig } from "@/lib/pricing-config";
 import { MediaVisual } from "@/components/MediaLightbox";
 import type { MediaItem } from "@/lib/media";
+import { getMediaKind } from "@/lib/media";
+import { STATIC_MEDIA_PLACEMENTS, getMediaPlacementPath, type MediaPlacement } from "@/lib/media-placements";
 
-type Placement = { value: string; label: string; group: string };
+type Placement = MediaPlacement;
 type MediaMode = "photo" | "video-file" | "video-url";
 
 type PricingConfigs = {
@@ -44,48 +46,8 @@ async function videoFileToDataUrl(file: File): Promise<string> {
   });
 }
 
-const staticPlacements: Placement[] = [
-  { value: "gallery", label: "Public Gallery → Gallery Grid", group: "Public Gallery" },
-  { value: "before-after", label: "Public Gallery → Before & After", group: "Public Gallery" },
-  { value: "portfolio", label: "Public Gallery → Portfolio", group: "Public Gallery" },
+const staticPlacements: Placement[] = STATIC_MEDIA_PLACEMENTS;
 
-  { value: "hero", label: "Homepage → Main Hero Background (photo only)", group: "Homepage" },
-  { value: "home-showcase-primary", label: "Homepage → Showcase → Large Media", group: "Homepage" },
-  { value: "home-showcase-secondary", label: "Homepage → Showcase → Small Media", group: "Homepage" },
-  { value: "home-story", label: "Homepage → Story Section", group: "Homepage" },
-  { value: "home-services-bg", label: "Homepage → Services Section", group: "Homepage" },
-  { value: "home-cta-bg", label: "Homepage → Booking CTA", group: "Homepage" },
-
-  { value: "pricing-car-packages-hero", label: "Car Detailing Packages → Hero Background (photo only)", group: "Car Detailing Packages" },
-  { value: "pricing-car-packages-intro", label: "Car Detailing Packages → Intro Media Strip", group: "Car Detailing Packages" },
-  { value: "pricing-car-packages-results", label: "Car Detailing Packages → Recent Results", group: "Car Detailing Packages" },
-
-  { value: "pricing-exterior-hero", label: "Exterior Detailing → Hero Background (photo only)", group: "Exterior Detailing" },
-  { value: "pricing-exterior-intro", label: "Exterior Detailing → Intro Media Strip", group: "Exterior Detailing" },
-  { value: "pricing-exterior-results", label: "Exterior Detailing → Recent Results", group: "Exterior Detailing" },
-
-  { value: "pricing-interior-hero", label: "Interior Detailing → Hero Background (photo only)", group: "Interior Detailing" },
-  { value: "pricing-interior-intro", label: "Interior Detailing → Intro Media Strip", group: "Interior Detailing" },
-  { value: "pricing-interior-results", label: "Interior Detailing → Recent Results", group: "Interior Detailing" },
-
-  { value: "services-hero", label: "Services Hub → Hero Background (photo only)", group: "Services Hub" },
-  { value: "marine-hero", label: "Marine Detailing → Hero Background (photo only)", group: "Marine Detailing" },
-  { value: "marine-services", label: "Marine Detailing → Services Media", group: "Marine Detailing" },
-  { value: "marine-results", label: "Marine Detailing → Results Media", group: "Marine Detailing" },
-  { value: "gallery-hero", label: "Gallery → Hero Background (photo only)", group: "Other Pages" },
-  { value: "reviews-hero", label: "Reviews → Hero Background (photo only)", group: "Other Pages" },
-  { value: "contact-hero", label: "Booking / Contact → Hero Background (photo only)", group: "Other Pages" },
-  { value: "about-hero", label: "About Car Dash → Hero Background (photo only)", group: "Explore Pages" },
-  { value: "about-story", label: "About Car Dash → Story Media", group: "Explore Pages" },
-  { value: "about-values-bg", label: "About Car Dash → Values Section", group: "Explore Pages" },
-  { value: "paint-correction-hero", label: "Paint Correction → Hero Background (photo only)", group: "Explore Pages" },
-  { value: "paint-correction-results", label: "Paint Correction → Results Media", group: "Explore Pages" },
-  { value: "ceramic-coatings-hero", label: "Ceramic Coatings → Hero Background (photo only)", group: "Explore Pages" },
-  { value: "ceramic-results", label: "Ceramic Coatings → Results Media", group: "Explore Pages" },
-  { value: "products-hero", label: "Products We Use → Hero Background (photo only)", group: "Explore Pages" },
-  { value: "products-gallery", label: "Products We Use → Product Media", group: "Explore Pages" },
-  { value: "faq-hero", label: "FAQ → Hero Background (photo only)", group: "Other Pages" },
-];
 
 function dynamicPackagePlacements(configs: PricingConfigs): Placement[] {
   const defs = [
@@ -110,6 +72,18 @@ function dynamicPackagePlacements(configs: PricingConfigs): Placement[] {
   );
 }
 
+type ServiceSummary = { id: string; title: string; category: string; active: boolean };
+
+function dynamicServicePlacements(services: ServiceSummary[]): Placement[] {
+  return services
+    .filter((service) => service.active)
+    .map((service) => ({
+      value: `service-${service.id}`,
+      label: `Service → ${service.title} → Photos & Videos`,
+      group: "Individual Services",
+    }));
+}
+
 export default function OwnerGallery() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [configs, setConfigs] = useState<PricingConfigs>({
@@ -117,6 +91,7 @@ export default function OwnerGallery() {
     exterior: DEFAULT_PRICING_PAGES.exterior,
     interior: DEFAULT_PRICING_PAGES.interior,
   });
+  const [services, setServices] = useState<ServiceSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<MediaMode>("photo");
@@ -127,7 +102,7 @@ export default function OwnerGallery() {
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const placements = useMemo(() => [...staticPlacements, ...dynamicPackagePlacements(configs)], [configs]);
+  const placements = useMemo(() => [...staticPlacements, ...dynamicPackagePlacements(configs), ...dynamicServicePlacements(services)], [configs, services]);
   const placementByValue = useMemo(() => new Map(placements.map((item) => [item.value, item])), [placements]);
   const groups = useMemo(() => [...new Set(placements.map((item) => item.group))], [placements]);
 
@@ -145,6 +120,7 @@ export default function OwnerGallery() {
         exterior: parsePricingConfig(content?.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior),
         interior: parsePricingConfig(content?.pricingInteriorConfig, DEFAULT_PRICING_PAGES.interior),
       })),
+      fetch("/api/services", { cache: "no-store" }).then((r) => r.ok ? r.json() : []).then((items) => setServices(Array.isArray(items) ? items : [])),
     ]).catch(() => setMessage("Could not load media or placements.")).finally(() => setLoading(false));
   }, []);
 
@@ -192,12 +168,17 @@ export default function OwnerGallery() {
   };
 
   const updateMedia = async (item: MediaItem, updates: Partial<MediaItem>) => {
+    const nextCategory = updates.category ?? item.category;
+    if (placementByValue.get(nextCategory)?.photoOnly && getMediaKind(item.url) !== "image") {
+      throw new Error("Hero placements only accept photos.");
+    }
     const response = await fetch(`/api/images/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: updates.title ?? item.title, category: updates.category ?? item.category }),
+      body: JSON.stringify({ title: updates.title ?? item.title, category: nextCategory }),
     });
-    if (!response.ok) throw new Error("Update failed");
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Update failed");
     await fetchMedia();
   };
 
@@ -208,11 +189,20 @@ export default function OwnerGallery() {
     await fetchMedia();
   };
 
-  const visibleMedia = filter === "all" ? media : media.filter((item) => (placementByValue.get(item.category)?.group || "Other") === filter);
+  const attentionMedia = media.filter((item) => {
+    const placement = placementByValue.get(item.category);
+    return !placement || (placement.photoOnly && getMediaKind(item.url) !== "image");
+  });
+
+  const visibleMedia = filter === "all"
+    ? media
+    : filter === "attention"
+      ? attentionMedia
+      : media.filter((item) => (placementByValue.get(item.category)?.group || "Other") === filter);
 
   const PlacementSelect = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
     <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm">
-      {groups.map((group) => <optgroup key={group} label={group}>{placements.filter((item) => item.group === group).map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</optgroup>)}
+      {groups.map((group) => <optgroup key={group} label={group}>{placements.filter((item) => item.group === group).map((item) => <option key={item.value} value={item.value}>{item.label}{item.photoOnly ? " (photo only)" : ""}</option>)}</optgroup>)}
       {!placementByValue.has(value) && <option value={value}>Legacy / custom placement: {value}</option>}
     </select>
   );
@@ -228,25 +218,26 @@ export default function OwnerGallery() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-6 rounded-2xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.045] p-4 text-sm leading-6 text-white/60">
-          <strong className="text-white">Package proof is now built in.</strong> Add a Before/After photo or clip to a package, or attach media to one exact included item like “Foam + hand wash.” Customers only see the small preview when media exists, then they can tap it to enlarge.
+          <strong className="text-white">Every placement below is connected to a real public page now.</strong> You can use photos or videos for page media, package proof, and individual services. Hero spots are photo-only. Package items like “Foam + hand wash” can still have their own tap-to-enlarge proof.
         </div>
 
         <form onSubmit={addMedia} className="grid gap-4 rounded-3xl border border-neutral-800 bg-neutral-950 p-6 md:grid-cols-4">
           <div>
             <label className="mb-2 block text-sm font-medium">Media type</label>
-            <select value={mode} onChange={(e) => { setMode(e.target.value as MediaMode); setFile(null); setVideoUrl(""); }} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm">
+            <select value={mode} onChange={(e) => { setMode(e.target.value as MediaMode); setFile(null); setVideoUrl(""); }} className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" disabled={placementByValue.get(category)?.photoOnly}>
               <option value="photo">Photo upload</option>
-              <option value="video-file">Small video upload</option>
-              <option value="video-url">Video link</option>
+              {!placementByValue.get(category)?.photoOnly && <option value="video-file">Small video upload</option>}
+              {!placementByValue.get(category)?.photoOnly && <option value="video-url">Video / social link</option>}
             </select>
+            {placementByValue.get(category)?.photoOnly && <p className="mt-2 text-xs text-neutral-500">Hero spots use photos only so the page always has a clean background image.</p>}
           </div>
 
           <div className="md:col-span-2">
             {mode === "video-url" ? (
               <>
                 <label className="mb-2 block text-sm font-medium">Video link</label>
-                <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="YouTube, Vimeo, or direct .mp4 link" className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" required />
-                <p className="mt-2 text-xs text-neutral-500">Best for normal phone-length videos. YouTube links can be unlisted.</p>
+                <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="YouTube Short, Vimeo, Instagram Reel, or .mp4 link" className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" required />
+                <p className="mt-2 text-xs text-neutral-500">YouTube Shorts, Vimeo, Instagram Reels/posts, and direct video links are supported. YouTube can be unlisted.</p>
               </>
             ) : (
               <>
@@ -258,12 +249,17 @@ export default function OwnerGallery() {
           </div>
 
           <div><label className="mb-2 block text-sm font-medium">Label</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Before, After, Hand wash…" className="w-full rounded-xl border border-neutral-800 bg-neutral-900 p-3 text-sm" /></div>
-          <div className="md:col-span-3"><label className="mb-2 block text-sm font-medium">Where should it appear?</label><PlacementSelect value={category} onChange={setCategory} /><p className="mt-2 text-[11px] leading-4 text-neutral-500">Current destination: {placementByValue.get(category)?.label || category}</p></div>
+          <div className="md:col-span-3"><label className="mb-2 block text-sm font-medium">Where should it appear?</label><PlacementSelect value={category} onChange={(value) => { setCategory(value); if (placementByValue.get(value)?.photoOnly) { setMode("photo"); setVideoUrl(""); setFile(null); const input = document.getElementById("gallery-file") as HTMLInputElement | null; if (input) input.value = ""; } }} /><p className="mt-2 text-[11px] leading-4 text-neutral-500">Current destination: {placementByValue.get(category)?.label || category}{getMediaPlacementPath(category) && <> · <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer" className="text-[#FF2D2D] hover:underline">Open page ↗</a></>}</p></div>
           <div className="flex items-end"><button disabled={saving} className="w-full rounded-xl bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D] disabled:opacity-50">{saving ? "Processing…" : "Add Media"}</button></div>
           {message && <div className="md:col-span-4 text-sm text-neutral-300">{message}</div>}
         </form>
 
-        <div className="mt-8 flex flex-wrap items-center gap-2"><button onClick={() => setFilter("all")} className={`rounded-full px-4 py-2 text-xs ${filter === "all" ? "bg-[#FF2D2D] text-[#0D0D0D]" : "border border-white/10 text-white/55"}`}>All Media</button>{groups.map((group) => <button key={group} onClick={() => setFilter(group)} className={`rounded-full px-4 py-2 text-xs ${filter === group ? "bg-[#FF2D2D] text-[#0D0D0D]" : "border border-white/10 text-white/55"}`}>{group}</button>)}</div>
+        <div className="mt-8 flex flex-wrap items-center gap-2">
+          <button onClick={() => setFilter("all")} className={`rounded-full px-4 py-2 text-xs ${filter === "all" ? "bg-[#FF2D2D] text-[#0D0D0D]" : "border border-white/10 text-white/55"}`}>All Media</button>
+          {attentionMedia.length > 0 && <button onClick={() => setFilter("attention")} className={`rounded-full px-4 py-2 text-xs ${filter === "attention" ? "bg-amber-300 text-black" : "border border-amber-400/25 text-amber-200"}`}>Needs attention ({attentionMedia.length})</button>}
+          {groups.map((group) => <button key={group} onClick={() => setFilter(group)} className={`rounded-full px-4 py-2 text-xs ${filter === group ? "bg-[#FF2D2D] text-[#0D0D0D]" : "border border-white/10 text-white/55"}`}>{group}</button>)}
+        </div>
+        {attentionMedia.length > 0 && <p className="mt-3 text-xs leading-5 text-amber-200/70">“Needs attention” means an older/custom placement is not connected to a current page, or a video is sitting in a photo-only hero spot. Move it with the placement dropdown on the media card.</p>}
 
         {loading ? <p className="py-12 text-neutral-400">Loading…</p> : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -272,9 +268,9 @@ export default function OwnerGallery() {
               return <article key={item.id} className="overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-950">
                 <div className="relative h-56 bg-black"><MediaVisual item={item} thumbnail className="h-full w-full object-cover" /></div>
                 <div className="space-y-3 p-4">
-                  <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Current Placement</p><p className="mt-1 text-sm font-medium text-white">{placement?.label || item.category}</p></div>
+                  <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Current Placement</p><p className="mt-1 text-sm font-medium text-white">{placement?.label || item.category}</p>{getMediaPlacementPath(item.category) && <a href={getMediaPlacementPath(item.category) || "#"} target="_blank" rel="noreferrer" className="mt-1 inline-flex text-[11px] font-semibold text-[#FF2D2D] hover:underline">Open public page ↗</a>}{!placement && <p className="mt-1 text-[11px] text-amber-300">This is a legacy/custom placement. Move it to a current page so customers can see it.</p>}{placement?.photoOnly && getMediaKind(item.url) !== "image" && <p className="mt-1 text-[11px] text-amber-300">This hero spot only displays photos. Move this video to a page-media spot.</p>}</div>
                   <input defaultValue={item.title} onBlur={(e) => { if (e.target.value !== item.title) updateMedia(item, { title: e.target.value }).catch(() => setMessage("Rename failed.")); }} className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm" />
-                  <PlacementSelect value={item.category} onChange={(value) => updateMedia(item, { category: value }).catch(() => setMessage("Update failed."))} />
+                  <PlacementSelect value={item.category} onChange={(value) => updateMedia(item, { category: value }).catch((error) => setMessage(error instanceof Error ? error.message : "Update failed."))} />
                   <button onClick={() => deleteMedia(item.id)} className="w-full rounded-lg bg-red-900/70 px-3 py-2 text-sm font-medium text-red-100 hover:bg-red-900">Delete Media</button>
                 </div>
               </article>;

@@ -7,6 +7,7 @@ import ReviewCards from "@/components/ReviewCards";
 import BookingForm from "@/components/BookingForm";
 import SimplePricingHub, { type PublicServiceSummary } from "@/components/SimplePricingHub";
 import type { MediaItem } from "@/lib/media";
+import PageMediaBand from "@/components/PageMediaBand";
 
  type PricingKind = "packages" | "interior" | "exterior";
 
@@ -55,6 +56,10 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
         </div>
       </section>
 
+      <section className="border-b border-black/8 bg-white">
+        <PageMediaBand categories={["home-showcase-primary", "home-showcase-secondary", "home-story"]} theme="light" eyebrow="A quick look" title="Real work from Car Dash." className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-12" />
+      </section>
+
       <section id="prices" className="scroll-mt-24 border-b border-black/8 bg-[#F4F3EF]">
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20">
           <div className="mb-10 grid gap-5 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
@@ -64,6 +69,8 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
             </div>
             <p className="max-w-2xl text-sm leading-7 text-black/52 sm:text-base">No digging through a bunch of pages. Full details, interior, exterior, add-ons, and specialty services are all below. Tap the price that matches your vehicle and it goes straight to booking.</p>
           </div>
+
+          <PageMediaBand categories={["home-services-bg"]} theme="light" compact className="mb-8" />
 
           <div className="mb-10 flex flex-wrap gap-2 border-y border-black/8 py-4 text-sm font-semibold">
             <a href="#prices-packages" className="rounded-full bg-[#111] px-4 py-2.5 text-white">Full detail</a>
@@ -88,6 +95,7 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
               <p className="flex gap-3"><span className="text-[#FF2D2D]">✓</span>Booked times disappear automatically.</p>
               <p className="flex gap-3"><span className="text-[#FF2D2D]">✓</span>You see the total before submitting.</p>
             </div>
+            <PageMediaBand categories={["home-cta-bg"]} theme="dark" compact className="mt-7" />
           </div>
           <div className="rounded-[28px] border border-white/10 bg-[#151515] p-5 shadow-[0_24px_70px_rgba(0,0,0,.28)] sm:p-7">
             <BookingForm initialSiteContent={content} />
