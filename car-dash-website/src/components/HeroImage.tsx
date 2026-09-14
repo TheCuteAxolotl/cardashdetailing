@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { isImageMedia } from "@/lib/media";
 
 type GalleryImage = { id: string; url: string; title: string; category: string };
 
@@ -10,7 +11,7 @@ export default function HeroImage() {
   useEffect(() => {
     fetch("/api/images?category=hero&limit=1")
       .then((r) => (r.ok ? r.json() : []))
-      .then((items: GalleryImage[]) => setImage(items[0] || null))
+      .then((items: GalleryImage[]) => setImage(items.find((item) => isImageMedia(item.url)) || null))
       .catch(() => setImage(null));
   }, []);
 

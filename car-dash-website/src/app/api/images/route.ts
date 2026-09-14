@@ -3,7 +3,20 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { isLikelyDatabaseError, databaseUnavailableResponseMessage } from "@/lib/database-errors";
 
-const MAX_DATA_URL_CHARS = 1_600_000;
+const MAX_IMAGE_DATA_URL_CHARS = 1_600_000;
+const MAX_VIDEO_DATA_URL_CHARS = 3_600_000;
+
+function isSupportedVideoUrl(value: string) {
+  if (!/^https?:\/\//i.test(value)) return false;
+  try {
+    const url = new URL(value);
+    const host = url.hostname.replace(/^www\./, "").toLowerCase();
+    if (["youtube.com", "m.youtube.com", "youtu.be", "vimeo.com", "player.vimeo.com"].includes(host)) return true;
+    return /\.(mp4|webm|mov|m4v|ogv|ogg)$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -84,23 +97,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!String(url).startsWith("data:image/")) {
+    const mediaUrl = String(url).trim();
+    const isImageData = mediaUrl.startsWith("data:image/");
+    const isVideoData = mediaUrl.startsWith("data:video/");
+    const isExternalVideo = isSupportedVideoUrl(mediaUrl);
+
+    if (!isImageData && !isVideoData && !isExternalVideo) {
       return NextResponse.json(
-        { error: "Please upload an image file from the dashboard" },
+        { error: "Upload a photo/video, or use a YouTube, Vimeo, or direct video link" },
         { status: 400 }
       );
     }
 
-    if (String(url).length > MAX_DATA_URL_CHARS) {
+    if (isImageData && mediaUrl.length > MAX_IMAGE_DATA_URL_CHARS) {
       return NextResponse.json(
         { error: "Image is too large after compression" },
         { status: 413 }
       );
     }
 
+    if (isVideoData && mediaUrl.length > MAX_VIDEO_DATA_URL_CHARS) {
+      return NextResponse.json(
+        { error: "Video is too large for a direct upload. Use a video link instead." },
+        { status: 413 }
+      );
+    }
+
     const image = await prisma.galleryImage.create({
       data: {
-        url: String(url),
+        url: mediaUrl,
         title: String(title).trim().slice(0, 120),
         category: String(category).trim().slice(0, 120),
       },

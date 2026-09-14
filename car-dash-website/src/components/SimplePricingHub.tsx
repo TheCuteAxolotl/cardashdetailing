@@ -1,6 +1,8 @@
 import type { PricingPageConfig, VehicleClass } from "@/lib/pricing-config";
 import { VEHICLE_LABELS } from "@/lib/pricing-config";
 import type { BookingPricingConfig } from "@/lib/booking-pricing";
+import PackageMediaEvidence from "@/components/PackageMediaEvidence";
+import type { MediaItem } from "@/lib/media";
 
 export type PublicServiceSummary = {
   id: string;
@@ -20,6 +22,7 @@ type Props = {
   configs: Record<PricingKind, PricingPageConfig>;
   bookingPricing: BookingPricingConfig;
   services: PublicServiceSummary[];
+  mediaItems?: MediaItem[];
 };
 
 const groups: Array<{ kind: PricingKind; label: string; description: string }> = [
@@ -43,7 +46,7 @@ function packageBookHref(kind: PricingKind, packageId: string, vehicleClass: Veh
   return `/?pricingPage=${encodeURIComponent(kind)}&packageId=${encodeURIComponent(packageId)}&vehicleClass=${encodeURIComponent(vehicleClass)}#book`;
 }
 
-export default function SimplePricingHub({ configs, bookingPricing, services }: Props) {
+export default function SimplePricingHub({ configs, bookingPricing, services, mediaItems = [] }: Props) {
   const specialty = services.filter((service) => service.title.trim().toLowerCase() !== "headlight restoration");
   const addOns = bookingPricing.addOns.filter((item) => item.active);
 
@@ -90,12 +93,13 @@ export default function SimplePricingHub({ configs, bookingPricing, services }: 
                     ))}
                   </div>
 
-                  <details className="mt-4 rounded-2xl border border-black/8 bg-black/[.02] px-4 py-3">
-                    <summary className="cursor-pointer text-sm font-semibold text-black/65">What’s included</summary>
-                    <ul className="mt-3 space-y-2 pb-1 text-sm leading-5 text-black/48">
-                      {pkg.features.map((feature) => <li key={feature} className="flex gap-2"><span className="text-[#FF2D2D]">✓</span><span>{feature}</span></li>)}
-                    </ul>
-                  </details>
+                  <PackageMediaEvidence
+                    packageMedia={mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}`)}
+                    featureMedia={pkg.features.map((feature, featureIndex) => ({
+                      feature,
+                      items: mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}-feature-${featureIndex + 1}`),
+                    }))}
+                  />
                 </article>
               ))}
             </div>

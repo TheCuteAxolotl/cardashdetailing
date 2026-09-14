@@ -6,6 +6,7 @@ import DynamicGallery from "@/components/DynamicGallery";
 import ReviewCards from "@/components/ReviewCards";
 import BookingForm from "@/components/BookingForm";
 import SimplePricingHub, { type PublicServiceSummary } from "@/components/SimplePricingHub";
+import type { MediaItem } from "@/lib/media";
 
  type PricingKind = "packages" | "interior" | "exterior";
 
@@ -14,9 +15,10 @@ type Props = {
   pricingConfigs: Record<PricingKind, PricingPageConfig>;
   bookingPricing: BookingPricingConfig;
   services: PublicServiceSummary[];
+  pricingMedia?: MediaItem[];
 };
 
-export default function HomeExperience({ initialContent: content, pricingConfigs, bookingPricing, services }: Props) {
+export default function HomeExperience({ initialContent: content, pricingConfigs, bookingPricing, services, pricingMedia = [] }: Props) {
   return (
     <div className="bg-[#F4F3EF] text-[#111]">
       <section className="border-b border-black/8 bg-[#0D0D0D] text-white">
@@ -71,7 +73,7 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
             <a href="#specialty-prices" className="rounded-full border border-black/10 bg-white px-4 py-2.5">Specialty</a>
           </div>
 
-          <SimplePricingHub configs={pricingConfigs} bookingPricing={bookingPricing} services={services} />
+          <SimplePricingHub configs={pricingConfigs} bookingPricing={bookingPricing} services={services} mediaItems={pricingMedia} />
         </div>
       </section>
 

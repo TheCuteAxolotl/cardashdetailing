@@ -76,10 +76,22 @@ export default async function Home() {
     console.error("Error loading public services for homepage:", error);
   }
 
+
+  let pricingMedia: Array<{ id: string; url: string; title: string; category: string }> = [];
+  try {
+    pricingMedia = await prisma.galleryImage.findMany({
+      where: { category: { startsWith: "pricing-" } },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, url: true, title: true, category: true },
+    });
+  } catch (error) {
+    console.error("Error loading package media for homepage:", error);
+  }
+
   return (
     <>
       <StructuredData data={websiteSchema} />
-      <HomeExperience initialContent={content} pricingConfigs={pricingConfigs} bookingPricing={bookingPricing} services={services} />
+      <HomeExperience initialContent={content} pricingConfigs={pricingConfigs} bookingPricing={bookingPricing} services={services} pricingMedia={pricingMedia} />
     </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { isImageMedia } from "@/lib/media";
 
 type GalleryImage = { id: string; url: string; title: string; category: string };
 
@@ -32,10 +33,11 @@ export default function SitePhoto({
       .then((response) => (response.ok ? response.json() : []))
       .then((items: GalleryImage[]) => {
         if (cancelled) return;
+        const imageItems = items.filter((item) => isImageMedia(item.url));
         const selected =
-          items.find((item) => item.category === category) ||
-          items.find((item) => item.category === fallbackCategory) ||
-          items[0] ||
+          imageItems.find((item) => item.category === category) ||
+          imageItems.find((item) => item.category === fallbackCategory) ||
+          imageItems[0] ||
           null;
         setImage(selected);
       })
