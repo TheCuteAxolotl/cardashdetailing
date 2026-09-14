@@ -7,6 +7,7 @@ import { isImageMedia } from "@/lib/media";
 type Props = {
   frames: MediaItem[];
   className?: string;
+  onInteractionChange?: (active: boolean) => void;
 };
 
 function wrap(index: number, length: number) {
@@ -14,11 +15,16 @@ function wrap(index: number, length: number) {
   return ((index % length) + length) % length;
 }
 
-export default function Hero360Viewer({ frames, className = "" }: Props) {
+export default function Hero360Viewer({ frames, className = "", onInteractionChange }: Props) {
   const imageFrames = frames.filter((item) => isImageMedia(item.url));
   const [index, setIndex] = useState(0);
   const [dragging, setDragging] = useState(false);
   const lastX = useRef<number | null>(null);
+
+  const setInteraction = (active: boolean) => {
+    setDragging(active);
+    onInteractionChange?.(active);
+  };
 
   useEffect(() => {
     setIndex(0);
@@ -63,7 +69,7 @@ export default function Hero360Viewer({ frames, className = "" }: Props) {
       onPointerDown={(event) => {
         if (!canRotate) return;
         lastX.current = event.clientX;
-        setDragging(true);
+        setInteraction(true);
         event.currentTarget.setPointerCapture?.(event.pointerId);
       }}
       onPointerMove={(event) => {
@@ -77,7 +83,7 @@ export default function Hero360Viewer({ frames, className = "" }: Props) {
       }}
       onPointerUp={(event) => {
         lastX.current = null;
-        setDragging(false);
+        setInteraction(false);
         try {
           event.currentTarget.releasePointerCapture?.(event.pointerId);
         } catch {
@@ -86,7 +92,13 @@ export default function Hero360Viewer({ frames, className = "" }: Props) {
       }}
       onPointerCancel={() => {
         lastX.current = null;
-        setDragging(false);
+        setInteraction(false);
+      }}
+      onLostPointerCapture={() => {
+        if (lastX.current !== null) {
+          lastX.current = null;
+          setInteraction(false);
+        }
       }}
     >
       <img
@@ -99,7 +111,10 @@ export default function Hero360Viewer({ frames, className = "" }: Props) {
       />
 
       {canRotate && (
-        <>
+        <div
+          className={`absolute inset-0 transition-opacity duration-200 ease-out ${dragging ? "pointer-events-none opacity-0" : "opacity-100"}`}
+          aria-hidden={dragging ? true : undefined}
+        >
           <div className="pointer-events-none absolute left-4 top-4 rounded-full border border-white/15 bg-black/55 px-3 py-2 text-[10px] font-bold uppercase tracking-[.16em] text-white/80 backdrop-blur-md sm:left-5 sm:top-5">
             ↔ Drag / swipe to rotate
           </div>
@@ -131,7 +146,7 @@ export default function Hero360Viewer({ frames, className = "" }: Props) {
           >
             ›
           </button>
-        </>
+        </div>
       )}
     </div>
   );

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { SiteContent } from "@/lib/site-defaults";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import type { BookingPricingConfig } from "@/lib/booking-pricing";
@@ -21,6 +24,8 @@ type Props = {
 };
 
 export default function HomeExperience({ initialContent: content, pricingConfigs, bookingPricing, services, pricingMedia = [], hero360Frames = [] }: Props) {
+  const [heroInteracting, setHeroInteracting] = useState(false);
+
   return (
     <div className="bg-[#F4F3EF] text-[#111]">
       <section className="border-b border-black/8 bg-[#0D0D0D] text-white">
@@ -47,11 +52,19 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
           </div>
 
           <div className="relative min-h-[300px] overflow-hidden rounded-[28px] bg-black sm:min-h-[390px] lg:min-h-[480px]">
-            <Hero360Viewer frames={hero360Frames} className="absolute inset-0 h-full w-full" />
+            <Hero360Viewer
+              frames={hero360Frames}
+              className="absolute inset-0 h-full w-full"
+              onInteractionChange={setHeroInteracting}
+            />
             {hero360Frames.length > 0 && (
               <>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
-                <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/12 bg-black/55 p-4 backdrop-blur-md sm:flex sm:items-center sm:justify-between sm:gap-4">
+                <div
+                  className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10 transition-opacity duration-200 ease-out ${heroInteracting ? "opacity-0" : "opacity-100"}`}
+                />
+                <div
+                  className={`absolute bottom-5 left-5 right-5 rounded-2xl border border-white/12 bg-black/55 p-4 backdrop-blur-md transition-all duration-200 ease-out sm:flex sm:items-center sm:justify-between sm:gap-4 ${heroInteracting ? "pointer-events-none translate-y-2 opacity-0" : "translate-y-0 opacity-100"}`}
+                >
                   <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Mobile service</p><p className="mt-1 text-sm font-semibold">South Elgin + surrounding areas</p></div>
                   <a href="#book" className="mt-3 inline-flex text-sm font-semibold text-white sm:mt-0">Check availability →</a>
                 </div>

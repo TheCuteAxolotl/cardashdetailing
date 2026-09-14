@@ -1,6 +1,6 @@
 {
   "name": "car-dash-website",
-  "version": "5.6.5",
+  "version": "5.6.6",
   "private": true,
   "scripts": {
     "dev": "next dev",
