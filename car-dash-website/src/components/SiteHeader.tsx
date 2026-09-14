@@ -11,13 +11,22 @@ const mainLinks = [
   ["/#prices", "Prices"],
   ["/gallery", "Gallery"],
   ["/reviews", "Reviews"],
-  ["/faq", "FAQ"],
+] as const;
+
+const moreLinks = [
+  ["/about", "About Car Dash", "Who we are and how mobile detailing works."],
+  ["/services", "All services", "Browse every detailing and specialty service."],
+  ["/products-we-use", "Products we use", "See the products and brands used on your vehicle."],
+  ["/faq", "FAQ", "Quick answers before you book."],
+  ["/contact", "Contact", "Call, text, or send us a message."],
+  ["/quote", "Exact quote", "Get a personalized price for your vehicle."],
 ] as const;
 
 export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
   const [staffAccess, setStaffAccess] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -49,6 +58,7 @@ export default function SiteHeader() {
   const openSupport = () => {
     window.dispatchEvent(new Event("open-support"));
     setMenuOpen(false);
+    setMobileMoreOpen(false);
   };
 
   return (
@@ -69,9 +79,32 @@ export default function SiteHeader() {
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-white/58 lg:flex">
             {mainLinks.map(([href, label]) => (
-              <a key={href} href={href} className="hover:text-white">{label}</a>
+              <a key={href} href={href} className="transition-colors hover:text-white">{label}</a>
             ))}
-            <button type="button" onClick={openSupport} className="hover:text-white">Help</button>
+
+            <details className="group relative">
+              <summary className="flex cursor-pointer list-none items-center gap-1.5 transition-colors hover:text-white [&::-webkit-details-marker]:hidden">
+                More
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-180">
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </summary>
+
+              <div className="absolute left-1/2 top-[calc(100%+18px)] z-[70] w-[330px] -translate-x-1/2 overflow-hidden rounded-[24px] border border-white/10 bg-[#151515] p-2 shadow-2xl shadow-black/50">
+                <div className="grid gap-1">
+                  {moreLinks.map(([href, label, description]) => (
+                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-white/[.06]">
+                      <span className="block text-sm font-semibold text-white">{label}</span>
+                      <span className="mt-0.5 block text-xs leading-5 text-white/42">{description}</span>
+                    </a>
+                  ))}
+                  <button type="button" onClick={openSupport} className="rounded-[18px] px-4 py-3 text-left transition-colors hover:bg-white/[.06]">
+                    <span className="block text-sm font-semibold text-white">Need help?</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-white/42">Open support without leaving the page.</span>
+                  </button>
+                </div>
+              </div>
+            </details>
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
@@ -103,7 +136,30 @@ export default function SiteHeader() {
               {mainLinks.map(([href, label]) => (
                 <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-2xl px-4 py-3.5 text-white/68 hover:bg-white/[.04] hover:text-white">{label}</a>
               ))}
-              <button type="button" onClick={openSupport} className="rounded-2xl px-4 py-3.5 text-left text-white/68 hover:bg-white/[.04] hover:text-white">Help</button>
+
+              <button
+                type="button"
+                aria-expanded={mobileMoreOpen}
+                aria-controls="mobile-more-menu"
+                onClick={() => setMobileMoreOpen((value) => !value)}
+                className="flex items-center justify-between rounded-2xl px-4 py-3.5 text-left text-white/68 hover:bg-white/[.04] hover:text-white"
+              >
+                <span>More</span>
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={`h-4 w-4 transition-transform duration-300 ${mobileMoreOpen ? "rotate-180" : ""}`}>
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <div id="mobile-more-menu" className={`mobile-accordion ${mobileMoreOpen ? "mobile-accordion-open" : ""}`}>
+                <div className="mobile-accordion-inner">
+                  <div className="ml-3 grid gap-1 border-l border-white/8 pl-3 pb-2">
+                    {moreLinks.map(([href, label]) => (
+                      <a key={href} href={href} onClick={() => { setMenuOpen(false); setMobileMoreOpen(false); }} className="rounded-2xl px-4 py-3 text-sm text-white/58 hover:bg-white/[.04] hover:text-white">{label}</a>
+                    ))}
+                    <button type="button" onClick={openSupport} className="rounded-2xl px-4 py-3 text-left text-sm text-white/58 hover:bg-white/[.04] hover:text-white">Need help?</button>
+                  </div>
+                </div>
+              </div>
+
               <div className="my-3 h-px bg-white/8" />
               {!user ? (
                 <a href="/login" className="rounded-2xl px-4 py-3.5 text-white/68">Login</a>
