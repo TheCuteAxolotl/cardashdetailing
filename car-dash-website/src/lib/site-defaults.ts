@@ -4,7 +4,7 @@ import { DEFAULT_BOOKING_PRICING } from "@/lib/booking-pricing";
 export const SITE_DEFAULTS = {
   heroEyebrow: "Mobile detailing · South Elgin, IL",
   heroTitle: "Mobile detailing that comes to you.",
-  heroBody: "We’re based in South Elgin and completely mobile. Interior, exterior, paint correction, ceramic coating, and marine detailing — we bring the setup to you.",
+  heroBody: "We’re based in South Elgin and completely mobile. You pick the service. You pick the time. We bring professional detailing directly to your home or workplace.",
   heroPrimaryCta: "Get an Exact Quote",
   heroSecondaryCta: "See Services",
 
@@ -75,6 +75,7 @@ export type SiteContent = Record<SiteContentKey, string>;
 // Only replace copy that exactly matches an older Car Dash default. Owner-written custom
 // content is left untouched, so upgrading the site never silently overwrites a custom edit.
 const LEGACY_COPY_REPLACEMENTS: Record<string, string> = {
+  "We’re based in South Elgin and completely mobile. Interior, exterior, paint correction, ceramic coating, and marine detailing — we bring the setup to you.": SITE_DEFAULTS.heroBody,
   // v5.4.3 defaults -> v5.4.4 human-voice copy. Custom owner-written text is still preserved.
   'Interior detailing, exterior care, paint correction, and ceramic protection brought to your vehicle in South Elgin and nearby suburbs.': SITE_DEFAULTS.heroBody,
   'How Car Dash prices the job': SITE_DEFAULTS.introEyebrow,

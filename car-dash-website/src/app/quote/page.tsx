@@ -251,8 +251,8 @@ export default function QuotePage() {
         <div className="mx-auto max-w-4xl">
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">No login required</p>
-            <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get a Free Exact Quote</h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. If you can, add a few photos. A clean SUV may be less work than the standard SUV price, while pet hair, stains, or heavier buildup can make it more.</p>
+            <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get a Free Custom Quote</h1>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. Upload a few photos if you can. We’ll customize your quote around your vehicle, its condition, and exactly what you want done.</p>
           </div>
 
           <PageMediaBand categories={["quote-media"]} theme="dark" compact className="mt-8" />
@@ -301,8 +301,8 @@ export default function QuotePage() {
       <div className="mx-auto max-w-7xl">
         <div>
           <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">Condition-based pricing</p>
-          <h1 className="mt-2 text-4xl font-semibold">Get a Free Exact Quote</h1>
-          <p className="mt-2 max-w-3xl text-white/40">Since you’re signed in, you can reuse saved vehicles and keep the whole quote conversation here. Package prices are the normal starting point, but the vehicle’s condition can move the final price up or down.</p>
+          <h1 className="mt-2 text-4xl font-semibold">Get a Free Custom Quote</h1>
+          <p className="mt-2 max-w-3xl text-white/40">Since you’re signed in, you can reuse saved vehicles and keep the whole quote conversation here. Tell us what you want done and we’ll customize the quote around your vehicle, its condition, and the work you actually want.</p>
         </div>
 
         <div className="mt-7 grid gap-5 lg:grid-cols-[300px_1fr]">

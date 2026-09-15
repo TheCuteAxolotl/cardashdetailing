@@ -42,7 +42,7 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#prices" className="rounded-full bg-white px-6 py-3.5 text-sm font-bold text-[#111]">See prices</a>
               <a href="#book" className="rounded-full bg-[#FF2D2D] px-6 py-3.5 text-sm font-bold text-white">Book now</a>
-              <a href="/quote" className="rounded-full border border-white/14 px-6 py-3.5 text-sm font-semibold text-white/70">Need an exact quote?</a>
+              <a href="/quote" className="rounded-full border border-white/14 px-6 py-3.5 text-sm font-semibold text-white/70">Need a custom quote?</a>
             </div>
             <div className="mt-8 grid max-w-2xl grid-cols-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[.025] text-center">
               <div className="px-3 py-4"><p className="text-[10px] uppercase tracking-[.16em] text-white/30">Step 1</p><p className="mt-1 text-xs font-semibold sm:text-sm">Pick a service</p></div>
@@ -112,6 +112,7 @@ export default function HomeExperience({ initialContent: content, pricingConfigs
               <p className="flex gap-3"><span className="text-[#FF2D2D]">✓</span>Unavailable days are greyed out.</p>
               <p className="flex gap-3"><span className="text-[#FF2D2D]">✓</span>Booked times disappear automatically.</p>
               <p className="flex gap-3"><span className="text-[#FF2D2D]">✓</span>You see the total before submitting.</p>
+              <p className="flex gap-3"><span className="text-[#FF2D2D]">✓</span>If you opt in, confirmation and appointment updates come by text.</p>
             </div>
             <PageMediaBand categories={["home-cta-bg"]} theme="dark" compact className="mt-7" />
           </div>
