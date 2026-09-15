@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
-import { DISCOUNT_CODES_KEY, DiscountCode, normalizeDiscountCode, parseDiscountCodes } from "@/lib/booking-pricing";
+import { DISCOUNT_CODES_KEY, DiscountCode, DiscountType, normalizeDiscountCode, normalizeDiscountTarget, parseDiscountCodes } from "@/lib/booking-pricing";
 import { getDiscountUsageCounts } from "@/lib/discount-usage";
 
 function sanitizeDiscounts(value: unknown): DiscountCode[] {
   if (!Array.isArray(value)) return [];
   return value
     .map((item: any, index) => {
-      const type: "percent" | "fixed" = item?.type === "fixed" ? "fixed" : "percent";
+      const type: DiscountType = item?.type === "fixed" ? "fixed" : item?.type === "set_service_price" ? "set_service_price" : "percent";
       const rawAmount = Number(item?.amount || 0);
       const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? (type === "percent" ? Math.min(rawAmount, 100) : rawAmount) : 0;
       const rawUsageLimit = Number(item?.usageLimit);
@@ -25,6 +25,7 @@ function sanitizeDiscounts(value: unknown): DiscountCode[] {
         usageLimit,
         onePerCustomer: item?.onePerCustomer === true,
         expiresAt,
+        appliesTo: normalizeDiscountTarget(item?.appliesTo),
       };
     })
     .filter((item) => item.code && item.amount > 0)
@@ -51,6 +52,9 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const discounts = sanitizeDiscounts(body?.discounts);
+    if (discounts.some((item) => item.type === "set_service_price" && !item.appliesTo)) {
+      return NextResponse.json({ error: "Exact promo-price codes must be restricted to one service or package." }, { status: 400 });
+    }
     await prisma.siteContent.upsert({
       where: { key: DISCOUNT_CODES_KEY },
       update: { value: JSON.stringify(discounts) },

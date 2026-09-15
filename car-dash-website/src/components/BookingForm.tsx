@@ -85,7 +85,7 @@ type PackageSelection = {
 };
 
 type PricingConfigs = Record<PricingKind, PricingPageConfig>;
-type AppliedDiscount = Pick<DiscountCode, "code" | "label" | "type" | "amount">;
+type AppliedDiscount = Pick<DiscountCode, "code" | "label" | "type" | "amount" | "appliesTo">;
 
 const initialState: FormState = {
   name: "",
@@ -212,11 +212,18 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   );
   const addOnTotal = useMemo(() => selectedAddOns.reduce((sum, item) => sum + Number(item.price || 0), 0), [selectedAddOns]);
   const subtotal = baseTotal == null ? null : Math.max(0, baseTotal + addOnTotal);
-  const discountAmount = subtotal == null ? 0 : calculateDiscount(subtotal, appliedDiscount);
+  const discountAmount = subtotal == null ? 0 : calculateDiscount(subtotal, appliedDiscount, baseTotal ?? subtotal);
   const bookingTotal = subtotal == null ? null : Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
 
   const packageChoiceValue = packageSelection ? `package:${packageSelection.pricingPage}:${packageSelection.packageId}` : "";
   const serviceChoiceValue = packageChoiceValue || (form.serviceId ? `service:${form.serviceId}` : "");
+  const bookingDiscountTarget = packageSelection
+    ? `package:${packageSelection.pricingPage}:${packageSelection.packageId}`
+    : quote
+      ? null
+      : form.serviceId
+        ? `service:${form.serviceId}`
+        : null;
 
   const selectPackage = (kind: PricingKind, packageId: string, vehicleClass: VehicleClass) => {
     const pkg = pricingConfigs[kind].packages.find((item) => item.id === packageId);
@@ -435,6 +442,13 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
     }
   };
 
+  useEffect(() => {
+    if (!appliedDiscount?.appliesTo) return;
+    if (appliedDiscount.appliesTo === bookingDiscountTarget) return;
+    setAppliedDiscount(null);
+    setDiscountMessage("That discount was removed because it only applies to a different service.");
+  }, [bookingDiscountTarget, appliedDiscount?.appliesTo]);
+
   const applyDiscount = async () => {
     if (!discountInput.trim()) { setDiscountMessage("Enter a discount code."); return; }
     setDiscountLoading(true);
@@ -443,7 +457,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       const response = await fetch("/api/discounts/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: discountInput, email: form.email, phone: form.phone }),
+        body: JSON.stringify({ code: discountInput, email: form.email, phone: form.phone, bookingTarget: bookingDiscountTarget }),
       });
       const data = await response.json();
       if (!response.ok || !data?.valid) throw new Error(data?.message || "That code is not valid.");

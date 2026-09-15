@@ -10,16 +10,19 @@ export type BookingPricingConfig = {
   addOns: BookingAddOn[];
 };
 
+export type DiscountType = "percent" | "fixed" | "set_service_price";
+
 export type DiscountCode = {
   id: string;
   code: string;
   label: string;
-  type: "percent" | "fixed";
+  type: DiscountType;
   amount: number;
   active: boolean;
   usageLimit: number | null;
   onePerCustomer: boolean;
   expiresAt: string | null;
+  appliesTo: string | null;
 };
 
 export const STANDALONE_HEADLIGHT_SERVICE_ID = "__headlight_restoration__";
@@ -78,13 +81,25 @@ export function normalizeDiscountCode(value: string) {
   return value.trim().toUpperCase().replace(/\s+/g, "").slice(0, 40);
 }
 
+export function normalizeDiscountTarget(value: unknown) {
+  const target = String(value || "").trim().slice(0, 180);
+  if (!target) return null;
+  if (/^package:(packages|exterior|interior):[^\s:][^\s]*$/i.test(target)) return target;
+  if (/^service:[^\s:][^\s]*$/i.test(target)) return target;
+  return null;
+}
+
 export function parseDiscountCodes(value: string | null | undefined): DiscountCode[] {
   try {
     const parsed = JSON.parse(value || "[]") as unknown;
     if (!Array.isArray(parsed)) return [];
     return parsed
       .map((item: any, index) => {
-        const type = item?.type === "fixed" ? "fixed" : "percent";
+        const type: DiscountType = item?.type === "fixed"
+          ? "fixed"
+          : item?.type === "set_service_price"
+            ? "set_service_price"
+            : "percent";
         const amount = safeNumber(item?.amount, 0);
         return {
           id: String(item?.id || `discount-${index + 1}`).slice(0, 80),
@@ -96,6 +111,7 @@ export function parseDiscountCodes(value: string | null | undefined): DiscountCo
           usageLimit: Number.isFinite(Number(item?.usageLimit)) && Number(item?.usageLimit) > 0 ? Math.floor(Number(item.usageLimit)) : null,
           onePerCustomer: item?.onePerCustomer === true,
           expiresAt: /^\d{4}-\d{2}-\d{2}$/.test(String(item?.expiresAt || "")) ? String(item.expiresAt) : null,
+          appliesTo: normalizeDiscountTarget(item?.appliesTo),
         } as DiscountCode;
       })
       .filter((item) => item.code && item.amount > 0);
@@ -104,12 +120,39 @@ export function parseDiscountCodes(value: string | null | undefined): DiscountCo
   }
 }
 
-export function calculateDiscount(subtotal: number, discount: Pick<DiscountCode, "type" | "amount"> | null | undefined) {
+export function discountAppliesToTarget(
+  discount: Pick<DiscountCode, "appliesTo"> | null | undefined,
+  target: string | null | undefined,
+) {
+  if (!discount?.appliesTo) return true;
+  return Boolean(target && discount.appliesTo === target);
+}
+
+export function calculateDiscount(
+  subtotal: number,
+  discount: Pick<DiscountCode, "type" | "amount"> | null | undefined,
+  baseServicePrice = subtotal,
+) {
   if (!discount || subtotal <= 0) return 0;
-  const raw = discount.type === "percent" ? subtotal * (discount.amount / 100) : discount.amount;
+
+  let raw = 0;
+  if (discount.type === "percent") {
+    raw = subtotal * (discount.amount / 100);
+  } else if (discount.type === "fixed") {
+    raw = discount.amount;
+  } else {
+    const servicePrice = Math.max(0, Math.min(subtotal, Number(baseServicePrice) || 0));
+    raw = Math.max(0, servicePrice - discount.amount);
+  }
+
   return Math.max(0, Math.min(subtotal, Math.round(raw * 100) / 100));
 }
 
+export function describeDiscount(discount: Pick<DiscountCode, "type" | "amount">) {
+  if (discount.type === "percent") return `${discount.amount}%`;
+  if (discount.type === "set_service_price") return `sets service to $${discount.amount.toFixed(2)}`;
+  return `$${discount.amount.toFixed(2)}`;
+}
 
 export function getDiscountUsageMarker(code: string) {
   return `Discount: ${normalizeDiscountCode(code)} (`;

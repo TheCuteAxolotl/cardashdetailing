@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthFromRequest } from "@/lib/auth";
-import { DISCOUNT_CODES_KEY, normalizeDiscountCode, parseDiscountCodes } from "@/lib/booking-pricing";
+import { DISCOUNT_CODES_KEY, discountAppliesToTarget, normalizeDiscountCode, normalizeDiscountTarget, parseDiscountCodes } from "@/lib/booking-pricing";
 import { checkDiscountAvailability } from "@/lib/discount-usage";
 
 export async function POST(request: NextRequest) {
@@ -10,11 +10,15 @@ export async function POST(request: NextRequest) {
     const code = normalizeDiscountCode(String(body?.code || ""));
     const submittedEmail = String(body?.email || "").trim();
     const submittedPhone = String(body?.phone || "").trim();
+    const bookingTarget = normalizeDiscountTarget(body?.bookingTarget);
     if (!code) return NextResponse.json({ valid: false, message: "Enter a discount code." }, { status: 400 });
 
     const row = await prisma.siteContent.findUnique({ where: { key: DISCOUNT_CODES_KEY } });
     const discount = parseDiscountCodes(row?.value).find((item) => item.code === code);
     if (!discount) return NextResponse.json({ valid: false, message: "That discount code is not valid." }, { status: 404 });
+    if (!discountAppliesToTarget(discount, bookingTarget)) {
+      return NextResponse.json({ valid: false, message: "That discount code is not valid for the selected service." }, { status: 409 });
+    }
 
     const auth = getAuthFromRequest(request);
     const availability = await checkDiscountAvailability(discount, {
@@ -35,6 +39,7 @@ export async function POST(request: NextRequest) {
         amount: discount.amount,
         expiresAt: discount.expiresAt,
         onePerCustomer: discount.onePerCustomer,
+        appliesTo: discount.appliesTo,
       },
     });
   } catch (error) {

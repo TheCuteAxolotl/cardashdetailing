@@ -11,6 +11,8 @@ import {
   DISCOUNT_CODES_KEY,
   STANDALONE_HEADLIGHT_SERVICE_ID,
   calculateDiscount,
+  describeDiscount,
+  discountAppliesToTarget,
   normalizeDiscountCode,
   parseBookingPricingConfig,
   parseDiscountCodes,
@@ -147,6 +149,7 @@ export async function POST(request: NextRequest) {
     let source = "Fixed-price website booking";
     let verifiedVehicleId = String(form.get("vehicleId") || "").trim() || null;
     let allowAddOns = false;
+    let bookingDiscountTarget: string | null = null;
 
     if (quoteThreadId) {
       await ensureGuestQuoteSupport();
@@ -188,11 +191,13 @@ export async function POST(request: NextRequest) {
       serviceName = `${selected.pkg.name} — ${VEHICLE_LABELS[selected.key]}`;
       baseTotal = selected.price;
       source = `Fixed pricing page: ${pricingPage}/${selected.pkg.id}/${selected.key}`;
+      bookingDiscountTarget = `package:${pricingPage}:${selected.pkg.id}`;
       allowAddOns = true;
     } else if (serviceId === STANDALONE_HEADLIGHT_SERVICE_ID) {
       serviceName = "Headlight Restoration";
       baseTotal = bookingPricing.headlightStandalonePrice;
       source = "Standalone Headlight Restoration";
+      bookingDiscountTarget = `service:${STANDALONE_HEADLIGHT_SERVICE_ID}`;
       allowAddOns = false;
     } else {
       if (!serviceId) return NextResponse.json({ success: false, message: "Choose a service or pricing package before booking." }, { status: 400 });
@@ -200,6 +205,7 @@ export async function POST(request: NextRequest) {
       if (!service || !service.active) return NextResponse.json({ success: false, message: "That service is not available." }, { status: 404 });
       if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Get an Exact Quote." }, { status: 409 });
 
+      bookingDiscountTarget = `service:${service.id}`;
       if (service.title.trim().toLowerCase() === "headlight restoration") {
         serviceName = "Headlight Restoration";
         baseTotal = bookingPricing.headlightStandalonePrice;
@@ -227,6 +233,9 @@ export async function POST(request: NextRequest) {
       const discountRow = await prisma.siteContent.findUnique({ where: { key: DISCOUNT_CODES_KEY } });
       appliedDiscount = parseDiscountCodes(discountRow?.value).find((item) => item.code === discountCode) || null;
       if (!appliedDiscount) return NextResponse.json({ success: false, message: "That discount code is no longer valid. Remove it and try again." }, { status: 409 });
+      if (!discountAppliesToTarget(appliedDiscount, bookingDiscountTarget)) {
+        return NextResponse.json({ success: false, message: "That discount code is not valid for the selected service." }, { status: 409 });
+      }
 
       const availability = await checkDiscountAvailability(appliedDiscount, {
         userId: auth?.id,
@@ -237,7 +246,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, message: availability.message || "That discount code is no longer available." }, { status: 409 });
       }
     }
-    const discountAmount = calculateDiscount(subtotal, appliedDiscount);
+    const discountAmount = calculateDiscount(subtotal, appliedDiscount, baseTotal);
     const bookingTotal = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
 
     if (Number.isFinite(displayedBookingTotal) && Math.abs(displayedBookingTotal - bookingTotal) > 0.01) {
@@ -256,7 +265,7 @@ export async function POST(request: NextRequest) {
       `Base service: $${baseTotal.toFixed(2)}`,
       `Add-ons: ${addOnSummary}`,
       `Add-ons total: $${addOnTotal.toFixed(2)}`,
-      appliedDiscount ? `Discount: ${appliedDiscount.code} (${appliedDiscount.type === "percent" ? `${appliedDiscount.amount}%` : `$${appliedDiscount.amount.toFixed(2)}`}) -$${discountAmount.toFixed(2)}` : "Discount: None",
+      appliedDiscount ? `Discount: ${appliedDiscount.code} (${describeDiscount(appliedDiscount)}) -$${discountAmount.toFixed(2)}` : "Discount: None",
       `Booking total: $${bookingTotal.toFixed(2)}`,
       `Booking source: ${source}`,
       quoteThreadId ? `Quote ID: ${quoteThreadId}` : null,

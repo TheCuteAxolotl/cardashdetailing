@@ -6,10 +6,12 @@ import {
   BookingPricingConfig,
   DEFAULT_BOOKING_PRICING,
   DiscountCode,
+  STANDALONE_HEADLIGHT_SERVICE_ID,
   isDiscountExpired,
   normalizeDiscountCode,
   parseBookingPricingConfig,
 } from "@/lib/booking-pricing";
+import { DEFAULT_PRICING_PAGES, parsePricingConfig } from "@/lib/pricing-config";
 import {
   BOOKING_DAY_KEYS,
   BookingAvailabilityConfig,
@@ -30,6 +32,8 @@ const DAY_LABELS: Record<BookingDayKey, string> = {
 };
 
 type ManagedDiscount = DiscountCode & { usageCount?: number };
+type DiscountTargetOption = { value: string; label: string; group: string };
+type ServiceOption = { id: string; title: string; price: number; pricingType: string; active: boolean };
 
 function makeId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -38,6 +42,7 @@ function makeId(prefix: string) {
 export default function BookingSettingsPage() {
   const [pricing, setPricing] = useState<BookingPricingConfig>(DEFAULT_BOOKING_PRICING);
   const [discounts, setDiscounts] = useState<ManagedDiscount[]>([]);
+  const [discountTargets, setDiscountTargets] = useState<DiscountTargetOption[]>([]);
   const [availability, setAvailability] = useState<BookingAvailabilityConfig>(DEFAULT_BOOKING_AVAILABILITY);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
@@ -64,15 +69,41 @@ export default function BookingSettingsPage() {
         setCanManagePricing(pricingAccess);
         setCanManageAvailability(bookingAccess);
 
-        const [contentResponse, discountsResponse, availabilityResponse] = await Promise.all([
+        const [contentResponse, discountsResponse, availabilityResponse, servicesResponse] = await Promise.all([
           pricingAccess ? fetch("/api/site-content", { cache: "no-store" }) : Promise.resolve(null),
           pricingAccess ? fetch("/api/discounts", { cache: "no-store" }) : Promise.resolve(null),
           bookingAccess ? fetch("/api/availability/settings", { cache: "no-store" }) : Promise.resolve(null),
+          pricingAccess ? fetch("/api/services", { cache: "no-store" }) : Promise.resolve(null),
         ]);
 
         if (contentResponse?.ok) {
           const content = await contentResponse.json();
-          setPricing(parseBookingPricingConfig(content?.bookingPricingConfig));
+          const loadedBookingPricing = parseBookingPricingConfig(content?.bookingPricingConfig);
+          setPricing(loadedBookingPricing);
+
+          const packageGroups = [
+            { key: "packages" as const, label: "Full Detailing", config: parsePricingConfig(content?.pricingPackagesConfig, DEFAULT_PRICING_PAGES.packages) },
+            { key: "interior" as const, label: "Interior Only", config: parsePricingConfig(content?.pricingInteriorConfig, DEFAULT_PRICING_PAGES.interior) },
+            { key: "exterior" as const, label: "Exterior Only", config: parsePricingConfig(content?.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior) },
+          ];
+          const packageTargets: DiscountTargetOption[] = packageGroups.flatMap((group) =>
+            group.config.packages.map((pkg) => ({
+              value: `package:${group.key}:${pkg.id}`,
+              label: pkg.name,
+              group: group.label,
+            }))
+          );
+          const serviceData: ServiceOption[] = servicesResponse?.ok ? await servicesResponse.json() : [];
+          const serviceTargets: DiscountTargetOption[] = Array.isArray(serviceData)
+            ? serviceData
+                .filter((service) => service.active && service.pricingType === "fixed" && Number(service.price) > 0 && service.title.trim().toLowerCase() !== "headlight restoration")
+                .map((service) => ({ value: `service:${service.id}`, label: service.title, group: "Other Services" }))
+            : [];
+          setDiscountTargets([
+            ...packageTargets,
+            { value: `service:${STANDALONE_HEADLIGHT_SERVICE_ID}`, label: "Headlight Restoration", group: "Standalone" },
+            ...serviceTargets,
+          ]);
         }
         if (discountsResponse?.ok) {
           const discountData = await discountsResponse.json();
@@ -178,6 +209,7 @@ export default function BookingSettingsPage() {
         usageLimit: null,
         onePerCustomer: false,
         expiresAt: null,
+        appliesTo: null,
         usageCount: 0,
       },
     ]);
@@ -219,7 +251,12 @@ export default function BookingSettingsPage() {
           amount: Math.max(0, Number(item.amount || 0)),
           usageLimit: item.usageLimit && item.usageLimit > 0 ? Math.floor(item.usageLimit) : null,
           expiresAt: item.expiresAt || null,
+          appliesTo: item.appliesTo || null,
         }));
+        if (cleanedDiscounts.some((item) => item.type === "set_service_price" && !item.appliesTo)) {
+          setMessage("Choose one specific service/package for every exact promo-price code before saving.");
+          return;
+        }
 
         requests.push(fetch("/api/site-content", {
           method: "PUT",
@@ -382,19 +419,21 @@ export default function BookingSettingsPage() {
               <div>
                 <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Discount Codes</p>
                 <h2 className="mt-2 text-2xl font-semibold">Promo code controls</h2>
-                <p className="mt-2 max-w-3xl text-sm text-white/40">Set an optional total usage limit, restrict a code to one booking per customer, and choose an expiration date. Leave the usage limit or expiration blank for no limit.</p>
+                <p className="mt-2 max-w-3xl text-sm text-white/40">Choose whether a code works everywhere or only on one service/package. You can discount by percent, dollars off, or set that service to an exact promo price. Usage limits, one-per-customer rules, and expiration dates still work too.</p>
               </div>
               <div className="mt-6 grid gap-4">
                 {discounts.map((item, index) => {
                   const usageCount = Number(item.usageCount || 0);
                   const limitReached = item.usageLimit !== null && usageCount >= item.usageLimit;
                   const expired = isDiscountExpired(item);
+                  const targetLabel = item.appliesTo ? discountTargets.find((option) => option.value === item.appliesTo)?.label || "Specific service" : "All services";
                   return (
                     <article key={item.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/60">Used {usageCount}{item.usageLimit !== null ? ` / ${item.usageLimit}` : " times"}</span>
                           {item.onePerCustomer && <span className="rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-blue-200">1 per customer</span>}
+                          {item.appliesTo && <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-emerald-200">Only: {targetLabel}</span>}
                           {item.expiresAt && <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/55">Expires {item.expiresAt}</span>}
                           {expired && <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1.5 text-amber-200">Expired</span>}
                           {limitReached && <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1.5 text-amber-200">Limit reached</span>}
@@ -405,13 +444,16 @@ export default function BookingSettingsPage() {
                       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                         <label className="text-sm text-white/55">Code<input className={`${input} mt-2 uppercase`} value={item.code} onChange={(e) => updateDiscount(index, { code: normalizeDiscountCode(e.target.value) })} placeholder="SAVE10" /></label>
                         <label className="text-sm text-white/55">Customer label<input className={`${input} mt-2`} value={item.label} onChange={(e) => updateDiscount(index, { label: e.target.value })} placeholder="10% off detailing" /></label>
-                        <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as "percent" | "fixed" })}><option value="percent">Percent %</option><option value="fixed">Fixed $</option></select></label>
-                        <label className="text-sm text-white/55">Amount<input type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} /></label>
+                        <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as DiscountCode["type"] })}><option value="percent">Percent off %</option><option value="fixed">Fixed dollars off $</option><option value="set_service_price">Set service price to $</option></select></label>
+                        <label className="text-sm text-white/55">{item.type === "set_service_price" ? "Promo service price" : "Amount"}<input type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} placeholder={item.type === "set_service_price" ? "40" : undefined} /></label>
+                        <label className="text-sm text-white/55 md:col-span-2">Applies to<select className={`${input} mt-2`} value={item.appliesTo || ""} onChange={(e) => updateDiscount(index, { appliesTo: e.target.value || null })}><option value="">All services and packages</option>{["Full Detailing", "Interior Only", "Exterior Only", "Standalone", "Other Services"].map((group) => { const options = discountTargets.filter((option) => option.group === group); return options.length ? <optgroup key={group} label={group}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</optgroup> : null; })}</select><span className="mt-2 block text-xs leading-5 text-white/32">Pick one service/package to prevent this code from working anywhere else.</span></label>
                         <label className="text-sm text-white/55">Total usage limit<input type="number" min="1" step="1" className={`${input} mt-2`} value={item.usageLimit ?? ""} onChange={(e) => updateDiscount(index, { usageLimit: e.target.value ? Math.max(1, Math.floor(Number(e.target.value))) : null })} placeholder="Unlimited" /></label>
                         <label className="text-sm text-white/55">Expiration date<input type="date" className={`${input} mt-2`} value={item.expiresAt || ""} onChange={(e) => updateDiscount(index, { expiresAt: e.target.value || null })} /></label>
                         <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.onePerCustomer} onChange={(e) => updateDiscount(index, { onePerCustomer: e.target.checked })} /> One use per customer</label>
                         <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateDiscount(index, { active: e.target.checked })} /> Active</label>
                       </div>
+                      {item.type === "set_service_price" && item.appliesTo && <p className="mt-3 rounded-xl border border-emerald-400/15 bg-emerald-400/[.06] px-4 py-3 text-xs leading-5 text-emerald-100/80">This sets only the selected service price to ${Number(item.amount || 0).toFixed(2)}. Any customer-selected add-ons stay at their normal price.</p>}
+                      {item.type === "set_service_price" && !item.appliesTo && <p className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[.07] px-4 py-3 text-xs leading-5 text-amber-100">Choose a specific service/package above. Exact promo-price codes cannot be saved as an all-services discount.</p>}
                     </article>
                   );
                 })}
