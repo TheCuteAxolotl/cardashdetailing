@@ -36,23 +36,23 @@ export default function StaffGuideClient({ sections, isOwner, permissions }: { s
 
   return (
     <main className="min-h-screen bg-[#070707] text-white">
-      <header className="border-b border-white/10 bg-[radial-gradient(circle_at_20%_-20%,rgba(255,45,45,.18),transparent_38%),#080808]">
+      <header className="border-b border-white/10 bg-[radial-gradient(circle_at_20%_-20%,rgba(110,174,198,.18),transparent_38%),#080808]">
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-12">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Internal · Car Dash Detailing</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#6EAEC6]">Internal · Car Dash Detailing</p>
               <h1 className="mt-3 text-4xl font-semibold tracking-[-.045em] sm:text-5xl">Staff Guide</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">Rules, communication standards, customer-service scripts, and the operating playbook for representing Car Dash professionally.</p>
             </div>
             <a href={isOwner ? "/owner/dashboard" : "/admin/dashboard"} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/70 hover:border-white/30 hover:text-white">Back to dashboard</a>
           </div>
           <div className="mt-7 max-w-xl">
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search rules, calls, quotes, SMS, support…" className="w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3.5 text-sm outline-none transition focus:border-[#FF2D2D]/60" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search rules, calls, quotes, SMS, support…" className="w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3.5 text-sm outline-none transition focus:border-[#6EAEC6]/60" />
           </div>
           {quickLinks.length > 0 && (
             <div className="mt-5 flex flex-wrap gap-2">
               {quickLinks.map((item) => (
-                <a key={item.label} href={item.href} className="rounded-full border border-white/10 bg-white/[.035] px-4 py-2 text-xs font-semibold text-white/55 transition hover:border-[#FF2D2D]/35 hover:text-white">
+                <a key={item.label} href={item.href} className="rounded-full border border-white/10 bg-white/[.035] px-4 py-2 text-xs font-semibold text-white/55 transition hover:border-[#6EAEC6]/35 hover:text-white">
                   {item.label} ↗
                 </a>
               ))}
@@ -69,7 +69,7 @@ export default function StaffGuideClient({ sections, isOwner, permissions }: { s
               <a key={section.id} href={`#${section.id}`} className="block rounded-xl px-3 py-2 text-sm text-white/55 transition hover:bg-white/[.05] hover:text-white">{section.title}</a>
             ))}
           </div>
-          <div className="mt-5 rounded-2xl border border-[#FF2D2D]/20 bg-[#FF2D2D]/[.06] p-4 text-xs leading-5 text-white/55">
+          <div className="mt-5 rounded-2xl border border-[#6EAEC6]/20 bg-[#6EAEC6]/[.06] p-4 text-xs leading-5 text-white/55">
             When in doubt, do not improvise a policy. Tell the customer you are verifying it and escalate to the owner.
           </div>
         </aside>
@@ -77,7 +77,7 @@ export default function StaffGuideClient({ sections, isOwner, permissions }: { s
         <div className="space-y-6">
           {filtered.map((section) => (
             <section id={section.id} key={section.id} className="scroll-mt-6 rounded-[28px] border border-white/10 bg-white/[.025] p-6 sm:p-8">
-              <p className="text-[10px] font-bold uppercase tracking-[.26em] text-[#FF2D2D]">{section.eyebrow}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.26em] text-[#6EAEC6]">{section.eyebrow}</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-[-.035em]">{section.title}</h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-white/45">{section.summary}</p>
 
@@ -97,9 +97,9 @@ export default function StaffGuideClient({ sections, isOwner, permissions }: { s
                     {section.scripts.map((script) => {
                       const copyKey = `${section.id}:${script.label}`;
                       return (
-                        <div key={script.label} className="rounded-2xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.045] p-5">
+                        <div key={script.label} className="rounded-2xl border border-[#6EAEC6]/15 bg-[#6EAEC6]/[.045] p-5">
                           <div className="flex items-center justify-between gap-3">
-                            <p className="text-xs font-bold uppercase tracking-[.16em] text-[#FF2D2D]">{script.label}</p>
+                            <p className="text-xs font-bold uppercase tracking-[.16em] text-[#6EAEC6]">{script.label}</p>
                             <button
                               type="button"
                               onClick={async () => {
