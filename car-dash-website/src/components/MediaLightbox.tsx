@@ -83,7 +83,7 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
     <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/92 p-3 sm:p-6" role="dialog" aria-modal="true" aria-label={item.title}>
       <button type="button" onClick={onClose} className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/60 text-2xl text-white" aria-label="Close media">×</button>
       {items.length > 1 && <button type="button" onClick={() => setIndex((index - 1 + items.length) % items.length)} className="absolute left-3 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/60 text-3xl text-white sm:left-6" aria-label="Previous media">‹</button>}
-      <div className="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[24px] border border-white/12 bg-[#0D0D0D]">
+      <div className="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[24px] border border-white/12 bg-[#0B1822]">
         <div className="relative flex min-h-[280px] flex-1 items-center justify-center bg-black sm:min-h-[520px]">
           <MediaVisual item={item} className="max-h-[76vh] min-h-[280px] w-full object-contain sm:min-h-[520px]" />
         </div>
