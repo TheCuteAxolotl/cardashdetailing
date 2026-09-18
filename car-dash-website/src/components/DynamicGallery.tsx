@@ -43,7 +43,7 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
             <MediaVisual item={item} thumbnail className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-5">
-              <p className="text-[10px] uppercase tracking-[.22em] text-[#FF2D2D]">{item.category.replaceAll("-", " ")}</p>
+              <p className="text-[10px] uppercase tracking-[.22em] text-[#6EAEC6]">{item.category.replaceAll("-", " ")}</p>
               <h3 className="mt-1 text-lg font-semibold text-white">{item.title}</h3>
             </div>
           </button>
