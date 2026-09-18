@@ -36,7 +36,7 @@ export default function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 sm:px-6">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-3xl overflow-hidden rounded-[2rem] border border-neutral-800 bg-neutral-900 shadow-2xl">
+      <div className="relative z-10 w-full max-w-3xl overflow-hidden rounded-[2rem] border border-[#27404F] bg-[#13232F] shadow-2xl">
         <button
           aria-label="Close"
           onClick={onClose}
