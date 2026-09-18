@@ -8,14 +8,14 @@ export default async function ContactPage() {
   const content = await getSiteContent();
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white">
+    <main className="min-h-screen bg-[#0B1822] text-white">
       <section className="border-b border-white/8">
         <div className="mx-auto grid max-w-7xl gap-7 px-5 py-9 sm:px-8 sm:py-12 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
           <div className="flex flex-col justify-center py-3 lg:py-8">
-            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Book a detail</p>
+            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Book a detail</p>
             <h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.055em] sm:text-6xl">Choose the service, day, and time.</h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/50">No account needed. Pick a fixed-price service, choose an open appointment, and see the total before you submit.</p>
-            <div className="mt-5 flex flex-wrap gap-3"><a href="/#prices" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">See all prices</a><a href={`tel:${BUSINESS_PHONE}`} className="rounded-full bg-white px-5 py-3 text-sm font-bold text-[#111]">Call {BUSINESS_PHONE_DISPLAY}</a><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold">Exact quote</a></div>
+            <div className="mt-5 flex flex-wrap gap-3"><a href="/#prices" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">See all prices</a><a href={`tel:${BUSINESS_PHONE}`} className="rounded-full bg-white px-5 py-3 text-sm font-bold text-[#111]">Call {BUSINESS_PHONE_DISPLAY}</a><a href="/quote" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-bold">Exact quote</a></div>
           </div>
           <div className="relative min-h-[280px] overflow-hidden rounded-[26px] bg-black sm:min-h-[360px]">
             <SitePhoto category="contact-hero" fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" />
