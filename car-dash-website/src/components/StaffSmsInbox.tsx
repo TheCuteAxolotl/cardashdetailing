@@ -181,14 +181,14 @@ export default function StaffSmsInbox({
   const backHref = role === "owner" ? "/owner/dashboard" : "/admin/dashboard";
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
-      <header className="border-b border-white/10 bg-neutral-950">
+    <main className="min-h-screen bg-[#07131B] text-white">
+      <header className="border-b border-white/10 bg-[#0B1822]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold">SMS Inbox</h1>
               {data.totalUnread > 0 && (
-                <span className="rounded-full bg-[#FF2D2D] px-2.5 py-1 text-xs font-bold text-[#0D0D0D]">
+                <span className="rounded-full bg-[#6EAEC6] px-2.5 py-1 text-xs font-bold text-[#0B1822]">
                   {data.totalUnread} unread
                 </span>
               )}
@@ -238,7 +238,7 @@ export default function StaffSmsInbox({
                   type="button"
                   onClick={repairConnection}
                   disabled={repairing}
-                  className="rounded-full bg-[#FF2D2D] px-4 py-2 text-sm font-bold text-[#0D0D0D] disabled:opacity-50"
+                  className="rounded-full bg-[#6EAEC6] px-4 py-2 text-sm font-bold text-[#0B1822] disabled:opacity-50"
                 >
                   {repairing ? "Connecting…" : "Repair SMS Connection"}
                 </button>
@@ -252,7 +252,7 @@ export default function StaffSmsInbox({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search customer, phone, vehicle, or message…"
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[#FF2D2D]/60"
+            className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[#6EAEC6]/60"
           />
         </div>
 
@@ -282,9 +282,9 @@ export default function StaffSmsInbox({
                 <a
                   key={row.conversationId}
                   href={`/booking-chat/${booking.id}`}
-                  className={`block rounded-3xl border p-5 transition hover:border-[#FF2D2D]/45 ${
+                  className={`block rounded-3xl border p-5 transition hover:border-[#6EAEC6]/45 ${
                     row.unreadCount > 0
-                      ? "border-[#FF2D2D]/35 bg-[#FF2D2D]/[.06]"
+                      ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/[.06]"
                       : "border-white/10 bg-white/[.025]"
                   }`}
                 >
@@ -293,7 +293,7 @@ export default function StaffSmsInbox({
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="font-semibold">{booking.customerName}</h2>
                         {row.unreadCount > 0 && (
-                          <span className="rounded-full bg-[#FF2D2D] px-2 py-0.5 text-[10px] font-bold text-[#0D0D0D]">
+                          <span className="rounded-full bg-[#6EAEC6] px-2 py-0.5 text-[10px] font-bold text-[#0B1822]">
                             {row.unreadCount} new
                           </span>
                         )}
