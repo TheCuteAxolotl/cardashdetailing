@@ -248,7 +248,7 @@ export default function SupportWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="support-launcher fixed bottom-5 right-5 z-[70] rounded-full border border-black/10 bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] shadow-[0_18px_50px_rgba(0,0,0,.22)] transition hover:-translate-y-0.5"
+          className="support-launcher fixed bottom-5 right-5 z-[70] rounded-full border border-white/15 bg-[#0B1822]/92 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(16,42,55,.22)] backdrop-blur-xl transition hover:-translate-y-0.5"
         >
           Need help?
         </button>
@@ -264,7 +264,7 @@ export default function SupportWidget() {
           <section className="flex max-h-[84vh] w-full max-w-[460px] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0a] text-white shadow-2xl">
             <div className="flex items-start justify-between border-b border-white/10 px-5 py-5">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[.26em] text-[#FF2D2D]">
+                <p className="text-[10px] font-semibold uppercase tracking-[.26em] text-[#6EAEC6]">
                   Car Dash Support
                 </p>
                 <h2 className="mt-2 text-xl font-semibold">
@@ -296,7 +296,7 @@ export default function SupportWidget() {
                 <div className="grid gap-2 sm:grid-cols-2">
                   <a
                     href="/login"
-                    className="rounded-full bg-[#FF2D2D] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]"
+                    className="rounded-full bg-[#6EAEC6] px-5 py-3 text-center text-sm font-semibold text-[#0B1822] hover:bg-[#6EAEC6]"
                   >
                     Login
                   </a>
@@ -316,7 +316,7 @@ export default function SupportWidget() {
                 </p>
                 <a
                   href={user.role === "owner" ? "/owner/support" : user.permissions?.includes("support") ? "/admin/support" : "/admin/dashboard"}
-                  className="block rounded-full bg-[#FF2D2D] px-5 py-3 text-center text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D]"
+                  className="block rounded-full bg-[#6EAEC6] px-5 py-3 text-center text-sm font-semibold text-[#0B1822] hover:bg-[#6EAEC6]"
                 >
                   {user.role === "owner" || user.permissions?.includes("support") ? "Open Support Inbox" : "Open Staff Dashboard"}
                 </a>
@@ -362,11 +362,11 @@ export default function SupportWidget() {
                   className="support-input"
                 />
 
-                {error && <p className="text-sm text-[#FF2D2D]">{error}</p>}
+                {error && <p className="text-sm text-[#6EAEC6]">{error}</p>}
 
                 <button
                   disabled={sending}
-                  className="w-full rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] hover:bg-[#FF2D2D] disabled:opacity-50"
+                  className="w-full rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-[#0B1822] hover:bg-[#6EAEC6] disabled:opacity-50"
                 >
                   {sending ? "Sending…" : "Start support chat"}
                 </button>
@@ -425,7 +425,7 @@ export default function SupportWidget() {
                           key={item.id}
                           className={`max-w-[86%] rounded-2xl px-4 py-3 text-sm leading-6 ${
                             item.sender === "team"
-                              ? "bg-[#FF2D2D] text-[#0D0D0D]"
+                              ? "bg-[#6EAEC6] text-[#0B1822]"
                               : "ml-auto bg-white/8 text-white/80"
                           }`}
                         >
@@ -448,12 +448,12 @@ export default function SupportWidget() {
                         />
                         <button
                           disabled={sending}
-                          className="rounded-full bg-white px-4 text-sm font-semibold text-[#0D0D0D] disabled:opacity-50"
+                          className="rounded-full bg-white px-4 text-sm font-semibold text-[#0B1822] disabled:opacity-50"
                         >
                           Send
                         </button>
                       </div>
-                      {error && <p className="mt-2 text-xs text-[#FF2D2D]">{error}</p>}
+                      {error && <p className="mt-2 text-xs text-[#6EAEC6]">{error}</p>}
                     </form>
                   </>
                 ) : (
