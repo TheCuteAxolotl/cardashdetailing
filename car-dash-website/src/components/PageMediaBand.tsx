@@ -59,15 +59,15 @@ export default function PageMediaBand({
       <div className={className}>
         {(eyebrow || title) && (
           <div className="mb-5">
-            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">{eyebrow}</p>}
-            {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${theme === "dark" ? "text-white" : "text-[#111]"}`}>{title}</h2>}
+            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7B5C4B]">{eyebrow}</p>}
+            {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${theme === "dark" ? "text-[#F7F5F2]" : "text-[#171411]"}`}>{title}</h2>}
           </div>
         )}
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
           {[0, 1, 2].map((slot) => (
             <div
               key={slot}
-              className={`${slot === 0 && !compact ? "col-span-2 row-span-2" : ""} ${compact ? "min-h-36" : "min-h-48"} animate-pulse rounded-[22px] border ${theme === "dark" ? "border-white/10 bg-white/[.045]" : "border-black/8 bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5)]"}`}
+              className={`${slot === 0 && !compact ? "col-span-2 row-span-2" : ""} ${compact ? "min-h-36" : "min-h-48"} animate-pulse rounded-[22px] border ${theme === "dark" ? "border-[#F7F5F2]/10 bg-[#C0AB9A]/10" : "border-[#C0AB9A]/35 bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2)]"}`}
               aria-hidden="true"
             />
           ))}
@@ -79,15 +79,15 @@ export default function PageMediaBand({
   if (!visible.length) return null;
 
   const dark = theme === "dark";
-  const border = dark ? "border-white/10" : "border-black/10";
+  const border = dark ? "border-[#F7F5F2]/10" : "border-[#C0AB9A]/35";
 
   return (
     <>
       <div className={className}>
         {(eyebrow || title) && (
           <div className="mb-5">
-            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">{eyebrow}</p>}
-            {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${dark ? "text-white" : "text-[#111]"}`}>{title}</h2>}
+            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7B5C4B]">{eyebrow}</p>}
+            {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${dark ? "text-[#F7F5F2]" : "text-[#171411]"}`}>{title}</h2>}
           </div>
         )}
         <div className={`grid gap-3 ${visible.length === 1 ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-3"}`}>
@@ -96,11 +96,11 @@ export default function PageMediaBand({
               key={item.id}
               type="button"
               onClick={() => setOpenIndex(index)}
-              className={`${index === 0 && visible.length >= 3 && !compact ? "col-span-2 row-span-2" : ""} group relative overflow-hidden rounded-[22px] border ${border} bg-black text-left ${compact ? "min-h-36" : "min-h-48"}`}
+              className={`${index === 0 && visible.length >= 3 && !compact ? "col-span-2 row-span-2" : ""} group relative overflow-hidden rounded-[22px] border ${border} bg-[#171411] text-left ${compact ? "min-h-36" : "min-h-48"}`}
               aria-label={`Open ${item.title}`}
             >
               <MediaVisual item={item} thumbnail className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${compact ? "min-h-36 max-h-56" : "min-h-48"}`} />
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-4 pb-3 pt-10 text-xs font-semibold text-white">{item.title}</span>
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#171411]/88 to-transparent px-4 pb-3 pt-10 text-xs font-semibold text-[#F7F5F2]">{item.title}</span>
             </button>
           ))}
         </div>
