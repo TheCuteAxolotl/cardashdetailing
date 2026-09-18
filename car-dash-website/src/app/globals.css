@@ -1,30 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0B1822;
-  --foreground: #FFFFFF;
-  --slate: #5E707A;
+  /* Car Dash master palette */
+  --pearl: #F7F5F2;
+  --platinum: #EFE8E2;
+  --tuscany: #C0AB9A;
+  --raw-umber: #7B5C4B;
+  --old-burgundy: #3F3027;
+  --eerie-black: #171411;
 
-  /* Public-site glass palette. Keep UI colors centralized here. */
-  --theme-canvas: #EEF7F5;
-  --theme-canvas-blue: #DDEFF6;
-  --theme-panel: rgba(255, 255, 255, 0.72);
-  --theme-panel-strong: rgba(255, 255, 255, 0.9);
-  --theme-ink: #17212A;
-  --theme-muted: #5E707A;
-  --theme-dark: #0B1822;
-  --theme-dark-deep: #07131B;
-  --theme-dark-2: #13232F;
-  --theme-accent: #6EAEC6;
-  --theme-accent-strong: #2F718D;
-  --theme-accent-soft: rgba(110, 174, 198, 0.14);
-  --theme-accent-line: rgba(110, 174, 198, 0.3);
-  --theme-danger: #D75C5C;
-  --theme-success: #69B7A5;
-  --theme-warning: #C9A96A;
-  --theme-info: #7BAFC8;
+  /* Global semantic tokens used everywhere: public, customer, staff, admin, owner */
+  --background: var(--eerie-black);
+  --foreground: var(--pearl);
+  --slate: var(--raw-umber);
+  --theme-canvas: var(--pearl);
+  --theme-canvas-alt: var(--platinum);
+  --theme-canvas-blue: var(--platinum);
+  --theme-panel: rgba(247,245,242,.78);
+  --theme-panel-strong: rgba(247,245,242,.94);
+  --theme-ink: var(--eerie-black);
+  --theme-muted: var(--raw-umber);
+  --theme-dark: var(--old-burgundy);
+  --theme-dark-deep: var(--eerie-black);
+  --theme-dark-2: var(--old-burgundy);
+  --theme-accent: var(--tuscany);
+  --theme-accent-strong: var(--raw-umber);
+  --theme-accent-soft: rgba(192,171,154,.18);
+  --theme-accent-line: rgba(123,92,75,.34);
+  --theme-danger: var(--raw-umber);
+  --theme-success: var(--tuscany);
+  --theme-warning: var(--raw-umber);
+  --theme-info: var(--tuscany);
+  --theme-border-dark: rgba(63,48,39,.16);
+  --theme-border-light: rgba(247,245,242,.14);
+  --theme-shadow: rgba(23,20,17,.18);
 
-  /* Legacy aliases still used by a few internal components. */
   --accent: var(--theme-accent);
   --accent-soft: var(--theme-accent-soft);
   --accent-line: var(--theme-accent-line);
@@ -65,7 +75,6 @@ summary {
   touch-action: manipulation;
 }
 
-/* Public UI motion is intentionally subtle so the site feels fast and simple. */
 a,
 button,
 summary {
@@ -92,35 +101,31 @@ a[aria-disabled="true"] {
   box-shadow: none !important;
 }
 
-summary::-webkit-details-marker {
-  display: none;
-}
+summary::-webkit-details-marker { display: none; }
 
 ::selection {
-  background: var(--theme-accent);
-  color: var(--theme-ink);
+  background: var(--tuscany);
+  color: var(--eerie-black);
 }
 
 .support-input {
   width: 100%;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.11);
-  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(247,245,242,.13);
+  background: rgba(247,245,242,.05);
   padding: 12px 14px;
-  color: #fff;
+  color: var(--pearl);
   outline: none;
   font-size: 14px;
   transition: border-color 240ms ease, box-shadow 240ms ease, background-color 240ms ease;
 }
-.support-input::placeholder { color: rgba(255,255,255,.24); }
+.support-input::placeholder { color: rgba(247,245,242,.30); }
 .support-input:focus {
-  border-color: rgba(110,174,198,.72);
-  box-shadow: 0 0 0 3px rgba(110,174,198,.10);
-  background: rgba(255,255,255,.06);
+  border-color: rgba(192,171,154,.76);
+  box-shadow: 0 0 0 3px rgba(192,171,154,.12);
+  background: rgba(247,245,242,.07);
 }
 
-
-/* Mobile navigation: keep the panel mounted so iPhone/Safari can animate both opening and closing. */
 .mobile-menu-shell {
   max-height: 0;
   overflow: hidden;
@@ -145,7 +150,7 @@ summary::-webkit-details-marker {
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0);
-  border-color: rgba(255,255,255,.1);
+  border-color: rgba(63,48,39,.14);
   transition:
     max-height 420ms cubic-bezier(.22,.8,.25,1),
     opacity 220ms ease,
@@ -154,19 +159,14 @@ summary::-webkit-details-marker {
     visibility 0s linear 0s;
 }
 
-/* The inner panel remains the actual momentum-scroll container on iPhone/Safari. */
 .mobile-menu-scroll {
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
   touch-action: pan-y;
 }
 
-/* Keep the floating help launcher from covering the mobile navigation. */
-.mobile-nav-open .support-launcher {
-  display: none !important;
-}
+.mobile-nav-open .support-launcher { display: none !important; }
 
-/* Natural-height accordion animation for the mobile Services and Explore sections. */
 .mobile-accordion {
   display: grid;
   grid-template-rows: 0fr;
@@ -175,66 +175,47 @@ summary::-webkit-details-marker {
     grid-template-rows 340ms cubic-bezier(.22,.8,.25,1),
     opacity 220ms ease;
 }
-
 .mobile-accordion.mobile-accordion-open {
   grid-template-rows: 1fr;
   opacity: 1;
 }
-
 .mobile-accordion-inner {
   min-height: 0;
   overflow: hidden;
 }
 
-/* Car Dash public-site finishing touches */
 img { display: block; }
 .public-glass {
-  background: rgba(11,24,34,.68);
-  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(63,48,39,.68);
+  border: 1px solid rgba(247,245,242,.12);
   backdrop-filter: blur(18px);
 }
 
-/* Smooth dropdown entrance used by the Services and Explore navigation. */
 .menu-pop {
   transform-origin: top center;
   animation: menuPop 260ms cubic-bezier(.2,.75,.2,1) both;
 }
-
 @keyframes menuPop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -8px) scale(.985);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
+  from { opacity: 0; transform: translate(-50%, -8px) scale(.985); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
-/* Services menu is positioned by the Services trigger itself, not by the header edge. */
 .menu-pop-services {
   transform-origin: top left;
   animation: menuPopServices 220ms cubic-bezier(.2,.75,.2,1) both;
 }
-
 @keyframes menuPopServices {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-6px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .soft-panel {
-  background: linear-gradient(145deg, rgba(94,112,122,.15), rgba(255,255,255,.035));
-  border: 1px solid rgba(255,255,255,.1);
+  background: linear-gradient(145deg, rgba(123,92,75,.17), rgba(247,245,242,.035));
+  border: 1px solid rgba(247,245,242,.11);
 }
 
 .accent-rule {
-  background: linear-gradient(90deg, transparent, rgba(110,174,198,.72), transparent);
+  background: linear-gradient(90deg, transparent, rgba(192,171,154,.78), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -246,142 +227,175 @@ img { display: block; }
   }
 }
 
-
 /*
- * Car Dash theme bridge
- * ---------------------
- * Public, customer, staff, admin, owner, booking and add-on screens all
- * resolve their core palette through these variables. This intentionally
- * catches both current and legacy hard-coded utility tokens so a future
- * palette swap can be made from :root without leaving mismatched screens.
+ * MASTER THEME BRIDGE
+ * All legacy and current UI tokens resolve into the six-color palette above.
+ * This covers public pages, account screens, booking/add-ons, staff/admin, owner tools,
+ * modal/lightbox UI, status badges, forms, and older hard-coded Tailwind utilities.
  */
 [class~="bg-[#6EAEC6]"],
-[class~="bg-[#FF2D2D]"] { background-color: var(--theme-accent) !important; }
-
+[class~="bg-[#FF2D2D]"] { background-color: var(--tuscany) !important; }
 [class~="text-[#6EAEC6]"],
-[class~="text-[#FF2D2D]"] { color: var(--theme-accent) !important; }
-
+[class~="text-[#FF2D2D]"] { color: var(--raw-umber) !important; }
 [class~="border-[#6EAEC6]"],
-[class~="border-[#FF2D2D]"] { border-color: var(--theme-accent) !important; }
+[class~="border-[#FF2D2D]"] { border-color: var(--tuscany) !important; }
 
-[class~="bg-[#2F718D]"] { background-color: var(--theme-accent-strong) !important; }
-[class~="text-[#2F718D]"] { color: var(--theme-accent-strong) !important; }
-[class~="border-[#2F718D]"] { border-color: var(--theme-accent-strong) !important; }
+[class~="bg-[#2F718D]"] { background-color: var(--raw-umber) !important; }
+[class~="text-[#2F718D]"] { color: var(--raw-umber) !important; }
+[class~="border-[#2F718D]"] { border-color: var(--raw-umber) !important; }
 
 [class~="bg-[#EEF7F5]"],
-[class~="bg-[#F4F3EF]"] { background-color: var(--theme-canvas) !important; }
+[class~="bg-[#F4F3EF]"],
+[class~="bg-[#DDEFF6]"],
+[class~="bg-[#E5F1F0]"],
+[class~="bg-[#F7F7F5]"],
+[class~="bg-[#fff8f7]"],
+[class~="bg-[#fffdfb]"] { background-color: var(--pearl) !important; }
 
 [class~="bg-[#0B1822]"],
-[class~="bg-[#0D0D0D]"] { background-color: var(--theme-dark) !important; }
-
-[class~="bg-[#07131B]"],
-[class~="bg-[#050505]"] { background-color: var(--theme-dark-deep) !important; }
-
-[class~="bg-[#13232F]"],
-[class~="bg-[#111318]"] { background-color: var(--theme-dark-2) !important; }
-
-[class~="text-[#17212A]"] { color: var(--theme-ink) !important; }
-[class~="border-[#27404F]"] { border-color: color-mix(in srgb, var(--theme-accent) 24%, transparent) !important; }
-[class~="border-[#365262]"] { border-color: color-mix(in srgb, var(--theme-accent) 34%, transparent) !important; }
-
-[class~="bg-[#6EAEC6]/8"],
-[class~="bg-[#FF2D2D]/8"] { background-color: color-mix(in srgb, var(--theme-accent) 8%, transparent) !important; }
-[class~="bg-[#6EAEC6]/10"],
-[class~="bg-[#FF2D2D]/10"] { background-color: color-mix(in srgb, var(--theme-accent) 10%, transparent) !important; }
-[class~="bg-[#6EAEC6]/12"],
-[class~="bg-[#FF2D2D]/12"] { background-color: color-mix(in srgb, var(--theme-accent) 12%, transparent) !important; }
-[class~="bg-[#6EAEC6]/15"],
-[class~="bg-[#FF2D2D]/15"] { background-color: color-mix(in srgb, var(--theme-accent) 15%, transparent) !important; }
-[class~="bg-[#6EAEC6]/20"],
-[class~="bg-[#FF2D2D]/20"] { background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important; }
-[class~="bg-[#6EAEC6]/30"],
-[class~="bg-[#FF2D2D]/30"] { background-color: color-mix(in srgb, var(--theme-accent) 30%, transparent) !important; }
-
-[class~="border-[#6EAEC6]/20"],
-[class~="border-[#FF2D2D]/20"] { border-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important; }
-[class~="border-[#6EAEC6]/30"],
-[class~="border-[#FF2D2D]/30"] { border-color: color-mix(in srgb, var(--theme-accent) 30%, transparent) !important; }
-[class~="border-[#6EAEC6]/55"],
-[class~="border-[#FF2D2D]/55"] { border-color: color-mix(in srgb, var(--theme-accent) 55%, transparent) !important; }
-[class~="border-[#6EAEC6]/60"],
-[class~="border-[#FF2D2D]/60"] { border-color: color-mix(in srgb, var(--theme-accent) 60%, transparent) !important; }
-[class~="border-[#6EAEC6]/65"],
-[class~="border-[#FF2D2D]/65"] { border-color: color-mix(in srgb, var(--theme-accent) 65%, transparent) !important; }
-
-
-/* Neutral + semantic compatibility so dashboards do not fall back to the old black/red/rainbow palette. */
+[class~="bg-[#0D0D0D]"],
 [class~="bg-[#111]"],
 [class~="bg-[#151515]"],
-[class~="bg-neutral-950"] { background-color: var(--theme-dark) !important; }
+[class~="bg-neutral-950"] { background-color: var(--old-burgundy) !important; }
 
+[class~="bg-[#07131B]"],
+[class~="bg-[#050505]"],
+[class~="bg-black"] { background-color: var(--eerie-black) !important; }
+
+[class~="bg-[#13232F]"],
 [class~="bg-neutral-900"],
-[class~="bg-neutral-800"] { background-color: var(--theme-dark-2) !important; }
+[class~="bg-neutral-800"] { background-color: var(--old-burgundy) !important; }
 
+[class~="text-[#17212A]"],
+[class~="text-[#17212a]"],
 [class~="text-[#111]"],
-[class~="text-black"] { color: var(--theme-ink) !important; }
+[class~="text-[#101820]"],
+[class~="text-black"] { color: var(--eerie-black) !important; }
 
-[class~="bg-black"] { background-color: var(--theme-dark-deep) !important; }
+[class~="text-white"] { color: var(--pearl) !important; }
+[class~="bg-white"] { background-color: var(--pearl) !important; }
 
-[class~="bg-black/20"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 20%, transparent) !important; }
-[class~="bg-black/30"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 30%, transparent) !important; }
-[class~="bg-black/35"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 35%, transparent) !important; }
-[class~="bg-black/40"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 40%, transparent) !important; }
-[class~="bg-black/45"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 45%, transparent) !important; }
-[class~="bg-black/50"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 50%, transparent) !important; }
-[class~="bg-black/55"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 55%, transparent) !important; }
-[class~="bg-black/60"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 60%, transparent) !important; }
-[class~="bg-black/70"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 70%, transparent) !important; }
-[class~="bg-black/75"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 75%, transparent) !important; }
-[class~="bg-black/80"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 80%, transparent) !important; }
-[class~="bg-black/85"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 85%, transparent) !important; }
+[class~="border-[#27404F]"],
+[class~="border-[#365262]"] { border-color: rgba(123,92,75,.35) !important; }
 
-[class*="text-red-"] { color: var(--theme-danger) !important; }
-[class*="border-red-"] { border-color: color-mix(in srgb, var(--theme-danger) 40%, transparent) !important; }
-[class*="bg-red-"] { background-color: color-mix(in srgb, var(--theme-danger) 16%, transparent) !important; }
+[class~="bg-[#6EAEC6]/8"], [class~="bg-[#FF2D2D]/8"] { background-color: rgba(192,171,154,.08) !important; }
+[class~="bg-[#6EAEC6]/10"], [class~="bg-[#FF2D2D]/10"] { background-color: rgba(192,171,154,.10) !important; }
+[class~="bg-[#6EAEC6]/12"], [class~="bg-[#FF2D2D]/12"] { background-color: rgba(192,171,154,.12) !important; }
+[class~="bg-[#6EAEC6]/15"], [class~="bg-[#FF2D2D]/15"] { background-color: rgba(192,171,154,.15) !important; }
+[class~="bg-[#6EAEC6]/20"], [class~="bg-[#FF2D2D]/20"] { background-color: rgba(192,171,154,.20) !important; }
+[class~="bg-[#6EAEC6]/30"], [class~="bg-[#FF2D2D]/30"] { background-color: rgba(192,171,154,.30) !important; }
 
+[class~="border-[#6EAEC6]/20"], [class~="border-[#FF2D2D]/20"] { border-color: rgba(192,171,154,.20) !important; }
+[class~="border-[#6EAEC6]/30"], [class~="border-[#FF2D2D]/30"] { border-color: rgba(192,171,154,.30) !important; }
+[class~="border-[#6EAEC6]/35"] { border-color: rgba(192,171,154,.35) !important; }
+[class~="border-[#6EAEC6]/55"], [class~="border-[#FF2D2D]/55"] { border-color: rgba(192,171,154,.55) !important; }
+[class~="border-[#6EAEC6]/60"], [class~="border-[#FF2D2D]/60"] { border-color: rgba(192,171,154,.60) !important; }
+[class~="border-[#6EAEC6]/65"], [class~="border-[#FF2D2D]/65"] { border-color: rgba(192,171,154,.65) !important; }
+
+[class~="bg-white/3"] { background-color: rgba(247,245,242,.03) !important; }
+[class~="bg-white/4"] { background-color: rgba(247,245,242,.04) !important; }
+[class~="bg-white/5"] { background-color: rgba(247,245,242,.05) !important; }
+[class~="bg-white/6"] { background-color: rgba(247,245,242,.06) !important; }
+[class~="bg-white/8"] { background-color: rgba(247,245,242,.08) !important; }
+[class~="bg-white/10"] { background-color: rgba(247,245,242,.10) !important; }
+[class~="bg-white/12"] { background-color: rgba(247,245,242,.12) !important; }
+[class~="bg-white/15"] { background-color: rgba(247,245,242,.15) !important; }
+[class~="bg-white/18"] { background-color: rgba(247,245,242,.18) !important; }
+[class~="bg-white/20"] { background-color: rgba(247,245,242,.20) !important; }
+[class~="bg-white/35"] { background-color: rgba(247,245,242,.35) !important; }
+[class~="bg-white/52"] { background-color: rgba(247,245,242,.52) !important; }
+[class~="bg-white/55"] { background-color: rgba(247,245,242,.55) !important; }
+[class~="bg-white/60"] { background-color: rgba(247,245,242,.60) !important; }
+[class~="bg-white/62"] { background-color: rgba(247,245,242,.62) !important; }
+[class~="bg-white/70"] { background-color: rgba(247,245,242,.70) !important; }
+[class~="bg-white/72"] { background-color: rgba(247,245,242,.72) !important; }
+[class~="bg-white/75"] { background-color: rgba(247,245,242,.75) !important; }
+[class~="bg-white/80"] { background-color: rgba(247,245,242,.80) !important; }
+[class~="bg-white/88"] { background-color: rgba(247,245,242,.88) !important; }
+[class~="bg-white/90"] { background-color: rgba(247,245,242,.90) !important; }
+[class~="bg-white/92"] { background-color: rgba(247,245,242,.92) !important; }
+[class~="bg-white/95"] { background-color: rgba(247,245,242,.95) !important; }
+
+[class~="bg-black/18"] { background-color: rgba(23,20,17,.18) !important; }
+[class~="bg-black/20"] { background-color: rgba(23,20,17,.20) !important; }
+[class~="bg-black/25"] { background-color: rgba(23,20,17,.25) !important; }
+[class~="bg-black/30"] { background-color: rgba(23,20,17,.30) !important; }
+[class~="bg-black/35"] { background-color: rgba(23,20,17,.35) !important; }
+[class~="bg-black/40"] { background-color: rgba(23,20,17,.40) !important; }
+[class~="bg-black/45"] { background-color: rgba(23,20,17,.45) !important; }
+[class~="bg-black/50"] { background-color: rgba(23,20,17,.50) !important; }
+[class~="bg-black/55"] { background-color: rgba(23,20,17,.55) !important; }
+[class~="bg-black/60"] { background-color: rgba(23,20,17,.60) !important; }
+[class~="bg-black/65"] { background-color: rgba(23,20,17,.65) !important; }
+[class~="bg-black/70"] { background-color: rgba(23,20,17,.70) !important; }
+[class~="bg-black/75"] { background-color: rgba(23,20,17,.75) !important; }
+[class~="bg-black/80"] { background-color: rgba(23,20,17,.80) !important; }
+[class~="bg-black/85"] { background-color: rgba(23,20,17,.85) !important; }
+[class~="bg-black/92"] { background-color: rgba(23,20,17,.92) !important; }
+
+[class*="text-red-"],
 [class*="text-green-"],
-[class*="text-emerald-"] { color: var(--theme-success) !important; }
-[class*="border-green-"],
-[class*="border-emerald-"] { border-color: color-mix(in srgb, var(--theme-success) 38%, transparent) !important; }
-[class*="bg-green-"],
-[class*="bg-emerald-"] { background-color: color-mix(in srgb, var(--theme-success) 15%, transparent) !important; }
-
+[class*="text-emerald-"],
 [class*="text-yellow-"],
 [class*="text-amber-"],
-[class*="text-orange-"] { color: var(--theme-warning) !important; }
-[class*="border-yellow-"],
-[class*="border-amber-"],
-[class*="border-orange-"] { border-color: color-mix(in srgb, var(--theme-warning) 38%, transparent) !important; }
-[class*="bg-yellow-"],
-[class*="bg-amber-"],
-[class*="bg-orange-"] { background-color: color-mix(in srgb, var(--theme-warning) 15%, transparent) !important; }
-
+[class*="text-orange-"],
 [class*="text-blue-"],
 [class*="text-sky-"],
 [class*="text-cyan-"],
 [class*="text-indigo-"],
 [class*="text-violet-"],
-[class*="text-purple-"] { color: var(--theme-info) !important; }
+[class*="text-purple-"] { color: var(--raw-umber) !important; }
+
+[class*="border-red-"],
+[class*="border-green-"],
+[class*="border-emerald-"],
+[class*="border-yellow-"],
+[class*="border-amber-"],
+[class*="border-orange-"],
 [class*="border-blue-"],
 [class*="border-sky-"],
 [class*="border-cyan-"],
 [class*="border-indigo-"],
 [class*="border-violet-"],
-[class*="border-purple-"] { border-color: color-mix(in srgb, var(--theme-info) 36%, transparent) !important; }
+[class*="border-purple-"] { border-color: rgba(123,92,75,.38) !important; }
+
+[class*="bg-red-"],
+[class*="bg-green-"],
+[class*="bg-emerald-"],
+[class*="bg-yellow-"],
+[class*="bg-amber-"],
+[class*="bg-orange-"],
 [class*="bg-blue-"],
 [class*="bg-sky-"],
 [class*="bg-cyan-"],
 [class*="bg-indigo-"],
 [class*="bg-violet-"],
-[class*="bg-purple-"] { background-color: color-mix(in srgb, var(--theme-info) 14%, transparent) !important; }
+[class*="bg-purple-"] { background-color: rgba(192,171,154,.16) !important; }
 
-[class~="text-white/38"] { color: rgba(255,255,255,.38) !important; }
-[class~="text-white/52"] { color: rgba(255,255,255,.52) !important; }
-[class~="text-white/72"] { color: rgba(255,255,255,.72) !important; }
-[class~="text-white/82"] { color: rgba(255,255,255,.82) !important; }
+[class~="text-white/26"] { color: rgba(247,245,242,.26) !important; }
+[class~="text-white/28"] { color: rgba(247,245,242,.28) !important; }
+[class~="text-white/30"] { color: rgba(247,245,242,.30) !important; }
+[class~="text-white/35"] { color: rgba(247,245,242,.35) !important; }
+[class~="text-white/38"] { color: rgba(247,245,242,.38) !important; }
+[class~="text-white/40"] { color: rgba(247,245,242,.40) !important; }
+[class~="text-white/42"] { color: rgba(247,245,242,.42) !important; }
+[class~="text-white/45"] { color: rgba(247,245,242,.45) !important; }
+[class~="text-white/48"] { color: rgba(247,245,242,.48) !important; }
+[class~="text-white/50"] { color: rgba(247,245,242,.50) !important; }
+[class~="text-white/52"] { color: rgba(247,245,242,.52) !important; }
+[class~="text-white/55"] { color: rgba(247,245,242,.55) !important; }
+[class~="text-white/58"] { color: rgba(247,245,242,.58) !important; }
+[class~="text-white/60"] { color: rgba(247,245,242,.60) !important; }
+[class~="text-white/62"] { color: rgba(247,245,242,.62) !important; }
+[class~="text-white/64"] { color: rgba(247,245,242,.64) !important; }
+[class~="text-white/68"] { color: rgba(247,245,242,.68) !important; }
+[class~="text-white/70"] { color: rgba(247,245,242,.70) !important; }
+[class~="text-white/72"] { color: rgba(247,245,242,.72) !important; }
+[class~="text-white/75"] { color: rgba(247,245,242,.75) !important; }
+[class~="text-white/80"] { color: rgba(247,245,242,.80) !important; }
+[class~="text-white/82"] { color: rgba(247,245,242,.82) !important; }
+[class~="text-white/90"] { color: rgba(247,245,242,.90) !important; }
 
-
-/* Keep global floating UI out of the way while media is open. */
 .media-lightbox-open .support-launcher {
   opacity: 0 !important;
   visibility: hidden !important;
