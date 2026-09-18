@@ -64,12 +64,12 @@ export default function SitePhoto({
   if (!image) {
     return (
       <div
-        className={`relative flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5_48%,#E5F1F0)] ${className}`}
+        className={`relative flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2_48%,#C0AB9A)] ${className}`}
         aria-label={loading ? "Loading photo" : "Photo placeholder"}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_22%,rgba(255,255,255,.85),transparent_32%),radial-gradient(circle_at_80%_70%,rgba(110,174,198,.18),transparent_30%)]" />
-        <div className="relative flex flex-col items-center gap-2 rounded-2xl border border-black/[.055] bg-white/52 px-4 py-3 text-center text-[#17212A]/45 backdrop-blur-xl">
-          <span className={`h-2 w-2 rounded-full bg-[#6EAEC6] ${loading ? "animate-pulse" : ""}`} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_22%,rgba(247,245,242,.88),transparent_32%),radial-gradient(circle_at_80%_70%,rgba(123,92,75,.16),transparent_30%)]" />
+        <div className="relative flex flex-col items-center gap-2 rounded-2xl border border-[#3F3027]/10 bg-[#F7F5F2]/66 px-4 py-3 text-center text-[#3F3027]/55 backdrop-blur-xl">
+          <span className={`h-2 w-2 rounded-full bg-[#7B5C4B] ${loading ? "animate-pulse" : ""}`} />
           <span className="text-[10px] font-semibold uppercase tracking-[.16em]">
             {loading ? "Loading photo" : "Photo coming soon"}
           </span>
@@ -79,9 +79,9 @@ export default function SitePhoto({
   }
 
   return (
-    <div className={`relative overflow-hidden bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5)] ${className}`}>
+    <div className={`relative overflow-hidden bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2)] ${className}`}>
       {!imageReady && (
-        <div className="absolute inset-0 z-0 animate-pulse bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5_48%,#E5F1F0)]" aria-hidden="true" />
+        <div className="absolute inset-0 z-0 animate-pulse bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2_48%,#C0AB9A)]" aria-hidden="true" />
       )}
       <img
         src={image.url}
