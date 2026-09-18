@@ -127,7 +127,7 @@ export default function BookingChatPage() {
 
   if (loading || accessKey === null) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#050505] text-white">
+      <main className="grid min-h-screen place-items-center bg-[#07131B] text-white">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#6EAEC6]" />
           <p className="mt-4 text-sm text-white/40">Loading booking conversation…</p>
@@ -138,7 +138,7 @@ export default function BookingChatPage() {
 
   if (!data) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#050505] px-5 text-white">
+      <main className="grid min-h-screen place-items-center bg-[#07131B] px-5 text-white">
         <div className="max-w-md rounded-3xl border border-white/10 bg-white/[.025] p-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#6EAEC6]">Booking chat</p>
           <h1 className="mt-3 text-2xl font-semibold">Conversation unavailable</h1>
@@ -165,7 +165,7 @@ export default function BookingChatPage() {
     data.lastCustomerSeenAt && Date.now() - new Date(data.lastCustomerSeenAt).getTime() < 90_000;
 
   return (
-    <main className="min-h-screen bg-[#050505] px-5 py-8 text-white sm:px-8">
+    <main className="min-h-screen bg-[#07131B] px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -249,7 +249,7 @@ export default function BookingChatPage() {
                 onChange={(event) => setReply(event.target.value)}
                 placeholder={staff ? "Text customer…" : "Message Car Dash Detailing…"}
                 maxLength={3000}
-                className="min-h-12 flex-1 resize-none rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-sm text-white outline-none focus:border-[#6EAEC6]/60"
+                className="min-h-12 flex-1 resize-none rounded-2xl border border-white/10 bg-[#07131B]/50 px-4 py-3 text-sm text-white outline-none focus:border-[#6EAEC6]/60"
               />
               <button
                 disabled={sending || !reply.trim()}
