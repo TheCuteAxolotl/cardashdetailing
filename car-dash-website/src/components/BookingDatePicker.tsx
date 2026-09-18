@@ -104,7 +104,7 @@ export default function BookingDatePicker({ value, onChange }: { value: string; 
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        className={`flex w-full items-center justify-between rounded-2xl border bg-black/50 px-4 py-3 text-left text-base outline-none transition ${
+        className={`flex w-full items-center justify-between rounded-2xl border bg-[#07131B]/50 px-4 py-3 text-left text-base outline-none transition ${
           open ? "border-[#6EAEC6]/60" : "border-white/10 hover:border-white/20"
         }`}
       >
