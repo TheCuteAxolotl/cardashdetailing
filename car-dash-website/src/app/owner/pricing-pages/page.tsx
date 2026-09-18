@@ -26,7 +26,7 @@ const routes: Record<Kind, string> = {
   interior: "/interior-detailing",
 };
 
-const input = "mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF2D2D]/55";
+const input = "mt-2 w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-[#6EAEC6]/55";
 
 function newPackage(index: number): PricingPackage {
   return {
@@ -116,12 +116,12 @@ export default function OwnerPricingPages() {
     <main className="min-h-screen bg-[#080808] text-white">
       <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div><p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Owner</p><h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Pricing Pages</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">Control the separate Car Packages, Exterior, and Interior pages. Package names, exact prices, features, badges, order, and buttons are all editable here.</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[.28em] text-[#6EAEC6]">Owner</p><h1 className="mt-2 text-4xl font-semibold tracking-[-.04em]">Pricing Pages</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-white/45">Control the separate Car Packages, Exterior, and Interior pages. Package names, exact prices, features, badges, order, and buttons are all editable here.</p></div>
           <div className="flex flex-wrap gap-2"><a href="/owner/booking-settings" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Add-Ons & Discounts</a><a href="/owner/gallery" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Photos & Media</a><a href="/owner/dashboard" className="rounded-full border border-white/15 px-4 py-2.5 text-sm">Back</a></div>
         </div>
 
         <div className="mt-8 flex flex-wrap gap-2 rounded-[22px] border border-white/10 bg-white/[.025] p-2">
-          {(Object.keys(labels) as Kind[]).map((kind) => <button key={kind} onClick={() => setActive(kind)} className={`rounded-[16px] px-5 py-3 text-sm font-semibold transition ${active === kind ? "bg-[#FF2D2D] text-[#0D0D0D]" : "text-white/55 hover:bg-white/5 hover:text-white"}`}>{labels[kind]}</button>)}
+          {(Object.keys(labels) as Kind[]).map((kind) => <button key={kind} onClick={() => setActive(kind)} className={`rounded-[16px] px-5 py-3 text-sm font-semibold transition ${active === kind ? "bg-[#6EAEC6] text-[#0B1822]" : "text-white/55 hover:bg-white/5 hover:text-white"}`}>{labels[kind]}</button>)}
         </div>
 
         <section className="mt-7 rounded-[28px] border border-white/10 bg-white/[.025] p-5 sm:p-7">
@@ -136,9 +136,9 @@ export default function OwnerPricingPages() {
 
         <div className="mt-7 space-y-6">
           {config.packages.map((pkg, index) => (
-            <article key={pkg.id} className="rounded-[28px] border border-white/10 bg-[#111318] p-5 sm:p-7">
+            <article key={pkg.id} className="rounded-[28px] border border-white/10 bg-[#13232F] p-5 sm:p-7">
               <div className="flex flex-wrap items-start justify-between gap-4">
-                <div><p className="text-xs font-bold uppercase tracking-[.24em] text-[#FF2D2D]">Package {index + 1}</p><h3 className="mt-2 text-2xl font-semibold">{pkg.name}</h3><p className="mt-1 text-xs text-white/30">Photo placement: {labels[active]} → {pkg.name} → Package Photos</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-[.24em] text-[#6EAEC6]">Package {index + 1}</p><h3 className="mt-2 text-2xl font-semibold">{pkg.name}</h3><p className="mt-1 text-xs text-white/30">Photo placement: {labels[active]} → {pkg.name} → Package Photos</p></div>
                 <div className="flex flex-wrap gap-2"><button onClick={() => movePackage(index, -1)} className="rounded-full border border-white/10 px-3 py-2 text-xs">↑ Move</button><button onClick={() => movePackage(index, 1)} className="rounded-full border border-white/10 px-3 py-2 text-xs">↓ Move</button><button onClick={() => removePackage(index)} className="rounded-full border border-red-500/25 px-3 py-2 text-xs text-red-300">Delete</button></div>
               </div>
 
@@ -159,10 +159,10 @@ export default function OwnerPricingPages() {
           ))}
         </div>
 
-        <button onClick={addPackage} className="mt-6 rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/8 px-5 py-3 text-sm font-semibold text-[#FF2D2D]">+ Add another package</button>
+        <button onClick={addPackage} className="mt-6 rounded-full border border-[#6EAEC6]/30 bg-[#6EAEC6]/8 px-5 py-3 text-sm font-semibold text-[#6EAEC6]">+ Add another package</button>
 
-        <div className="sticky bottom-4 z-20 mt-10 flex flex-wrap items-center gap-4 rounded-[22px] border border-[#FF2D2D]/20 bg-[#0D0D0D]/95 p-4 shadow-2xl backdrop-blur-xl">
-          <button onClick={save} disabled={saving} className="rounded-full bg-[#FF2D2D] px-7 py-3 font-semibold text-[#0D0D0D] disabled:opacity-50">{saving ? "Saving…" : "Save All Pricing Pages"}</button>
+        <div className="sticky bottom-4 z-20 mt-10 flex flex-wrap items-center gap-4 rounded-[22px] border border-[#6EAEC6]/20 bg-[#0B1822]/95 p-4 shadow-2xl backdrop-blur-xl">
+          <button onClick={save} disabled={saving} className="rounded-full bg-[#6EAEC6] px-7 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{saving ? "Saving…" : "Save All Pricing Pages"}</button>
           {message && <p className="text-sm text-white/55">{message}</p>}
         </div>
       </div>
