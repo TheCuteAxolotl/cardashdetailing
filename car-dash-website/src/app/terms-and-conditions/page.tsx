@@ -14,7 +14,7 @@ export default function TermsAndConditionsPage() {
   return (
     <section className="bg-[#070707] px-5 py-20 text-white sm:px-8 lg:px-10">
       <div className="mx-auto max-w-4xl">
-        <p className="text-xs font-semibold uppercase tracking-[.28em] text-[#FF2D2D]">Legal</p>
+        <p className="text-xs font-semibold uppercase tracking-[.28em] text-[#6EAEC6]">Legal</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-.04em] sm:text-5xl">Terms and Conditions</h1>
         <p className="mt-4 text-sm text-white/45">Effective {effectiveDate}</p>
 
@@ -84,7 +84,7 @@ export default function TermsAndConditionsPage() {
             </p>
             <p className="mt-3">
               For information about how we handle your information, see our{" "}
-              <a className="text-[#FF2D2D] hover:text-[#FF2D2D]" href="/privacy-policy">Privacy Policy</a>.
+              <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href="/privacy-policy">Privacy Policy</a>.
             </p>
           </section>
 
@@ -109,11 +109,11 @@ export default function TermsAndConditionsPage() {
             <h2 className="text-xl font-semibold text-white">Contact</h2>
             <p className="mt-3">
               Questions about these Terms and Conditions can be sent to{" "}
-              <a className="text-[#FF2D2D] hover:text-[#FF2D2D]" href="mailto:cardashdetailing@gmail.com">
+              <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href="mailto:cardashdetailing@gmail.com">
                 cardashdetailing@gmail.com
               </a>{" "}
               or by calling{" "}
-              <a className="text-[#FF2D2D] hover:text-[#FF2D2D]" href={`tel:${BUSINESS_PHONE}`}>{BUSINESS_PHONE_DISPLAY}</a>.
+              <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href={`tel:${BUSINESS_PHONE}`}>{BUSINESS_PHONE_DISPLAY}</a>.
             </p>
           </section>
         </div>
