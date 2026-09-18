@@ -3,13 +3,13 @@ import SocialLinks from "@/components/SocialLinks";
 
 export default function SiteFooter({ blurb }: { blurb: string }) {
   return (
-    <footer className="border-t border-white/8 bg-[#0D0D0D] text-white">
+    <footer className="border-t border-white/8 bg-[#0B1822] text-white">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-start">
           <div>
-            <div className="flex items-center gap-3"><span className="h-2 w-2 rounded-full bg-[#FF2D2D]" /><p className="text-2xl font-semibold tracking-[-.04em]">Car Dash Detailing</p></div>
+            <div className="flex items-center gap-3"><span className="h-2 w-2 rounded-full bg-[#6EAEC6]" /><p className="text-2xl font-semibold tracking-[-.04em]">Car Dash Detailing</p></div>
             <p className="mt-4 max-w-xl text-sm leading-7 text-white/42">{blurb}</p>
-            <div className="mt-6 flex flex-wrap gap-3"><a href="/#prices" className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold text-white/70">Prices</a><a href="/#book" className="rounded-full bg-[#FF2D2D] px-4 py-2.5 text-sm font-bold text-white">Book now</a><a href="/quote" className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold text-white/70">Exact quote</a></div>
+            <div className="mt-6 flex flex-wrap gap-3"><a href="/#prices" className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold text-white/70">Prices</a><a href="/#book" className="rounded-full bg-[#6EAEC6] px-4 py-2.5 text-sm font-bold text-white">Book now</a><a href="/quote" className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold text-white/70">Exact quote</a></div>
             <div className="mt-6"><SocialLinks /></div>
           </div>
 
