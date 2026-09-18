@@ -61,36 +61,36 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
           <section key={kind} id={`prices-${kind}`} className="scroll-mt-28">
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">{label}</p>
-                <h3 className="mt-2 text-3xl font-semibold tracking-[-.045em] text-[#111] sm:text-4xl">{config.eyebrow}</h3>
+                <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7B5C4B]">{label}</p>
+                <h3 className="mt-2 text-3xl font-semibold tracking-[-.045em] text-[#171411] sm:text-4xl">{config.eyebrow}</h3>
               </div>
-              <p className="max-w-lg text-sm leading-6 text-black/50">{description}</p>
+              <p className="max-w-lg text-sm leading-6 text-[#3F3027]/62">{description}</p>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-3">
               {config.packages.map((pkg) => (
-                <article key={pkg.id} className={`rounded-[26px] border p-5 sm:p-6 ${pkg.featured ? "border-[#6EAEC6]/35 bg-[#fff8f7] shadow-[0_18px_50px_rgba(0,0,0,.07)]" : "border-black/10 bg-white"}`}>
+                <article key={pkg.id} className={`rounded-[26px] border p-5 sm:p-6 ${pkg.featured ? "border-[#C0AB9A]/55 bg-[#EFE8E2] shadow-[0_18px_50px_rgba(23,20,17,.08)]" : "border-[#C0AB9A]/35 bg-[#F7F5F2]"}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#6EAEC6]">{pkg.tier}</p>
-                      <h4 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#111]">{pkg.name}</h4>
+                      <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#7B5C4B]">{pkg.tier}</p>
+                      <h4 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#171411]">{pkg.name}</h4>
                     </div>
-                    {pkg.badge && <span className="rounded-full bg-[#6EAEC6] px-3 py-1.5 text-[10px] font-bold text-white">{pkg.badge}</span>}
+                    {pkg.badge && <span className="rounded-full bg-[#C0AB9A] px-3 py-1.5 text-[10px] font-bold text-[#171411]">{pkg.badge}</span>}
                   </div>
 
-                  <p className="mt-3 min-h-12 text-sm leading-6 text-black/48">{pkg.description}</p>
+                  <p className="mt-3 min-h-12 text-sm leading-6 text-[#3F3027]/62">{pkg.description}</p>
 
-                  <div className="mt-5 overflow-hidden rounded-2xl border border-black/10 bg-[#F7F7F5]">
+                  <div className="mt-5 overflow-hidden rounded-2xl border border-[#C0AB9A]/35 bg-[#EFE8E2]">
                     {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
                       <a
                         key={vehicleClass}
                         href={packageBookHref(kind, pkg.id, vehicleClass)}
-                        className={`flex min-h-14 items-center justify-between gap-4 px-4 py-3 hover:bg-white ${index ? "border-t border-black/8" : ""}`}
+                        className={`flex min-h-14 items-center justify-between gap-4 px-4 py-3 hover:bg-[#F7F5F2] ${index ? "border-t border-[#C0AB9A]/28" : ""}`}
                       >
-                        <span className="text-sm font-medium text-black/60">{VEHICLE_LABELS[vehicleClass]}</span>
+                        <span className="text-sm font-medium text-[#3F3027]/70">{VEHICLE_LABELS[vehicleClass]}</span>
                         <span className="flex items-center gap-3">
-                          <strong className="text-lg text-[#111]">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong>
-                          <span className="text-xs font-semibold text-[#6EAEC6]">Book →</span>
+                          <strong className="text-lg text-[#171411]">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong>
+                          <span className="text-xs font-semibold text-[#7B5C4B]">Book →</span>
                         </span>
                       </a>
                     ))}
@@ -116,19 +116,19 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
         );
       })}
 
-      <section id="extras" className="scroll-mt-28 rounded-[28px] border border-black/10 bg-[#111] p-6 text-white sm:p-8">
+      <section id="extras" className="scroll-mt-28 rounded-[28px] border border-[#C0AB9A]/35 bg-[linear-gradient(135deg,#3F3027,#171411)] p-6 text-[#F7F5F2] sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Add-ons</p>
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#C0AB9A]">Add-ons</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Extras and their prices.</h3>
           </div>
-          <p className="max-w-lg text-sm leading-6 text-white/45">Add-ons can be selected while booking. Headlight restoration is ${bookingPricing.headlightStandalonePrice.toFixed(0)} by itself.</p>
+          <p className="max-w-lg text-sm leading-6 text-[#F7F5F2]/55">Add-ons can be selected while booking. Headlight restoration is ${bookingPricing.headlightStandalonePrice.toFixed(0)} by itself.</p>
         </div>
-        <div className="mt-6 grid overflow-hidden rounded-2xl border border-white/10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid overflow-hidden rounded-2xl border border-[#F7F5F2]/12 bg-[#F7F5F2]/4 sm:grid-cols-2 lg:grid-cols-3">
           {addOns.map((item, index) => (
-            <div key={item.id} className={`flex items-center justify-between gap-4 px-4 py-3.5 ${index ? "border-t border-white/8 sm:border-t-0" : ""} sm:border-r sm:border-white/8`}>
-              <span className="text-sm text-white/62">{item.name}</span>
-              <strong className="text-sm text-white">+${item.price.toFixed(0)}</strong>
+            <div key={item.id} className={`flex items-center justify-between gap-4 px-4 py-3.5 ${index ? "border-t border-[#F7F5F2]/10 sm:border-t-0" : ""} sm:border-r sm:border-[#F7F5F2]/10`}>
+              <span className="text-sm text-[#F7F5F2]/68">{item.name}</span>
+              <strong className="text-sm text-[#F7F5F2]">+${item.price.toFixed(0)}</strong>
             </div>
           ))}
         </div>
@@ -137,27 +137,27 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
       {specialty.length > 0 && (
         <section id="specialty-prices" className="scroll-mt-28">
           <div className="mb-6">
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Specialty services</p>
-            <h3 className="mt-2 text-3xl font-semibold tracking-[-.045em] text-[#111] sm:text-4xl">Paint, ceramic, marine, and other services.</h3>
+            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7B5C4B]">Specialty services</p>
+            <h3 className="mt-2 text-3xl font-semibold tracking-[-.045em] text-[#171411] sm:text-4xl">Paint, ceramic, marine, and other services.</h3>
           </div>
-          <div className="overflow-hidden rounded-[26px] border border-black/10 bg-white">
+          <div className="overflow-hidden rounded-[26px] border border-[#C0AB9A]/35 bg-[#F7F5F2]">
             {specialty.map((service, index) => {
               const canBook = service.pricingType === "fixed" && service.price > 0;
               const href = canBook ? `/?service=${encodeURIComponent(service.id)}#book` : `/quote?service=${encodeURIComponent(service.id)}`;
               return (
-                <div key={service.id} className={`grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:px-6 ${index ? "border-t border-black/8" : ""}`}>
+                <div key={service.id} className={`grid gap-4 px-5 py-5 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:px-6 ${index ? "border-t border-[#C0AB9A]/28" : ""}`}>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="text-lg font-semibold text-[#111]">{service.title}</h4>
-                      <span className="rounded-full bg-black/[.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[.12em] text-black/42">{service.category}</span>
+                      <h4 className="text-lg font-semibold text-[#171411]">{service.title}</h4>
+                      <span className="rounded-full bg-[#EFE8E2] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#3F3027]/62">{service.category}</span>
                     </div>
-                    <p className="mt-1 line-clamp-2 max-w-3xl text-sm leading-6 text-black/45">{service.description}</p>
+                    <p className="mt-1 line-clamp-2 max-w-3xl text-sm leading-6 text-[#3F3027]/60">{service.description}</p>
                     <div className="mt-3">
                       <ServiceMediaEvidence items={mediaItems.filter((item) => item.category === `service-${service.id}`)} />
                     </div>
                   </div>
-                  <strong className="text-xl text-[#111]">{servicePrice(service)}</strong>
-                  <a href={href} className={`rounded-full px-4 py-2.5 text-center text-xs font-bold ${canBook ? "bg-[#111] text-white" : "border border-black/12 text-[#111]"}`}>{canBook ? "Book" : "Get quote"}</a>
+                  <strong className="text-xl text-[#171411]">{servicePrice(service)}</strong>
+                  <a href={href} className={`rounded-full px-4 py-2.5 text-center text-xs font-bold ${canBook ? "bg-[#3F3027] text-[#F7F5F2]" : "border border-[#7B5C4B]/35 text-[#3F3027]"}`}>{canBook ? "Book" : "Get quote"}</a>
                 </div>
               );
             })}
