@@ -49,7 +49,7 @@ export default function RegisterPage() {
     }
   };
 
-  const inputClass = "w-full rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]";
+  const inputClass = "w-full rounded-2xl border border-white/10 bg-[#07131B]/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]";
 
   return (
     <div className="min-h-[72vh] bg-[#0B1822] px-6 py-16 text-white sm:py-24">
