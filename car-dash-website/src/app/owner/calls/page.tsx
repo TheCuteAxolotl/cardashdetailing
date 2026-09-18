@@ -229,11 +229,11 @@ export default function OwnerCallsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
-      <header className="border-b border-white/10 bg-neutral-950">
+    <main className="min-h-screen bg-[#07131B] text-white">
+      <header className="border-b border-white/10 bg-[#0B1822]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#FF2D2D]">Car Dash Phone</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#6EAEC6]">Car Dash Phone</p>
             <h1 className="mt-1 text-2xl font-bold">Business Calls</h1>
             <p className="mt-1 text-sm text-white/40">Forward calls, screen them before connecting, save Car Dash voicemail, keep call history, and block unwanted callers.</p>
           </div>
@@ -265,7 +265,7 @@ export default function OwnerCallsPage() {
                 type="button"
                 onClick={repairConnection}
                 disabled={repairing}
-                className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-bold text-[#0D0D0D] disabled:opacity-50"
+                className="rounded-full bg-[#6EAEC6] px-5 py-2.5 text-sm font-bold text-[#0B1822] disabled:opacity-50"
               >
                 {repairing ? "Connecting…" : "Repair Voice Connection"}
               </button>
@@ -288,15 +288,15 @@ export default function OwnerCallsPage() {
                 value={phoneNumber}
                 onChange={(event) => setPhoneNumber(event.target.value)}
                 placeholder="Phone number, e.g. (630) 555-1234"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[#FF2D2D]/60"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[#6EAEC6]/60"
               />
               <input
                 value={reason}
                 onChange={(event) => setReason(event.target.value)}
                 placeholder="Reason (optional)"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[#FF2D2D]/60"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm outline-none focus:border-[#6EAEC6]/60"
               />
-              <button disabled={saving} className="rounded-full bg-[#FF2D2D] px-5 py-2.5 text-sm font-bold text-[#0D0D0D] disabled:opacity-50">Block Number</button>
+              <button disabled={saving} className="rounded-full bg-[#6EAEC6] px-5 py-2.5 text-sm font-bold text-[#0B1822] disabled:opacity-50">Block Number</button>
             </form>
           </div>
 
@@ -332,7 +332,7 @@ export default function OwnerCallsPage() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search calls…"
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-[#FF2D2D]/60 sm:w-72"
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm outline-none focus:border-[#6EAEC6]/60 sm:w-72"
             />
           </div>
 
