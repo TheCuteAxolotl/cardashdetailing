@@ -32,7 +32,7 @@ export default function HeroBackdrop() {
 
   if (!image) {
     return (
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,rgba(220,38,38,.22),transparent_28%),linear-gradient(120deg,#050505_15%,#0d0d0d_60%,#1a0808)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,rgba(220,38,38,.22),transparent_28%),linear-gradient(120deg,#07131B_15%,#0B1822_60%,#1a0808)]" />
     );
   }
 
