@@ -23,7 +23,7 @@ export default function PackageMediaEvidence({ packageMedia, featureMedia }: { p
         <div className="mt-4 rounded-2xl border border-black/8 bg-white p-3">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-xs font-semibold text-black/62">See this package</p>
-            <button type="button" onClick={() => open(packageMedia, 0)} className="text-[11px] font-bold text-[#FF2D2D]">View all →</button>
+            <button type="button" onClick={() => open(packageMedia, 0)} className="text-[11px] font-bold text-[#6EAEC6]">View all →</button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {packageMedia.slice(0, 4).map((item, index) => (
@@ -43,7 +43,7 @@ export default function PackageMediaEvidence({ packageMedia, featureMedia }: { p
             const media = entry.items;
             return (
               <li key={entry.feature} className="flex min-h-8 items-center gap-2">
-                <span className="text-[#FF2D2D]">✓</span>
+                <span className="text-[#6EAEC6]">✓</span>
                 {media.length ? (
                   <button type="button" onClick={() => open(media, 0)} className="group flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
                     <span className="min-w-0 flex-1 text-black/52 underline decoration-black/15 underline-offset-4 group-hover:text-black/75">{entry.feature}</span>
