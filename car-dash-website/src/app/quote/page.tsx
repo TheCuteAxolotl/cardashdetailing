@@ -25,7 +25,7 @@ type Thread = {
   messages: Msg[];
 };
 
-const input = "w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 outline-none transition focus:border-[#6EAEC6]/60 focus:shadow-[0_0_0_3px_rgba(110,174,198,.06)]";
+const input = "w-full rounded-2xl border border-white/10 bg-[#07131B]/50 px-4 py-3 outline-none transition focus:border-[#6EAEC6]/60 focus:shadow-[0_0_0_3px_rgba(110,174,198,.06)]";
 
 async function compressImage(file: File) {
   const source = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -281,7 +281,7 @@ export default function QuotePage() {
               <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/45 hover:border-[#6EAEC6]/35">Add up to 3 photos so we can quote it better<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
               {photos.length > 0 && <p className="text-sm text-[#6EAEC6]">{photos.length} photo(s) ready</p>}
 
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="rounded-2xl border border-white/10 bg-[#07131B]/20 p-4">
                 <label className="flex items-start gap-3 text-sm leading-6 text-white/58"><input type="checkbox" checked={smsConsent} onChange={(e)=>setSmsConsent(e.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label>
                 <p className="mt-3 pl-6 text-xs text-white/30">See our <a href="/privacy-policy" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" className="text-[#6EAEC6]">Terms</a>.</p>
               </div>
