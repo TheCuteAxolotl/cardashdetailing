@@ -60,7 +60,7 @@ export default function ReviewCards() {
 
   if (loading) {
     return (
-      <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 text-neutral-400">
+      <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 text-white/52">
         Loading live Google reviews…
       </div>
     );
@@ -70,7 +70,7 @@ export default function ReviewCards() {
     return (
       <div className="rounded-[2rem] border border-[#6EAEC6]/20 bg-[#13232F] p-8">
         <p className="text-xl font-black text-white">Google reviews are temporarily unavailable.</p>
-        <p className="mt-3 text-neutral-400">Reviews can still be viewed or submitted directly on Google.</p>
+        <p className="mt-3 text-white/52">Reviews can still be viewed or submitted directly on Google.</p>
         <a
           href={GOOGLE_REVIEW_URL}
           target="_blank"
@@ -92,7 +92,7 @@ export default function ReviewCards() {
             {data.rating !== null && <span className="text-4xl font-black text-white">{data.rating.toFixed(1)}</span>}
             {data.rating !== null && <Stars rating={data.rating} />}
             {data.reviewCount !== null && (
-              <span className="text-sm text-neutral-400">{data.reviewCount} Google reviews</span>
+              <span className="text-sm text-white/52">{data.reviewCount} Google reviews</span>
             )}
           </div>
         </div>
@@ -148,12 +148,12 @@ export default function ReviewCards() {
                 )}
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
                   <Stars rating={review.rating} />
-                  {review.relativeTime && <span className="text-neutral-500">{review.relativeTime}</span>}
+                  {review.relativeTime && <span className="text-white/38">{review.relativeTime}</span>}
                 </div>
               </div>
             </div>
 
-            {review.text && <p className="mt-6 flex-1 text-base leading-8 text-neutral-300">“{review.text}”</p>}
+            {review.text && <p className="mt-6 flex-1 text-base leading-8 text-white/72">“{review.text}”</p>}
 
             <a
               href={review.googleMapsUri}
@@ -168,13 +168,13 @@ export default function ReviewCards() {
       </div>
 
       {!data.reviews.length && (
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 text-neutral-400">
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 text-white/52">
           No Google review cards were returned, but the business rating is live above.
         </div>
       )}
 
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.025] px-5 py-4 text-xs leading-6 text-neutral-500">
-        <span translate="no" className="font-bold text-neutral-300">Google Maps</span> reviews are shown in Google&apos;s relevance order. Reviewer names, profile links, photos, ratings and review links are provided by Google Maps.
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.025] px-5 py-4 text-xs leading-6 text-white/38">
+        <span translate="no" className="font-bold text-white/72">Google Maps</span> reviews are shown in Google&apos;s relevance order. Reviewer names, profile links, photos, ratings and review links are provided by Google Maps.
       </div>
     </section>
   );
