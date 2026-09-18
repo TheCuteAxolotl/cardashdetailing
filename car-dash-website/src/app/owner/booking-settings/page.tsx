@@ -20,7 +20,7 @@ import {
   parseBookingAvailabilityConfig,
 } from "@/lib/booking-availability";
 
-const input = "w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-[#FF2D2D]/60";
+const input = "w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-[#6EAEC6]/60";
 const DAY_LABELS: Record<BookingDayKey, string> = {
   sunday: "Sunday",
   monday: "Monday",
@@ -298,12 +298,12 @@ export default function BookingSettingsPage() {
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.28em] text-[#FF2D2D]">Owner</p>
+            <p className="text-xs font-bold uppercase tracking-[.28em] text-[#6EAEC6]">Owner</p>
             <h1 className="mt-2 text-4xl font-semibold">Booking Settings</h1>
             <p className="mt-2 max-w-3xl text-white/40">Set the days and times customers can book, block off dates, and manage booking add-ons and discount codes.</p>
           </div>
           <div className="flex gap-2">
-            <a href="/owner/bookings" className="rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/10 px-5 py-3 text-sm text-[#FF2D2D]">View Bookings</a>
+            <a href="/owner/bookings" className="rounded-full border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-5 py-3 text-sm text-[#6EAEC6]">View Bookings</a>
             <a href="/owner/dashboard" className="rounded-full border border-white/15 px-5 py-3 text-sm">Back</a>
           </div>
         </div>
@@ -312,7 +312,7 @@ export default function BookingSettingsPage() {
           <>
             <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Weekly Availability</p>
+                <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Weekly Availability</p>
                 <h2 className="mt-2 text-2xl font-semibold">Days and times customers can book</h2>
                 <p className="mt-2 max-w-3xl text-sm text-white/40">Turn a day off if you normally do not work that day. Add or remove times for each day. A time disappears from the customer booking form as soon as another active booking takes it.</p>
               </div>
@@ -353,11 +353,11 @@ export default function BookingSettingsPage() {
             <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Date Overrides</p>
+                  <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Date Overrides</p>
                   <h2 className="mt-2 text-2xl font-semibold">Days off and special hours</h2>
                   <p className="mt-2 max-w-3xl text-sm text-white/40">Use this for a specific day you are unavailable, a vacation day, or a day where your hours are different from your normal weekly schedule.</p>
                 </div>
-                <button type="button" onClick={addDateOverride} className="rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/8 px-5 py-3 text-sm font-semibold text-[#FF2D2D]">+ Add date</button>
+                <button type="button" onClick={addDateOverride} className="rounded-full border border-[#6EAEC6]/30 bg-[#6EAEC6]/8 px-5 py-3 text-sm font-semibold text-[#6EAEC6]">+ Add date</button>
               </div>
 
               <div className="mt-6 space-y-4">
@@ -396,7 +396,7 @@ export default function BookingSettingsPage() {
           <>
             <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
               <div className="flex flex-wrap items-end justify-between gap-4">
-                <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Car Detailing Add-Ons</p><h2 className="mt-2 text-2xl font-semibold">Booking add-ons</h2><p className="mt-2 text-sm text-white/40">These prices appear in the booking form and are added to the exact total.</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Car Detailing Add-Ons</p><h2 className="mt-2 text-2xl font-semibold">Booking add-ons</h2><p className="mt-2 text-sm text-white/40">These prices appear in the booking form and are added to the exact total.</p></div>
                 <label className="text-sm text-white/55">Headlight Restoration booked alone
                   <input type="number" min="0" step="1" className={`${input} mt-2 w-56`} value={pricing.headlightStandalonePrice} onChange={(e) => setPricing((current) => ({ ...current, headlightStandalonePrice: Number(e.target.value) }))} />
                 </label>
@@ -412,12 +412,12 @@ export default function BookingSettingsPage() {
                   </div>
                 ))}
               </div>
-              <button type="button" onClick={addAddOn} className="mt-5 rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/8 px-5 py-3 text-sm font-semibold text-[#FF2D2D]">+ Add add-on</button>
+              <button type="button" onClick={addAddOn} className="mt-5 rounded-full border border-[#6EAEC6]/30 bg-[#6EAEC6]/8 px-5 py-3 text-sm font-semibold text-[#6EAEC6]">+ Add add-on</button>
             </section>
 
             <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Discount Codes</p>
+                <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Discount Codes</p>
                 <h2 className="mt-2 text-2xl font-semibold">Promo code controls</h2>
                 <p className="mt-2 max-w-3xl text-sm text-white/40">Choose whether a code works everywhere or only on one service/package. You can discount by percent, dollars off, or set that service to an exact promo price. Usage limits, one-per-customer rules, and expiration dates still work too.</p>
               </div>
@@ -459,13 +459,13 @@ export default function BookingSettingsPage() {
                 })}
                 {discounts.length === 0 && <p className="rounded-2xl border border-dashed border-white/10 p-6 text-sm text-white/35">No discount codes yet.</p>}
               </div>
-              <button type="button" onClick={addDiscount} className="mt-5 rounded-full border border-[#FF2D2D]/30 bg-[#FF2D2D]/8 px-5 py-3 text-sm font-semibold text-[#FF2D2D]">+ Create discount code</button>
+              <button type="button" onClick={addDiscount} className="mt-5 rounded-full border border-[#6EAEC6]/30 bg-[#6EAEC6]/8 px-5 py-3 text-sm font-semibold text-[#6EAEC6]">+ Create discount code</button>
             </section>
           </>
         )}
 
-        <div className="sticky bottom-4 z-20 mt-8 flex flex-wrap items-center gap-4 rounded-[22px] border border-[#FF2D2D]/20 bg-[#0D0D0D]/95 p-4 shadow-2xl backdrop-blur-xl">
-          <button type="button" onClick={save} disabled={saving} className="rounded-full bg-[#FF2D2D] px-7 py-3 font-semibold text-[#0D0D0D] disabled:opacity-50">{saving ? "Saving…" : "Save Booking Settings"}</button>
+        <div className="sticky bottom-4 z-20 mt-8 flex flex-wrap items-center gap-4 rounded-[22px] border border-[#6EAEC6]/20 bg-[#0B1822]/95 p-4 shadow-2xl backdrop-blur-xl">
+          <button type="button" onClick={save} disabled={saving} className="rounded-full bg-[#6EAEC6] px-7 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{saving ? "Saving…" : "Save Booking Settings"}</button>
           {message && <p className="text-sm text-white/55">{message}</p>}
         </div>
       </div>
