@@ -57,10 +57,10 @@ export default function MarineDetailingPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#F4F3EF] text-[#111]">
+    <main className="min-h-screen bg-[#EEF7F5] text-[#111]">
       <section className="border-b border-black/8 bg-white">
         <div className="mx-auto grid max-w-7xl gap-7 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
-          <div className="flex flex-col justify-center py-3 lg:py-8"><p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">Marine detailing</p><h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Boat cleaning, correction, and protection.</h1><p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Marine pricing depends a lot on length, condition, oxidation, access, and the work you want done. Current marine services and prices are listed below.</p><div className="mt-5 flex flex-wrap gap-3"><a href="#marine-prices" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a><a href="/quote" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-bold text-white">Marine quote</a><a href="/#book" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Book</a></div></div>
+          <div className="flex flex-col justify-center py-3 lg:py-8"><p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Marine detailing</p><h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Boat cleaning, correction, and protection.</h1><p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Marine pricing depends a lot on length, condition, oxidation, access, and the work you want done. Current marine services and prices are listed below.</p><div className="mt-5 flex flex-wrap gap-3"><a href="#marine-prices" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See prices</a><a href="/quote" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-bold text-white">Marine quote</a><a href="/#book" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Book</a></div></div>
           <div className="relative min-h-[300px] overflow-hidden rounded-[26px] bg-black sm:min-h-[380px]"><SitePhoto category="marine-hero" fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" /></div>
         </div>
       </section>
@@ -68,7 +68,7 @@ export default function MarineDetailingPage() {
       <section className="mx-auto max-w-7xl px-5 pt-8 sm:px-8 sm:pt-10"><PricingMediaStrip category="marine-services" /></section>
 
       <section id="marine-prices" className="mx-auto max-w-7xl scroll-mt-28 px-5 py-12 sm:px-8 sm:py-16">
-        <div className="mb-7"><p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Current marine services</p><h2 className="mt-2 text-4xl font-semibold tracking-[-.05em]">Prices without the maze.</h2></div>
+        <div className="mb-7"><p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Current marine services</p><h2 className="mt-2 text-4xl font-semibold tracking-[-.05em]">Prices without the maze.</h2></div>
 
         <div className="overflow-hidden rounded-[26px] border border-black/10 bg-white">
           {items.length ? items.map((service, index) => {
@@ -85,11 +85,11 @@ export default function MarineDetailingPage() {
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[.7fr_1.3fr]">
-          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Marine add-ons</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.045em]">Extra work when the boat needs it.</h2><p className="mt-4 text-sm leading-6 text-black/48">Per-foot pricing is common because a 20-foot boat and a 30-foot boat are completely different jobs.</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Marine add-ons</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.045em]">Extra work when the boat needs it.</h2><p className="mt-4 text-sm leading-6 text-black/48">Per-foot pricing is common because a 20-foot boat and a 30-foot boat are completely different jobs.</p></div>
           <div className="overflow-hidden rounded-[24px] border border-black/10 bg-white">{marineAddOns.map(([name, cost], index) => <div key={name} className={`flex items-center justify-between gap-5 px-5 py-4 ${index ? "border-t border-black/8" : ""}`}><span className="text-sm text-black/58">{name}</span><strong className="shrink-0 text-sm">{cost}</strong></div>)}</div>
         </div>
 
-        <div className="mt-8 rounded-[24px] border border-black/10 bg-[#111] p-6 text-white"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#FF2D2D]">Pricing note</p><p className="mt-3 max-w-4xl text-sm leading-7 text-white/48">Final marine pricing can change with oxidation, mold, waterline buildup, accessibility, wet sanding, coating prep, and the overall condition of the boat. We confirm anything outside the listed service before starting.</p></div>
+        <div className="mt-8 rounded-[24px] border border-black/10 bg-[#111] p-6 text-white"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#6EAEC6]">Pricing note</p><p className="mt-3 max-w-4xl text-sm leading-7 text-white/48">Final marine pricing can change with oxidation, mold, waterline buildup, accessibility, wet sanding, coating prep, and the overall condition of the boat. We confirm anything outside the listed service before starting.</p></div>
       </section>
       <PageMediaBand categories={["marine-results"]} theme="light" className="mx-auto max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16" />
     </main>
