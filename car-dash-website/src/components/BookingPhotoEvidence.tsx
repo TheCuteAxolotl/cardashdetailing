@@ -12,9 +12,9 @@ export default function BookingPhotoEvidence({ notes }: { notes: string | null |
 
   return (
     <>
-      {cleanNotes && <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-neutral-900 p-4 text-xs leading-6 text-neutral-300">{cleanNotes}</pre>}
+      {cleanNotes && <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-[#13232F] p-4 text-xs leading-6 text-white/72">{cleanNotes}</pre>}
       {photos.length > 0 && (
-        <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-900/70 p-4">
+        <div className="mt-4 rounded-2xl border border-white/10 bg-[#13232F]/70 p-4">
           <p className="text-xs font-semibold uppercase tracking-[.15em] text-white/45">Customer vehicle photos</p>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {photos.map((src, index) => (
