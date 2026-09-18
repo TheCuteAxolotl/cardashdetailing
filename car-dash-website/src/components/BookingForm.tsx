@@ -112,7 +112,7 @@ const initialState: FormState = {
   policyAgreed: false,
 };
 
-const input = "mt-2 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none focus:border-[#FF2D2D]/60";
+const input = "mt-2 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none focus:border-[#6EAEC6]/60";
 
 function vehicleTypeToClass(value: string): VehicleClass {
   const normalized = value.toLowerCase();
@@ -516,20 +516,20 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   return (
     <form onSubmit={submit} className="space-y-6 text-white">
       <div className="border-b border-white/10 pb-5">
-        <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Appointment</p>
+        <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Appointment</p>
         <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Book your detail</h2>
         <p className="mt-2 text-sm leading-6 text-white/42">Choose the service, enter the car, pick an open time, and submit. You can attach photos too.</p>
-        <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#FF2D2D]">Get a free photo quote →</a></p>
+        <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#6EAEC6]">Get a free photo quote →</a></p>
       </div>
 
-      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#FF2D2D]">Get an Exact Quote →</a></div>}
+      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#6EAEC6]">Get an Exact Quote →</a></div>}
 
       <section>
         <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Pick what you want done.</p></div></div>
 
         {quoteLocked ? (
-          <div className="rounded-2xl border border-[#FF2D2D]/25 bg-[#FF2D2D]/[.055] p-4">
-            <p className="text-xs uppercase tracking-[.18em] text-[#FF2D2D]">Accepted quote</p>
+          <div className="rounded-2xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.055] p-4">
+            <p className="text-xs uppercase tracking-[.18em] text-[#6EAEC6]">Accepted quote</p>
             <div className="mt-2 flex flex-wrap items-end justify-between gap-4"><div><p className="text-lg font-semibold">{form.selectedPackage}</p><p className="mt-1 text-xs text-white/35">Quote #{form.quoteThreadId.slice(-7)}</p></div><p className="text-2xl font-semibold">${Number(baseTotal || 0).toFixed(2)}</p></div>
           </div>
         ) : (
@@ -549,7 +549,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
         {packageSelection && !quoteLocked && (
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.025] p-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">{packageSelection.packageName}</p><p className="mt-1 text-xs text-white/35">Choose vehicle size</p></div><p className="text-2xl font-semibold">${packageSelection.price.toFixed(0)}</p></div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#FF2D2D]/55 bg-[#FF2D2D]/10 text-white" : "border-white/10 bg-black/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#6EAEC6]/55 bg-[#6EAEC6]/10 text-white" : "border-white/10 bg-black/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
           </div>
         )}
       </section>
@@ -576,7 +576,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
         <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates are unavailable. Booked times are removed.</p></div></div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
-          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#FF2D2D]">No times left on this day. Choose another date.</span>}</label>
+          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
         </div>
       </section>
 
@@ -588,7 +588,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
             {allowCarAddOns && (
               <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
-                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#FF2D2D]/35 bg-[#FF2D2D]/8 text-white" : "border-white/10 bg-black/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-black/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
               </details>
             )}
 
@@ -630,15 +630,15 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       )}
 
       <section className="space-y-3 border-t border-white/8 pt-6">
-        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request with the displayed total and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Privacy Policy</a>.</span></label>
+        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request with the displayed total and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a>.</span></label>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#FF2D2D]">Terms and Conditions</a>.</p></div>
+        <div className="rounded-2xl border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
       </section>
 
       {status !== "idle" && <div className={`rounded-2xl border p-4 text-sm ${status === "success" ? "border-green-800 bg-green-950/30 text-green-200" : "border-red-800 bg-red-950/30 text-red-200"}`}><p>{message}</p>{status === "success" && chatUrl && <a href={chatUrl} className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black">Open booking chat</a>}</div>}
 
       <div className="flex flex-wrap gap-3">
-        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="min-w-[180px] rounded-full bg-[#FF2D2D] px-6 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Book for $${bookingTotal.toFixed(2)}` : "Choose a service"}</button>
+        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="min-w-[180px] rounded-full bg-[#6EAEC6] px-6 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Book for $${bookingTotal.toFixed(2)}` : "Choose a service"}</button>
         {onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-6 py-3.5">Close</button>}
       </div>
     </form>
