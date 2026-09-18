@@ -140,7 +140,7 @@ export default function OwnerGallery() {
         if (!file) throw new Error("Choose a photo first.");
         url = await fileToCompressedDataUrl(file);
         fallbackTitle = category === "home-360"
-          ? `Frame ${String(media.filter((item) => item.category === "home-360").length + 1).padStart(2, "0")}`
+          ? `Slide ${String(media.filter((item) => item.category === "home-360").length + 1).padStart(2, "0")}`
           : file.name.replace(/\.[^.]+$/, "");
       } else if (mode === "video-file") {
         if (!file) throw new Error("Choose a video first.");
@@ -225,7 +225,7 @@ export default function OwnerGallery() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-6 rounded-2xl border border-[#FF2D2D]/15 bg-[#FF2D2D]/[.045] p-4 text-sm leading-6 text-white/60">
-          <strong className="text-white">Every placement below is connected to a real public page now.</strong> The Homepage 360 Hero Viewer is photo-only and loops through frames in upload order. If you have not added any 360 frames yet, that hero media area stays intentionally blank. Other page media can use photos or videos, package items like “Foam + hand wash” can still have their own tap-to-enlarge proof, and every package now has a “When should I get this?” dirty-before example placement.
+          <strong className="text-white">Every placement below is connected to a real public page now.</strong> The Homepage Hero Slideshow is photo-only and crossfades to the next uploaded slide automatically every few seconds. Slides play in upload order, and customers can also use the arrow controls. If you have not added any hero slides yet, that hero media area stays intentionally blank. Other page media can use photos or videos, package items like “Foam + hand wash” can still have their own tap-to-enlarge proof, and every package now has a “When should I get this?” dirty-before example placement.
         </div>
 
         <form onSubmit={addMedia} className="grid gap-4 rounded-3xl border border-neutral-800 bg-neutral-950 p-6 md:grid-cols-4">
