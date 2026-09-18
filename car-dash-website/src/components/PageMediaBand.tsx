@@ -25,10 +25,12 @@ export default function PageMediaBand({
 }: Props) {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
   const categoryKey = categories.join("|");
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
     const query = new URLSearchParams();
     categories.forEach((category) => query.append("category", category));
     query.set("limit", "50");
@@ -40,6 +42,9 @@ export default function PageMediaBand({
       })
       .catch(() => {
         if (!cancelled) setItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
 
     return () => {
@@ -48,6 +53,29 @@ export default function PageMediaBand({
   }, [categoryKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const visible = useMemo(() => items.slice(0, Math.max(1, maxPreview)), [items, maxPreview]);
+
+  if (loading) {
+    return (
+      <div className={className}>
+        {(eyebrow || title) && (
+          <div className="mb-5">
+            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">{eyebrow}</p>}
+            {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${theme === "dark" ? "text-white" : "text-[#111]"}`}>{title}</h2>}
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+          {[0, 1, 2].map((slot) => (
+            <div
+              key={slot}
+              className={`${slot === 0 && !compact ? "col-span-2 row-span-2" : ""} ${compact ? "min-h-36" : "min-h-48"} animate-pulse rounded-[22px] border ${theme === "dark" ? "border-white/10 bg-white/[.045]" : "border-black/8 bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5)]"}`}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!visible.length) return null;
 
   const dark = theme === "dark";
