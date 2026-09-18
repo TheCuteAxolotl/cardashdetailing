@@ -72,7 +72,7 @@ export default function HomeExperience({
               className={`absolute left-5 right-5 top-5 z-20 flex items-center justify-between transition-all duration-200 sm:left-7 sm:right-7 sm:top-7 ${heroInteracting ? "pointer-events-none -translate-y-2 opacity-0" : "opacity-100"}`}
             >
               <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white/80 backdrop-blur-xl">
-                <span className="h-2 w-2 rounded-full bg-[#FF2D2D]" />
+                <span className="h-2 w-2 rounded-full bg-[#6EAEC6]" />
                 {content.heroEyebrow}
               </div>
               <a
@@ -110,7 +110,7 @@ export default function HomeExperience({
             </div>
 
             <div
-              className={`absolute bottom-7 right-7 z-20 hidden w-[280px] overflow-hidden rounded-[24px] border border-white/16 bg-white/12 p-5 text-white shadow-2xl shadow-black/25 backdrop-blur-2xl transition-all duration-200 lg:block ${heroInteracting ? "pointer-events-none translate-y-3 opacity-0" : "opacity-100"}`}
+              className={`absolute bottom-24 right-7 z-20 hidden w-[280px] overflow-hidden rounded-[24px] border border-white/16 bg-white/12 p-5 text-white shadow-2xl shadow-black/25 backdrop-blur-2xl transition-all duration-200 lg:block ${heroInteracting ? "pointer-events-none translate-y-3 opacity-0" : "opacity-100"}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[.17em] text-white/55">Mobile service</p>
