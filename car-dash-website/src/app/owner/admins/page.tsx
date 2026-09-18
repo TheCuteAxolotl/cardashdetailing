@@ -23,7 +23,7 @@ type Account = {
   staffAccess: boolean;
 };
 
-const input = "w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none transition focus:border-[#FF2D2D]/60";
+const input = "w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none transition focus:border-[#6EAEC6]/60";
 
 const ROLE_TEMPLATES = [
   { name: "Detailer", description: "Booking operations, customer arrival updates, and day-of-service messaging.", permissions: ["staffGuide", "bookings", "smsInbox"] },
@@ -246,7 +246,7 @@ export default function StaffAccountsPage() {
       <div className="mx-auto max-w-[1500px] px-5 py-9 sm:px-8 lg:px-12">
         <div className="flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-7">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#FF2D2D]">Owner only · Access control</p>
+            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#6EAEC6]">Owner only · Access control</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-[-.045em]">Staff & Accounts</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/42">View every account, promote or remove Admin access, create custom staff roles, assign dashboard permissions, contact customers, edit account information, or remove accounts.</p>
           </div>
@@ -276,7 +276,7 @@ export default function StaffAccountsPage() {
                     <button key={account.id} onClick={() => setSelectedId(account.id)} className={`w-full rounded-2xl border p-4 text-left transition ${selectedId === account.id ? "border-white/40 bg-white text-black" : "border-white/[.07] bg-black/20 hover:border-white/20"}`}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0"><p className="truncate font-semibold">{account.name}</p><p className={`mt-1 truncate text-xs ${selectedId === account.id ? "text-black/50" : "text-white/35"}`}>{account.email}</p></div>
-                        <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-bold uppercase ${selectedId === account.id ? "bg-black/8 text-black/55" : account.role === "owner" ? "bg-[#FF2D2D]/15 text-[#FF2D2D]" : account.role === "admin" ? "bg-sky-400/10 text-sky-200" : account.staffAccess ? "bg-violet-400/10 text-violet-200" : "bg-white/5 text-white/35"}`}>{account.role === "user" && account.staffAccess ? "staff" : account.role}</span>
+                        <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-bold uppercase ${selectedId === account.id ? "bg-black/8 text-black/55" : account.role === "owner" ? "bg-[#6EAEC6]/15 text-[#6EAEC6]" : account.role === "admin" ? "bg-sky-400/10 text-sky-200" : account.staffAccess ? "bg-violet-400/10 text-violet-200" : "bg-white/5 text-white/35"}`}>{account.role === "user" && account.staffAccess ? "staff" : account.role}</span>
                       </div>
                       {account.customRoles.length > 0 && <p className={`mt-2 text-[10px] ${selectedId === account.id ? "text-black/45" : "text-white/30"}`}>{account.customRoles.map((role) => role.name).join(" · ")}</p>}
                     </button>
@@ -289,7 +289,7 @@ export default function StaffAccountsPage() {
                   <div className="space-y-7">
                     <div className="flex flex-wrap items-start justify-between gap-4 border-b border-white/8 pb-6">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#FF2D2D]">Account details</p>
+                        <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Account details</p>
                         <h2 className="mt-2 text-3xl font-semibold">{selected.name}</h2>
                         <p className="mt-1 text-sm text-white/35">Created {new Date(selected.createdAt).toLocaleDateString()} · Updated {new Date(selected.updatedAt).toLocaleDateString()}</p>
                       </div>
@@ -349,7 +349,7 @@ export default function StaffAccountsPage() {
                     {!selected.protected && (
                       <>
                         <div>
-                          <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/30">Custom roles</p><h3 className="mt-2 text-xl font-semibold">Assigned roles</h3></div><button type="button" onClick={() => setTab("roles")} className="text-xs font-semibold text-[#FF2D2D]">Manage roles</button></div>
+                          <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/30">Custom roles</p><h3 className="mt-2 text-xl font-semibold">Assigned roles</h3></div><button type="button" onClick={() => setTab("roles")} className="text-xs font-semibold text-[#6EAEC6]">Manage roles</button></div>
                           <div className="mt-4 grid gap-2 sm:grid-cols-2">
                             {roles.map((role) => (
                               <label key={role.id} className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/[.08] bg-black/20 p-4"><input type="checkbox" className="mt-1" checked={editRoleIds.includes(role.id)} onChange={(event) => setEditRoleIds((current) => event.target.checked ? [...current, role.id] : current.filter((id) => id !== role.id))} /><span><span className="block text-sm font-semibold">{role.name}</span><span className="mt-1 block text-xs leading-5 text-white/30">{role.description || `${role.permissions.length} dashboard permission${role.permissions.length === 1 ? "" : "s"}`}</span></span></label>
@@ -373,7 +373,7 @@ export default function StaffAccountsPage() {
                     )}
 
                     <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/8 pt-6">
-                      <button onClick={saveAccount} disabled={saving} className="rounded-full bg-[#FF2D2D] px-6 py-3 text-sm font-bold text-[#0D0D0D] disabled:opacity-50">{saving ? "Saving…" : "Save account & access"}</button>
+                      <button onClick={saveAccount} disabled={saving} className="rounded-full bg-[#6EAEC6] px-6 py-3 text-sm font-bold text-[#0B1822] disabled:opacity-50">{saving ? "Saving…" : "Save account & access"}</button>
                       {!selected.protected && (
                         <div className="flex flex-wrap gap-2">
                           {selected.staffAccess && <button onClick={removeAllStaffAccess} disabled={saving} className="rounded-full border border-amber-400/25 bg-amber-400/[.06] px-5 py-3 text-sm font-semibold text-amber-200 disabled:opacity-50">Remove all staff access</button>}
@@ -396,12 +396,12 @@ export default function StaffAccountsPage() {
         ) : (
           <div className="mt-6 grid gap-5 xl:grid-cols-[380px_1fr]">
             <aside className="rounded-[26px] border border-white/10 bg-white/[.025] p-4">
-              <button onClick={() => chooseRole(null)} className="w-full rounded-2xl border border-dashed border-[#FF2D2D]/30 bg-[#FF2D2D]/[.05] p-4 text-left text-sm font-semibold text-[#FF2D2D]">+ Create custom role</button>
+              <button onClick={() => chooseRole(null)} className="w-full rounded-2xl border border-dashed border-[#6EAEC6]/30 bg-[#6EAEC6]/[.05] p-4 text-left text-sm font-semibold text-[#6EAEC6]">+ Create custom role</button>
               <div className="mt-3 space-y-2">{roles.map((role) => <button key={role.id} onClick={() => chooseRole(role)} className={`w-full rounded-2xl border p-4 text-left ${roleId === role.id ? "border-white/40 bg-white text-black" : "border-white/[.07] bg-black/20"}`}><div className="flex justify-between gap-3"><span className="font-semibold">{role.name}</span><span className={`text-[10px] ${roleId === role.id ? "text-black/40" : "text-white/30"}`}>{role.assignedCount} assigned</span></div><p className={`mt-1 text-xs ${roleId === role.id ? "text-black/45" : "text-white/30"}`}>{role.permissions.length} permissions</p></button>)}</div>
             </aside>
 
             <form onSubmit={saveRole} className="rounded-[26px] border border-white/10 bg-white/[.025] p-6 sm:p-7">
-              <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#FF2D2D]">{roleId ? "Edit custom role" : "New custom role"}</p>
+              <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#6EAEC6]">{roleId ? "Edit custom role" : "New custom role"}</p>
               <h2 className="mt-2 text-3xl font-semibold">{roleId ? roleName || "Custom role" : "Build a role"}</h2>
               <p className="mt-2 text-sm leading-6 text-white/35">Roles are reusable permission bundles. Assign a role to any account, then use per-account Deny/Allow overrides when that person needs an exception.</p>
               {!roleId && (
@@ -417,7 +417,7 @@ export default function StaffAccountsPage() {
                           setRoleDescription(template.description);
                           setRolePermissions([...template.permissions]);
                         }}
-                        className="rounded-full border border-white/10 bg-white/[.025] px-3.5 py-2 text-xs font-semibold text-white/55 transition hover:border-[#FF2D2D]/35 hover:text-white"
+                        className="rounded-full border border-white/10 bg-white/[.025] px-3.5 py-2 text-xs font-semibold text-white/55 transition hover:border-[#6EAEC6]/35 hover:text-white"
                       >
                         {template.name}
                       </button>
@@ -426,8 +426,8 @@ export default function StaffAccountsPage() {
                 </div>
               )}
               <div className="mt-6 grid gap-4 md:grid-cols-2"><label><span className="mb-2 block text-xs uppercase tracking-[.15em] text-white/30">Role name</span><input className={input} value={roleName} onChange={(event) => setRoleName(event.target.value)} placeholder="Example: Detailer, Support Agent, Manager" required /></label><label><span className="mb-2 block text-xs uppercase tracking-[.15em] text-white/30">Description</span><input className={input} value={roleDescription} onChange={(event) => setRoleDescription(event.target.value)} placeholder="What this role is for" /></label></div>
-              <div className="mt-6"><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/30">Role permissions</p><div className="mt-4 grid gap-3 md:grid-cols-2">{catalog.map((permission) => <label key={permission.key} className={`cursor-pointer rounded-2xl border p-4 transition ${rolePermissions.includes(permission.key) ? "border-[#FF2D2D]/35 bg-[#FF2D2D]/[.06]" : "border-white/[.07] bg-black/20"}`}><div className="flex gap-3"><input type="checkbox" className="mt-1" checked={rolePermissions.includes(permission.key)} onChange={(event) => setRolePermissions((current) => event.target.checked ? [...current, permission.key] : current.filter((key) => key !== permission.key))} /><div><p className="text-sm font-semibold">{permission.label}</p><p className="mt-1 text-xs leading-5 text-white/30">{permission.description}</p></div></div></label>)}</div></div>
-              <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/8 pt-6"><button disabled={saving} className="rounded-full bg-[#FF2D2D] px-6 py-3 text-sm font-bold text-[#0D0D0D] disabled:opacity-50">{saving ? "Saving…" : roleId ? "Save role" : "Create role"}</button>{roleId && (() => { const current = roles.find((role) => role.id === roleId); return current ? <button type="button" onClick={() => deleteRole(current)} className="rounded-full border border-red-500/25 bg-red-500/[.06] px-5 py-3 text-sm font-semibold text-red-300">Delete role</button> : null; })()}</div>
+              <div className="mt-6"><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/30">Role permissions</p><div className="mt-4 grid gap-3 md:grid-cols-2">{catalog.map((permission) => <label key={permission.key} className={`cursor-pointer rounded-2xl border p-4 transition ${rolePermissions.includes(permission.key) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/[.06]" : "border-white/[.07] bg-black/20"}`}><div className="flex gap-3"><input type="checkbox" className="mt-1" checked={rolePermissions.includes(permission.key)} onChange={(event) => setRolePermissions((current) => event.target.checked ? [...current, permission.key] : current.filter((key) => key !== permission.key))} /><div><p className="text-sm font-semibold">{permission.label}</p><p className="mt-1 text-xs leading-5 text-white/30">{permission.description}</p></div></div></label>)}</div></div>
+              <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white/8 pt-6"><button disabled={saving} className="rounded-full bg-[#6EAEC6] px-6 py-3 text-sm font-bold text-[#0B1822] disabled:opacity-50">{saving ? "Saving…" : roleId ? "Save role" : "Create role"}</button>{roleId && (() => { const current = roles.find((role) => role.id === roleId); return current ? <button type="button" onClick={() => deleteRole(current)} className="rounded-full border border-red-500/25 bg-red-500/[.06] px-5 py-3 text-sm font-semibold text-red-300">Delete role</button> : null; })()}</div>
             </form>
           </div>
         )}
