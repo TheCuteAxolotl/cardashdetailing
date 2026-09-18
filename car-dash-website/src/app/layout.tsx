@@ -47,9 +47,9 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-black text-white`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-[#0B1822] text-white`}
     >
-      <body className="min-h-full flex min-h-screen flex-col bg-[#0D0D0D] text-white">
+      <body className="min-h-full flex min-h-screen flex-col bg-[#0B1822] text-white">
         <StructuredData data={localBusinessSchema} />
         <SiteHeader />
         <main className="flex-1">{children}</main>
