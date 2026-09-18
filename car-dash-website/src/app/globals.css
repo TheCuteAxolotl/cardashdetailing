@@ -13,6 +13,7 @@
   --theme-ink: #17212A;
   --theme-muted: #5E707A;
   --theme-dark: #0B1822;
+  --theme-dark-deep: #07131B;
   --theme-dark-2: #13232F;
   --theme-accent: #6EAEC6;
   --theme-accent-strong: #2F718D;
@@ -241,3 +242,65 @@ img { display: block; }
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/*
+ * Car Dash theme bridge
+ * ---------------------
+ * Public, customer, staff, admin, owner, booking and add-on screens all
+ * resolve their core palette through these variables. This intentionally
+ * catches both current and legacy hard-coded utility tokens so a future
+ * palette swap can be made from :root without leaving mismatched screens.
+ */
+[class~="bg-[#6EAEC6]"],
+[class~="bg-[#FF2D2D]"] { background-color: var(--theme-accent) !important; }
+
+[class~="text-[#6EAEC6]"],
+[class~="text-[#FF2D2D]"] { color: var(--theme-accent) !important; }
+
+[class~="border-[#6EAEC6]"],
+[class~="border-[#FF2D2D]"] { border-color: var(--theme-accent) !important; }
+
+[class~="bg-[#2F718D]"] { background-color: var(--theme-accent-strong) !important; }
+[class~="text-[#2F718D]"] { color: var(--theme-accent-strong) !important; }
+[class~="border-[#2F718D]"] { border-color: var(--theme-accent-strong) !important; }
+
+[class~="bg-[#EEF7F5]"],
+[class~="bg-[#F4F3EF]"] { background-color: var(--theme-canvas) !important; }
+
+[class~="bg-[#0B1822]"],
+[class~="bg-[#0D0D0D]"] { background-color: var(--theme-dark) !important; }
+
+[class~="bg-[#07131B]"],
+[class~="bg-[#050505]"] { background-color: var(--theme-dark-deep) !important; }
+
+[class~="bg-[#13232F]"],
+[class~="bg-[#111318]"] { background-color: var(--theme-dark-2) !important; }
+
+[class~="text-[#17212A]"] { color: var(--theme-ink) !important; }
+[class~="border-[#27404F]"] { border-color: color-mix(in srgb, var(--theme-accent) 24%, transparent) !important; }
+[class~="border-[#365262]"] { border-color: color-mix(in srgb, var(--theme-accent) 34%, transparent) !important; }
+
+[class~="bg-[#6EAEC6]/8"],
+[class~="bg-[#FF2D2D]/8"] { background-color: color-mix(in srgb, var(--theme-accent) 8%, transparent) !important; }
+[class~="bg-[#6EAEC6]/10"],
+[class~="bg-[#FF2D2D]/10"] { background-color: color-mix(in srgb, var(--theme-accent) 10%, transparent) !important; }
+[class~="bg-[#6EAEC6]/12"],
+[class~="bg-[#FF2D2D]/12"] { background-color: color-mix(in srgb, var(--theme-accent) 12%, transparent) !important; }
+[class~="bg-[#6EAEC6]/15"],
+[class~="bg-[#FF2D2D]/15"] { background-color: color-mix(in srgb, var(--theme-accent) 15%, transparent) !important; }
+[class~="bg-[#6EAEC6]/20"],
+[class~="bg-[#FF2D2D]/20"] { background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important; }
+[class~="bg-[#6EAEC6]/30"],
+[class~="bg-[#FF2D2D]/30"] { background-color: color-mix(in srgb, var(--theme-accent) 30%, transparent) !important; }
+
+[class~="border-[#6EAEC6]/20"],
+[class~="border-[#FF2D2D]/20"] { border-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important; }
+[class~="border-[#6EAEC6]/30"],
+[class~="border-[#FF2D2D]/30"] { border-color: color-mix(in srgb, var(--theme-accent) 30%, transparent) !important; }
+[class~="border-[#6EAEC6]/55"],
+[class~="border-[#FF2D2D]/55"] { border-color: color-mix(in srgb, var(--theme-accent) 55%, transparent) !important; }
+[class~="border-[#6EAEC6]/60"],
+[class~="border-[#FF2D2D]/60"] { border-color: color-mix(in srgb, var(--theme-accent) 60%, transparent) !important; }
+[class~="border-[#6EAEC6]/65"],
+[class~="border-[#FF2D2D]/65"] { border-color: color-mix(in srgb, var(--theme-accent) 65%, transparent) !important; }
