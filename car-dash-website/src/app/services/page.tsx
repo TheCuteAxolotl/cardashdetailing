@@ -66,11 +66,11 @@ export default async function ServicesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F4F3EF] text-[#111]">
+    <main className="min-h-screen bg-[#EEF7F5] text-[#111]">
       <section className="border-b border-black/8 bg-white">
         <div className="mx-auto grid max-w-7xl gap-7 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
           <div className="flex flex-col justify-center py-3 lg:py-8">
-            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#FF2D2D]">All prices</p>
+            <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">All prices</p>
             <h1 className="mt-3 max-w-4xl text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Everything in one place.</h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Compare the prices, tap the package that fits your vehicle, and go straight to booking. You do not need to open a separate page for every service.</p>
             <div className="mt-5 flex flex-wrap gap-3"><a href="/#book" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">Book now</a><a href="/quote" className="rounded-full border border-black/12 bg-white px-5 py-3 text-sm font-semibold">Get an exact quote</a></div>
