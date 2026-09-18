@@ -68,11 +68,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="mt-7 space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-white/72">Email</label>
-              <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]" placeholder="your@email.com" required />
+              <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-2xl border border-white/10 bg-[#07131B]/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]" placeholder="your@email.com" required />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-white/72">Password</label>
-              <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]" placeholder="••••••••" required />
+              <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-2xl border border-white/10 bg-[#07131B]/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]" placeholder="••••••••" required />
             </div>
             <button type="submit" disabled={loading} className="w-full rounded-2xl bg-[#6EAEC6] py-3.5 font-semibold text-[#0B1822] shadow-[0_0_30px_rgba(110,174,198,.12)] hover:bg-[#6EAEC6] disabled:cursor-not-allowed disabled:opacity-45">
               {loading ? "Signing in..." : "Sign In"}
