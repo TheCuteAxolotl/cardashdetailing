@@ -37,7 +37,7 @@ export default function PricingMediaStrip({
         {[0, 1, 2, 3].map((slot) => (
           <div
             key={slot}
-            className={`${slot === 0 ? "col-span-2 row-span-2" : ""} min-h-44 animate-pulse rounded-[24px] border ${dark ? "border-white/10 bg-white/[.045]" : "border-black/8 bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5)]"}`}
+            className={`${slot === 0 ? "col-span-2 row-span-2" : ""} min-h-44 animate-pulse rounded-[24px] border ${dark ? "border-[#F7F5F2]/10 bg-[#C0AB9A]/10" : "border-[#C0AB9A]/35 bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2)]"}`}
             aria-hidden="true"
           />
         ))}
@@ -55,11 +55,11 @@ export default function PricingMediaStrip({
             key={item.id}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className={`${index === 0 && items.length > 2 ? "col-span-2 row-span-2" : ""} group relative min-h-44 overflow-hidden rounded-[24px] border ${dark ? "border-white/10" : "border-black/10"} bg-black text-left`}
+            className={`${index === 0 && items.length > 2 ? "col-span-2 row-span-2" : ""} group relative min-h-44 overflow-hidden rounded-[24px] border ${dark ? "border-[#F7F5F2]/10" : "border-[#C0AB9A]/35"} bg-[#171411] text-left`}
             aria-label={`Open ${item.title}`}
           >
             <MediaVisual item={item} thumbnail className="h-full min-h-44 w-full object-cover transition duration-500 group-hover:scale-[1.02]" />
-            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-8 text-xs font-semibold text-white">{item.title}</span>
+            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#171411]/84 to-transparent px-4 pb-3 pt-8 text-xs font-semibold text-[#F7F5F2]">{item.title}</span>
           </button>
         ))}
       </div>
