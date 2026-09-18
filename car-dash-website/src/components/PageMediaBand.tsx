@@ -58,7 +58,7 @@ export default function PageMediaBand({
       <div className={className}>
         {(eyebrow || title) && (
           <div className="mb-5">
-            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">{eyebrow}</p>}
+            {eyebrow && <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">{eyebrow}</p>}
             {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${dark ? "text-white" : "text-[#111]"}`}>{title}</h2>}
           </div>
         )}
