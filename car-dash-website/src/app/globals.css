@@ -1,12 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0D0D0D;
+  --background: #0B1822;
   --foreground: #FFFFFF;
-  --slate: #4A5568;
-  --accent: #FF2D2D;
-  --accent-soft: rgba(255, 45, 45, 0.12);
-  --accent-line: rgba(255, 45, 45, 0.28);
+  --slate: #5E707A;
+
+  /* Public-site glass palette. Keep UI colors centralized here. */
+  --theme-canvas: #EEF7F5;
+  --theme-canvas-blue: #DDEFF6;
+  --theme-panel: rgba(255, 255, 255, 0.72);
+  --theme-panel-strong: rgba(255, 255, 255, 0.9);
+  --theme-ink: #17212A;
+  --theme-muted: #5E707A;
+  --theme-dark: #0B1822;
+  --theme-dark-2: #13232F;
+  --theme-accent: #6EAEC6;
+  --theme-accent-strong: #2F718D;
+  --theme-accent-soft: rgba(110, 174, 198, 0.14);
+  --theme-accent-line: rgba(110, 174, 198, 0.3);
+  --theme-danger: #D75C5C;
+
+  /* Legacy aliases still used by a few internal components. */
+  --accent: var(--theme-accent);
+  --accent-soft: var(--theme-accent-soft);
+  --accent-line: var(--theme-accent-line);
 }
 
 @theme inline {
@@ -76,8 +93,8 @@ summary::-webkit-details-marker {
 }
 
 ::selection {
-  background: var(--accent);
-  color: #0D0D0D;
+  background: var(--theme-accent);
+  color: var(--theme-ink);
 }
 
 .support-input {
@@ -93,8 +110,8 @@ summary::-webkit-details-marker {
 }
 .support-input::placeholder { color: rgba(255,255,255,.24); }
 .support-input:focus {
-  border-color: rgba(255,45,45,.65);
-  box-shadow: 0 0 0 3px rgba(255,45,45,.08);
+  border-color: rgba(110,174,198,.72);
+  box-shadow: 0 0 0 3px rgba(110,174,198,.10);
   background: rgba(255,255,255,.06);
 }
 
@@ -168,7 +185,7 @@ summary::-webkit-details-marker {
 /* Car Dash public-site finishing touches */
 img { display: block; }
 .public-glass {
-  background: rgba(13,13,13,.68);
+  background: rgba(11,24,34,.68);
   border: 1px solid rgba(255,255,255,.1);
   backdrop-filter: blur(18px);
 }
@@ -208,12 +225,12 @@ img { display: block; }
 }
 
 .soft-panel {
-  background: linear-gradient(145deg, rgba(74,85,104,.14), rgba(255,255,255,.025));
+  background: linear-gradient(145deg, rgba(94,112,122,.15), rgba(255,255,255,.035));
   border: 1px solid rgba(255,255,255,.1);
 }
 
 .accent-rule {
-  background: linear-gradient(90deg, transparent, rgba(255,45,45,.7), transparent);
+  background: linear-gradient(90deg, transparent, rgba(110,174,198,.72), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
