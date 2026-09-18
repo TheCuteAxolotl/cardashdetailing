@@ -54,7 +54,7 @@ export default async function Analytics() {
       <div className="mx-auto max-w-7xl">
         <div className="flex justify-between gap-5">
           <div>
-            <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">{access.role === "owner" ? "Owner" : "Staff"}</p>
+            <p className="text-xs uppercase tracking-[.28em] text-[#6EAEC6]">{access.role === "owner" ? "Owner" : "Staff"}</p>
             <h1 className="mt-2 text-4xl font-semibold">Analytics</h1>
             <p className="mt-2 text-white/40">Bookings, leads, customers, and exact booking totals.</p>
           </div>
