@@ -112,7 +112,7 @@ const initialState: FormState = {
   policyAgreed: false,
 };
 
-const input = "mt-2 w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-white outline-none focus:border-[#6EAEC6]/60";
+const input = "mt-2 w-full rounded-2xl border border-white/10 bg-[#07131B]/50 px-4 py-3 text-white outline-none focus:border-[#6EAEC6]/60";
 
 function vehicleTypeToClass(value: string): VehicleClass {
   const normalized = value.toLowerCase();
@@ -549,7 +549,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
         {packageSelection && !quoteLocked && (
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.025] p-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">{packageSelection.packageName}</p><p className="mt-1 text-xs text-white/35">Choose vehicle size</p></div><p className="text-2xl font-semibold">${packageSelection.price.toFixed(0)}</p></div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#6EAEC6]/55 bg-[#6EAEC6]/10 text-white" : "border-white/10 bg-black/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#6EAEC6]/55 bg-[#6EAEC6]/10 text-white" : "border-white/10 bg-[#07131B]/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
           </div>
         )}
       </section>
@@ -588,7 +588,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
             {allowCarAddOns && (
               <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
-                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-black/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
               </details>
             )}
 
@@ -619,7 +619,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       )}
 
       {baseTotal != null && (
-        <section className="rounded-[22px] border border-white/10 bg-black/35 p-5">
+        <section className="rounded-[22px] border border-white/10 bg-[#07131B]/35 p-5">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-white/48"><span>Service</span><span>${Number(baseTotal).toFixed(2)}</span></div>
             {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/42"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
