@@ -67,7 +67,7 @@ export default function SiteHeader() {
       <div className="bg-[linear-gradient(90deg,#dff4ef,#edf8f5_45%,#deeffb)] text-[#17212a]">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-black/45 sm:px-8">
           <span className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#FF2D2D]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#6EAEC6]" />
             South Elgin · Mobile detailing
           </span>
           <a href={`tel:${BUSINESS_PHONE}`} className="hover:text-black">{BUSINESS_PHONE_DISPLAY}</a>
@@ -121,8 +121,8 @@ export default function SiteHeader() {
             ) : (
               <a href="/account" className="rounded-full px-3 py-2 text-xs font-semibold text-black/55 hover:bg-white hover:text-black">Account</a>
             )}
-            {staff && <a href="/admin/dashboard" className="rounded-full px-3 py-2 text-xs font-semibold text-[#d82424]">Staff</a>}
-            {owner && <a href="/owner/dashboard" className="rounded-full px-3 py-2 text-xs font-semibold text-[#d82424]">Owner</a>}
+            {staff && <a href="/admin/dashboard" className="rounded-full px-3 py-2 text-xs font-semibold text-[#2F718D]">Staff</a>}
+            {owner && <a href="/owner/dashboard" className="rounded-full px-3 py-2 text-xs font-semibold text-[#2F718D]">Owner</a>}
             <a href="/#book" className="rounded-full bg-[#17212a] px-5 py-3 text-xs font-semibold text-white shadow-md shadow-black/10">
               Book now
             </a>
@@ -195,8 +195,8 @@ export default function SiteHeader() {
                 <a href="/account" className="rounded-2xl px-4 py-3.5 text-black/62">Account</a>
               )}
               {user && !owner && !staff && <a href="/dashboard" className="rounded-2xl px-4 py-3.5 text-black/62">My dashboard</a>}
-              {staff && <a href="/admin/dashboard" className="rounded-2xl px-4 py-3.5 text-[#d82424]">Staff dashboard</a>}
-              {owner && <a href="/owner/dashboard" className="rounded-2xl px-4 py-3.5 text-[#d82424]">Owner dashboard</a>}
+              {staff && <a href="/admin/dashboard" className="rounded-2xl px-4 py-3.5 text-[#2F718D]">Staff dashboard</a>}
+              {owner && <a href="/owner/dashboard" className="rounded-2xl px-4 py-3.5 text-[#2F718D]">Owner dashboard</a>}
               <a href="/#book" onClick={() => setMenuOpen(false)} className="mt-3 rounded-2xl bg-[#17212a] px-5 py-4 text-center text-sm font-semibold text-white">
                 Book now
               </a>
