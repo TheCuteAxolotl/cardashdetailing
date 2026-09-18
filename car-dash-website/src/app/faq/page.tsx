@@ -14,14 +14,14 @@ export default async function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F4F3EF] text-[#111]">
+    <div className="min-h-screen bg-[#EEF7F5] text-[#111]">
       <PublicHero
         content={content}
         imageCategory="faq-hero"
         eyebrowKey="faqEyebrow"
         titleKey="faqTitle"
         bodyKey="faqBody"
-        action={<a href="/#book" className="inline-flex rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-white">Book now</a>}
+        action={<a href="/#book" className="inline-flex rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-white">Book now</a>}
       />
       <PageMediaBand categories={["faq-media"]} theme="light" compact className="mx-auto max-w-5xl px-5 pt-10 sm:px-8" />
       <main className="mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-16">
@@ -40,7 +40,7 @@ export default async function FAQPage() {
         </div>
         <div className="mt-8 flex flex-col gap-4 rounded-[24px] bg-[#111] p-6 text-white sm:flex-row sm:items-center sm:justify-between">
           <div><p className="font-semibold">Still have a question?</p><p className="mt-1 text-sm text-white/45">Use the help button or call/text us.</p></div>
-          <div className="flex gap-3"><a href="/#prices" className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold">Prices</a><a href="/#book" className="rounded-full bg-[#FF2D2D] px-4 py-2.5 text-sm font-bold">Book now</a></div>
+          <div className="flex gap-3"><a href="/#prices" className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold">Prices</a><a href="/#book" className="rounded-full bg-[#6EAEC6] px-4 py-2.5 text-sm font-bold">Book now</a></div>
         </div>
       </main>
     </div>
