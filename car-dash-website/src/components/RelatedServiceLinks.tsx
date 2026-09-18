@@ -10,13 +10,13 @@ const services = [
 export default function RelatedServiceLinks({ currentPath }: { currentPath?: string }) {
   const visible = services.filter((service) => service.href !== currentPath);
   return (
-    <section className="border-t border-black/8 bg-[#F4F3EF] px-5 py-10 text-[#111] sm:px-8">
+    <section className="border-t border-black/8 bg-[#EEF7F5] px-5 py-10 text-[#111] sm:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#FF2D2D]">More services</p><h2 className="mt-2 text-2xl font-semibold tracking-[-.035em]">Need something else?</h2></div>
+          <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">More services</p><h2 className="mt-2 text-2xl font-semibold tracking-[-.035em]">Need something else?</h2></div>
           <div className="flex flex-wrap gap-2">
             <a href="/#prices" className="rounded-full bg-[#111] px-4 py-2.5 text-sm font-semibold text-white">All prices</a>
-            <a href="/#book" className="rounded-full bg-[#FF2D2D] px-4 py-2.5 text-sm font-semibold text-white">Book</a>
+            <a href="/#book" className="rounded-full bg-[#6EAEC6] px-4 py-2.5 text-sm font-semibold text-white">Book</a>
           </div>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
