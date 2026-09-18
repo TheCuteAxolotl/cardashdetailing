@@ -10,7 +10,7 @@ export const STATIC_MEDIA_PLACEMENTS: MediaPlacement[] = [
   { value: "before-after", label: "Public Gallery → Before & After", group: "Public Gallery" },
   { value: "portfolio", label: "Public Gallery → Portfolio", group: "Public Gallery" },
 
-  { value: "home-360", label: "Homepage → 360 Hero Viewer → Rotation Frames", group: "Homepage", photoOnly: true },
+  { value: "home-360", label: "Homepage → Hero Slideshow → Slides", group: "Homepage", photoOnly: true },
   { value: "hero", label: "Global Fallback → Hero Photo", group: "Fallback Media", photoOnly: true },
   { value: "home-showcase-primary", label: "Homepage → Work Showcase → Primary", group: "Homepage" },
   { value: "home-showcase-secondary", label: "Homepage → Work Showcase → Secondary", group: "Homepage" },
