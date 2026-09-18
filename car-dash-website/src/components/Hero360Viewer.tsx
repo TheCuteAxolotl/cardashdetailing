@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { MediaItem } from "@/lib/media";
 import { isImageMedia } from "@/lib/media";
 
@@ -15,138 +15,127 @@ function wrap(index: number, length: number) {
   return ((index % length) + length) % length;
 }
 
-export default function Hero360Viewer({ frames, className = "", onInteractionChange }: Props) {
-  const imageFrames = frames.filter((item) => isImageMedia(item.url));
-  const [index, setIndex] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const lastX = useRef<number | null>(null);
+const AUTOPLAY_MS = 5000;
+const FADE_MS = 900;
 
-  const setInteraction = (active: boolean) => {
-    setDragging(active);
-    onInteractionChange?.(active);
-  };
+export default function Hero360Viewer({ frames, className = "", onInteractionChange }: Props) {
+  const imageFrames = useMemo(
+    () => frames.filter((item) => isImageMedia(item.url)),
+    [frames]
+  );
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     setIndex(0);
+    onInteractionChange?.(false);
+
     imageFrames.forEach((frame) => {
       const image = new Image();
       image.src = frame.url;
     });
-  }, [frames]);
+  }, [imageFrames, onInteractionChange]);
+
+  useEffect(() => {
+    if (imageFrames.length <= 1 || paused) return;
+
+    const timer = window.setInterval(() => {
+      setIndex((value) => wrap(value + 1, imageFrames.length));
+    }, AUTOPLAY_MS);
+
+    return () => window.clearInterval(timer);
+  }, [imageFrames.length, paused]);
 
   if (imageFrames.length === 0) {
-    return <div className={`bg-[#060606] ${className}`} aria-hidden="true" />;
+    return <div className={`bg-[#0b1822] ${className}`} aria-hidden="true" />;
   }
 
-  const current = imageFrames[wrap(index, imageFrames.length)];
-  const canRotate = imageFrames.length > 1;
+  const canAdvance = imageFrames.length > 1;
 
-  const rotateBy = (amount: number) => {
-    if (!canRotate) return;
-    setIndex((value) => wrap(value + amount, imageFrames.length));
+  const goTo = (nextIndex: number) => {
+    if (!canAdvance) return;
+    setIndex(wrap(nextIndex, imageFrames.length));
   };
 
   return (
     <div
-      className={`relative select-none overflow-hidden bg-black outline-none ${dragging ? "cursor-grabbing" : canRotate ? "cursor-grab" : ""} ${className}`}
-      style={{ touchAction: "pan-y" }}
-      role={canRotate ? "slider" : "img"}
-      aria-label={canRotate ? "360 degree photo viewer. Drag or swipe left and right to rotate." : current.title || "Car Dash Detailing photo"}
-      aria-valuemin={canRotate ? 1 : undefined}
-      aria-valuemax={canRotate ? imageFrames.length : undefined}
-      aria-valuenow={canRotate ? wrap(index, imageFrames.length) + 1 : undefined}
-      tabIndex={canRotate ? 0 : -1}
+      className={`relative select-none overflow-hidden bg-[#0b1822] outline-none ${className}`}
+      role={canAdvance ? "region" : "img"}
+      aria-label={
+        canAdvance
+          ? "Car Dash Detailing homepage photo slideshow"
+          : imageFrames[0].title || "Car Dash Detailing photo"
+      }
+      tabIndex={canAdvance ? 0 : -1}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setPaused(false);
+        }
+      }}
       onKeyDown={(event) => {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
-          rotateBy(-1);
+          goTo(index - 1);
         }
         if (event.key === "ArrowRight") {
           event.preventDefault();
-          rotateBy(1);
-        }
-      }}
-      onPointerDown={(event) => {
-        if (!canRotate) return;
-        lastX.current = event.clientX;
-        setInteraction(true);
-        event.currentTarget.setPointerCapture?.(event.pointerId);
-      }}
-      onPointerMove={(event) => {
-        if (!canRotate || lastX.current === null) return;
-        const delta = event.clientX - lastX.current;
-        const sensitivity = 12;
-        const steps = Math.trunc(delta / sensitivity);
-        if (steps === 0) return;
-        setIndex((value) => wrap(value - steps, imageFrames.length));
-        lastX.current += steps * sensitivity;
-      }}
-      onPointerUp={(event) => {
-        lastX.current = null;
-        setInteraction(false);
-        try {
-          event.currentTarget.releasePointerCapture?.(event.pointerId);
-        } catch {
-          // Pointer capture may already be released by the browser.
-        }
-      }}
-      onPointerCancel={() => {
-        lastX.current = null;
-        setInteraction(false);
-      }}
-      onLostPointerCapture={() => {
-        if (lastX.current !== null) {
-          lastX.current = null;
-          setInteraction(false);
+          goTo(index + 1);
         }
       }}
     >
-      <img
-        src={current.url}
-        alt={current.title || "Car Dash Detailing 360 view"}
-        draggable={false}
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="eager"
-        fetchPriority="high"
-      />
+      {imageFrames.map((frame, frameIndex) => {
+        const active = frameIndex === wrap(index, imageFrames.length);
+        return (
+          <img
+            key={frame.id || `${frame.url}-${frameIndex}`}
+            src={frame.url}
+            alt={frame.title || `Car Dash Detailing hero photo ${frameIndex + 1}`}
+            draggable={false}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out ${active ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            style={{ transitionDuration: `${FADE_MS}ms` }}
+            loading={frameIndex === 0 ? "eager" : "lazy"}
+            fetchPriority={frameIndex === 0 ? "high" : "auto"}
+            aria-hidden={!active}
+          />
+        );
+      })}
 
-      {canRotate && (
-        <div
-          className={`absolute inset-0 transition-opacity duration-200 ease-out ${dragging ? "pointer-events-none opacity-0" : "opacity-100"}`}
-          aria-hidden={dragging ? true : undefined}
-        >
-          <div className="pointer-events-none absolute left-4 top-4 rounded-full border border-white/15 bg-black/55 px-3 py-2 text-[10px] font-bold uppercase tracking-[.16em] text-white/80 backdrop-blur-md sm:left-5 sm:top-5">
-            ↔ Drag / swipe to rotate
-          </div>
-          <div className="pointer-events-none absolute right-4 top-4 rounded-full border border-white/15 bg-black/55 px-3 py-2 text-[10px] font-semibold text-white/70 backdrop-blur-md sm:right-5 sm:top-5">
-            {wrap(index, imageFrames.length) + 1} / {imageFrames.length}
-          </div>
-
+      {canAdvance && (
+        <>
           <button
             type="button"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.stopPropagation();
-              rotateBy(-1);
-            }}
-            className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/50 text-2xl text-white/90 backdrop-blur-md transition hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/70 sm:left-4"
-            aria-label="Previous 360 frame"
+            onClick={() => goTo(index - 1)}
+            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/18 bg-[#0b1822]/42 text-xl text-white/92 shadow-lg backdrop-blur-xl transition hover:bg-[#0b1822]/62 focus:outline-none focus:ring-2 focus:ring-white/70 sm:left-4"
+            aria-label="Previous hero photo"
           >
             ‹
           </button>
+
           <button
             type="button"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.stopPropagation();
-              rotateBy(1);
-            }}
-            className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/50 text-2xl text-white/90 backdrop-blur-md transition hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white/70 sm:right-4"
-            aria-label="Next 360 frame"
+            onClick={() => goTo(index + 1)}
+            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-white/18 bg-[#0b1822]/42 text-xl text-white/92 shadow-lg backdrop-blur-xl transition hover:bg-[#0b1822]/62 focus:outline-none focus:ring-2 focus:ring-white/70 sm:right-4"
+            aria-label="Next hero photo"
           >
             ›
           </button>
-        </div>
+
+          <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/14 bg-[#0b1822]/35 px-2.5 py-2 backdrop-blur-xl">
+            {imageFrames.map((frame, dotIndex) => (
+              <button
+                key={`dot-${frame.id || dotIndex}`}
+                type="button"
+                onClick={() => goTo(dotIndex)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${dotIndex === wrap(index, imageFrames.length) ? "w-5 bg-white" : "w-1.5 bg-white/38 hover:bg-white/62"}`}
+                aria-label={`Show hero photo ${dotIndex + 1}`}
+                aria-current={dotIndex === wrap(index, imageFrames.length) ? "true" : undefined}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
