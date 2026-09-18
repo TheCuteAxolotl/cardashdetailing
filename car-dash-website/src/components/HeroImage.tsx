@@ -27,7 +27,7 @@ export default function HeroImage() {
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#6EAEC6]">Featured Work</p>
               <div className="mt-2 flex items-end justify-between gap-5">
                 <h2 className="max-w-md text-xl font-black sm:text-2xl">{image.title}</h2>
-                <span className="shrink-0 rounded-full border border-white/15 bg-black/40 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white backdrop-blur">Car Dash</span>
+                <span className="shrink-0 rounded-full border border-white/15 bg-[#07131B]/40 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-white backdrop-blur">Car Dash</span>
               </div>
             </div>
           </div>
