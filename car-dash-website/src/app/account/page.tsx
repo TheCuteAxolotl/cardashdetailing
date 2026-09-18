@@ -378,7 +378,7 @@ export default function AccountPage() {
                   value={deletePassword}
                   onChange={(event) => setDeletePassword(event.target.value)}
                   required
-                  className="w-full rounded-2xl border border-red-400/15 bg-black/20 px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-red-400/55"
+                  className="w-full rounded-2xl border border-red-400/15 bg-[#07131B]/20 px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-red-400/55"
                 />
                 <label className="block">
                   <span className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-white/35">
@@ -390,7 +390,7 @@ export default function AccountPage() {
                     placeholder="DELETE"
                     autoComplete="off"
                     required
-                    className="w-full rounded-2xl border border-red-400/15 bg-black/20 px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-red-400/55"
+                    className="w-full rounded-2xl border border-red-400/15 bg-[#07131B]/20 px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-red-400/55"
                   />
                 </label>
 
@@ -418,7 +418,7 @@ export default function AccountPage() {
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your Car Dash permissions</h2>
             <p className="mt-2 text-sm leading-6 text-white/35">Your dashboard access is controlled by the Owner. Changes take effect the next time a protected panel or API is opened.</p>
 
-            <div className="mt-7 rounded-2xl border border-white/8 bg-black/20 p-5">
+            <div className="mt-7 rounded-2xl border border-white/8 bg-[#07131B]/20 p-5">
               <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/28">Assigned roles</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {user.role === "admin" && <span className="rounded-full border border-[#6EAEC6]/25 bg-[#6EAEC6]/10 px-3 py-1.5 text-xs font-semibold text-[#6EAEC6]">Admin</span>}
