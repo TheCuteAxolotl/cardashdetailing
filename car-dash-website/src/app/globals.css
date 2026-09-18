@@ -20,6 +20,9 @@
   --theme-accent-soft: rgba(110, 174, 198, 0.14);
   --theme-accent-line: rgba(110, 174, 198, 0.3);
   --theme-danger: #D75C5C;
+  --theme-success: #69B7A5;
+  --theme-warning: #C9A96A;
+  --theme-info: #7BAFC8;
 
   /* Legacy aliases still used by a few internal components. */
   --accent: var(--theme-accent);
@@ -304,3 +307,75 @@ img { display: block; }
 [class~="border-[#FF2D2D]/60"] { border-color: color-mix(in srgb, var(--theme-accent) 60%, transparent) !important; }
 [class~="border-[#6EAEC6]/65"],
 [class~="border-[#FF2D2D]/65"] { border-color: color-mix(in srgb, var(--theme-accent) 65%, transparent) !important; }
+
+
+/* Neutral + semantic compatibility so dashboards do not fall back to the old black/red/rainbow palette. */
+[class~="bg-[#111]"],
+[class~="bg-[#151515]"],
+[class~="bg-neutral-950"] { background-color: var(--theme-dark) !important; }
+
+[class~="bg-neutral-900"],
+[class~="bg-neutral-800"] { background-color: var(--theme-dark-2) !important; }
+
+[class~="text-[#111]"],
+[class~="text-black"] { color: var(--theme-ink) !important; }
+
+[class~="bg-black"] { background-color: var(--theme-dark-deep) !important; }
+
+[class~="bg-black/20"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 20%, transparent) !important; }
+[class~="bg-black/30"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 30%, transparent) !important; }
+[class~="bg-black/35"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 35%, transparent) !important; }
+[class~="bg-black/40"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 40%, transparent) !important; }
+[class~="bg-black/45"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 45%, transparent) !important; }
+[class~="bg-black/50"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 50%, transparent) !important; }
+[class~="bg-black/55"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 55%, transparent) !important; }
+[class~="bg-black/60"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 60%, transparent) !important; }
+[class~="bg-black/70"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 70%, transparent) !important; }
+[class~="bg-black/75"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 75%, transparent) !important; }
+[class~="bg-black/80"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 80%, transparent) !important; }
+[class~="bg-black/85"] { background-color: color-mix(in srgb, var(--theme-dark-deep) 85%, transparent) !important; }
+
+[class*="text-red-"] { color: var(--theme-danger) !important; }
+[class*="border-red-"] { border-color: color-mix(in srgb, var(--theme-danger) 40%, transparent) !important; }
+[class*="bg-red-"] { background-color: color-mix(in srgb, var(--theme-danger) 16%, transparent) !important; }
+
+[class*="text-green-"],
+[class*="text-emerald-"] { color: var(--theme-success) !important; }
+[class*="border-green-"],
+[class*="border-emerald-"] { border-color: color-mix(in srgb, var(--theme-success) 38%, transparent) !important; }
+[class*="bg-green-"],
+[class*="bg-emerald-"] { background-color: color-mix(in srgb, var(--theme-success) 15%, transparent) !important; }
+
+[class*="text-yellow-"],
+[class*="text-amber-"],
+[class*="text-orange-"] { color: var(--theme-warning) !important; }
+[class*="border-yellow-"],
+[class*="border-amber-"],
+[class*="border-orange-"] { border-color: color-mix(in srgb, var(--theme-warning) 38%, transparent) !important; }
+[class*="bg-yellow-"],
+[class*="bg-amber-"],
+[class*="bg-orange-"] { background-color: color-mix(in srgb, var(--theme-warning) 15%, transparent) !important; }
+
+[class*="text-blue-"],
+[class*="text-sky-"],
+[class*="text-cyan-"],
+[class*="text-indigo-"],
+[class*="text-violet-"],
+[class*="text-purple-"] { color: var(--theme-info) !important; }
+[class*="border-blue-"],
+[class*="border-sky-"],
+[class*="border-cyan-"],
+[class*="border-indigo-"],
+[class*="border-violet-"],
+[class*="border-purple-"] { border-color: color-mix(in srgb, var(--theme-info) 36%, transparent) !important; }
+[class*="bg-blue-"],
+[class*="bg-sky-"],
+[class*="bg-cyan-"],
+[class*="bg-indigo-"],
+[class*="bg-violet-"],
+[class*="bg-purple-"] { background-color: color-mix(in srgb, var(--theme-info) 14%, transparent) !important; }
+
+[class~="text-white/38"] { color: rgba(255,255,255,.38) !important; }
+[class~="text-white/52"] { color: rgba(255,255,255,.52) !important; }
+[class~="text-white/72"] { color: rgba(255,255,255,.72) !important; }
+[class~="text-white/82"] { color: rgba(255,255,255,.82) !important; }
