@@ -379,3 +379,11 @@ img { display: block; }
 [class~="text-white/52"] { color: rgba(255,255,255,.52) !important; }
 [class~="text-white/72"] { color: rgba(255,255,255,.72) !important; }
 [class~="text-white/82"] { color: rgba(255,255,255,.82) !important; }
+
+
+/* Keep global floating UI out of the way while media is open. */
+.media-lightbox-open .support-launcher {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
