@@ -55,6 +55,7 @@ export default function SiteHeader() {
 
   const owner = Boolean(user && (user.role === "owner" || user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()));
   const staff = Boolean(user && !owner && staffAccess);
+
   const openSupport = () => {
     window.dispatchEvent(new Event("open-support"));
     setMenuOpen(false);
@@ -63,59 +64,68 @@ export default function SiteHeader() {
 
   return (
     <>
-      <div className="border-b border-black/10 bg-[#FF2D2D] text-[#0D0D0D]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 text-[10px] font-bold uppercase tracking-[.18em] sm:px-8">
-          <span>South Elgin · Mobile detailing</span>
-          <a href={`tel:${BUSINESS_PHONE}`} className="hover:opacity-70">{BUSINESS_PHONE_DISPLAY}</a>
+      <div className="bg-[linear-gradient(90deg,#dff4ef,#edf8f5_45%,#deeffb)] text-[#17212a]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-black/45 sm:px-8">
+          <span className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#FF2D2D]" />
+            South Elgin · Mobile detailing
+          </span>
+          <a href={`tel:${BUSINESS_PHONE}`} className="hover:text-black">{BUSINESS_PHONE_DISPLAY}</a>
         </div>
       </div>
 
-      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#0D0D0D]/96 text-white backdrop-blur-xl">
-        <div className="mx-auto flex h-[74px] max-w-7xl items-center justify-between gap-5 px-5 sm:px-8">
+      <header className="sticky top-0 z-50 bg-[linear-gradient(90deg,rgba(223,244,239,.88),rgba(237,248,245,.84)_45%,rgba(222,239,251,.88))] py-2.5 backdrop-blur-2xl">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-5 rounded-[22px] border border-white/70 bg-white/72 px-4 shadow-[0_14px_44px_rgba(54,84,91,.10)] backdrop-blur-2xl sm:px-6">
           <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center gap-3">
-            <Image src="/car-dash-logo.png" alt="Car Dash Detailing" width={96} height={96} priority className="h-11 w-11 object-contain" />
-            <span className="hidden text-sm font-semibold tracking-[-.02em] text-white/90 sm:block">Car Dash Detailing</span>
+            <span className="grid h-10 w-10 place-items-center rounded-[14px] border border-black/6 bg-white shadow-sm">
+              <Image src="/car-dash-logo.png" alt="Car Dash Detailing" width={96} height={96} priority className="h-8 w-8 object-contain" />
+            </span>
+            <span className="hidden text-sm font-semibold tracking-[-.025em] text-[#17212a] sm:block">Car Dash Detailing</span>
           </a>
 
-          <nav className="hidden items-center gap-7 text-sm font-medium text-white/58 lg:flex">
+          <nav className="hidden items-center gap-1 rounded-full border border-black/[.055] bg-black/[.025] p-1 text-sm font-medium text-black/55 lg:flex">
             {mainLinks.map(([href, label]) => (
-              <a key={href} href={href} className="transition-colors hover:text-white">{label}</a>
+              <a key={href} href={href} className="rounded-full px-4 py-2 transition-colors hover:bg-white hover:text-black hover:shadow-sm">
+                {label}
+              </a>
             ))}
 
             <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-1.5 transition-colors hover:text-white [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full px-4 py-2 transition-colors hover:bg-white hover:text-black hover:shadow-sm [&::-webkit-details-marker]:hidden">
                 More
                 <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-180">
                   <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </summary>
 
-              <div className="absolute left-1/2 top-[calc(100%+18px)] z-[70] w-[330px] -translate-x-1/2 overflow-hidden rounded-[24px] border border-white/10 bg-[#151515] p-2 shadow-2xl shadow-black/50">
+              <div className="absolute left-1/2 top-[calc(100%+18px)] z-[70] w-[330px] -translate-x-1/2 overflow-hidden rounded-[24px] border border-white/80 bg-white/92 p-2 text-[#17212a] shadow-[0_28px_80px_rgba(45,70,80,.18)] backdrop-blur-2xl">
                 <div className="grid gap-1">
                   {moreLinks.map(([href, label, description]) => (
-                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-white/[.06]">
-                      <span className="block text-sm font-semibold text-white">{label}</span>
-                      <span className="mt-0.5 block text-xs leading-5 text-white/42">{description}</span>
+                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-black/[.035]">
+                      <span className="block text-sm font-semibold">{label}</span>
+                      <span className="mt-0.5 block text-xs leading-5 text-black/42">{description}</span>
                     </a>
                   ))}
-                  <button type="button" onClick={openSupport} className="rounded-[18px] px-4 py-3 text-left transition-colors hover:bg-white/[.06]">
-                    <span className="block text-sm font-semibold text-white">Need help?</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-white/42">Open support without leaving the page.</span>
+                  <button type="button" onClick={openSupport} className="rounded-[18px] px-4 py-3 text-left transition-colors hover:bg-black/[.035]">
+                    <span className="block text-sm font-semibold">Need help?</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-black/42">Open support without leaving the page.</span>
                   </button>
                 </div>
               </div>
             </details>
           </nav>
 
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden items-center gap-1.5 lg:flex">
             {!user ? (
-              <a href="/login" className="px-3 py-2 text-xs font-semibold text-white/48 hover:text-white">Login</a>
+              <a href="/login" className="rounded-full px-3 py-2 text-xs font-semibold text-black/48 hover:bg-white hover:text-black">Login</a>
             ) : (
-              <a href="/account" className="px-3 py-2 text-xs font-semibold text-white/55 hover:text-white">Account</a>
+              <a href="/account" className="rounded-full px-3 py-2 text-xs font-semibold text-black/55 hover:bg-white hover:text-black">Account</a>
             )}
-            {staff && <a href="/admin/dashboard" className="px-3 py-2 text-xs font-semibold text-[#FF2D2D]">Staff</a>}
-            {owner && <a href="/owner/dashboard" className="px-3 py-2 text-xs font-semibold text-[#FF2D2D]">Owner</a>}
-            <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-xs font-bold text-[#0D0D0D]">Book now</a>
+            {staff && <a href="/admin/dashboard" className="rounded-full px-3 py-2 text-xs font-semibold text-[#d82424]">Staff</a>}
+            {owner && <a href="/owner/dashboard" className="rounded-full px-3 py-2 text-xs font-semibold text-[#d82424]">Owner</a>}
+            <a href="/#book" className="rounded-full bg-[#17212a] px-5 py-3 text-xs font-semibold text-white shadow-md shadow-black/10">
+              Book now
+            </a>
           </div>
 
           <button
@@ -123,18 +133,22 @@ export default function SiteHeader() {
             aria-expanded={menuOpen}
             aria-controls="mobile-site-menu"
             onClick={() => setMenuOpen((value) => !value)}
-            className="rounded-full border border-white/12 bg-white/[.03] px-4 py-2.5 text-xs font-semibold lg:hidden"
+            className="rounded-full border border-black/8 bg-white/75 px-4 py-2.5 text-xs font-semibold text-[#17212a] shadow-sm lg:hidden"
           >
             {menuOpen ? "Close" : "Menu"}
           </button>
         </div>
 
-        <div id="mobile-site-menu" aria-hidden={!menuOpen} className={`mobile-menu-shell border-t bg-[#0D0D0D] lg:hidden ${menuOpen ? "mobile-menu-shell-open" : ""}`}>
+        <div
+          id="mobile-site-menu"
+          aria-hidden={!menuOpen}
+          className={`mobile-menu-shell mx-auto mt-2 max-w-7xl rounded-[24px] border bg-white/95 text-[#17212a] shadow-[0_24px_70px_rgba(45,70,80,.18)] backdrop-blur-2xl lg:hidden ${menuOpen ? "mobile-menu-shell-open" : ""}`}
+        >
           <div className="mobile-menu-scroll max-h-[70dvh] overflow-y-auto px-5 py-5 pb-24">
             <nav className="grid gap-1 text-base">
-              <a href="/" onClick={() => setMenuOpen(false)} className="rounded-2xl px-4 py-3.5 font-semibold text-white">Home</a>
+              <a href="/" onClick={() => setMenuOpen(false)} className="rounded-2xl px-4 py-3.5 font-semibold text-[#17212a]">Home</a>
               {mainLinks.map(([href, label]) => (
-                <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-2xl px-4 py-3.5 text-white/68 hover:bg-white/[.04] hover:text-white">{label}</a>
+                <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-2xl px-4 py-3.5 text-black/60 hover:bg-black/[.035] hover:text-black">{label}</a>
               ))}
 
               <button
@@ -142,34 +156,50 @@ export default function SiteHeader() {
                 aria-expanded={mobileMoreOpen}
                 aria-controls="mobile-more-menu"
                 onClick={() => setMobileMoreOpen((value) => !value)}
-                className="flex items-center justify-between rounded-2xl px-4 py-3.5 text-left text-white/68 hover:bg-white/[.04] hover:text-white"
+                className="flex items-center justify-between rounded-2xl px-4 py-3.5 text-left text-black/60 hover:bg-black/[.035] hover:text-black"
               >
                 <span>More</span>
                 <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={`h-4 w-4 transition-transform duration-300 ${mobileMoreOpen ? "rotate-180" : ""}`}>
                   <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
+
               <div id="mobile-more-menu" className={`mobile-accordion ${mobileMoreOpen ? "mobile-accordion-open" : ""}`}>
                 <div className="mobile-accordion-inner">
-                  <div className="ml-3 grid gap-1 border-l border-white/8 pl-3 pb-2">
+                  <div className="ml-3 grid gap-1 border-l border-black/8 pb-2 pl-3">
                     {moreLinks.map(([href, label]) => (
-                      <a key={href} href={href} onClick={() => { setMenuOpen(false); setMobileMoreOpen(false); }} className="rounded-2xl px-4 py-3 text-sm text-white/58 hover:bg-white/[.04] hover:text-white">{label}</a>
+                      <a
+                        key={href}
+                        href={href}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileMoreOpen(false);
+                        }}
+                        className="rounded-2xl px-4 py-3 text-sm text-black/55 hover:bg-black/[.035] hover:text-black"
+                      >
+                        {label}
+                      </a>
                     ))}
-                    <button type="button" onClick={openSupport} className="rounded-2xl px-4 py-3 text-left text-sm text-white/58 hover:bg-white/[.04] hover:text-white">Need help?</button>
+                    <button type="button" onClick={openSupport} className="rounded-2xl px-4 py-3 text-left text-sm text-black/55 hover:bg-black/[.035] hover:text-black">
+                      Need help?
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div className="my-3 h-px bg-white/8" />
+              <div className="my-3 h-px bg-black/8" />
+
               {!user ? (
-                <a href="/login" className="rounded-2xl px-4 py-3.5 text-white/68">Login</a>
+                <a href="/login" className="rounded-2xl px-4 py-3.5 text-black/62">Login</a>
               ) : (
-                <a href="/account" className="rounded-2xl px-4 py-3.5 text-white/68">Account</a>
+                <a href="/account" className="rounded-2xl px-4 py-3.5 text-black/62">Account</a>
               )}
-              {user && !owner && !staff && <a href="/dashboard" className="rounded-2xl px-4 py-3.5 text-white/68">My dashboard</a>}
-              {staff && <a href="/admin/dashboard" className="rounded-2xl px-4 py-3.5 text-[#FF2D2D]">Staff dashboard</a>}
-              {owner && <a href="/owner/dashboard" className="rounded-2xl px-4 py-3.5 text-[#FF2D2D]">Owner dashboard</a>}
-              <a href="/#book" onClick={() => setMenuOpen(false)} className="mt-3 rounded-2xl bg-[#FF2D2D] px-5 py-4 text-center text-sm font-bold text-[#0D0D0D]">Book now</a>
+              {user && !owner && !staff && <a href="/dashboard" className="rounded-2xl px-4 py-3.5 text-black/62">My dashboard</a>}
+              {staff && <a href="/admin/dashboard" className="rounded-2xl px-4 py-3.5 text-[#d82424]">Staff dashboard</a>}
+              {owner && <a href="/owner/dashboard" className="rounded-2xl px-4 py-3.5 text-[#d82424]">Owner dashboard</a>}
+              <a href="/#book" onClick={() => setMenuOpen(false)} className="mt-3 rounded-2xl bg-[#17212a] px-5 py-4 text-center text-sm font-semibold text-white">
+                Book now
+              </a>
             </nav>
           </div>
         </div>
