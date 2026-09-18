@@ -71,7 +71,7 @@ export default function HomeExperience({
             <div
               className={`absolute left-5 right-5 top-5 z-20 flex items-center justify-between transition-all duration-200 sm:left-7 sm:right-7 sm:top-7 ${heroInteracting ? "pointer-events-none -translate-y-2 opacity-0" : "opacity-100"}`}
             >
-              <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white/80 backdrop-blur-xl">
+              <div className="flex items-center gap-2 rounded-full border border-white/15 bg-[#07131B]/20 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.18em] text-white/80 backdrop-blur-xl">
                 <span className="h-2 w-2 rounded-full bg-[#6EAEC6]" />
                 {content.heroEyebrow}
               </div>
