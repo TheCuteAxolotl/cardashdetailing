@@ -59,16 +59,16 @@ export default function AdminDashboard() {
     { permission: "pricing", href: "/owner/booking-settings", icon: "%", title: "Add-Ons & Discounts", description: "Manage booking add-ons, discount codes, limits, and expiration dates." },
   ], [smsUnread]);
 
-  if (!user) return <div className="min-h-screen bg-[#050505] p-12 text-white">Loading staff dashboard…</div>;
+  if (!user) return <div className="min-h-screen bg-[#07131B] p-12 text-white">Loading staff dashboard…</div>;
 
   const visible = cards.filter((card) => permissions.includes(card.permission));
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white">
+    <main className="min-h-screen bg-[#07131B] text-white">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#FF2D2D]">Staff</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[.28em] text-[#6EAEC6]">Staff</p>
             <h1 className="mt-2 text-4xl font-semibold">Staff Dashboard</h1>
             <p className="mt-2 text-sm text-white/45">Signed in as {user.email}. The panels below reflect the access the owner has assigned to this account.</p>
           </div>
@@ -77,9 +77,9 @@ export default function AdminDashboard() {
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {visible.map((card) => (
-            <a key={card.href} href={card.href} className="relative rounded-3xl border border-white/10 bg-white/[.025] p-8 transition hover:border-[#FF2D2D]/45">
+            <a key={card.href} href={card.href} className="relative rounded-3xl border border-white/10 bg-white/[.025] p-8 transition hover:border-[#6EAEC6]/45">
               {(card.badge || 0) > 0 && (
-                <span className="absolute right-5 top-5 rounded-full bg-[#FF2D2D] px-2.5 py-1 text-xs font-bold text-[#0D0D0D]">{card.badge}</span>
+                <span className="absolute right-5 top-5 rounded-full bg-[#6EAEC6] px-2.5 py-1 text-xs font-bold text-[#0B1822]">{card.badge}</span>
               )}
               <p className="text-3xl">{card.icon}</p>
               <h2 className="mt-5 text-2xl font-semibold">{card.title}</h2>
