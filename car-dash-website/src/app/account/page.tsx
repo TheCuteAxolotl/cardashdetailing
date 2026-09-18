@@ -215,9 +215,9 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <main className="grid min-h-[70vh] place-items-center bg-[#0D0D0D] text-white">
+      <main className="grid min-h-[70vh] place-items-center bg-[#0B1822] text-white">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#FF2D2D]" />
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#6EAEC6]" />
           <p className="mt-4 text-sm text-white/40">Loading account…</p>
         </div>
       </main>
@@ -227,12 +227,12 @@ export default function AccountPage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white">
+    <main className="min-h-screen bg-[#0B1822] text-white">
       <section className="border-b border-white/8">
         <div className="mx-auto max-w-[1280px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#FF2D2D]">Account</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#6EAEC6]">Account</p>
               <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl lg:text-6xl">
                 {staffAccess ? "Your Car Dash account and staff access." : "Everything about your detail, in one place."}
               </h1>
@@ -248,7 +248,7 @@ export default function AccountPage() {
                   {staffAccess ? "Staff Dashboard" : "Dashboard"}
                 </a>
               )}
-              <a href="/#book" className="rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">
+              <a href="/#book" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-[#0B1822] transition hover:bg-[#6EAEC6]">
                 Request a Detail
               </a>
               <button
@@ -265,13 +265,13 @@ export default function AccountPage() {
 
       <div className="mx-auto grid max-w-[1280px] gap-6 px-5 py-10 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-12 lg:py-14">
         <div className="space-y-6">
-          <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">
+          <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/30">Account information</p>
                 <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Profile</h2>
               </div>
-              <div className="grid h-11 w-11 place-items-center rounded-full border border-[#FF2D2D]/20 bg-[#FF2D2D]/10 text-sm font-semibold text-[#FF2D2D]">
+              <div className="grid h-11 w-11 place-items-center rounded-full border border-[#6EAEC6]/20 bg-[#6EAEC6]/10 text-sm font-semibold text-[#6EAEC6]">
                 {user.name?.slice(0, 1).toUpperCase() || "C"}
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function AccountPage() {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   required
-                  className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white outline-none transition focus:border-[#FF2D2D]/60"
+                  className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white outline-none transition focus:border-[#6EAEC6]/60"
                 />
               </label>
 
@@ -311,7 +311,7 @@ export default function AccountPage() {
             </form>
           </section>
 
-          <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">
+          <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/30">Security</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Change password</h2>
             <p className="mt-2 text-sm leading-6 text-white/35">Use at least 8 characters for your new password.</p>
@@ -324,7 +324,7 @@ export default function AccountPage() {
                 value={currentPassword}
                 onChange={(event) => setCurrentPassword(event.target.value)}
                 required
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-[#FF2D2D]/60"
+                className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-[#6EAEC6]/60"
               />
               <input
                 type="password"
@@ -334,7 +334,7 @@ export default function AccountPage() {
                 onChange={(event) => setNewPassword(event.target.value)}
                 minLength={8}
                 required
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-[#FF2D2D]/60"
+                className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-[#6EAEC6]/60"
               />
               <input
                 type="password"
@@ -344,7 +344,7 @@ export default function AccountPage() {
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 minLength={8}
                 required
-                className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-[#FF2D2D]/60"
+                className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-sm text-white placeholder:text-white/22 outline-none transition focus:border-[#6EAEC6]/60"
               />
 
               {passwordMessage && (
@@ -413,15 +413,15 @@ export default function AccountPage() {
         </div>
 
         {staffAccess ? (
-          <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#FF2D2D]">Staff access</p>
+          <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#6EAEC6]">Staff access</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your Car Dash permissions</h2>
             <p className="mt-2 text-sm leading-6 text-white/35">Your dashboard access is controlled by the Owner. Changes take effect the next time a protected panel or API is opened.</p>
 
             <div className="mt-7 rounded-2xl border border-white/8 bg-black/20 p-5">
               <p className="text-[10px] font-bold uppercase tracking-[.2em] text-white/28">Assigned roles</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {user.role === "admin" && <span className="rounded-full border border-[#FF2D2D]/25 bg-[#FF2D2D]/10 px-3 py-1.5 text-xs font-semibold text-[#FF2D2D]">Admin</span>}
+                {user.role === "admin" && <span className="rounded-full border border-[#6EAEC6]/25 bg-[#6EAEC6]/10 px-3 py-1.5 text-xs font-semibold text-[#6EAEC6]">Admin</span>}
                 {customRoles.map((role) => <span key={role.id} className="rounded-full border border-white/10 bg-white/[.035] px-3 py-1.5 text-xs font-semibold text-white/65">{role.name}</span>)}
                 {user.role !== "admin" && !customRoles.length && <span className="text-sm text-white/30">Direct permissions only</span>}
               </div>
@@ -442,13 +442,13 @@ export default function AccountPage() {
               })}
             </div>
 
-            <a href="/admin/dashboard" className="mt-7 inline-flex rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D]">Open Staff Dashboard</a>
+            <a href="/admin/dashboard" className="mt-7 inline-flex rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-[#0B1822]">Open Staff Dashboard</a>
           </section>
         ) : (
-        <section className="rounded-[28px] border border-white/8 bg-[#111318] p-6 sm:p-8">
+        <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#FF2D2D]">Detail status</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#6EAEC6]">Detail status</p>
               <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your requests</h2>
               <p className="mt-2 text-sm text-white/35">Updates appear here when Car Dash Detailing changes your booking status.</p>
             </div>
@@ -490,7 +490,7 @@ export default function AccountPage() {
                       <p className="text-sm leading-6 text-white/38">{detail.description}</p>
                       <a
                         href={`/booking-chat/${booking.id}`}
-                        className="rounded-full border border-[#FF2D2D]/35 bg-[#FF2D2D]/10 px-4 py-2 text-xs font-semibold text-[#FF2D2D] transition hover:bg-[#FF2D2D]/20"
+                        className="rounded-full border border-[#6EAEC6]/35 bg-[#6EAEC6]/10 px-4 py-2 text-xs font-semibold text-[#6EAEC6] transition hover:bg-[#6EAEC6]/20"
                       >
                         Message Car Dash
                       </a>
@@ -503,7 +503,7 @@ export default function AccountPage() {
             <div className="mt-8 rounded-3xl border border-dashed border-white/10 px-6 py-12 text-center">
               <p className="text-lg font-semibold">No detail requests yet.</p>
               <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-white/35">When you request a service while signed in, its status will appear here.</p>
-              <a href="/#book" className="mt-6 inline-block rounded-full bg-[#FF2D2D] px-5 py-3 text-sm font-semibold text-[#0D0D0D] transition hover:bg-[#FF2D2D]">Request a Detail</a>
+              <a href="/#book" className="mt-6 inline-block rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-[#0B1822] transition hover:bg-[#6EAEC6]">Request a Detail</a>
             </div>
           )}
         </section>
