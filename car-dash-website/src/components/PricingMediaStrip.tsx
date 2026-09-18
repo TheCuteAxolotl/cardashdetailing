@@ -15,19 +15,37 @@ export default function PricingMediaStrip({
 }) {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     const query = new URLSearchParams();
     query.append("category", category);
     query.set("limit", "50");
     fetch(`/api/images?${query.toString()}`, { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : []))
       .then((media) => setItems(Array.isArray(media) ? media : []))
-      .catch(() => setItems([]));
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
   }, [category]);
 
-  if (!items.length) return null;
   const dark = theme === "dark";
+
+  if (loading) {
+    return (
+      <div className={`grid grid-cols-2 gap-3 lg:grid-cols-4 ${className}`}>
+        {[0, 1, 2, 3].map((slot) => (
+          <div
+            key={slot}
+            className={`${slot === 0 ? "col-span-2 row-span-2" : ""} min-h-44 animate-pulse rounded-[24px] border ${dark ? "border-white/10 bg-white/[.045]" : "border-black/8 bg-[linear-gradient(135deg,#DDEFF6,#EEF7F5)]"}`}
+            aria-hidden="true"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (!items.length) return null;
 
   return (
     <>
