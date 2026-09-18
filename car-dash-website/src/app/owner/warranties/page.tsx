@@ -23,7 +23,7 @@ type Vehicle = {
   customerEmail: string;
 };
 
-const input = "w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 outline-none focus:border-[#FF2D2D]/50";
+const input = "w-full rounded-2xl border border-white/10 bg-black/50 px-4 py-3 outline-none focus:border-[#6EAEC6]/50";
 
 export default function WarrantyPage() {
   const [items, setItems] = useState<Warranty[]>([]);
@@ -93,7 +93,7 @@ export default function WarrantyPage() {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[.28em] text-[#FF2D2D]">{isOwner ? "Owner" : "Staff"}</p>
+            <p className="text-xs uppercase tracking-[.28em] text-[#6EAEC6]">{isOwner ? "Owner" : "Staff"}</p>
             <h1 className="mt-2 text-4xl font-semibold">Ceramic warranty records</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/40">Create and manage coating warranty records for customer vehicles without requiring Quote Chat access.</p>
           </div>
@@ -118,14 +118,14 @@ export default function WarrantyPage() {
           </select>
           <input type="date" className={input} value={date} onChange={(event) => setDate(event.target.value)} />
           <textarea className={`${input} md:col-span-2`} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Install notes / maintenance requirements" />
-          <button className="rounded-full bg-[#FF2D2D] px-6 py-3 font-semibold text-[#0D0D0D]">Create warranty record</button>
+          <button className="rounded-full bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822]">Create warranty record</button>
           {msg && <p className="self-center text-sm text-white/50">{msg}</p>}
         </form>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {items.map((warranty) => (
             <article key={warranty.id} className="rounded-[26px] border border-white/10 bg-white/[.025] p-6">
-              <p className="text-xs uppercase tracking-[.22em] text-[#FF2D2D]">{warranty.durationYears}-year protection</p>
+              <p className="text-xs uppercase tracking-[.22em] text-[#6EAEC6]">{warranty.durationYears}-year protection</p>
               <h2 className="mt-2 text-2xl font-semibold">{warranty.coatingName}</h2>
               <p className="mt-2 text-white/45">{warranty.vehicle.year} {warranty.vehicle.make} {warranty.vehicle.model}</p>
               <p className="mt-1 text-sm text-white/35">{warranty.user.name} · expires {new Date(warranty.expiresAt).toLocaleDateString()}</p>
