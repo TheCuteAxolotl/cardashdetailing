@@ -20,47 +20,65 @@ export type PricingPageConfig = {
   packages: PricingPackage[];
 };
 
+// Keep the existing internal keys for backward compatibility with saved pricing data,
+// but present the vehicle sizes customers actually choose on the current menu.
 export const VEHICLE_LABELS: Record<VehicleClass, string> = {
-  coupe: "Coupe",
-  sedan: "Sedan",
-  truckSuv: "Truck & SUV",
+  coupe: "Sedan",
+  sedan: "SUV/CRV",
+  truckSuv: "Truck",
 };
 
 export const DEFAULT_PRICING_PAGES: Record<"packages" | "exterior" | "interior", PricingPageConfig> = {
   packages: {
     eyebrow: "Car Detailing Packages",
-    title: "Pick a full-detail package and your vehicle size.",
-    body: "Choose your vehicle size, compare what is included, and pick the package that fits what you want done.",
-    priceNote: "Prices shown are fixed for the selected vehicle class. Extreme pet hair, biohazards, or unusual restoration work are quoted separately before service begins.",
+    title: "Choose the detail your vehicle needs.",
+    body: "Two straightforward inside-and-out packages. Choose your vehicle size, compare what is included, and book the level that matches its condition.",
+    priceNote: "Standard pricing covers normal vehicle conditions. Extreme pet hair, biohazards, excessive adhesive or sticker removal, severe staining, or unusual restoration work is quoted separately before service begins.",
     packages: [
       {
         id: "essential",
         tier: "Essential",
         name: "Essential Detail",
-        description: "A basic inside-and-out clean for a vehicle that is already kept up pretty well.",
+        description: "A complete maintenance-style interior and exterior detail for vehicles that are already kept up fairly well.",
         ctaLabel: "Book Essential Detail",
-        prices: { coupe: 159, sedan: 179, truckSuv: 219 },
-        features: ["Foam hand wash", "Wheels and tires", "Interior vacuum", "Interior wipe-down", "Glass inside and out", "Crevices and touch points", "Tire dressing"],
+        prices: { coupe: 159, sedan: 189, truckSuv: 199 },
+        features: [
+          "Full interior vacuum",
+          "Seats, dash, console, door panels and cup holders cleaned",
+          "Cracks and crevices cleaned",
+          "Floor mats cleaned",
+          "Interior and exterior glass",
+          "Pre-rinse and foam wash",
+          "Hand contact wash",
+          "Wheels and tires cleaned",
+          "Tire dressing",
+          "Hand dry and exterior finishing gloss",
+        ],
       },
       {
         id: "complete",
-        tier: "Best Value",
-        name: "Complete Detail",
-        description: "A more complete interior + exterior detail with extra cleaning and paint protection.",
+        tier: "Full Detail",
+        name: "Full Detail",
+        description: "A deeper interior and exterior reset for everyday buildup, kids, crumbs, moderate mess, and vehicles that need more attention.",
         badge: "Most Popular",
         featured: true,
-        ctaLabel: "Book Complete Detail",
-        prices: { coupe: 219, sedan: 249, truckSuv: 299 },
-        features: ["Everything in Essential", "Interior disinfecting", "Vent and detail brushing", "Iron decontamination", "Contact wash", "Spray sealant protection", "Door jambs"],
-      },
-      {
-        id: "signature",
-        tier: "Signature",
-        name: "Signature Detail",
-        description: "Everything in the full detail plus a light machine polish for more gloss and clarity.",
-        ctaLabel: "Book Signature Detail",
-        prices: { coupe: 399, sedan: 449, truckSuv: 529 },
-        features: ["Everything in Complete", "Clay decontamination as needed", "Single-stage paint enhancement", "Gloss refinement", "Hand-applied protection", "Exterior trim finish", "Final paint inspection"],
+        ctaLabel: "Book Full Detail",
+        prices: { coupe: 219, sedan: 249, truckSuv: 279 },
+        features: [
+          "Everything in Essential",
+          "Thorough interior vacuum and deeper crevice work",
+          "Seats and under-seat areas detailed",
+          "Dashboard, console, cup holders and door pockets detailed",
+          "Carpet and floor mats deep cleaned",
+          "Light stain treatment",
+          "Interior surfaces disinfected",
+          "Air vents detailed",
+          "Trunk or cargo area vacuumed",
+          "Moderate crumbs and kid mess cleaned",
+          "Light sticker or adhesive removal when possible",
+          "Two-stage foam and contact wash",
+          "Bug removal, spray protection and gloss finish",
+        ],
       },
     ],
   },
@@ -140,10 +158,18 @@ export const DEFAULT_PRICING_PAGES: Record<"packages" | "exterior" | "interior",
   },
 };
 
+function shouldMigrateLegacyPackageMenu(parsed: PricingPageConfig, fallback: PricingPageConfig) {
+  if (fallback !== DEFAULT_PRICING_PAGES.packages) return false;
+  const ids = new Set(parsed.packages.map((item) => item.id));
+  const complete = parsed.packages.find((item) => item.id === "complete");
+  return ids.has("signature") || complete?.name === "Complete Detail";
+}
+
 export function parsePricingConfig(value: string | null | undefined, fallback: PricingPageConfig): PricingPageConfig {
   try {
     const parsed = JSON.parse(value || "") as PricingPageConfig;
     if (!parsed || !Array.isArray(parsed.packages)) return fallback;
+    if (shouldMigrateLegacyPackageMenu(parsed, fallback)) return DEFAULT_PRICING_PAGES.packages;
     return parsed;
   } catch {
     return fallback;
