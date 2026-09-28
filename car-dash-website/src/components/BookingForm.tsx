@@ -116,9 +116,9 @@ const input = "mt-2 w-full rounded-2xl border border-white/10 bg-[#07131B]/50 px
 
 function vehicleTypeToClass(value: string): VehicleClass {
   const normalized = value.toLowerCase();
-  if (normalized.includes("truck") || normalized.includes("suv")) return "truckSuv";
-  if (normalized.includes("coupe")) return "coupe";
-  return "sedan";
+  if (normalized.includes("truck")) return "truckSuv";
+  if (normalized.includes("suv") || normalized.includes("crv") || normalized.includes("crossover")) return "sedan";
+  return "coupe";
 }
 
 function formatPricingType(service: Service) {
