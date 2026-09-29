@@ -5,6 +5,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SupportWidget from "@/components/SupportWidget";
 import StructuredData from "@/components/StructuredData";
+import ScrollReveal from "@/components/ScrollReveal";
 import { localBusinessSchema, SITE_URL } from "@/lib/seo";
 import { getSiteContent } from "@/lib/site-content";
 
@@ -52,6 +53,7 @@ export default async function RootLayout({
       <body className="min-h-full flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
         <StructuredData data={localBusinessSchema} />
         <SiteHeader />
+        <ScrollReveal />
         <main className="flex-1">{children}</main>
         <SiteFooter blurb={siteContent.footerBlurb} />
         <SupportWidget />
