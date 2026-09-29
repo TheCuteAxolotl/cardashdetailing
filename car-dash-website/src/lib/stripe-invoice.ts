@@ -69,13 +69,7 @@ function safeCheckoutDescription(invoice: InvoiceRecord) {
   return text || `${invoice.assetType || "Detailing"} service`;
 }
 
-export async function createInvoiceCheckoutSession(invoice: InvoiceRecord) {
-  const totals = calculateInvoiceTotals(invoice);
-  const amountCents = Math.round(totals.balance * 100);
-
-  if (amountCents <= 0) throw new Error("This invoice has no remaining balance.");
-  if (!invoice.paymentOptions.online) throw new Error("Online payment is disabled for this invoice.");
-
+function buildCheckoutForm(invoice: InvoiceRecord, amountCents: number, includeAch: boolean) {
   const site = publicSiteUrl();
   const form = new URLSearchParams();
   form.set("mode", "payment");
@@ -84,7 +78,7 @@ export async function createInvoiceCheckoutSession(invoice: InvoiceRecord) {
   form.set("cancel_url", `${site}/invoice/${invoice.shareToken}?payment=cancelled`);
   form.set("client_reference_id", invoice.id);
   form.set("payment_method_types[0]", "card");
-  form.set("payment_method_types[1]", "us_bank_account");
+  if (includeAch) form.set("payment_method_types[1]", "us_bank_account");
   form.set("metadata[invoice_id]", invoice.id);
   form.set("metadata[invoice_number]", invoice.invoiceNumber);
   form.set("payment_intent_data[metadata][invoice_id]", invoice.id);
@@ -97,14 +91,34 @@ export async function createInvoiceCheckoutSession(invoice: InvoiceRecord) {
   if (invoice.customerEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(invoice.customerEmail)) {
     form.set("customer_email", invoice.customerEmail);
   }
+  return form;
+}
 
-  const payload = await stripeRequest("/v1/checkout/sessions", {
+async function postCheckout(form: URLSearchParams) {
+  return (await stripeRequest("/v1/checkout/sessions", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: form,
-  });
+  })) as StripeCheckoutSession;
+}
 
-  const session = payload as StripeCheckoutSession;
+export async function createInvoiceCheckoutSession(invoice: InvoiceRecord) {
+  const totals = calculateInvoiceTotals(invoice);
+  const amountCents = Math.round(totals.balance * 100);
+
+  if (amountCents <= 0) throw new Error("This invoice has no remaining balance.");
+  if (!invoice.paymentOptions.online) throw new Error("Online payment is disabled for this invoice.");
+
+  let session: StripeCheckoutSession;
+  try {
+    session = await postCheckout(buildCheckoutForm(invoice, amountCents, true));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (!/us_bank_account|payment method type|activated/i.test(message)) throw error;
+    console.warn("ACH is unavailable for Stripe Checkout; retrying with card only.");
+    session = await postCheckout(buildCheckoutForm(invoice, amountCents, false));
+  }
+
   if (!session.id || !session.url) throw new Error("Stripe did not return a checkout URL.");
   return session;
 }
