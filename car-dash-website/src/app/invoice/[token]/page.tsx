@@ -45,13 +45,38 @@ function prettyDate(value: string) {
 export default function PublicInvoicePage({ params }: { params: Promise<{ token: string }> }) {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
+  const [paymentMessage, setPaymentMessage] = useState("");
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const { token } = await params;
+        const query = new URLSearchParams(window.location.search);
+        const sessionId = query.get("session_id");
+        const paymentState = query.get("payment");
+
+        if (sessionId && paymentState === "success") {
+          const confirmResponse = await fetch(
+            `/api/invoices/public/${encodeURIComponent(token)}/checkout/confirm?session_id=${encodeURIComponent(sessionId)}`,
+            { method: "POST", cache: "no-store" }
+          );
+          const confirmation = await confirmResponse.json().catch(() => ({}));
+          if (confirmResponse.ok) {
+            if (confirmation.paymentStatus === "paid") {
+              setPaymentMessage("Payment received. Thank you!");
+            } else {
+              setPaymentMessage("Payment submitted. Bank payments can take time to finish processing; this invoice will update automatically when Stripe confirms settlement.");
+            }
+          }
+          window.history.replaceState({}, "", `/invoice/${token}`);
+        } else if (paymentState === "cancelled") {
+          setPaymentMessage("Online payment was cancelled. Your invoice is still available below.");
+          window.history.replaceState({}, "", `/invoice/${token}`);
+        }
+
         const response = await fetch(`/api/invoices/public/${encodeURIComponent(token)}`, { cache: "no-store" });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || "Invoice not found");
@@ -64,6 +89,31 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
     })();
     return () => { cancelled = true; };
   }, [params]);
+
+  async function startOnlinePayment() {
+    if (!invoice || paying) return;
+    if (invoice.paymentOptions.onlinePaymentUrl) {
+      window.location.assign(invoice.paymentOptions.onlinePaymentUrl);
+      return;
+    }
+
+    setPaying(true);
+    setPaymentMessage("");
+    try {
+      const { token } = await params;
+      const response = await fetch(`/api/invoices/public/${encodeURIComponent(token)}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Could not start online payment.");
+      if (!data.url) throw new Error("Stripe did not return a checkout link.");
+      window.location.assign(data.url);
+    } catch (err) {
+      setPaymentMessage(err instanceof Error ? err.message : "Could not start online payment.");
+      setPaying(false);
+    }
+  }
 
   if (loading) {
     return <main className="grid min-h-screen place-items-center bg-[#07131B] text-white"><div className="text-center"><div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-b-[#6EAEC6]" /><p className="mt-4 text-sm text-white/45">Loading invoice…</p></div></main>;
@@ -83,6 +133,8 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
           <a href="/" className="text-sm text-[#8EC5D8] hover:text-white">Car Dash Detailing</a>
           <button onClick={() => window.print()} className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white/70 hover:text-white">Print / Save PDF</button>
         </div>
+
+        {paymentMessage && <div className="mb-5 rounded-2xl border border-[#6EAEC6]/20 bg-[#6EAEC6]/10 px-4 py-3 text-sm leading-6 text-[#C7E6F0] print:hidden">{paymentMessage}</div>}
 
         <article className="overflow-hidden rounded-[2rem] border border-[#27404F] bg-[#0B1822] shadow-2xl shadow-black/20 print:rounded-none print:border-0 print:bg-white print:shadow-none">
           <header className="border-b border-white/8 bg-gradient-to-br from-[#102838] to-[#0B1822] p-7 sm:p-10 print:border-black/10 print:bg-white">
@@ -121,10 +173,10 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
             </div>
 
             {!paid && <section className="mt-9 rounded-2xl border border-[#6EAEC6]/18 bg-[#6EAEC6]/[0.055] p-5 sm:p-6 print:border-black/15 print:bg-transparent"><p className="text-xs font-semibold uppercase tracking-[.18em] text-[#8EC5D8] print:text-black/50">Payment options</p><div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {invoice.paymentOptions.online && <button onClick={startOnlinePayment} disabled={paying} className="flex min-h-28 flex-col justify-between rounded-2xl border border-[#6EAEC6]/35 bg-[#6EAEC6]/12 p-4 text-left transition hover:bg-[#6EAEC6]/18 disabled:cursor-wait disabled:opacity-55 print:hidden"><div><p className="font-semibold text-white">Pay online</p><p className="mt-1 text-sm leading-6 text-white/50">Secure Stripe checkout with card or U.S. bank account.</p></div><span className="mt-4 text-sm font-bold text-[#A9D6E5]">{paying ? "Opening secure checkout…" : `${invoice.paymentOptions.onlineLabel || "Pay online"} · ${currency.format(invoice.totals.balance)} →`}</span></button>}
               {invoice.paymentOptions.check && <PaymentCard title="Check"><p>Make check payable to <strong className="text-white print:text-black">{invoice.paymentOptions.checkPayableTo || "Car Dash Detailing"}</strong>.</p></PaymentCard>}
               {invoice.paymentOptions.cash && <PaymentCard title="Cash"><p>Cash payment accepted directly by Car Dash Detailing.</p></PaymentCard>}
               {invoice.paymentOptions.other && invoice.paymentOptions.otherInstructions && <PaymentCard title="Other"><p className="whitespace-pre-wrap">{invoice.paymentOptions.otherInstructions}</p></PaymentCard>}
-              {invoice.paymentOptions.online && invoice.paymentOptions.onlinePaymentUrl && <a href={invoice.paymentOptions.onlinePaymentUrl} target="_blank" rel="noreferrer" className="flex min-h-28 flex-col justify-between rounded-2xl border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 p-4 transition hover:bg-[#6EAEC6]/15 print:hidden"><div><p className="font-semibold text-white">Online payment</p><p className="mt-1 text-sm text-white/50">Use the secure payment link selected by Car Dash.</p></div><span className="mt-4 text-sm font-bold text-[#A9D6E5]">{invoice.paymentOptions.onlineLabel || "Pay online"} →</span></a>}
             </div></section>}
 
             {invoice.payments.length > 0 && <section className="mt-8"><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/35 print:text-black/45">Payments recorded</p><div className="mt-3 space-y-2">{invoice.payments.map((payment) => <div key={payment.id} className="flex items-center justify-between rounded-xl border border-white/7 px-4 py-3 text-sm print:border-black/10"><div><p className="font-medium">{payment.method}</p><p className="mt-1 text-xs text-white/35 print:text-black/45">{new Date(payment.paidAt).toLocaleDateString("en-US")}{payment.reference ? ` · Ref ${payment.reference}` : ""}</p></div><span className="font-semibold">{currency.format(payment.amount)}</span></div>)}</div></section>}
