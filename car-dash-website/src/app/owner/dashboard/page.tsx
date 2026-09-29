@@ -165,6 +165,16 @@ export default function OwnerDashboard() {
             </div>
           </a>
 
+          <a href="/owner/invoices">
+            <div className="rounded-3xl border border-[#27404F] bg-[#0B1822] p-8 hover:border-[#6EAEC6]/45 transition cursor-pointer">
+              <div className="rounded-2xl bg-[#6EAEC6]/10 p-4 w-12 h-12 flex items-center justify-center mb-4">
+                <span className="text-2xl">▤</span>
+              </div>
+              <h2 className="text-xl font-semibold mb-2">Invoices</h2>
+              <p className="text-white/52 text-sm">Create custom invoices, send secure links by SMS, and record check, cash, or online payments</p>
+            </div>
+          </a>
+
           <a href="/owner/messages">
             <div className="relative rounded-3xl border border-[#27404F] bg-[#0B1822] p-8 hover:border-[#6EAEC6]/45 transition cursor-pointer">
               {smsUnread > 0 && (
