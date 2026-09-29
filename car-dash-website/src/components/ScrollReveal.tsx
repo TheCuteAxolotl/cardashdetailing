@@ -30,6 +30,7 @@ export default function ScrollReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const observed = new Set<Element>();
+    const isPhone = window.matchMedia("(max-width: 640px)").matches;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -46,8 +47,9 @@ export default function ScrollReveal() {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: "-8% 0px -8% 0px",
+        // A low threshold keeps the effect responsive on phones and on tall sections.
+        threshold: isPhone ? 0.015 : 0.03,
+        rootMargin: isPhone ? "-2% 0px -2% 0px" : "-4% 0px -4% 0px",
       }
     );
 
@@ -64,9 +66,8 @@ export default function ScrollReveal() {
         if (observed.has(element)) continue;
 
         const rect = element.getBoundingClientRect();
-        const visibleTop = window.innerHeight * 0.08;
-        const visibleBottom = window.innerHeight * 0.92;
-        const initiallyVisible = rect.bottom > visibleTop && rect.top < visibleBottom;
+        const edgeInset = window.innerHeight * (isPhone ? 0.02 : 0.04);
+        const initiallyVisible = rect.bottom > edgeInset && rect.top < window.innerHeight - edgeInset;
 
         if (initiallyVisible) {
           element.classList.add("is-revealed");
