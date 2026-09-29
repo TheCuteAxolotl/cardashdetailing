@@ -17,6 +17,11 @@ function shouldAnimate(pathname: string) {
   return !EXCLUDED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
+function setHiddenDirection(element: Element, top: number) {
+  element.classList.remove("is-above", "is-below");
+  element.classList.add(top < 0 ? "is-above" : "is-below");
+}
+
 export default function ScrollReveal() {
   const pathname = usePathname();
 
@@ -25,20 +30,24 @@ export default function ScrollReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const observed = new Set<Element>();
-    const revealImmediatelyBelow = window.innerHeight * 0.92;
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add("is-revealed");
-          observer.unobserve(entry.target);
-          observed.delete(entry.target);
+          const element = entry.target;
+
+          if (entry.isIntersecting) {
+            element.classList.add("is-revealed");
+            element.classList.remove("is-above", "is-below");
+          } else {
+            element.classList.remove("is-revealed");
+            setHiddenDirection(element, entry.boundingClientRect.top);
+          }
         }
       },
       {
-        threshold: 0.08,
-        rootMargin: "0px 0px -9% 0px",
+        threshold: 0.1,
+        rootMargin: "-8% 0px -8% 0px",
       }
     );
 
@@ -48,15 +57,23 @@ export default function ScrollReveal() {
       );
 
       for (const element of elements) {
-        if (element.classList.contains("scroll-reveal")) continue;
+        if (!element.classList.contains("scroll-reveal")) {
+          element.classList.add("scroll-reveal");
+        }
 
-        element.classList.add("scroll-reveal");
+        if (observed.has(element)) continue;
+
         const rect = element.getBoundingClientRect();
+        const visibleTop = window.innerHeight * 0.08;
+        const visibleBottom = window.innerHeight * 0.92;
+        const initiallyVisible = rect.bottom > visibleTop && rect.top < visibleBottom;
 
-        // Anything already visible should stay visible so hydration never causes a flash.
-        if (rect.top <= revealImmediatelyBelow) {
+        if (initiallyVisible) {
           element.classList.add("is-revealed");
-          continue;
+          element.classList.remove("is-above", "is-below");
+        } else {
+          element.classList.remove("is-revealed");
+          setHiddenDirection(element, rect.top);
         }
 
         observer.observe(element);
@@ -87,7 +104,7 @@ export default function ScrollReveal() {
       observer.disconnect();
       observed.clear();
       document.querySelectorAll(".scroll-reveal").forEach((element) => {
-        element.classList.remove("scroll-reveal", "is-revealed");
+        element.classList.remove("scroll-reveal", "is-revealed", "is-above", "is-below");
       });
     };
   }, [pathname]);
