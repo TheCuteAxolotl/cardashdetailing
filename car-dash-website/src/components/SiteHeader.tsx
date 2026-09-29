@@ -78,7 +78,7 @@ export default function SiteHeader() {
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-5 rounded-[22px] border border-[#C0AB9A]/45 bg-[#F7F5F2]/90 px-4 shadow-[0_14px_44px_rgba(23,20,17,.12)] backdrop-blur-2xl sm:px-6">
           <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-[14px] border border-[#3F3027]/10 bg-[#F7F5F2] shadow-sm">
-              <Image src="/car-dash-logo.png" alt="Car Dash Detailing" width={96} height={96} priority className="h-8 w-8 object-contain" />
+              <Image src="/icon.svg" alt="Car Dash Detailing" width={140} height={140} priority className="h-8 w-8 rounded-full object-contain" />
             </span>
             <span className="hidden text-sm font-semibold tracking-[-.025em] text-[#171411] sm:block">Car Dash Detailing</span>
           </a>
