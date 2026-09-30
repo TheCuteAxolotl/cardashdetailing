@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     "Mobile car and marine detailing based in South Elgin, Illinois. Interior detailing, exterior detailing, paint correction, ceramic coatings, and condition-based exact quotes.",
   applicationName: "Car Dash Detailing",
   category: "automotive detailing",
+  icons: {
+    icon: [{ url: "/favicon-gold.png", type: "image/png", sizes: "140x140" }],
+  },
   openGraph: {
     siteName: "Car Dash Detailing",
     type: "website",
