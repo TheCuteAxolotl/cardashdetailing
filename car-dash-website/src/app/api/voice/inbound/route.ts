@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 import { prisma } from "@/lib/prisma";
@@ -39,9 +40,10 @@ export async function POST(request: NextRequest) {
     const rawFrom = String(params.From || "unknown").trim();
     const fromPhone = normalizePhoneNumber(rawFrom) || rawFrom.slice(0, 64);
     const toPhone = normalizePhoneNumber(params.To) || voiceNumber || null;
+    const normalizedFrom = normalizePhoneNumber(rawFrom);
 
-    const blockedCaller = normalizePhoneNumber(rawFrom)
-      ? await prisma.blockedCaller.findUnique({ where: { phoneNumber: normalizePhoneNumber(rawFrom)! } })
+    const blockedCaller = normalizedFrom
+      ? await prisma.blockedCaller.findUnique({ where: { phoneNumber: normalizedFrom } })
       : null;
 
     if (callSid) {
@@ -50,14 +52,14 @@ export async function POST(request: NextRequest) {
         update: {
           fromPhone,
           toPhone,
-          status: blockedCaller ? "blocked" : "forwarding",
+          status: blockedCaller ? "blocked" : "caller-screening",
           blocked: Boolean(blockedCaller),
         },
         create: {
           callSid,
           fromPhone,
           toPhone,
-          status: blockedCaller ? "blocked" : "forwarding",
+          status: blockedCaller ? "blocked" : "caller-screening",
           blocked: Boolean(blockedCaller),
         },
       });
@@ -77,27 +79,23 @@ export async function POST(request: NextRequest) {
       return xml(response);
     }
 
-    const businessCallerId = toPhone || voiceNumber || undefined;
-    const actionUrl = `${getPublicSiteUrl()}/api/voice/complete${
-      callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
-    }`;
-    const screeningUrl = `${getPublicSiteUrl()}/api/voice/screen${
-      callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
-    }`;
+    // Challenge the caller before the owner's phone ever rings.
+    // Using 2-9 avoids the predictable legacy "press 1" behavior.
+    const expectedDigit = String(randomInt(2, 10));
+    const challengeUrl = `${getPublicSiteUrl()}/api/voice/caller-screen?${
+      callSid ? `callSid=${encodeURIComponent(callSid)}&` : ""
+    }expected=${expectedDigit}`;
 
-    const dial = response.dial({
-      action: actionUrl,
+    const gather = response.gather({
+      action: challengeUrl,
       method: "POST",
-      timeout: 25,
-      answerOnBridge: true,
-      ...(businessCallerId ? { callerId: businessCallerId } : {}),
+      numDigits: 1,
+      timeout: 7,
+      actionOnEmptyResult: true,
     });
-    dial.number(
-      {
-        url: screeningUrl,
-        method: "POST",
-      },
-      forwardToNumber
+    gather.say(
+      { voice: "alice" },
+      `Thanks for calling Car Dash Detailing. To continue, press ${expectedDigit} now.`
     );
 
     return xml(response);

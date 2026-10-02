@@ -28,6 +28,10 @@ export async function POST(request: NextRequest) {
     await ensureCallSystemSchema();
 
     const callSid = request.nextUrl.searchParams.get("callSid") || String(params.ParentCallSid || params.CallSid || "");
+    const purpose = (request.nextUrl.searchParams.get("purpose") || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .slice(0, 160);
     const call = callSid ? await prisma.callLog.findUnique({ where: { callSid } }) : null;
 
     let callerLabel = "a customer";
@@ -44,8 +48,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const decisionUrl = `${getPublicSiteUrl()}/api/voice/screen/decision${
-      callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
+    const decisionUrl = `${getPublicSiteUrl()}/api/voice/screen/decision?${
+      callSid ? `callSid=${encodeURIComponent(callSid)}` : ""
     }`;
 
     const gather = response.gather({
@@ -56,7 +60,9 @@ export async function POST(request: NextRequest) {
     });
     gather.say(
       { voice: "alice" },
-      `Car Dash Detailing call from ${callerLabel}. Press 1 to accept.`
+      purpose
+        ? `Car Dash Detailing call from ${callerLabel}. They said: ${purpose}. Press 1 to accept.`
+        : `Car Dash Detailing call from ${callerLabel}. Press 1 to accept.`
     );
 
     // If a person does not press 1 (including personal voicemail answering),
