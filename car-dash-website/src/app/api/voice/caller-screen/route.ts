@@ -56,19 +56,7 @@ export async function POST(request: NextRequest) {
       callSid ? `?callSid=${encodeURIComponent(callSid)}` : ""
     }`;
 
-    const gather = response.gather({
-      action: forwardUrl,
-      method: "POST",
-      input: "speech",
-      timeout: 5,
-      speechTimeout: "auto",
-      actionOnEmptyResult: true,
-    });
-    gather.say(
-      { voice: "alice" },
-      "Thanks. Briefly tell us what service you are calling about."
-    );
-
+    response.redirect({ method: "POST" }, forwardUrl);
     return xml(response);
   } catch (error) {
     console.error("Caller screening webhook failed:", error);
