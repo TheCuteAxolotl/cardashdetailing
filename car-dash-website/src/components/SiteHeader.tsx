@@ -12,7 +12,7 @@ const mainLinks = [
   ["/reviews", "Reviews"],
 ] as const;
 
-const HOME_LOGO = "/home-logo.png?v=20261003";
+const HOME_LOGO = "/brand-mark.svg?v=20261003d";
 
 const moreLinks = [
   ["/about", "About Car Dash", "Who we are and how mobile detailing works."],
