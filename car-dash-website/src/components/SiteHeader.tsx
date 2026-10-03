@@ -77,7 +77,7 @@ export default function SiteHeader() {
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-5 rounded-[22px] border border-[#C0AB9A]/45 bg-[#F7F5F2]/90 px-4 shadow-[0_14px_44px_rgba(23,20,17,.12)] backdrop-blur-2xl sm:px-6">
           <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center gap-3">
             <img
-              src="/brand-logo.png?v=3"
+              src="/brand-logo.png?v=4"
               alt="Car Dash Detailing"
               width={40}
               height={40}
