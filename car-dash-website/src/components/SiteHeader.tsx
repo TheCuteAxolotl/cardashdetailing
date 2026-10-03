@@ -76,13 +76,29 @@ export default function SiteHeader() {
       <header className="sticky top-0 z-50 bg-[linear-gradient(90deg,rgba(239,232,226,.92),rgba(247,245,242,.90)_48%,rgba(192,171,154,.78))] py-2.5 backdrop-blur-2xl">
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-5 rounded-[22px] border border-[#C0AB9A]/45 bg-[#F7F5F2]/90 px-4 shadow-[0_14px_44px_rgba(23,20,17,.12)] backdrop-blur-2xl sm:px-6">
           <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center gap-3">
-            <img
-              src="/cardash-logo-140.svg?v=2"
-              alt="Car Dash Detailing"
-              width={40}
-              height={40}
-              className="h-10 w-10 shrink-0 object-contain"
-            />
+            <svg
+              viewBox="0 0 140 140"
+              role="img"
+              aria-label="Car Dash Detailing"
+              className="h-10 w-10 shrink-0"
+            >
+              <circle cx="70" cy="70" r="66" fill="#0B0B0C" stroke="#D9AE45" strokeWidth="3" />
+              <circle cx="70" cy="70" r="61" fill="none" stroke="#76673E" strokeWidth="1.5" />
+
+              <path
+                d="M78 34H54C32 34 18 49 18 70s14 36 36 36h28L69 89H55c-12 0-20-7-20-19s8-19 20-19h10L78 34Z"
+                fill="#474A4D"
+              />
+
+              <path
+                d="M77 34h17c24 0 43 15 43 36s-19 36-43 36H58l14-18h22c14 0 25-7 25-18s-11-18-25-18H62l15-18Z"
+                fill="#E6B83F"
+              />
+
+              <path d="M72 53h22L61 94H39l33-41Z" fill="#E6B83F" />
+              <path d="M15 61h43l-7 7H12l3-7Z" fill="#E6B83F" />
+              <path d="M11 72h37l-7 7H8l3-7Z" fill="#E6B83F" />
+            </svg>
             <span className="hidden text-sm font-semibold tracking-[-.025em] text-[#171411] sm:block">Car Dash Detailing</span>
           </a>
 
