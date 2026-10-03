@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY, OWNER_EMAIL } from "@/lib/constants";
 
 type User = { id: string; name: string; email: string; role: string };
@@ -77,9 +76,13 @@ export default function SiteHeader() {
       <header className="sticky top-0 z-50 bg-[linear-gradient(90deg,rgba(239,232,226,.92),rgba(247,245,242,.90)_48%,rgba(192,171,154,.78))] py-2.5 backdrop-blur-2xl">
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-5 rounded-[22px] border border-[#C0AB9A]/45 bg-[#F7F5F2]/90 px-4 shadow-[0_14px_44px_rgba(23,20,17,.12)] backdrop-blur-2xl sm:px-6">
           <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-[14px] border border-[#3F3027]/10 bg-[#F7F5F2] shadow-sm">
-              <Image src="/cardash-logo-140.svg" alt="Car Dash Detailing" width={140} height={140} priority className="h-8 w-8 rounded-full object-contain" />
-            </span>
+            <img
+              src="/brand-logo.png?v=3"
+              alt="Car Dash Detailing"
+              width={40}
+              height={40}
+              className="h-10 w-10 shrink-0 object-contain"
+            />
             <span className="hidden text-sm font-semibold tracking-[-.025em] text-[#171411] sm:block">Car Dash Detailing</span>
           </a>
 
