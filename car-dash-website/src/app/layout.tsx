@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   applicationName: "Car Dash Detailing",
   category: "automotive detailing",
   icons: {
-    icon: [{ url: "/favicon-cd-transparent-140.png", type: "image/png", sizes: "140x140" }],
-    shortcut: ["/favicon-cd-transparent-140.png"],
+    icon: [{ url: "/cardash-logo-140.svg", type: "image/svg+xml", sizes: "140x140" }],
+    shortcut: ["/cardash-logo-140.svg"],
   },
   openGraph: {
     siteName: "Car Dash Detailing",
