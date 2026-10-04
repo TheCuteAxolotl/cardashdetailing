@@ -25,14 +25,14 @@ export type PricingPageConfig = {
 export const VEHICLE_LABELS: Record<VehicleClass, string> = {
   coupe: "Sedan",
   sedan: "SUV/CRV",
-  truckSuv: "Truck",
+  truckSuv: "Truck/3 Row SUV",
 };
 
 export const DEFAULT_PRICING_PAGES: Record<"packages" | "exterior" | "interior", PricingPageConfig> = {
   packages: {
     eyebrow: "Car Detailing Packages",
     title: "Choose the detail your vehicle needs.",
-    body: "Two straightforward inside-and-out packages. Choose your vehicle size, compare what is included, and book the level that matches its condition.",
+    body: "Three straightforward inside-and-out packages. Choose your vehicle size, compare what is included, and book the level that matches its condition.",
     priceNote: "Standard pricing covers normal vehicle conditions. Extreme pet hair, biohazards, excessive adhesive or sticker removal, severe staining, or unusual restoration work is quoted separately before service begins.",
     packages: [
       {
@@ -78,6 +78,24 @@ export const DEFAULT_PRICING_PAGES: Record<"packages" | "exterior" | "interior",
           "Light sticker or adhesive removal when possible",
           "Two-stage foam and contact wash",
           "Bug removal, spray protection and gloss finish",
+        ],
+      },
+      {
+        id: "signature",
+        tier: "Signature",
+        name: "Signature Detail",
+        description: "Our most complete detail: a full interior and exterior reset plus paint decontamination and a one-step machine polish for more gloss and clarity.",
+        ctaLabel: "Book Signature Detail",
+        prices: { coupe: 399, sedan: 449, truckSuv: 499 },
+        features: [
+          "Everything in Full Detail",
+          "Iron decontamination",
+          "Clay-bar treatment",
+          "One-step machine paint enhancement",
+          "Gloss and clarity enhancement",
+          "Light swirl, haze and oxidation reduction",
+          "Panel wipe and final paint inspection",
+          "Premium ceramic sealant protection",
         ],
       },
     ],
@@ -161,8 +179,22 @@ export const DEFAULT_PRICING_PAGES: Record<"packages" | "exterior" | "interior",
 function shouldMigrateLegacyPackageMenu(parsed: PricingPageConfig, fallback: PricingPageConfig) {
   if (fallback !== DEFAULT_PRICING_PAGES.packages) return false;
   const ids = new Set(parsed.packages.map((item) => item.id));
+  const essential = parsed.packages.find((item) => item.id === "essential");
   const complete = parsed.packages.find((item) => item.id === "complete");
-  return ids.has("signature") || complete?.name === "Complete Detail";
+  const currentTwoPackageMenu =
+    parsed.packages.length === 2 &&
+    ids.has("essential") &&
+    ids.has("complete") &&
+    essential?.name === "Essential Detail" &&
+    complete?.name === "Full Detail" &&
+    essential.prices?.coupe === 159 &&
+    essential.prices?.sedan === 189 &&
+    essential.prices?.truckSuv === 199 &&
+    complete.prices?.coupe === 219 &&
+    complete.prices?.sedan === 249 &&
+    complete.prices?.truckSuv === 279;
+
+  return currentTwoPackageMenu || complete?.name === "Complete Detail";
 }
 
 export function parsePricingConfig(value: string | null | undefined, fallback: PricingPageConfig): PricingPageConfig {
