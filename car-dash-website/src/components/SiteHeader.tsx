@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY, OWNER_EMAIL } from "@/lib/constants";
 
@@ -40,6 +40,8 @@ export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServiceOpen, setMobileServiceOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [desktopMenu, setDesktopMenu] = useState<"service" | "more" | null>(null);
+  const desktopCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -54,6 +56,21 @@ export default function SiteHeader() {
         setStaffAccess(false);
       });
   }, [pathname]);
+
+  useEffect(() => {
+    setDesktopMenu(null);
+  }, [pathname]);
+
+  const openDesktopMenu = (menu: "service" | "more") => {
+    if (desktopCloseTimer.current) clearTimeout(desktopCloseTimer.current);
+    desktopCloseTimer.current = null;
+    setDesktopMenu(menu);
+  };
+
+  const scheduleDesktopClose = () => {
+    if (desktopCloseTimer.current) clearTimeout(desktopCloseTimer.current);
+    desktopCloseTimer.current = setTimeout(() => setDesktopMenu(null), 140);
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -108,59 +125,83 @@ export default function SiteHeader() {
               </a>
             ))}
 
-            <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full px-4 py-2 transition-colors hover:bg-[#F7F5F2] hover:text-[#171411] hover:shadow-sm [&::-webkit-details-marker]:hidden">
+            <div
+              className="relative"
+              onMouseEnter={() => openDesktopMenu("service")}
+              onMouseLeave={scheduleDesktopClose}
+              onFocusCapture={() => openDesktopMenu("service")}
+            >
+              <button
+                type="button"
+                aria-expanded={desktopMenu === "service"}
+                onClick={() => setDesktopMenu((current) => current === "service" ? null : "service")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-2 transition-all duration-200 ${desktopMenu === "service" ? "bg-[#F7F5F2] text-[#171411] shadow-sm" : "hover:bg-[#F7F5F2] hover:text-[#171411] hover:shadow-sm"}`}
+              >
                 Service
-                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-180">
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={`h-3.5 w-3.5 transition-transform duration-200 ${desktopMenu === "service" ? "rotate-180" : ""}`}>
                   <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </summary>
+              </button>
 
-              <div className="absolute left-1/2 top-[calc(100%+18px)] z-[70] w-[360px] -translate-x-1/2 overflow-hidden rounded-[24px] border border-[#C0AB9A]/55 bg-[#F7F5F2]/96 p-2 text-[#171411] shadow-[0_28px_80px_rgba(23,20,17,.18)] backdrop-blur-2xl">
-                <div className="px-4 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[.18em] text-[#7B5C4B]">Detailing</div>
-                <div className="grid gap-1">
-                  {detailingLinks.map(([href, label, description]) => (
-                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-[#EFE8E2]">
-                      <span className="block text-sm font-semibold">{label}</span>
-                      <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
-                    </a>
-                  ))}
-                </div>
-                <div className="mx-3 my-2 h-px bg-[#C0AB9A]/40" />
-                <div className="grid gap-1">
-                  {specialtyLinks.map(([href, label, description]) => (
-                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-[#EFE8E2]">
-                      <span className="block text-sm font-semibold">{label}</span>
-                      <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
-                    </a>
-                  ))}
+              <div className={`absolute left-1/2 top-full z-[70] w-[360px] -translate-x-1/2 pt-3 transition-all duration-200 ease-out ${desktopMenu === "service" ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0"}`}>
+                <div className={`overflow-hidden rounded-[24px] border border-[#C0AB9A]/55 bg-[#F7F5F2]/96 p-2 text-[#171411] shadow-[0_28px_80px_rgba(23,20,17,.18)] backdrop-blur-2xl transition-transform duration-200 ease-out ${desktopMenu === "service" ? "scale-100" : "scale-[.985]"}`}>
+                  <div className="px-4 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[.18em] text-[#7B5C4B]">Detailing</div>
+                  <div className="grid gap-1">
+                    {detailingLinks.map(([href, label, description]) => (
+                      <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-all duration-150 hover:translate-x-0.5 hover:bg-[#EFE8E2]">
+                        <span className="block text-sm font-semibold">{label}</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
+                      </a>
+                    ))}
+                  </div>
+                  <div className="mx-3 my-2 h-px bg-[#C0AB9A]/40" />
+                  <div className="grid gap-1">
+                    {specialtyLinks.map(([href, label, description]) => (
+                      <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-all duration-150 hover:translate-x-0.5 hover:bg-[#EFE8E2]">
+                        <span className="block text-sm font-semibold">{label}</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </details>
+            </div>
 
-            <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full px-4 py-2 transition-colors hover:bg-[#F7F5F2] hover:text-[#171411] hover:shadow-sm [&::-webkit-details-marker]:hidden">
+            <div
+              className="relative"
+              onMouseEnter={() => openDesktopMenu("more")}
+              onMouseLeave={scheduleDesktopClose}
+              onFocusCapture={() => openDesktopMenu("more")}
+            >
+              <button
+                type="button"
+                aria-expanded={desktopMenu === "more"}
+                onClick={() => setDesktopMenu((current) => current === "more" ? null : "more")}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-2 transition-all duration-200 ${desktopMenu === "more" ? "bg-[#F7F5F2] text-[#171411] shadow-sm" : "hover:bg-[#F7F5F2] hover:text-[#171411] hover:shadow-sm"}`}
+              >
                 More
-                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-180">
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={`h-3.5 w-3.5 transition-transform duration-200 ${desktopMenu === "more" ? "rotate-180" : ""}`}>
                   <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </summary>
+              </button>
 
-              <div className="absolute left-1/2 top-[calc(100%+18px)] z-[70] w-[330px] -translate-x-1/2 overflow-hidden rounded-[24px] border border-[#C0AB9A]/55 bg-[#F7F5F2]/96 p-2 text-[#171411] shadow-[0_28px_80px_rgba(23,20,17,.18)] backdrop-blur-2xl">
-                <div className="grid gap-1">
-                  {moreLinks.map(([href, label, description]) => (
-                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-[#EFE8E2]">
-                      <span className="block text-sm font-semibold">{label}</span>
-                      <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
-                    </a>
-                  ))}
-                  <button type="button" onClick={openSupport} className="rounded-[18px] px-4 py-3 text-left transition-colors hover:bg-[#EFE8E2]">
-                    <span className="block text-sm font-semibold">Need help?</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">Open support without leaving the page.</span>
-                  </button>
+              <div className={`absolute left-1/2 top-full z-[70] w-[330px] -translate-x-1/2 pt-3 transition-all duration-200 ease-out ${desktopMenu === "more" ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0"}`}>
+                <div className={`overflow-hidden rounded-[24px] border border-[#C0AB9A]/55 bg-[#F7F5F2]/96 p-2 text-[#171411] shadow-[0_28px_80px_rgba(23,20,17,.18)] backdrop-blur-2xl transition-transform duration-200 ease-out ${desktopMenu === "more" ? "scale-100" : "scale-[.985]"}`}>
+                  <div className="grid gap-1">
+                    {moreLinks.map(([href, label, description]) => (
+                      <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-all duration-150 hover:translate-x-0.5 hover:bg-[#EFE8E2]">
+                        <span className="block text-sm font-semibold">{label}</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
+                      </a>
+                    ))}
+                    <button type="button" onClick={openSupport} className="rounded-[18px] px-4 py-3 text-left transition-all duration-150 hover:translate-x-0.5 hover:bg-[#EFE8E2]">
+                      <span className="block text-sm font-semibold">Need help?</span>
+                      <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">Open support without leaving the page.</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </details>
+            </div>
           </nav>
 
           <div className="hidden items-center gap-1.5 lg:flex">
