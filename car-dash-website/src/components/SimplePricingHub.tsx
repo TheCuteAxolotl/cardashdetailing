@@ -26,6 +26,7 @@ type Props = {
   bookingPricing: BookingPricingConfig;
   services: PublicServiceSummary[];
   mediaItems?: MediaItem[];
+  packagesOnly?: boolean;
 };
 
 const groups: Array<{ kind: PricingKind; label: string; description: string }> = [
@@ -49,13 +50,14 @@ function packageBookHref(kind: PricingKind, packageId: string, vehicleClass: Veh
   return `/?pricingPage=${encodeURIComponent(kind)}&packageId=${encodeURIComponent(packageId)}&vehicleClass=${encodeURIComponent(vehicleClass)}#book`;
 }
 
-export default function SimplePricingHub({ configs, bookingPricing, services, mediaItems = [] }: Props) {
+export default function SimplePricingHub({ configs, bookingPricing, services, mediaItems = [], packagesOnly = false }: Props) {
   const specialty = services.filter((service) => service.title.trim().toLowerCase() !== "headlight restoration");
   const addOns = bookingPricing.addOns.filter((item) => item.active);
+  const visibleGroups = packagesOnly ? groups.filter((group) => group.kind === "packages") : groups;
 
   return (
     <div className="space-y-14">
-      {groups.map(({ kind, label, description }) => {
+      {visibleGroups.map(({ kind, label, description }) => {
         const config = configs[kind];
         return (
           <section key={kind} id={`prices-${kind}`} className="scroll-mt-28">
@@ -116,7 +118,7 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
         );
       })}
 
-      <section id="extras" className="scroll-mt-28 rounded-[28px] border border-[#C0AB9A]/35 bg-[linear-gradient(135deg,#3F3027,#171411)] p-6 text-[#F7F5F2] sm:p-8">
+      {!packagesOnly && <section id="extras" className="scroll-mt-28 rounded-[28px] border border-[#C0AB9A]/35 bg-[linear-gradient(135deg,#3F3027,#171411)] p-6 text-[#F7F5F2] sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.2em] text-[#C0AB9A]">Add-ons</p>
@@ -132,9 +134,9 @@ export default function SimplePricingHub({ configs, bookingPricing, services, me
             </div>
           ))}
         </div>
-      </section>
+      </section>}
 
-      {specialty.length > 0 && (
+      {!packagesOnly && specialty.length > 0 && (
         <section id="specialty-prices" className="scroll-mt-28">
           <div className="mb-6">
             <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7B5C4B]">Specialty services</p>
