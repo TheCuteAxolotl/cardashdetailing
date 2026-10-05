@@ -14,9 +14,20 @@ const mainLinks = [
 
 const HOME_LOGO = "/brand-mark.svg?v=20261003d";
 
+const detailingLinks = [
+  ["/car-detailing-packages", "Packages", "Essential, Full, and Signature Detail."],
+  ["/interior-detailing", "Interior", "Interior-only detailing options."],
+  ["/exterior-detailing", "Exterior", "Exterior cleaning, decontamination, and protection."],
+  ["/paint-correction", "Paint Correction", "Swirl, haze, oxidation, and defect reduction."],
+] as const;
+
+const specialtyLinks = [
+  ["/marine-detailing", "Marine", "Boat cleaning, correction, and protection."],
+  ["/ceramic-coatings", "Ceramic Coating", "Long-term paint protection systems."],
+] as const;
+
 const moreLinks = [
   ["/about", "About Car Dash", "Who we are and how mobile detailing works."],
-  ["/services", "All services", "Browse every detailing and specialty service."],
   ["/products-we-use", "Products we use", "See the products and brands used on your vehicle."],
   ["/faq", "FAQ", "Quick answers before you book."],
   ["/contact", "Contact", "Call, text, or send us a message."],
@@ -27,6 +38,7 @@ export default function SiteHeader() {
   const [user, setUser] = useState<User | null>(null);
   const [staffAccess, setStaffAccess] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileServiceOpen, setMobileServiceOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const pathname = usePathname();
 
@@ -60,6 +72,7 @@ export default function SiteHeader() {
   const openSupport = () => {
     window.dispatchEvent(new Event("open-support"));
     setMenuOpen(false);
+    setMobileServiceOpen(false);
     setMobileMoreOpen(false);
   };
 
@@ -94,6 +107,36 @@ export default function SiteHeader() {
                 {label}
               </a>
             ))}
+
+            <details className="group relative">
+              <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full px-4 py-2 transition-colors hover:bg-[#F7F5F2] hover:text-[#171411] hover:shadow-sm [&::-webkit-details-marker]:hidden">
+                Service
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-180">
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </summary>
+
+              <div className="absolute left-1/2 top-[calc(100%+18px)] z-[70] w-[360px] -translate-x-1/2 overflow-hidden rounded-[24px] border border-[#C0AB9A]/55 bg-[#F7F5F2]/96 p-2 text-[#171411] shadow-[0_28px_80px_rgba(23,20,17,.18)] backdrop-blur-2xl">
+                <div className="px-4 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[.18em] text-[#7B5C4B]">Detailing</div>
+                <div className="grid gap-1">
+                  {detailingLinks.map(([href, label, description]) => (
+                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-[#EFE8E2]">
+                      <span className="block text-sm font-semibold">{label}</span>
+                      <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
+                    </a>
+                  ))}
+                </div>
+                <div className="mx-3 my-2 h-px bg-[#C0AB9A]/40" />
+                <div className="grid gap-1">
+                  {specialtyLinks.map(([href, label, description]) => (
+                    <a key={href} href={href} className="rounded-[18px] px-4 py-3 transition-colors hover:bg-[#EFE8E2]">
+                      <span className="block text-sm font-semibold">{label}</span>
+                      <span className="mt-0.5 block text-xs leading-5 text-[#3F3027]/58">{description}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </details>
 
             <details className="group relative">
               <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full px-4 py-2 transition-colors hover:bg-[#F7F5F2] hover:text-[#171411] hover:shadow-sm [&::-webkit-details-marker]:hidden">
@@ -155,6 +198,54 @@ export default function SiteHeader() {
               {mainLinks.map(([href, label]) => (
                 <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-2xl px-4 py-3.5 text-[#3F3027]/70 hover:bg-[#EFE8E2] hover:text-[#171411]">{label}</a>
               ))}
+
+              <button
+                type="button"
+                aria-expanded={mobileServiceOpen}
+                aria-controls="mobile-service-menu"
+                onClick={() => setMobileServiceOpen((value) => !value)}
+                className="flex items-center justify-between rounded-2xl px-4 py-3.5 text-left text-[#3F3027]/70 hover:bg-[#EFE8E2] hover:text-[#171411]"
+              >
+                <span>Service</span>
+                <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={`h-4 w-4 transition-transform duration-300 ${mobileServiceOpen ? "rotate-180" : ""}`}>
+                  <path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              <div id="mobile-service-menu" className={`mobile-accordion ${mobileServiceOpen ? "mobile-accordion-open" : ""}`}>
+                <div className="mobile-accordion-inner">
+                  <div className="ml-3 grid gap-1 border-l border-[#C0AB9A]/45 pb-2 pl-3">
+                    <p className="px-4 pb-1 pt-2 text-[10px] font-bold uppercase tracking-[.18em] text-[#7B5C4B]">Detailing</p>
+                    {detailingLinks.map(([href, label]) => (
+                      <a
+                        key={href}
+                        href={href}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileServiceOpen(false);
+                        }}
+                        className="rounded-2xl px-4 py-3 text-sm text-[#3F3027]/68 hover:bg-[#EFE8E2] hover:text-[#171411]"
+                      >
+                        {label}
+                      </a>
+                    ))}
+                    <div className="mx-4 my-1 h-px bg-[#C0AB9A]/40" />
+                    {specialtyLinks.map(([href, label]) => (
+                      <a
+                        key={href}
+                        href={href}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setMobileServiceOpen(false);
+                        }}
+                        className="rounded-2xl px-4 py-3 text-sm font-medium text-[#3F3027]/76 hover:bg-[#EFE8E2] hover:text-[#171411]"
+                      >
+                        {label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               <button
                 type="button"
