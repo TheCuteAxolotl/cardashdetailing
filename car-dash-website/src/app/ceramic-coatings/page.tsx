@@ -89,7 +89,7 @@ export default function CeramicCoatingsPage() {
 
         <div className="grid gap-5 lg:grid-cols-3">
           {coatingPackages.map((pkg) => (
-            <article key={pkg.id} className={\`overflow-hidden rounded-[28px] border \${pkg.featured ? "border-[#6EAEC6]/45 bg-white shadow-[0_22px_60px_rgba(0,0,0,.08)]" : "border-black/10 bg-white"}\`}>
+            <article key={pkg.id} className={`overflow-hidden rounded-[28px] border ${pkg.featured ? "border-[#6EAEC6]/45 bg-white shadow-[0_22px_60px_rgba(0,0,0,.08)]" : "border-black/10 bg-white"}`}>
               <div className="relative h-52 overflow-hidden bg-black">
                 <SitePhoto category={pkg.imageCategory} fallbackCategory="ceramic-results" className="absolute inset-0 h-full w-full object-cover" alt={pkg.name} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
@@ -107,9 +107,9 @@ export default function CeramicCoatingsPage() {
 
                 <div className="mt-5 overflow-hidden rounded-2xl border border-black/10 bg-[#F7F7F5]">
                   {priceRows.map(([label, key], index) => (
-                    <div key={key} className={\`flex items-center justify-between gap-4 px-4 py-3.5 \${index ? "border-t border-black/8" : ""}\`}>
+                    <div key={key} className={`flex items-center justify-between gap-4 px-4 py-3.5 ${index ? "border-t border-black/8" : ""}`}>
                       <span className="text-sm font-medium text-black/58">{label}</span>
-                      <strong className="text-base">Starting $\{pkg.prices[key]}</strong>
+                      <strong className="text-base">Starting ${pkg.prices[key]}</strong>
                     </div>
                   ))}
                 </div>
@@ -123,7 +123,7 @@ export default function CeramicCoatingsPage() {
                   ))}
                 </div>
 
-                <a href={\`/quote?service=\${encodeURIComponent(pkg.name)}\`} className="mt-6 inline-flex w-full justify-center rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">Get exact quote</a>
+                <a href={`/quote?service=${encodeURIComponent(pkg.name)}`} className="mt-6 inline-flex w-full justify-center rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">Get exact quote</a>
               </div>
             </article>
           ))}
