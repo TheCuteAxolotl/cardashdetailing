@@ -148,21 +148,17 @@ export default function HomeExperience({
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-7 text-[#3F3027]/66 sm:text-base">
-              Full details, interior, exterior, add-ons, and specialty services are all in one place. Choose what fits your vehicle, then go straight to booking.
+              Compare our Essential, Full, and Signature Detail packages here. Interior, exterior, paint correction, ceramic coating, and marine services each have their own dedicated page.
             </p>
           </div>
 
           <PageMediaBand categories={["home-services-bg"]} theme="light" compact className="mb-8" />
 
           <div className="mb-10 flex flex-wrap gap-2">
-            <a href="#prices-packages" className="rounded-full bg-[#3F3027] px-4 py-2.5 text-sm font-semibold text-[#F7F5F2]">Full detail</a>
-            <a href="#prices-interior" className="rounded-full border border-[#C0AB9A]/42 bg-[#F7F5F2]/88 px-4 py-2.5 text-sm font-medium">Interior</a>
-            <a href="#prices-exterior" className="rounded-full border border-[#C0AB9A]/42 bg-[#F7F5F2]/88 px-4 py-2.5 text-sm font-medium">Exterior</a>
-            <a href="#extras" className="rounded-full border border-[#C0AB9A]/42 bg-[#F7F5F2]/88 px-4 py-2.5 text-sm font-medium">Add-ons</a>
-            <a href="#specialty-prices" className="rounded-full border border-[#C0AB9A]/42 bg-[#F7F5F2]/88 px-4 py-2.5 text-sm font-medium">Specialty</a>
+            <a href="#prices-packages" className="rounded-full bg-[#3F3027] px-4 py-2.5 text-sm font-semibold text-[#F7F5F2]">Detail packages</a>
           </div>
 
-          <SimplePricingHub configs={pricingConfigs} bookingPricing={bookingPricing} services={services} mediaItems={pricingMedia} />
+          <SimplePricingHub configs={pricingConfigs} bookingPricing={bookingPricing} services={services} mediaItems={pricingMedia} packagesOnly />
         </div>
       </section>
 
