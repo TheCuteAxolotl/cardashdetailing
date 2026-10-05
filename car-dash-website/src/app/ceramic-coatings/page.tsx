@@ -9,6 +9,7 @@ const coatingPackages = [
     description: "A strong entry into long-term ceramic protection with excellent gloss, chemical resistance, and hydrophobic behavior.",
     prices: { sedan: 499, suv: 649, truck: 699 },
     imageCategory: "ceramic-3-year",
+    featured: false,
     features: [
       "Full exterior detail",
       "Chemical decontamination and clay treatment as needed",
@@ -41,10 +42,12 @@ const coatingPackages = [
     description: "Our highest-level ceramic package, built around professional-grade Crystal Serum Ultra and a maintenance-backed long-term protection plan.",
     prices: { sedan: 999, suv: 1149, truck: 1199 },
     imageCategory: "ceramic-8-year",
+    featured: false,
     features: [
       "Full exterior detail",
       "Chemical and mechanical decontamination",
-      "Paint correction and finish refinement based on inspection",
+      "2-step paint correction",
+      "Finish refinement based on paint inspection",
       "Gtechniq Crystal Serum Ultra",
       "Final coating inspection and care guidance",
       "Car Dash 8+ year guarantee with active maintenance program",
