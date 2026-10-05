@@ -21,7 +21,7 @@ const coatingPackages = [
   {
     id: "5-year",
     eyebrow: "5-year protection",
-    name: "Gtechniq CSL + EXO",
+    name: "Gtechniq CSL + EXO v5",
     description: "Our correction-focused package for owners who want a noticeably sharper finish before long-term ceramic protection.",
     prices: { sedan: 699, suv: 849, truck: 899 },
     imageCategory: "ceramic-5-year",
@@ -31,7 +31,7 @@ const coatingPackages = [
       "Chemical and mechanical decontamination",
       "2-step paint correction",
       "Gtechniq Crystal Serum Light base coating",
-      "Gtechniq EXO top coating",
+      "Gtechniq EXO v5 top coating",
       "Final coating inspection and care guidance",
     ],
   },
@@ -94,7 +94,7 @@ export default function CeramicCoatingsPage() {
           {coatingPackages.map((pkg) => (
             <article key={pkg.id} className={`overflow-hidden rounded-[28px] border ${pkg.featured ? "border-[#6EAEC6]/45 bg-white shadow-[0_22px_60px_rgba(0,0,0,.08)]" : "border-black/10 bg-white"}`}>
               <div className="relative h-52 overflow-hidden bg-black">
-                <SitePhoto category={pkg.imageCategory} fallbackCategory="ceramic-results" className="absolute inset-0 h-full w-full object-cover" alt={pkg.name} />
+                <SitePhoto category={pkg.imageCategory} fallbackCategory="ceramic-coatings-hero" className="absolute inset-0 h-full w-full object-cover" alt={pkg.name} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
                 <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 text-white">
                   <div>
