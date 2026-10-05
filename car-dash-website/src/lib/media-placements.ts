@@ -52,8 +52,11 @@ export const STATIC_MEDIA_PLACEMENTS: MediaPlacement[] = [
   { value: "about-values-bg", label: "About Car Dash → Values Media", group: "Explore Pages" },
   { value: "paint-correction-hero", label: "Paint Correction → Hero Photo", group: "Explore Pages", photoOnly: true },
   { value: "paint-correction-results", label: "Paint Correction → Results Media", group: "Explore Pages" },
-  { value: "ceramic-coatings-hero", label: "Ceramic Coatings → Hero Photo", group: "Explore Pages", photoOnly: true },
-  { value: "ceramic-results", label: "Ceramic Coatings → Results Media", group: "Explore Pages" },
+  { value: "ceramic-coatings-hero", label: "Ceramic Coatings → Hero Photo", group: "Ceramic Coatings", photoOnly: true },
+  { value: "ceramic-3-year", label: "Ceramic Coatings → 3-Year GYEON Mohs", group: "Ceramic Coatings", photoOnly: true },
+  { value: "ceramic-5-year", label: "Ceramic Coatings → 5-Year CSL + EXO", group: "Ceramic Coatings", photoOnly: true },
+  { value: "ceramic-8-year", label: "Ceramic Coatings → 8+ Year Crystal Serum Ultra", group: "Ceramic Coatings", photoOnly: true },
+  { value: "ceramic-results", label: "Ceramic Coatings → Results Media", group: "Ceramic Coatings" },
   { value: "products-hero", label: "Products We Use → Hero Photo", group: "Explore Pages", photoOnly: true },
   { value: "products-gallery", label: "Products We Use → Product Media", group: "Explore Pages" },
 ];
@@ -73,7 +76,7 @@ export function getMediaPlacementPath(category: string): string | null {
   if (category === "estimate-media") return "/estimate";
   if (category.startsWith("about-")) return "/about";
   if (category.startsWith("paint-correction-")) return "/paint-correction";
-  if (category.startsWith("ceramic-coatings-") || category === "ceramic-results") return "/ceramic-coatings";
+  if (category.startsWith("ceramic-coatings-") || category.startsWith("ceramic-") || category === "ceramic-results") return "/ceramic-coatings";
   if (category.startsWith("products-")) return "/products-we-use";
   if (category.startsWith("marine-")) return "/marine-detailing";
   if (category.startsWith("services-")) return "/services";
