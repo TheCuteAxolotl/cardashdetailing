@@ -1,5 +1,4 @@
 import PricingMediaStrip from "@/components/PricingMediaStrip";
-import RelatedServiceLinks from "@/components/RelatedServiceLinks";
 import SitePhoto from "@/components/SitePhoto";
 
 const levels = [
@@ -32,7 +31,6 @@ export default function PaintCorrectionPage() {
         </div>
       </section>
 
-      <RelatedServiceLinks currentPath="/paint-correction" />
     </main>
   );
 }
