@@ -16,45 +16,50 @@ function packageBookHref(packageId: string, vehicleClass: VehicleClass) {
 
 export default function HomePackagePricing({ config, mediaItems = [] }: Props) {
   return (
-    <section id="prices-packages" className="scroll-mt-28">
+    <section id="prices-packages" className="scroll-mt-24">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7B5C4B]">Detail packages</p>
-          <h3 className="mt-2 text-3xl font-semibold tracking-[-.045em] text-[#171411] sm:text-4xl">{config.eyebrow}</h3>
+          <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-black/36">Detail packages</p>
+          <h3 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#111] sm:text-3xl">{config.eyebrow}</h3>
         </div>
-        <p className="max-w-lg text-sm leading-6 text-[#3F3027]/62">Interior + exterior in one appointment.</p>
+        <p className="max-w-lg text-sm leading-6 text-black/42">Interior and exterior in one appointment.</p>
       </div>
-      <div className="grid gap-4 lg:grid-cols-3">
+
+      <div className="grid gap-px overflow-hidden border border-black/[.09] bg-black/[.09] lg:grid-cols-3">
         {config.packages.map((pkg) => (
-          <article key={pkg.id} className={`rounded-[26px] border p-5 sm:p-6 ${pkg.featured ? "border-[#C0AB9A]/55 bg-[#EFE8E2] shadow-[0_18px_50px_rgba(23,20,17,.08)]" : "border-[#C0AB9A]/35 bg-[#F7F5F2]"}`}>
-            <div className="flex items-start justify-between gap-3">
+          <article key={pkg.id} className={`relative bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "after:absolute after:inset-x-0 after:top-0 after:h-[3px] after:bg-[#111]" : ""}`}>
+            <div className="flex min-h-[72px] items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#7B5C4B]">{pkg.tier}</p>
-                <h4 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#171411]">{pkg.name}</h4>
+                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-black/34">{pkg.tier}</p>
+                <h4 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#111]">{pkg.name}</h4>
               </div>
-              {pkg.badge && <span className="rounded-full bg-[#C0AB9A] px-3 py-1.5 text-[10px] font-bold text-[#171411]">{pkg.badge}</span>}
+              {pkg.badge && <span className="border border-black/10 bg-[#f5f4f1] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.08em] text-black/50">{pkg.badge}</span>}
             </div>
-            <p className="mt-3 min-h-12 text-sm leading-6 text-[#3F3027]/62">{pkg.description}</p>
-            <div className="mt-5 overflow-hidden rounded-2xl border border-[#C0AB9A]/35 bg-[#EFE8E2]">
+
+            <p className="mt-2 min-h-[72px] text-sm leading-6 text-black/46">{pkg.description}</p>
+
+            <div className="mt-5 border-y border-black/[.08]">
               {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
                 <a
                   key={vehicleClass}
                   href={packageBookHref(pkg.id, vehicleClass)}
-                  className={`flex min-h-14 items-center justify-between gap-4 px-4 py-3 hover:bg-[#F7F5F2] ${index ? "border-t border-[#C0AB9A]/28" : ""}`}
+                  className={`group flex min-h-14 items-center justify-between gap-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}
                 >
-                  <span className="text-sm font-medium text-[#3F3027]/70">{VEHICLE_LABELS[vehicleClass]}</span>
+                  <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
                   <span className="flex items-center gap-3">
-                    <strong className="text-lg text-[#171411]">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong>
-                    <span className="text-xs font-semibold text-[#7B5C4B]">Book →</span>
+                    <strong className="text-lg font-semibold text-[#111]">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong>
+                    <span className="text-xs font-semibold text-black/35 group-hover:text-black">Book →</span>
                   </span>
                 </a>
               ))}
             </div>
+
             <PackageConditionGuide
               copy={getPackageConditionGuide("packages", pkg.id, pkg.description)}
               packageName={pkg.name}
               media={mediaItems.filter((item) => item.category === `pricing-car-packages-pkg-${pkg.id}-condition`)}
             />
+
             <PackageMediaEvidence
               packageMedia={mediaItems.filter((item) => item.category === `pricing-car-packages-pkg-${pkg.id}`)}
               featureMedia={pkg.features.map((feature, featureIndex) => ({
