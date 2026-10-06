@@ -144,7 +144,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     <div className="flex h-full flex-col bg-[#0c0c0c] text-white">
       <div className="border-b border-white/[.08] px-5 py-5">
         <a href="/owner/dashboard" className="flex items-center gap-3">
-          <img src="/brand-logo.png?v=20261005" alt="Car Dash" className="h-9 w-[72px] object-cover" />
+          <img src="/favicon.png" alt="Car Dash" className="h-9 w-[72px] object-cover" />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold tracking-[-.02em]">Car Dash</p>
             <p className="mt-0.5 text-[10px] uppercase tracking-[.16em] text-white/35">Business console</p>
