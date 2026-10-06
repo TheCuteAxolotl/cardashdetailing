@@ -11,6 +11,14 @@ export type InvoiceLineItem = {
   rate: number;
 };
 
+export type InvoiceInternalBreakdownItem = {
+  id: string;
+  name: string;
+  category: string;
+  quantity: number;
+  rate: number;
+};
+
 export type InvoicePayment = {
   id: string;
   amount: number;
@@ -54,6 +62,9 @@ export type InvoiceRecord = {
   viewedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  source?: string;
+  internalInspectionNotes?: string;
+  internalBreakdown?: InvoiceInternalBreakdownItem[];
 };
 
 export type InvoiceTotals = {
@@ -105,6 +116,20 @@ function cleanLineItems(value: unknown): InvoiceLineItem[] {
       rate: Math.max(0, money(item?.rate)),
     }))
     .filter((item) => item.description || item.rate > 0);
+}
+
+function cleanInternalBreakdown(value: unknown): InvoiceInternalBreakdownItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .slice(0, 100)
+    .map((item, index) => ({
+      id: cleanString(item?.id, 80) || `internal-${index + 1}`,
+      name: cleanString(item?.name, 160),
+      category: cleanString(item?.category, 80),
+      quantity: Math.max(0, money(item?.quantity || 1)),
+      rate: Math.max(0, money(item?.rate)),
+    }))
+    .filter((item) => item.name || item.rate > 0);
 }
 
 function cleanPayments(value: unknown): InvoicePayment[] {
@@ -176,6 +201,9 @@ export function sanitizeInvoiceInput(input: unknown, existing?: InvoiceRecord): 
     viewedAt: existing?.viewedAt || null,
     createdAt: existing?.createdAt || now,
     updatedAt: now,
+    source: cleanString(body.source ?? existing?.source, 80) || undefined,
+    internalInspectionNotes: cleanString(body.internalInspectionNotes ?? existing?.internalInspectionNotes, 4000) || undefined,
+    internalBreakdown: cleanInternalBreakdown(body.internalBreakdown ?? existing?.internalBreakdown ?? []),
   };
 
   return withCalculatedStatus(invoice);
