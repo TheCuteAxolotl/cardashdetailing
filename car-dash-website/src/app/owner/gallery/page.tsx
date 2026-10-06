@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import { DEFAULT_PRICING_PAGES, PricingPageConfig, parsePricingConfig } from "@/lib/pricing-config";
 import { MediaVisual } from "@/components/MediaLightbox";
 import type { MediaItem } from "@/lib/media";
@@ -16,7 +17,7 @@ type PricingConfigs = {
   interior: PricingPageConfig;
 };
 
-const MAX_VIDEO_UPLOAD_BYTES = 2_500_000;
+const MAX_VIDEO_UPLOAD_BYTES = 500 * 1024 * 1024;
 
 async function fileToCompressedDataUrl(file: File): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
@@ -33,17 +34,9 @@ async function fileToCompressedDataUrl(file: File): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.8);
 }
 
-async function videoFileToDataUrl(file: File): Promise<string> {
-  if (!file.type.startsWith("video/")) throw new Error("Please choose a video file.");
-  if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
-    throw new Error("That video is too large for a direct upload. Use a video link instead, or trim/compress it under 2.5 MB.");
-  }
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result || ""));
-    reader.onerror = () => reject(new Error("Your browser could not read this video."));
-    reader.readAsDataURL(file);
-  });
+function safeVideoPath(file: File) {
+  const clean = file.name.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "video.mp4";
+  return `gallery/${Date.now()}-${clean}`;
 }
 
 const staticPlacements: Placement[] = STATIC_MEDIA_PLACEMENTS;
@@ -86,6 +79,7 @@ export default function OwnerGallery() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [mode, setMode] = useState<MediaMode>("photo");
   const [file, setFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState("");
@@ -130,7 +124,19 @@ export default function OwnerGallery() {
           : file.name.replace(/\.[^.]+$/, "");
       } else if (mode === "video-file") {
         if (!file) throw new Error("Choose a video first.");
-        url = await videoFileToDataUrl(file);
+        if (!file.type.startsWith("video/")) throw new Error("Please choose a video file.");
+        if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+          throw new Error("That video is over the 500 MB upload limit. Trim/compress it or use a video link.");
+        }
+        setUploadProgress(1);
+        const blob = await upload(safeVideoPath(file), file, {
+          access: "public",
+          handleUploadUrl: "/api/media-upload",
+          contentType: file.type || undefined,
+          multipart: true,
+          onUploadProgress: ({ percentage }) => setUploadProgress(Math.max(1, Math.round(percentage))),
+        });
+        url = blob.url;
         fallbackTitle = file.name.replace(/\.[^.]+$/, "");
       } else {
         url = videoUrl.trim();
@@ -157,6 +163,7 @@ export default function OwnerGallery() {
       setMessage(error instanceof Error ? error.message : "Upload failed.");
     } finally {
       setSaving(false);
+      setUploadProgress(0);
     }
   };
 
@@ -219,7 +226,7 @@ export default function OwnerGallery() {
             <label className="mb-2 block text-sm font-medium">Media type</label>
             <select value={mode} onChange={(e) => { setMode(e.target.value as MediaMode); setFile(null); setVideoUrl(""); }} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" disabled={placementByValue.get(category)?.photoOnly}>
               <option value="photo">Photo upload</option>
-              {!placementByValue.get(category)?.photoOnly && <option value="video-file">Small video upload</option>}
+              {!placementByValue.get(category)?.photoOnly && <option value="video-file">Video upload</option>}
               {!placementByValue.get(category)?.photoOnly && <option value="video-url">Video / social link</option>}
             </select>
             {placementByValue.get(category)?.photoOnly && <p className="mt-2 text-xs text-white/38">Hero spots use photos only so the page always has a clean background image.</p>}
@@ -236,14 +243,14 @@ export default function OwnerGallery() {
               <>
                 <label className="mb-2 block text-sm font-medium">{mode === "photo" ? "Photo" : "Video clip"}</label>
                 <input id="gallery-file" type="file" accept={mode === "photo" ? "image/*" : "video/mp4,video/webm,video/quicktime,video/*"} onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" required />
-                <p className="mt-2 text-xs text-white/38">{category === "home-360" ? "Upload the 360 frames in order as you move around the car/interior. About 8 photos works; 12–24 looks smoother (up to 36 frames). Customers can drag or swipe through them in a loop." : mode === "photo" ? "Photos are resized/compressed automatically." : "Direct video uploads are limited to 2.5 MB. Use a video link for anything larger."}</p>
+                <p className="mt-2 text-xs text-white/38">{category === "home-360" ? "Upload the 360 frames in order as you move around the car/interior. About 8 photos works; 12–24 looks smoother (up to 36 frames). Customers can drag or swipe through them in a loop." : mode === "photo" ? "Photos are resized/compressed automatically." : "Upload videos directly up to 500 MB. Large files upload straight to media storage instead of through the normal website request."}</p>
               </>
             )}
           </div>
 
           <div><label className="mb-2 block text-sm font-medium">Label</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === "home-360" ? "Frame 01 (optional)" : "Before, After, Hand wash…"} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" /></div>
           <div className="md:col-span-3"><label className="mb-2 block text-sm font-medium">Where should it appear?</label><PlacementSelect value={category} onChange={(value) => { setCategory(value); if (placementByValue.get(value)?.photoOnly) { setMode("photo"); setVideoUrl(""); setFile(null); const input = document.getElementById("gallery-file") as HTMLInputElement | null; if (input) input.value = ""; } }} /><p className="mt-2 text-[11px] leading-4 text-white/38">Current destination: {placementByValue.get(category)?.label || category}{getMediaPlacementPath(category) && <> · <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer" className="text-[#6EAEC6] hover:underline">Open page ↗</a></>}</p></div>
-          <div className="flex items-end"><button disabled={saving} className="w-full rounded-xl bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{saving ? "Processing…" : "Add Media"}</button></div>
+          <div className="flex items-end"><button disabled={saving} className="w-full rounded-xl bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{saving ? (mode === "video-file" && uploadProgress > 0 ? `Uploading ${uploadProgress}%` : "Processing…") : "Add Media"}</button></div>
           {message && <div className="md:col-span-4 text-sm text-white/72">{message}</div>}
         </form>
 
