@@ -41,6 +41,7 @@ const groups: Array<{ label: string; items: NavItem[] }> = [
     label: "Overview",
     items: [
       { href: "/owner/dashboard", label: "Dashboard", icon: "home" },
+      { href: "/owner/schedule", label: "Schedule", icon: "calendar", ownerOnly: true },
       { href: "/owner/analytics", label: "Analytics", icon: "chart", permissions: ["analytics"] },
     ],
   },
