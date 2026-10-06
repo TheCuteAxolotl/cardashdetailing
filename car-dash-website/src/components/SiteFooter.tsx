@@ -1,5 +1,6 @@
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 import SocialLinks from "@/components/SocialLinks";
+import { BUSINESS_EMAIL } from "@/lib/seo";
 
 export default function SiteFooter({ blurb }: { blurb: string }) {
   return (
@@ -24,7 +25,7 @@ export default function SiteFooter({ blurb }: { blurb: string }) {
             </div>
             <div className="col-span-2 sm:col-span-1">
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[.18em] text-[#C0AB9A]">Contact</p>
-              <div className="space-y-2 text-[#F7F5F2]/62"><a href={`tel:${BUSINESS_PHONE}`} className="block hover:text-[#F7F5F2]">{BUSINESS_PHONE_DISPLAY}</a><a href="mailto:cardashdetailing@gmail.com" className="block break-all hover:text-[#F7F5F2]">cardashdetailing@gmail.com</a><a href="/privacy-policy" className="block hover:text-[#F7F5F2]">Privacy</a><a href="/terms-and-conditions" className="block hover:text-[#F7F5F2]">Terms</a></div>
+              <div className="space-y-2 text-[#F7F5F2]/62"><a href={`tel:${BUSINESS_PHONE}`} className="block hover:text-[#F7F5F2]">{BUSINESS_PHONE_DISPLAY}</a><a href={`mailto:${BUSINESS_EMAIL}`} className="block break-all hover:text-[#F7F5F2]">{BUSINESS_EMAIL}</a><a href="/privacy-policy" className="block hover:text-[#F7F5F2]">Privacy</a><a href="/terms-and-conditions" className="block hover:text-[#F7F5F2]">Terms</a></div>
             </div>
           </div>
         </div>

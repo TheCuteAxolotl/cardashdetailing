@@ -77,18 +77,6 @@ function dynamicPackagePlacements(configs: PricingConfigs): Placement[] {
   );
 }
 
-type ServiceSummary = { id: string; title: string; category: string; active: boolean };
-
-function dynamicServicePlacements(services: ServiceSummary[]): Placement[] {
-  return services
-    .filter((service) => service.active)
-    .map((service) => ({
-      value: `service-${service.id}`,
-      label: `Service → ${service.title} → Photos & Videos`,
-      group: "Individual Services",
-    }));
-}
-
 export default function OwnerGallery() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [configs, setConfigs] = useState<PricingConfigs>({
@@ -96,7 +84,6 @@ export default function OwnerGallery() {
     exterior: DEFAULT_PRICING_PAGES.exterior,
     interior: DEFAULT_PRICING_PAGES.interior,
   });
-  const [services, setServices] = useState<ServiceSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mode, setMode] = useState<MediaMode>("photo");
@@ -107,7 +94,7 @@ export default function OwnerGallery() {
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const placements = useMemo(() => [...staticPlacements, ...dynamicPackagePlacements(configs), ...dynamicServicePlacements(services)], [configs, services]);
+  const placements = useMemo(() => [...staticPlacements, ...dynamicPackagePlacements(configs)], [configs]);
   const placementByValue = useMemo(() => new Map(placements.map((item) => [item.value, item])), [placements]);
   const groups = useMemo(() => [...new Set(placements.map((item) => item.group))], [placements]);
 
@@ -125,7 +112,6 @@ export default function OwnerGallery() {
         exterior: parsePricingConfig(content?.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior),
         interior: parsePricingConfig(content?.pricingInteriorConfig, DEFAULT_PRICING_PAGES.interior),
       })),
-      fetch("/api/services", { cache: "no-store" }).then((r) => r.ok ? r.json() : []).then((items) => setServices(Array.isArray(items) ? items : [])),
     ]).catch(() => setMessage("Could not load media or placements.")).finally(() => setLoading(false));
   }, []);
 

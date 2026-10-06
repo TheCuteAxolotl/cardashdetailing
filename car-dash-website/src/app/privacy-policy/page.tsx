@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/seo";
+import { BUSINESS_EMAIL, pageMetadata } from "@/lib/seo";
 import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY } from "@/lib/constants";
 
 export const metadata: Metadata = pageMetadata({
@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-semibold text-white">Contact us</h2>
             <p className="mt-3">
               Questions about this Privacy Policy can be sent to{" "}
-              <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href="mailto:cardashdetailing@gmail.com">
+              <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href={`mailto:${BUSINESS_EMAIL}`}>
                 cardashdetailing@gmail.com
               </a>{" "}
               or by calling{" "}

@@ -3,32 +3,26 @@
 import { useState } from "react";
 import type { SiteContent } from "@/lib/site-defaults";
 import type { PricingPageConfig } from "@/lib/pricing-config";
-import type { BookingPricingConfig } from "@/lib/booking-pricing";
 import DynamicGallery from "@/components/DynamicGallery";
 import ReviewCards from "@/components/ReviewCards";
 import BookingForm from "@/components/BookingForm";
-import SimplePricingHub, { type PublicServiceSummary } from "@/components/SimplePricingHub";
+import HomePackagePricing from "@/components/HomePackagePricing";
 import type { MediaItem } from "@/lib/media";
 import PageMediaBand from "@/components/PageMediaBand";
 import Hero360Viewer from "@/components/Hero360Viewer";
 import SitePhoto from "@/components/SitePhoto";
 
-type PricingKind = "packages" | "interior" | "exterior";
 
 type Props = {
   initialContent: SiteContent;
-  pricingConfigs: Record<PricingKind, PricingPageConfig>;
-  bookingPricing: BookingPricingConfig;
-  services: PublicServiceSummary[];
+  pricingConfig: PricingPageConfig;
   pricingMedia?: MediaItem[];
   hero360Frames?: MediaItem[];
 };
 
 export default function HomeExperience({
   initialContent: content,
-  pricingConfigs,
-  bookingPricing,
-  services,
+  pricingConfig,
   pricingMedia = [],
   hero360Frames = [],
 }: Props) {
@@ -158,7 +152,7 @@ export default function HomeExperience({
             <a href="#prices-packages" className="rounded-full bg-[#3F3027] px-4 py-2.5 text-sm font-semibold text-[#F7F5F2]">Detail packages</a>
           </div>
 
-          <SimplePricingHub configs={pricingConfigs} bookingPricing={bookingPricing} services={services} mediaItems={pricingMedia} packagesOnly />
+          <HomePackagePricing config={pricingConfig} mediaItems={pricingMedia} />
         </div>
       </section>
 

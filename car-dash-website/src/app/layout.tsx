@@ -31,8 +31,9 @@ export const metadata: Metadata = {
   applicationName: "Car Dash Detailing",
   category: "automotive detailing",
   icons: {
-    icon: [{ url: "/brand-mark.svg?v=20261003d", type: "image/svg+xml", sizes: "any" }],
-    shortcut: ["/brand-mark.svg?v=20261003d"],
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    shortcut: ["/favicon.png"],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png" }],
   },
   openGraph: {
     siteName: "Car Dash Detailing",
@@ -55,11 +56,11 @@ export default async function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-[#171411] text-[#F7F5F2]`}
     >
-      <body className="min-h-full flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
+      <body className="flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
         <StructuredData data={localBusinessSchema} />
         <SiteHeader />
         <ScrollReveal />
-        <main className="flex-1">{children}</main>
+        <div className="flex-1">{children}</div>
         <SiteFooter blurb={siteContent.footerBlurb} />
         <SupportWidget />
       </body>

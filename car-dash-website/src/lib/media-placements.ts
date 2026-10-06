@@ -30,8 +30,6 @@ export const STATIC_MEDIA_PLACEMENTS: MediaPlacement[] = [
   { value: "pricing-interior-intro", label: "Interior Detailing → Intro Media", group: "Interior Detailing" },
   { value: "pricing-interior-results", label: "Interior Detailing → Results Media", group: "Interior Detailing" },
 
-  { value: "services-hero", label: "All Services → Hero Photo", group: "All Services", photoOnly: true },
-  { value: "services-media", label: "All Services → Page Media", group: "All Services" },
 
   { value: "marine-hero", label: "Marine Detailing → Hero Photo", group: "Marine Detailing", photoOnly: true },
   { value: "marine-services", label: "Marine Detailing → Services Media", group: "Marine Detailing" },
@@ -79,11 +77,9 @@ export function getMediaPlacementPath(category: string): string | null {
   if (category.startsWith("ceramic-coatings-") || category.startsWith("ceramic-") || category === "ceramic-results") return "/ceramic-coatings";
   if (category.startsWith("products-")) return "/products-we-use";
   if (category.startsWith("marine-")) return "/marine-detailing";
-  if (category.startsWith("services-")) return "/services";
   if (category.startsWith("pricing-car-packages-")) return "/car-detailing-packages";
   if (category.startsWith("pricing-exterior-")) return "/exterior-detailing";
   if (category.startsWith("pricing-interior-")) return "/interior-detailing";
-  if (category.startsWith("service-")) return "/#specialty-prices";
   if (category.startsWith("home-")) return "/";
   if (category === "hero") return null;
   return null;

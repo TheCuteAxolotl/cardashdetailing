@@ -5,7 +5,14 @@ import type { NextRequest } from "next/server";
 import { OWNER_EMAIL } from "@/lib/constants";
 
 const SALT_ROUNDS = 10;
-const SECRET_KEY = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "your-secret-key";
+const CONFIGURED_SECRET = (process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "").trim();
+const DEV_SECRET = "car-dash-local-development-only";
+
+function authSecret() {
+  if (CONFIGURED_SECRET) return CONFIGURED_SECRET;
+  if (process.env.VERCEL_ENV !== "production") return DEV_SECRET;
+  throw new Error("JWT_SECRET or NEXTAUTH_SECRET must be configured in production.");
+}
 
 export type AuthPayload = {
   id: string;
@@ -30,12 +37,12 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export function createToken(data: AuthPayload): string {
-  return jwt.sign(data, SECRET_KEY, { expiresIn: "7d" });
+  return jwt.sign(data, authSecret(), { expiresIn: "7d" });
 }
 
 export function verifyToken(token: string): AuthPayload | null {
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, authSecret());
     if (typeof decoded === "object" && decoded && "id" in decoded && "email" in decoded && "role" in decoded) {
       return decoded as AuthPayload;
     }

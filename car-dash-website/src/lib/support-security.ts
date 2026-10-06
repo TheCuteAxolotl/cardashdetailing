@@ -2,12 +2,16 @@ import crypto from "crypto";
 import type { NextRequest } from "next/server";
 
 function secret() {
-  return (
+  const configured = (
     process.env.SUPPORT_HASH_SECRET ||
     process.env.NEXTAUTH_SECRET ||
     process.env.JWT_SECRET ||
-    "car-dash-support-fallback"
-  );
+    ""
+  ).trim();
+
+  if (configured) return configured;
+  if (process.env.VERCEL_ENV !== "production") return "car-dash-local-support-only";
+  throw new Error("SUPPORT_HASH_SECRET, JWT_SECRET, or NEXTAUTH_SECRET must be configured in production.");
 }
 
 export function getClientIp(request: NextRequest) {
