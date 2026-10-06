@@ -2,9 +2,9 @@ import { DEFAULT_PRICING_PAGES } from "@/lib/pricing-config";
 import { DEFAULT_BOOKING_PRICING } from "@/lib/booking-pricing";
 
 export const SITE_DEFAULTS = {
-  heroEyebrow: "Mobile detailing · South Elgin, IL",
-  heroTitle: "Mobile detailing that comes to you.",
-  heroBody: "We’re based in South Elgin and completely mobile. You pick the service. You pick the time. We bring professional detailing directly to your home or workplace.",
+  heroEyebrow: "South Elgin, IL · Mobile car detailing",
+  heroTitle: "Professional detailing, brought to your driveway.",
+  heroBody: "Car Dash handles interior and exterior details, paint correction, and ceramic protection at your home or workplace. Book a package online or send photos for an exact quote.",
   heroPrimaryCta: "Get an Exact Quote",
   heroSecondaryCta: "See Services",
 
@@ -66,7 +66,7 @@ export const SITE_DEFAULTS = {
   pricingInteriorConfig: JSON.stringify(DEFAULT_PRICING_PAGES.interior),
   bookingPricingConfig: JSON.stringify(DEFAULT_BOOKING_PRICING),
 
-  footerBlurb: "Based in South Elgin and completely mobile. Interior, exterior, paint correction, ceramic coating, and marine detailing.",
+  footerBlurb: "Mobile detailing based in South Elgin, Illinois. Interior and exterior detailing, paint correction, ceramic protection, and select marine work.",
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_DEFAULTS;
@@ -75,6 +75,10 @@ export type SiteContent = Record<SiteContentKey, string>;
 // Only replace copy that exactly matches an older Car Dash default. Owner-written custom
 // content is left untouched, so upgrading the site never silently overwrites a custom edit.
 const LEGACY_COPY_REPLACEMENTS: Record<string, string> = {
+  "Mobile detailing · South Elgin, IL": SITE_DEFAULTS.heroEyebrow,
+  "Mobile detailing that comes to you.": SITE_DEFAULTS.heroTitle,
+  "We’re based in South Elgin and completely mobile. You pick the service. You pick the time. We bring professional detailing directly to your home or workplace.": SITE_DEFAULTS.heroBody,
+  "Based in South Elgin and completely mobile. Interior, exterior, paint correction, ceramic coating, and marine detailing.": SITE_DEFAULTS.footerBlurb,
   "We’re based in South Elgin and completely mobile. Interior, exterior, paint correction, ceramic coating, and marine detailing — we bring the setup to you.": SITE_DEFAULTS.heroBody,
   // v5.4.3 defaults -> v5.4.4 human-voice copy. Custom owner-written text is still preserved.
   'Interior detailing, exterior care, paint correction, and ceramic protection brought to your vehicle in South Elgin and nearby suburbs.': SITE_DEFAULTS.heroBody,
