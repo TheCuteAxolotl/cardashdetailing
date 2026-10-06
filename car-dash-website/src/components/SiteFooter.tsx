@@ -8,7 +8,7 @@ export default function SiteFooter({ blurb }: { blurb: string }) {
       <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8 sm:py-16">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_.8fr]">
           <div>
-            <p className="text-xl font-bold tracking-[.05em]">CAR / DASH</p>
+            <p className="text-xl font-bold tracking-[.05em]">CAR DASH</p>
             <p className="mt-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/30">Mobile detailing</p>
             <p className="mt-6 max-w-xl text-sm leading-7 text-white/42">{blurb}</p>
             <div className="mt-7 flex flex-wrap gap-3">
