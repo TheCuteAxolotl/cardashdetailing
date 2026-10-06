@@ -27,6 +27,7 @@ const quickActions = [
 ] as const;
 
 const workspace = [
+  ["Schedule", "/owner/schedule", "Weekly calendar with bookings, plans and private to-dos"],
   ["Build a Detail", "/owner/detail-builder", "Private inspection pricing, custom estimates and checkout"],
   ["Bookings", "/owner/bookings", "Schedule, customer details, status and arrival texts"],
   ["Messages", "/owner/messages", "Customer SMS conversations"],
@@ -91,7 +92,7 @@ export default function OwnerDashboard() {
             <p className="mt-2 max-w-2xl text-sm leading-6 text-black/48">Bookings, customer communication and the website in one place.</p>
           </div>
           <div className="flex gap-2">
-            <a href="/owner/bookings" className="rounded-md border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black/65 hover:border-black/20 hover:text-black">View schedule</a>
+            <a href="/owner/schedule" className="rounded-md border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black/65 hover:border-black/20 hover:text-black">View schedule</a>
             <a href="/owner/invoices" className="rounded-md bg-[#111] px-4 py-2.5 text-sm font-semibold text-white hover:bg-black">Create invoice</a>
           </div>
         </div>
