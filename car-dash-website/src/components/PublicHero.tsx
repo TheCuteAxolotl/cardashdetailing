@@ -16,17 +16,17 @@ export default async function PublicHero({ imageCategory, eyebrowKey, titleKey, 
   const resolvedContent = content ?? (await getSiteContent());
 
   return (
-    <section className="border-b border-[#C0AB9A]/35 bg-[#F7F5F2] text-[#171411]">
-      <div className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[.82fr_1.18fr] lg:items-stretch">
-        <div className="flex flex-col justify-center py-5 lg:py-10">
-          <p className="text-xs font-bold uppercase tracking-[.22em] text-[#7B5C4B]">{resolvedContent[eyebrowKey]}</p>
-          <h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[.93] tracking-[-.06em] sm:text-6xl">{resolvedContent[titleKey]}</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-[#3F3027]/65">{resolvedContent[bodyKey]}</p>
-          {action && <div className="mt-6">{action}</div>}
+    <section className="border-b border-black/[.08] bg-[#f5f4f1] text-[#111]">
+      <div className="mx-auto grid max-w-[1440px] gap-0 lg:grid-cols-[.82fr_1.18fr]">
+        <div className="flex flex-col justify-center px-5 py-14 sm:px-8 sm:py-18 lg:px-10 lg:py-20 xl:px-14">
+          <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">{resolvedContent[eyebrowKey]}</p>
+          <h1 className="mt-4 max-w-4xl text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-6xl lg:text-7xl">{resolvedContent[titleKey]}</h1>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-black/50">{resolvedContent[bodyKey]}</p>
+          {action && <div className="mt-7 flex flex-wrap gap-3 [&_a]:rounded-md [&_a]:border-black/10 [&_a]:px-5 [&_a]:py-3">{action}</div>}
         </div>
-        <div className="relative min-h-[300px] overflow-hidden rounded-[26px] border border-[#C0AB9A]/35 bg-[#171411] sm:min-h-[390px]">
+        <div className="relative min-h-[360px] bg-[#111] lg:min-h-[560px]">
           <SitePhoto category={imageCategory} fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#171411]/45 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.28))]" />
         </div>
       </div>
     </section>
