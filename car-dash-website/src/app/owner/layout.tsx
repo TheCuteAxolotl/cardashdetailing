@@ -3,8 +3,10 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
+import OwnerShell from "@/components/OwnerShell";
 
 type AccessState = "checking" | "allowed" | "redirecting";
+type User = { id: string; name?: string | null; email?: string | null; role?: string | null };
 
 const SHARED_OWNER_ROUTES: Array<{ prefix: string; permissions: string[] }> = [
   { prefix: "/owner/calls", permissions: ["businessPhone"] },
@@ -20,6 +22,8 @@ const SHARED_OWNER_ROUTES: Array<{ prefix: string; permissions: string[] }> = [
 export default function OwnerLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [state, setState] = useState<AccessState>("checking");
+  const [user, setUser] = useState<User | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
 
   const requiredPermissions = useMemo(
     () => SHARED_OWNER_ROUTES.find((item) => pathname.startsWith(item.prefix))?.permissions || null,
@@ -43,15 +47,23 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
 
         const data = await response.json();
         const role = String(data.user?.role || "user");
-        const permissions = Array.isArray(data.permissions) ? data.permissions : [];
+        const nextPermissions = Array.isArray(data.permissions) ? data.permissions : [];
 
         if (role === "owner") {
-          if (!cancelled) setState("allowed");
+          if (!cancelled) {
+            setUser(data.user);
+            setPermissions(nextPermissions);
+            setState("allowed");
+          }
           return;
         }
 
-        if (requiredPermissions && requiredPermissions.some((permission) => permissions.includes(permission))) {
-          if (!cancelled) setState("allowed");
+        if (requiredPermissions && requiredPermissions.some((permission) => nextPermissions.includes(permission))) {
+          if (!cancelled) {
+            setUser(data.user);
+            setPermissions(nextPermissions);
+            setState("allowed");
+          }
           return;
         }
 
@@ -72,16 +84,16 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
     };
   }, [requiredPermissions]);
 
-  if (state !== "allowed") {
+  if (state !== "allowed" || !user) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#07131B] px-6 text-white">
+      <main className="grid min-h-screen place-items-center bg-[#0c0c0c] px-6 text-white">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-b-[#6EAEC6]" />
-          <p className="mt-4 text-sm text-white/45">Checking dashboard access…</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-b-white" />
+          <p className="mt-4 text-xs font-medium uppercase tracking-[.14em] text-white/35">Opening business console</p>
         </div>
       </main>
     );
   }
 
-  return children;
+  return <OwnerShell user={user} permissions={permissions}>{children}</OwnerShell>;
 }
