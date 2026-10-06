@@ -401,3 +401,25 @@ img { display: block; }
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+
+/* Public-site polish: keep cards and media controlled instead of bubble-like. */
+.public-clean [class~="rounded-3xl"],
+.public-clean [class~="rounded-[34px]"],
+.public-clean [class~="rounded-[32px]"],
+.public-clean [class~="rounded-[30px]"],
+.public-clean [class~="rounded-[28px]"],
+.public-clean [class~="rounded-[26px]"],
+.public-clean [class~="rounded-[24px]"],
+.public-clean [class~="rounded-[22px]"] {
+  border-radius: 10px !important;
+}
+
+.public-clean [class~="rounded-2xl"] {
+  border-radius: 8px !important;
+}
+
+.public-clean section,
+.public-clean article {
+  scroll-margin-top: 92px;
+}
