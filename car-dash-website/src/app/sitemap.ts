@@ -4,7 +4,6 @@ import { SITE_URL } from "@/lib/seo";
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
     ["/", 1, "weekly"],
-    ["/services", 0.9, "weekly"],
     ["/car-detailing-packages", 0.9, "weekly"],
     ["/interior-detailing", 0.9, "weekly"],
     ["/exterior-detailing", 0.9, "weekly"],

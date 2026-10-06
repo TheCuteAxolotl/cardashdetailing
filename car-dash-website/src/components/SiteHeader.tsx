@@ -12,7 +12,7 @@ const mainLinks = [
   ["/reviews", "Reviews"],
 ] as const;
 
-const HOME_LOGO = "/brand-mark.svg?v=20261003d";
+const HOME_LOGO = "/brand-logo.png?v=20261006";
 
 const detailingLinks = [
   ["/car-detailing-packages", "Packages", "Essential, Full, and Signature Detail."],
@@ -111,9 +111,9 @@ export default function SiteHeader() {
             <img
               src={HOME_LOGO}
               alt="Car Dash Detailing"
-              width={140}
-              height={140}
-              className="h-10 w-10 shrink-0 object-contain"
+              width={160}
+              height={80}
+              className="h-9 w-[72px] shrink-0 rounded-lg object-cover"
             />
             <span className="hidden text-sm font-semibold tracking-[-.025em] text-[#171411] sm:block">Car Dash Detailing</span>
           </a>
