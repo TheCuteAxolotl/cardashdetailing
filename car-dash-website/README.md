@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Car Dash Detailing Website
 
-## Getting Started
+Production website for Car Dash Detailing. Built with Next.js 16, React 19, Prisma/PostgreSQL, Twilio, and Stripe invoice payments.
 
-First, run the development server:
+## Local development
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Production validation:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run lint
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database
 
-## Learn More
+Prisma schema: `prisma/schema.prisma`
 
-To learn more about Next.js, take a look at the following resources:
+Useful commands:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run db:push
+npm run seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The app uses PostgreSQL. Local SQLite database files are not part of the project.
 
-## Deploy on Vercel
+## Environment variables used by the app
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Core: `DATABASE_URL`, `JWT_SECRET` or `NEXTAUTH_SECRET`, `NEXT_PUBLIC_SITE_URL`, `OWNER_EMAIL` / `NEXT_PUBLIC_OWNER_EMAIL`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Optional integrations depend on enabled features: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_MESSAGING_SERVICE_SID`, `TWILIO_VOICE_NUMBER`, `TWILIO_FORWARD_TO_NUMBER`, `TWILIO_INBOUND_WEBHOOK_URL`, `TWILIO_VOICE_WEBHOOK_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`, `DISCORD_WEBHOOK_URL`, `DISCORD_SUPPORT_WEBHOOK_URL`, and `SUPPORT_HASH_SECRET`.
+
+## Branding
+
+Current public brand assets live in `public/`:
+
+- `brand-logo.png` — header and structured-data logo
+- `favicon.png` — browser tab icon
+- `apple-touch-icon.png` — iOS home-screen icon
+
+## Deployment
+
+The repository is designed for Vercel deployment from the project root `car-dash-website/`.
