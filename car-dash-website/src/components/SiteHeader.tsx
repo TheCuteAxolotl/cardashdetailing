@@ -101,7 +101,7 @@ export default function SiteHeader() {
           <a href="/" aria-label="Car Dash Detailing home" className="flex shrink-0 items-center gap-3">
             <img src={HOME_LOGO} alt="" width={40} height={40} className="h-10 w-10 rounded-md object-cover" />
             <div className="leading-none">
-              <span className="block text-[15px] font-bold tracking-[.06em]">CAR / DASH</span>
+              <span className="block text-[15px] font-bold tracking-[.06em]">CAR DASH</span>
               <span className="mt-1.5 block text-[9px] font-semibold uppercase tracking-[.2em] text-black/40">Mobile detailing</span>
             </div>
           </a>
