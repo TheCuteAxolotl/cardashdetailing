@@ -20,13 +20,14 @@ type Metrics = {
 };
 
 const quickActions = [
+  ["Build a Detail", "/owner/detail-builder", "Inspect a vehicle and build an exact custom price"],
   ["New invoice", "/owner/invoices", "Create and send a customer invoice"],
   ["Add booking", "/owner/bookings", "Record a phone or outside booking"],
   ["Quote requests", "/owner/quotes", "Review photos and send an exact price"],
-  ["Edit website", "/owner/website", "Update public copy and page content"],
 ] as const;
 
 const workspace = [
+  ["Build a Detail", "/owner/detail-builder", "Private inspection pricing, custom estimates and checkout"],
   ["Bookings", "/owner/bookings", "Schedule, customer details, status and arrival texts"],
   ["Messages", "/owner/messages", "Customer SMS conversations"],
   ["Invoices", "/owner/invoices", "Create, send and record payments"],
