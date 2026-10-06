@@ -111,9 +111,9 @@ export default function SiteHeader() {
             <img
               src={HOME_LOGO}
               alt="Car Dash Detailing"
-              width={160}
-              height={80}
-              className="h-9 w-[72px] shrink-0 rounded-lg object-cover"
+              width={140}
+              height={140}
+              className="h-10 w-10 shrink-0 object-contain"
             />
             <span className="hidden text-sm font-semibold tracking-[-.025em] text-[#171411] sm:block">Car Dash Detailing</span>
           </a>
