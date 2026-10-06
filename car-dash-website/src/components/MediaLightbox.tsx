@@ -66,6 +66,7 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
 
   useEffect(() => {
     if (openIndex == null) return;
+    setMediaReady(false);
     setIndex(openIndex);
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -73,8 +74,14 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
-      if (event.key === "ArrowLeft" && items.length > 1) setIndex((current) => (current - 1 + items.length) % items.length);
-      if (event.key === "ArrowRight" && items.length > 1) setIndex((current) => (current + 1) % items.length);
+      if (event.key === "ArrowLeft" && items.length > 1) {
+        setMediaReady(false);
+        setIndex((current) => (current - 1 + items.length) % items.length);
+      }
+      if (event.key === "ArrowRight" && items.length > 1) {
+        setMediaReady(false);
+        setIndex((current) => (current + 1) % items.length);
+      }
     };
 
     window.addEventListener("keydown", onKey);
@@ -87,12 +94,16 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
 
   const item = useMemo(() => items[index] || null, [items, index]);
 
-  useEffect(() => { setMediaReady(false); }, [item?.id, item?.url]);
-
   if (!mounted || openIndex == null || !item) return null;
 
-  const previous = () => setIndex((current) => (current - 1 + items.length) % items.length);
-  const next = () => setIndex((current) => (current + 1) % items.length);
+  const previous = () => {
+    setMediaReady(false);
+    setIndex((current) => (current - 1 + items.length) % items.length);
+  };
+  const next = () => {
+    setMediaReady(false);
+    setIndex((current) => (current + 1) % items.length);
+  };
 
   const lightbox = (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#171411]/95 p-3 backdrop-blur-sm sm:p-6" role="dialog" aria-modal="true" aria-label={item.title} onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
@@ -117,7 +128,7 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
             </div>
           )}
 
-          <MediaVisual item={item} onReady={() => setMediaReady(true)} className={`relative z-10 max-h-[calc(100dvh-132px)] min-h-[260px] w-full object-contain transition-opacity duration-200 sm:max-h-[76vh] sm:min-h-[520px] ${mediaReady ? "opacity-100" : "opacity-0"}`} />
+          <MediaVisual key={`${item.id}:${item.url}`} item={item} onReady={() => setMediaReady(true)} className={`relative z-10 max-h-[calc(100dvh-132px)] min-h-[260px] w-full object-contain transition-opacity duration-200 sm:max-h-[76vh] sm:min-h-[520px] ${mediaReady ? "opacity-100" : "opacity-0"}`} />
 
           {items.length > 1 && (
             <>
