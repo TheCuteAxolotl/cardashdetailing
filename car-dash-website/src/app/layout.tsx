@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./scroll-reveal.css";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
-import SupportWidget from "@/components/SupportWidget";
+import SiteChrome from "@/components/SiteChrome";
 import StructuredData from "@/components/StructuredData";
-import ScrollReveal from "@/components/ScrollReveal";
 import { localBusinessSchema, SITE_URL } from "@/lib/seo";
 import { getSiteContent } from "@/lib/site-content";
 
@@ -31,9 +28,9 @@ export const metadata: Metadata = {
   applicationName: "Car Dash Detailing",
   category: "automotive detailing",
   icons: {
-    icon: [{ url: "/favicon.png", type: "image/png" }],
-    shortcut: ["/favicon.png"],
-    apple: [{ url: "/apple-touch-icon.png", type: "image/png" }],
+    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     siteName: "Car Dash Detailing",
@@ -58,11 +55,7 @@ export default async function RootLayout({
     >
       <body className="flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
         <StructuredData data={localBusinessSchema} />
-        <SiteHeader />
-        <ScrollReveal />
-        <div className="flex-1">{children}</div>
-        <SiteFooter blurb={siteContent.footerBlurb} />
-        <SupportWidget />
+        <SiteChrome footerBlurb={siteContent.footerBlurb}>{children}</SiteChrome>
       </body>
     </html>
   );
