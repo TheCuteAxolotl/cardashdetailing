@@ -20,7 +20,7 @@ export default function PackageMediaEvidence({ packageMedia, featureMedia }: { p
   return (
     <>
       {packageMedia.length > 0 && (
-        <div className="mt-4 rounded-2xl border border-black/8 bg-white p-3">
+        <div className="package-detail-panel mt-4 border border-black/[.08] bg-white p-3">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-xs font-semibold text-black/62">See this package</p>
             <button type="button" onClick={() => open(packageMedia, 0)} className="text-[11px] font-bold text-[#6EAEC6]">View all →</button>
@@ -36,8 +36,8 @@ export default function PackageMediaEvidence({ packageMedia, featureMedia }: { p
         </div>
       )}
 
-      <details className="mt-4 rounded-2xl border border-black/8 bg-black/[.02] px-4 py-3">
-        <summary className="cursor-pointer text-sm font-semibold text-black/65">What’s included</summary>
+      <details className="package-detail-panel mt-4 border border-black/[.08] bg-black/[.018] px-4 py-3">
+        <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold text-black/65"><span>What’s included</span><span className="text-[#7B5C4B]">+</span></summary>
         <ul className="mt-3 space-y-2 pb-1 text-sm leading-5 text-black/48">
           {featureMedia.map((entry) => {
             const media = entry.items;
