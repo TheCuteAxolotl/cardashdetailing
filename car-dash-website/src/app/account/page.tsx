@@ -215,7 +215,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <main className="grid min-h-[70vh] place-items-center bg-[#0B1822] text-white">
+      <main className="customer-app grid min-h-[70vh] place-items-center text-white">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#6EAEC6]" />
           <p className="mt-4 text-sm text-white/40">Loading account…</p>
@@ -227,7 +227,7 @@ export default function AccountPage() {
   if (!user) return null;
 
   return (
-    <main className="min-h-screen bg-[#0B1822] text-white">
+    <main className="customer-app min-h-screen text-white">
       <section className="border-b border-white/8">
         <div className="mx-auto max-w-[1280px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
@@ -265,7 +265,7 @@ export default function AccountPage() {
 
       <div className="mx-auto grid max-w-[1280px] gap-6 px-5 py-10 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-12 lg:py-14">
         <div className="space-y-6">
-          <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
+          <section className="customer-panel border border-white/8 bg-white/[.028] p-6 sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/30">Account information</p>
@@ -311,7 +311,7 @@ export default function AccountPage() {
             </form>
           </section>
 
-          <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
+          <section className="customer-panel border border-white/8 bg-white/[.028] p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/30">Security</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Change password</h2>
             <p className="mt-2 text-sm leading-6 text-white/35">Use at least 8 characters for your new password.</p>
@@ -413,7 +413,7 @@ export default function AccountPage() {
         </div>
 
         {staffAccess ? (
-          <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
+          <section className="customer-panel border border-white/8 bg-white/[.028] p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#6EAEC6]">Staff access</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your Car Dash permissions</h2>
             <p className="mt-2 text-sm leading-6 text-white/35">Your dashboard access is controlled by the Owner. Changes take effect the next time a protected panel or API is opened.</p>
@@ -445,14 +445,14 @@ export default function AccountPage() {
             <a href="/admin/dashboard" className="mt-7 inline-flex rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-[#0B1822]">Open Staff Dashboard</a>
           </section>
         ) : (
-        <section className="rounded-[28px] border border-white/8 bg-[#13232F] p-6 sm:p-8">
+        <section className="customer-panel border border-white/8 bg-white/[.028] p-6 sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#6EAEC6]">Detail status</p>
               <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your requests</h2>
               <p className="mt-2 text-sm text-white/35">Updates appear here when Car Dash Detailing changes your booking status.</p>
             </div>
-            <div className="rounded-2xl border border-white/8 bg-white/[0.025] px-4 py-3 text-right">
+            <div className="customer-subcard border border-white/8 bg-white/[0.025] px-4 py-3 text-right">
               <p className="text-2xl font-semibold">{activeBookings.length}</p>
               <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/28">Active</p>
             </div>
@@ -469,7 +469,7 @@ export default function AccountPage() {
                 };
 
                 return (
-                  <article key={booking.id} className="rounded-3xl border border-white/8 bg-white/[0.018] p-5 sm:p-6">
+                  <article key={booking.id} className="customer-subcard border border-white/8 bg-white/[0.022] p-5 sm:p-6">
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <p className="text-lg font-semibold tracking-[-0.015em]">{booking.serviceName}</p>
