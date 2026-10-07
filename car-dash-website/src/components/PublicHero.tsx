@@ -18,7 +18,7 @@ export default async function PublicHero({ imageCategory, eyebrowKey, titleKey, 
   return (
     <section className="border-b border-black/[.08] bg-[#f5f4f1] text-[#111] sm:px-5 lg:px-8">
       <div className="public-hero-shell mx-auto grid max-w-[1440px] gap-0 overflow-hidden sm:my-5 lg:my-7 lg:grid-cols-[.8fr_1.2fr]">
-        <div className="flex flex-col justify-center px-5 py-14 sm:px-8 sm:py-20 lg:px-12 lg:py-24 xl:px-16">
+        <div className="public-hero-copy flex flex-col justify-center px-5 py-14 sm:px-8 sm:py-20 lg:px-12 lg:py-24 xl:px-16">
           <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-black/38"><span className="h-px w-8 bg-black/20" />{resolvedContent[eyebrowKey]}</p>
           <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[.9] tracking-[-.065em] sm:text-6xl lg:text-7xl">{resolvedContent[titleKey]}</h1>
           <p className="mt-6 max-w-xl text-base leading-7 text-black/50">{resolvedContent[bodyKey]}</p>
