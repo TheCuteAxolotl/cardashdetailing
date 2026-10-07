@@ -23,6 +23,11 @@ export async function POST(request: NextRequest) {
     const requestedName = String(body.customerName || "").trim().slice(0, 120);
     const requestedEmail = String(body.customerEmail || "").trim().toLowerCase().slice(0, 200);
     const requestedPhone = normalizePhoneNumber(String(body.customerPhone || "")) || null;
+    const termsAccepted = body.termsAccepted === true;
+
+    if (!termsAccepted) {
+      return NextResponse.json({ error: "Please agree to the recurring subscription terms." }, { status: 400 });
+    }
 
     let offerId: string | null = null;
     let shareToken: string | null = null;
