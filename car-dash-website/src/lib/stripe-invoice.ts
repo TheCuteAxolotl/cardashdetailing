@@ -14,14 +14,20 @@ export const stripeInvoiceRuntimeInfo = {
 
 type StripeCheckoutSession = {
   id: string;
+  object?: string;
   url?: string | null;
+  mode?: string | null;
   payment_status?: string | null;
   status?: string | null;
   amount_total?: number | null;
   currency?: string | null;
   client_reference_id?: string | null;
   payment_intent?: string | null;
+  customer?: string | null;
+  subscription?: string | null;
   metadata?: Record<string, string> | null;
+  cancel_at_period_end?: boolean;
+  current_period_end?: number | null;
 };
 
 type StripeEvent = {
@@ -34,7 +40,7 @@ function publicSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://cardashdetailing.com").replace(/\/$/, "");
 }
 
-async function stripeRequest(path: string, init?: RequestInit) {
+export async function stripeRequest(path: string, init?: RequestInit) {
   if (!stripeSecretKey) {
     throw new Error("Stripe is not configured on the server yet.");
   }
