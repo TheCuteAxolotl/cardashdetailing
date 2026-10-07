@@ -50,13 +50,13 @@ export default function HomeExperience({
             <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.18),transparent_38%,rgba(0,0,0,.7))] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
           </div>
 
-          <div className={`relative z-10 flex min-h-[680px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
+          <div className={`home-hero-content relative z-10 flex min-h-[680px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
             <div className="flex items-start justify-between gap-5 text-white">
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
               <a href="/quote" className="hidden rounded-full border border-white/24 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-md hover:bg-white hover:text-black sm:inline-flex">Get an exact quote <span className="ml-2">↗</span></a>
             </div>
 
-            <div className="max-w-[900px] pb-5 text-white sm:pb-9">
+            <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
               <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">We come to you. No shop drop-off.</p>
               <h1 className="max-w-[12ch] text-[clamp(3.55rem,7.8vw,7.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
                 {content.heroTitle}
@@ -69,15 +69,15 @@ export default function HomeExperience({
             </div>
           </div>
           {hero360Frames.length > 1 && !heroInteracting && (
-            <div className="pointer-events-none absolute bottom-5 right-5 z-20 hidden items-center gap-2 rounded-full border border-white/16 bg-black/20 px-3 py-2 text-[10px] font-medium uppercase tracking-[.14em] text-white/58 backdrop-blur-md sm:flex">
-              <span className="text-base leading-none">↔</span> Drag to explore
+            <div className="pointer-events-none absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/16 bg-black/25 px-3 py-2 text-[9px] font-medium uppercase tracking-[.14em] text-white/62 backdrop-blur-md sm:bottom-5 sm:right-5 sm:text-[10px]">
+              <span className="text-base leading-none">↔</span><span className="sm:hidden">Swipe</span><span className="hidden sm:inline">Drag to explore</span>
             </div>
           )}
         </div>
       </section>
 
       <section className="border-b border-black/[.08] bg-white py-1">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
+        <div className="home-proof-grid mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
             ["01", "Mobile service", "We come to your home or work."],
             ["02", "Clear pricing", "You’ll see the price before you book."],
