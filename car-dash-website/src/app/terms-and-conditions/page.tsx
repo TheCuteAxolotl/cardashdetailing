@@ -12,14 +12,14 @@ const effectiveDate = "September 12, 2026";
 
 export default function TermsAndConditionsPage() {
   return (
-    <section className="bg-[#070707] px-5 py-20 text-white sm:px-8 lg:px-10">
+    <section className="legal-luxury px-5 py-20 text-white sm:px-8 lg:px-10">
       <div className="mx-auto max-w-4xl">
-        <p className="text-xs font-semibold uppercase tracking-[.28em] text-[#6EAEC6]">Legal</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[.24em] text-white/36">Legal · Car Dash</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-.04em] sm:text-5xl">Terms and Conditions</h1>
         <p className="mt-4 text-sm text-white/45">Effective {effectiveDate}</p>
 
-        <div className="mt-10 space-y-10 text-[15px] leading-7 text-white/68">
-          <section>
+        <div className="legal-copy mt-12 space-y-0 text-[15px] leading-7 text-white/64">
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Agreement to these terms</h2>
             <p className="mt-3">
               These Terms and Conditions apply when you use cardashdetailing.com or request services from Car Dash Detailing. By
@@ -28,7 +28,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Quotes and estimates</h2>
             <p className="mt-3">
               Website estimates are informational and may change after the vehicle and requested work are reviewed. A final quote is
@@ -37,7 +37,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Bookings and availability</h2>
             <p className="mt-3">
               Submitting a booking request does not guarantee an appointment until Car Dash Detailing confirms it. Customers are
@@ -46,7 +46,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Vehicle condition and personal property</h2>
             <p className="mt-3">
               Please disclose known damage, sensitive aftermarket equipment, electrical problems, loose trim, fragile components,
@@ -56,7 +56,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Results</h2>
             <p className="mt-3">
               Detailing, stain removal, odor treatment, paint correction, oxidation correction, scratch reduction, and similar
@@ -65,7 +65,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Payments and additional work</h2>
             <p className="mt-3">
               The customer is responsible for the agreed price for completed services. Additional work that changes the agreed scope
@@ -74,7 +74,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">SMS terms</h2>
             <p className="mt-3">
               SMS is optional. If you check the SMS consent box on our website, you agree to receive transactional and customer-care
@@ -88,7 +88,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Website accounts and acceptable use</h2>
             <p className="mt-3">
               You are responsible for keeping your account credentials secure and for activity performed through your account. You
@@ -97,7 +97,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Changes</h2>
             <p className="mt-3">
               We may update these Terms and Conditions as our website, services, or legal requirements change. The effective date at
@@ -105,7 +105,7 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Contact</h2>
             <p className="mt-3">
               Questions about these Terms and Conditions can be sent to{" "}
