@@ -79,10 +79,16 @@ export function ensureBookingChatSchema() {
           "fromPhone" TEXT NOT NULL,
           "toPhone" TEXT,
           "body" TEXT NOT NULL,
+          "direction" TEXT NOT NULL DEFAULT 'inbound',
           "externalSid" TEXT NOT NULL,
           "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
           CONSTRAINT "UnmatchedSmsMessage_pkey" PRIMARY KEY ("id")
         )
+      `);
+
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "UnmatchedSmsMessage"
+        ADD COLUMN IF NOT EXISTS "direction" TEXT NOT NULL DEFAULT 'inbound'
       `);
 
       await prisma.$executeRawUnsafe(`
