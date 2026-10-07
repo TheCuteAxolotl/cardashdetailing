@@ -76,10 +76,10 @@ export default function SiteChrome({ children, footerBlurb }: { children: ReactN
       <SiteFooter blurb={footerBlurb} />
       <SupportWidget />
       {showMobileActions && (
-        <div className="mobile-booking-bar fixed inset-x-0 bottom-0 z-[65] border-t border-black/[.08] bg-[#faf9f7]/94 px-3 pb-[calc(.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-14px_36px_rgba(23,20,17,.10)] backdrop-blur-2xl sm:hidden">
-          <div className="mx-auto grid max-w-lg grid-cols-[1fr_.86fr] gap-2">
-            <a href="/#book" className="rounded-full bg-[#171411] px-4 py-3 text-center text-sm font-semibold text-white">Book a detail</a>
-            <a href="/quote" className="rounded-full border border-black/10 bg-white px-4 py-3 text-center text-sm font-semibold text-[#171411]">Exact quote</a>
+        <div className="mobile-booking-bar fixed z-[65] sm:hidden">
+          <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-[1fr_.86fr] gap-2">
+            <a href="/#book" className="mobile-book-primary rounded-full px-4 py-3 text-center text-sm font-semibold">Book a detail</a>
+            <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Exact quote</a>
           </div>
         </div>
       )}
