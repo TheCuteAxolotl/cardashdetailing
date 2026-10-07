@@ -518,7 +518,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       <div className="border-b border-white/10 pb-5">
         <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Appointment</p>
         <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Book your detail</h2>
-        <p className="mt-2 text-sm leading-6 text-white/42">Choose the service, enter the car, pick an open time, and submit. You can attach photos too.</p>
+        <p className="mt-2 text-sm leading-6 text-white/42">Pick the service, tell us what you drive, choose an open time, and send it over. You can add photos too.</p>
         <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#6EAEC6]">Get a free photo quote →</a></p>
       </div>
 
@@ -573,7 +573,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       </section>
 
       <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates are unavailable. Booked times are removed.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates aren’t available. Times that are already booked won’t show up.</p></div></div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
           <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
@@ -624,13 +624,13 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
             <div className="flex justify-between text-white/48"><span>Service</span><span>${Number(baseTotal).toFixed(2)}</span></div>
             {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/42"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
             {discountAmount > 0 && <div className="flex justify-between text-green-300"><span>Discount {appliedDiscount?.code ? `(${appliedDiscount.code})` : ""}</span><span>−${discountAmount.toFixed(2)}</span></div>}
-            <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/28">Total</p><p className="mt-1 text-xs text-white/32">Checked again when you submit</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
+            <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/28">Total</p><p className="mt-1 text-xs text-white/32">We’ll double-check this when you submit</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
           </div>
         </section>
       )}
 
       <section className="space-y-3 border-t border-white/8 pt-6">
-        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request with the displayed total and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a>.</span></label>
+        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request at the total shown, and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a>.</span></label>
 
         <div className="rounded-2xl border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
       </section>
