@@ -117,7 +117,7 @@ export default function ReviewCards() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="review-grid grid gap-4 lg:grid-cols-2">
         {data.reviews.map((review) => (
           <article key={review.id} className="review-card group flex h-full flex-col border border-black/[.08] bg-white p-6 shadow-[0_14px_44px_rgba(23,20,17,.035)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_58px_rgba(23,20,17,.075)] sm:p-7">
             <div className="flex items-center gap-4">
