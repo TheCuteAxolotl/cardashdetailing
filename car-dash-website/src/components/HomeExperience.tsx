@@ -62,7 +62,7 @@ export default function HomeExperience({
                 {content.heroTitle}
               </h1>
               <p className="mt-7 max-w-[650px] text-sm leading-7 text-white/68 sm:text-base sm:leading-8">{content.heroBody}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="home-hero-actions mt-8 flex flex-wrap gap-3">
                 <a href="#book" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ece9e3]">Book a detail</a>
                 <a href="#prices" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">View pricing</a>
               </div>
