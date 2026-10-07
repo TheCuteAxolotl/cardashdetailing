@@ -124,6 +124,22 @@ export default function HomeExperience({
             <a href="/exterior-detailing" className="hover:text-black">Exterior only →</a>
             <a href="/paint-correction" className="hover:text-black">Paint correction →</a>
             <a href="/ceramic-coatings" className="hover:text-black">Ceramic coating →</a>
+            <a href="/maintenance" className="hover:text-black">Monthly maintenance →</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="maintenance" className="border-b border-black/[.08] bg-[#EFE8E2] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
+        <div className="mx-auto grid max-w-[1320px] gap-8 overflow-hidden rounded-[20px] border border-black/[.08] bg-[#171411] p-6 text-white shadow-[0_26px_80px_rgba(23,20,17,.12)] sm:p-8 lg:grid-cols-[1.25fr_.75fr] lg:items-end lg:p-10">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-white/36">Ceramic maintenance membership</p>
+            <h2 className="mt-4 max-w-3xl text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Keep your coating maintained every month.</h2>
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/48">A simple recurring maintenance plan for ceramic-coated vehicles. Set up billing once and keep your monthly maintenance with Car Dash.</p>
+            <a href="/maintenance" className="mt-7 inline-flex rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#171411]">Join monthly maintenance</a>
+          </div>
+          <div className="border-t border-white/10 pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+            <div className="flex items-end gap-2"><span className="text-6xl font-semibold tracking-[-.07em]">$60</span><span className="pb-2 text-sm text-white/38">/ month</span></div>
+            <p className="mt-3 text-xs leading-5 text-white/32">Recurring billing through Stripe. Customers can manage or cancel future renewals themselves.</p>
           </div>
         </div>
       </section>
