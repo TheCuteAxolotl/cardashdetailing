@@ -104,7 +104,7 @@ export default function BookingDatePicker({ value, onChange }: { value: string; 
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-expanded={open}
-        className={`flex w-full items-center justify-between rounded-2xl border bg-[#07131B]/50 px-4 py-3 text-left text-base outline-none transition ${
+        className={`flex w-full items-center justify-between rounded-xl border bg-[#07131B]/45 px-4 py-3 text-left text-base outline-none transition ${
           open ? "border-[#6EAEC6]/60" : "border-white/10 hover:border-white/20"
         }`}
       >
@@ -113,7 +113,7 @@ export default function BookingDatePicker({ value, onChange }: { value: string; 
       </button>
 
       {open && (
-        <div className="mt-3 rounded-[24px] border border-white/10 bg-[#151515] p-4 shadow-2xl shadow-black/40 sm:p-5">
+        <div className="calendar-popover mt-3 border border-white/10 bg-[#171411]/98 p-4 shadow-[0_26px_80px_rgba(0,0,0,.34)] backdrop-blur-xl sm:p-5">
           <div className="flex items-center justify-between gap-3">
             <button
               type="button"
@@ -155,7 +155,7 @@ export default function BookingDatePicker({ value, onChange }: { value: string; 
                     onChange(cell.date);
                     setOpen(false);
                   }}
-                  className={`relative aspect-square min-h-10 rounded-xl text-sm font-semibold transition sm:min-h-11 ${
+                  className={`relative aspect-square min-h-10 rounded-lg text-sm font-semibold transition sm:min-h-11 ${
                     selected
                       ? "bg-[#6EAEC6] text-black"
                       : unavailable
