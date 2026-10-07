@@ -556,3 +556,166 @@ img { display: block; }
     overflow-wrap: anywhere;
   }
 }
+
+
+/* Customer-facing luxury application system */
+.customer-app,
+.luxury-form-page,
+.customer-document {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 12% -8%, rgba(192,171,154,.14), transparent 32rem),
+    radial-gradient(circle at 88% 12%, rgba(123,92,75,.10), transparent 28rem),
+    linear-gradient(180deg, #201a16 0%, var(--eerie-black) 38%, #14110f 100%);
+}
+
+.customer-app::before,
+.luxury-form-page::before,
+.customer-document::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .18;
+  background-image:
+    linear-gradient(rgba(247,245,242,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247,245,242,.014) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+.customer-auth-card,
+.customer-panel,
+.customer-stat-card,
+.customer-subcard,
+.quote-panel,
+.estimate-result-panel,
+.invoice-card,
+.support-panel,
+.calendar-popover,
+.booking-option-panel,
+.booking-total-panel,
+.package-detail-panel {
+  border-radius: 18px;
+}
+
+.customer-auth-card,
+.customer-panel,
+.quote-panel,
+.estimate-result-panel {
+  backdrop-filter: blur(18px);
+}
+
+.customer-auth-card {
+  background:
+    linear-gradient(145deg, rgba(247,245,242,.065), rgba(247,245,242,.018));
+}
+
+.customer-panel {
+  box-shadow: 0 22px 74px rgba(0,0,0,.16);
+}
+
+.customer-stat-card {
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0,0,0,.10);
+}
+
+.customer-subcard {
+  border-radius: 13px;
+}
+
+.customer-input {
+  border-radius: 12px !important;
+  min-height: 48px;
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.customer-input:focus {
+  box-shadow: 0 0 0 3px rgba(192,171,154,.09);
+}
+
+.customer-app input[type="checkbox"],
+.luxury-form-page input[type="checkbox"] {
+  accent-color: var(--tuscany);
+}
+
+.quote-panel {
+  box-shadow: 0 24px 80px rgba(0,0,0,.14);
+}
+
+.estimate-result-panel {
+  box-shadow:
+    inset 0 1px 0 rgba(247,245,242,.06),
+    0 24px 70px rgba(0,0,0,.12);
+}
+
+.invoice-card {
+  border-radius: 22px;
+}
+
+.support-panel {
+  border-radius: 20px;
+}
+
+.calendar-popover {
+  border-radius: 16px;
+}
+
+.booking-option-panel,
+.booking-total-panel,
+.package-detail-panel {
+  border-radius: 13px;
+}
+
+.luxury-booking-form section {
+  position: relative;
+}
+
+.luxury-booking-form > section:not(:first-of-type) {
+  border-color: rgba(247,245,242,.08);
+}
+
+.luxury-booking-form summary {
+  transition: color 180ms ease;
+}
+
+.luxury-booking-form details[open] summary {
+  color: rgba(247,245,242,.92);
+}
+
+@media (hover: hover) {
+  .customer-stat-card:hover {
+    transform: translateY(-3px);
+    background: rgba(247,245,242,.055);
+    box-shadow: 0 20px 54px rgba(0,0,0,.16);
+  }
+
+  .customer-panel:hover,
+  .quote-panel:hover {
+    border-color: rgba(247,245,242,.12);
+  }
+}
+
+@media (max-width: 639px) {
+  .customer-auth-card,
+  .customer-panel,
+  .quote-panel,
+  .estimate-result-panel,
+  .invoice-card {
+    border-radius: 15px;
+  }
+
+  .customer-app,
+  .luxury-form-page,
+  .customer-document {
+    background:
+      radial-gradient(circle at 40% -5%, rgba(192,171,154,.12), transparent 24rem),
+      linear-gradient(180deg, #1e1915 0%, var(--eerie-black) 42%);
+  }
+}
