@@ -6,7 +6,7 @@ const coatingPackages = [
     id: "3-year",
     eyebrow: "3-year protection",
     name: "GYEON Mohs",
-    description: "A strong entry into long-term ceramic protection with excellent gloss, chemical resistance, and hydrophobic behavior.",
+    description: "A solid long-term coating if you want more gloss, easier washing, and strong chemical and water resistance.",
     prices: { sedan: 499, suv: 649, truck: 699 },
     imageCategory: "ceramic-3-year",
     featured: false,
@@ -22,7 +22,7 @@ const coatingPackages = [
     id: "5-year",
     eyebrow: "5-year protection",
     name: "Gtechniq CSL + EXO v5",
-    description: "Our correction-focused package for owners who want a noticeably sharper finish before long-term ceramic protection.",
+    description: "For cars that need more paint correction first. We sharpen up the finish, then lock it in with long-term ceramic protection.",
     prices: { sedan: 699, suv: 849, truck: 899 },
     imageCategory: "ceramic-5-year",
     featured: true,
@@ -39,7 +39,7 @@ const coatingPackages = [
     id: "8-year",
     eyebrow: "8+ year protection",
     name: "Gtechniq Crystal Serum Ultra",
-    description: "Our highest-level ceramic package, built around professional-grade Crystal Serum Ultra and a maintenance-backed long-term protection plan.",
+    description: "Our highest-level coating package. It uses Crystal Serum Ultra and includes a maintenance-backed long-term protection plan.",
     prices: { sedan: 999, suv: 1149, truck: 1199 },
     imageCategory: "ceramic-8-year",
     featured: false,
@@ -69,7 +69,7 @@ export default function CeramicCoatingsPage() {
           <div className="flex flex-col justify-center py-3 lg:py-8">
             <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Ceramic coating</p>
             <h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Protection starts with the paint underneath.</h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Every ceramic package starts with a full exterior detail and proper coating prep. Higher-level packages add more correction and longer-term protection.</p>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Every coating package starts with a full exterior detail and proper prep. Higher levels add more paint correction and longer-lasting protection.</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <a href="#coating-packages" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See packages</a>
               <a href="/quote?service=ceramic-coating" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-bold text-white">Get exact quote</a>
@@ -86,8 +86,8 @@ export default function CeramicCoatingsPage() {
       <section id="coating-packages" className="mx-auto max-w-7xl scroll-mt-28 px-5 py-12 sm:px-8 sm:py-16">
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Ceramic packages</p>
-          <h2 className="mt-2 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">Choose the protection level that fits the car.</h2>
-          <p className="mt-4 text-sm leading-7 text-black/52">All prices are starting prices. Paint condition, vehicle size, existing coatings, oxidation, sanding needs, and correction time can increase the final quote. We confirm that before work begins.</p>
+          <h2 className="mt-2 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">Pick the protection level that makes sense for your car.</h2>
+          <p className="mt-4 text-sm leading-7 text-black/52">These are starting prices. Paint condition, vehicle size, old coatings, oxidation, sanding, or extra correction can change the final quote. We’ll confirm that with you before we start.</p>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-3">
@@ -149,7 +149,7 @@ export default function CeramicCoatingsPage() {
             <h2 className="mt-3 text-3xl font-semibold tracking-[-.04em]">More gloss, easier maintenance, stronger chemical resistance, and long-term paint protection.</h2>
           </div>
           <div>
-            <p className="text-sm leading-7 text-white/48">Ceramic coating does not make paint scratch-proof or eliminate the need for washing. The finish underneath matters, which is why correction and preparation are handled before the coating is locked in.</p>
+            <p className="text-sm leading-7 text-white/48">A ceramic coating won’t make the paint scratch-proof, and you’ll still need to wash the car. The finish underneath matters, which is why we handle correction and prep before the coating goes on.</p>
             <a href="/paint-correction" className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold">Learn about paint correction →</a>
           </div>
         </div>
