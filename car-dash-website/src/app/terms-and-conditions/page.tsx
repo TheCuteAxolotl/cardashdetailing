@@ -8,7 +8,7 @@ export const metadata: Metadata = pageMetadata({
   path: '/terms-and-conditions',
 });
 
-const effectiveDate = "September 12, 2026";
+const effectiveDate = "October 6, 2026";
 
 export default function TermsAndConditionsPage() {
   return (
@@ -71,6 +71,18 @@ export default function TermsAndConditionsPage() {
               The customer is responsible for the agreed price for completed services. Additional work that changes the agreed scope
               or price will be discussed before it is performed whenever reasonably possible. Applicable taxes, fees, or approved
               add-on services may be included in the final amount due.
+            </p>
+          </section>
+
+          <section className="legal-section">
+            <h2 className="text-xl font-semibold text-white">Monthly maintenance subscriptions</h2>
+            <p className="mt-3">
+              Monthly maintenance plans are recurring subscriptions. By enrolling, you authorize the displayed monthly amount to be
+              charged through Stripe each billing period until the subscription is canceled. A subscription may be canceled from the
+              private subscription-management page or, when available, from the customer account. Cancellation stops future renewals
+              after the current billing period; the subscription remains active through the end of that paid period unless otherwise
+              stated. Subscription enrollment does not guarantee a particular appointment date or time, and service scheduling remains
+              subject to availability.
             </p>
           </section>
 
