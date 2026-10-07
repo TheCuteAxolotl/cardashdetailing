@@ -116,6 +116,7 @@ model UnmatchedSmsMessage {
   fromPhone   String
   toPhone     String?
   body        String
+  direction   String   @default("inbound") // inbound, outbound
   externalSid String   @unique
   createdAt   DateTime @default(now())
 
