@@ -13,8 +13,8 @@ const productGroups = [
 export default function ProductsWeUsePage() {
   return (
     <div className="min-h-screen bg-[#EEF7F5] text-[#111]">
-      <section className="border-b border-black/8">
-        <div className="mx-auto grid max-w-7xl gap-6 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[.82fr_1.18fr] lg:items-stretch">
+      <section className="border-b border-black/8 bg-[#f5f4f1] sm:px-5 lg:px-8">
+        <div className="public-hero-shell mx-auto grid max-w-[1440px] gap-6 overflow-hidden bg-white px-5 py-10 sm:my-5 sm:px-8 sm:py-14 lg:my-7 lg:grid-cols-[.82fr_1.18fr] lg:items-stretch lg:px-10">
           <div className="flex flex-col justify-center py-5 lg:py-10">
             <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Products we use</p>
             <h1 className="mt-4 text-5xl font-semibold leading-[.93] tracking-[-.06em] sm:text-6xl">The products behind the detail.</h1>
@@ -24,7 +24,7 @@ export default function ProductsWeUsePage() {
               <a href="/#book" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-white">Book now</a>
             </div>
           </div>
-          <div className="relative min-h-[300px] overflow-hidden rounded-[26px] bg-black sm:min-h-[390px]">
+          <div className="public-hero-media relative min-h-[320px] overflow-hidden bg-black sm:min-h-[420px]">
             <SitePhoto category="products-hero" fallbackCategory="home-showcase-secondary" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
           </div>
