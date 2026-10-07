@@ -110,7 +110,7 @@ export default function TermsAndConditionsPage() {
             <p className="mt-3">
               Questions about these Terms and Conditions can be sent to{" "}
               <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href={`mailto:${BUSINESS_EMAIL}`}>
-                cardashdetailing@gmail.com
+                cardashdetailing.il@gmail.com
               </a>{" "}
               or by calling{" "}
               <a className="text-[#6EAEC6] hover:text-[#6EAEC6]" href={`tel:${BUSINESS_PHONE}`}>{BUSINESS_PHONE_DISPLAY}</a>.
