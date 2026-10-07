@@ -26,7 +26,7 @@ export default function SiteFooter({ blurb }: { blurb: string }) {
             </div>
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[.16em] text-white/28">Services</p>
-              <div className="space-y-3 text-white/52"><a href="/car-detailing-packages" className="block hover:text-white">Detail packages</a><a href="/paint-correction" className="block hover:text-white">Paint correction</a><a href="/ceramic-coatings" className="block hover:text-white">Ceramic coating</a><a href="/marine-detailing" className="block hover:text-white">Marine</a></div>
+              <div className="space-y-3 text-white/52"><a href="/car-detailing-packages" className="block hover:text-white">Detail packages</a><a href="/paint-correction" className="block hover:text-white">Paint correction</a><a href="/ceramic-coatings" className="block hover:text-white">Ceramic coating</a><a href="/maintenance" className="block hover:text-white">Monthly maintenance</a><a href="/marine-detailing" className="block hover:text-white">Marine</a></div>
             </div>
             <div className="col-span-2 sm:col-span-1">
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[.16em] text-white/28">Contact</p>
