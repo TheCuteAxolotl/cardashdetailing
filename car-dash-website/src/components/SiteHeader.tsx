@@ -89,14 +89,14 @@ export default function SiteHeader() {
 
   return (
     <>
-      <div className="border-b border-white/8 bg-[#171411] text-white">
+      <div className="mobile-top-strip border-b border-white/8 bg-[#171411] text-white">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-2 text-[9px] font-medium uppercase tracking-[.18em] text-white/48 sm:px-8">
           <span>South Elgin, Illinois · Mobile detailing</span>
-          <a href={`tel:${BUSINESS_PHONE}`} className="text-white/70 hover:text-white">{BUSINESS_PHONE_DISPLAY}</a>
+          <a href={`tel:${BUSINESS_PHONE}`} className="mobile-top-phone text-white/70 hover:text-white">{BUSINESS_PHONE_DISPLAY}</a>
         </div>
       </div>
 
-      <header className="sticky top-0 z-50 border-b border-black/[.07] bg-[#faf9f7]/92 text-[#111] shadow-[0_10px_30px_rgba(23,20,17,.035)] backdrop-blur-2xl">
+      <header className="mobile-site-header sticky top-0 z-50 border-b border-black/[.07] bg-[#faf9f7]/92 text-[#111] shadow-[0_10px_30px_rgba(23,20,17,.035)] backdrop-blur-2xl">
         <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-6 px-5 sm:px-8">
           <a href="/" aria-label="Car Dash Detailing home" className="group flex shrink-0 items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full border border-black/[.08] bg-white shadow-[0_6px_18px_rgba(23,20,17,.06)] transition-transform duration-300 group-hover:scale-[1.03]"><img src={HOME_LOGO} alt="" width={40} height={40} className="h-9 w-9 rounded-full object-contain" /></span>
@@ -164,9 +164,9 @@ export default function SiteHeader() {
         </div>
 
         {menuOpen && (
-          <div className="border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
+          <div className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
             <div className="mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
-              <nav className="divide-y divide-black/[.07] border-y border-black/[.07]">
+              <nav className="mobile-menu-nav divide-y divide-black/[.07] border-y border-black/[.07]">
                 <a href="/#prices" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Pricing</a>
                 <a href="/gallery" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Work</a>
                 <a href="/reviews" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Reviews</a>
