@@ -127,7 +127,7 @@ export default function BookingChatPage() {
 
   if (loading || accessKey === null) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#07131B] text-white">
+      <main className="customer-app grid min-h-screen place-items-center text-white">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#6EAEC6]" />
           <p className="mt-4 text-sm text-white/40">Loading booking conversation…</p>
@@ -138,7 +138,7 @@ export default function BookingChatPage() {
 
   if (!data) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#07131B] px-5 text-white">
+      <main className="customer-app grid min-h-screen place-items-center px-5 text-white">
         <div className="max-w-md rounded-3xl border border-white/10 bg-white/[.025] p-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[.24em] text-[#6EAEC6]">Booking chat</p>
           <h1 className="mt-3 text-2xl font-semibold">Conversation unavailable</h1>
@@ -165,7 +165,7 @@ export default function BookingChatPage() {
     data.lastCustomerSeenAt && Date.now() - new Date(data.lastCustomerSeenAt).getTime() < 90_000;
 
   return (
-    <main className="min-h-screen bg-[#07131B] px-5 py-8 text-white sm:px-8">
+    <main className="customer-app min-h-screen px-5 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -181,7 +181,7 @@ export default function BookingChatPage() {
         </div>
 
         <div className="mt-7 grid gap-5 lg:grid-cols-[1fr_320px]">
-          <section className="flex min-h-[650px] flex-col rounded-[28px] border border-white/10 bg-white/[.025] p-5 sm:p-6">
+          <section className="customer-panel flex min-h-[650px] flex-col border border-white/10 bg-white/[.028] p-5 sm:p-6">
             <div className="border-b border-white/10 pb-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -260,7 +260,7 @@ export default function BookingChatPage() {
             </form>
           </section>
 
-          <aside className="h-fit rounded-[28px] border border-white/10 bg-white/[.025] p-5">
+          <aside className="customer-panel h-fit border border-white/10 bg-white/[.028] p-5">
             <p className="text-xs font-semibold uppercase tracking-[.22em] text-[#6EAEC6]">Booking details</p>
             <div className="mt-5 space-y-4 text-sm">
               <div>
