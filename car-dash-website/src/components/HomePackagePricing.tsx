@@ -25,7 +25,7 @@ export default function HomePackagePricing({ config, mediaItems = [] }: Props) {
         <p className="max-w-lg text-sm leading-6 text-black/42">Interior and exterior in one appointment.</p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3 lg:items-stretch">
+      <div className="home-package-grid grid gap-4 lg:grid-cols-3 lg:items-stretch">
         {config.packages.map((pkg) => (
           <article key={pkg.id} className={`package-card relative border border-black/[.08] bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "package-card-featured" : ""}`}>
             <div className="flex min-h-[72px] items-start justify-between gap-3">
