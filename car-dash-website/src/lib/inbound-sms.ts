@@ -145,6 +145,7 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
         fromPhone,
         toPhone: normalizePhoneNumber(input.to || "") || input.to || null,
         body: body.slice(0, 3000),
+        direction: "inbound",
         externalSid: messageSid,
         createdAt,
       },
