@@ -29,6 +29,7 @@ export default function MaintenanceCheckoutForm({
   const [customerEmail, setCustomerEmail] = useState(defaultCustomerEmail);
   const [customerPhone, setCustomerPhone] = useState(defaultCustomerPhone);
   const [submitting, setSubmitting] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [message, setMessage] = useState("");
 
   const submit = async (event: FormEvent) => {
@@ -45,6 +46,7 @@ export default function MaintenanceCheckoutForm({
           customerName,
           customerEmail,
           customerPhone,
+          termsAccepted: agreed,
         }),
       });
       const payload = await response.json().catch(() => ({}));
@@ -117,13 +119,28 @@ export default function MaintenanceCheckoutForm({
           </label>
         </div>
 
+        <label className="mt-5 flex items-start gap-3 rounded-2xl border border-white/8 bg-black/15 p-4 text-xs leading-5 text-white/45">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(event) => setAgreed(event.target.checked)}
+            className="mt-0.5"
+            required
+          />
+          <span>
+            I understand this is a recurring monthly subscription charged until canceled. I agree to the{" "}
+            <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-white underline underline-offset-2">Terms and Conditions</a>.
+            Canceling stops future renewals after the current billing period.
+          </span>
+        </label>
+
         {message && (
           <p className="mt-5 rounded-xl border border-red-400/15 bg-red-500/[.06] px-4 py-3 text-sm text-red-100/80">{message}</p>
         )}
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || !agreed}
           className="mt-6 w-full rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-[#171411] transition hover:bg-[#EFE8E2] disabled:cursor-not-allowed disabled:opacity-45"
         >
           {submitting ? "Opening secure checkout…" : `Subscribe for $${(amountCents / 100).toFixed(2)}/month`}
