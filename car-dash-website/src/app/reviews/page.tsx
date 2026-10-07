@@ -10,7 +10,7 @@ export default function ReviewsPage() {
       <PublicHero imageCategory="reviews-hero" eyebrowKey="reviewsEyebrow" titleKey="reviewsTitle" bodyKey="reviewsBody" action={<div className="flex flex-wrap gap-3"><a href="/#book" className="inline-flex rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-white">Book now</a><a href={REVIEW_URL} target="_blank" rel="noreferrer" className="inline-flex rounded-full border border-black/12 bg-white px-5 py-3 text-sm font-semibold">Leave a Google review</a></div>} />
       <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
         <ReviewCards />
-        <PageMediaBand categories={["reviews-media"]} theme="light" eyebrow="Customer cars" title="A little more of the work behind the reviews." className="mt-12" />
+        <PageMediaBand categories={["reviews-media"]} theme="light" eyebrow="Customer cars" title="Here’s some of the work behind those reviews." className="mt-12" />
       </main>
     </div>
   );
