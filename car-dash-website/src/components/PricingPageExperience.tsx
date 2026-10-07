@@ -55,7 +55,7 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
           <a href="/#prices" className="text-sm font-semibold text-black/42 hover:text-black">All services + pricing →</a>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3 lg:items-stretch">
+        <div className="pricing-package-grid grid gap-4 lg:grid-cols-3 lg:items-stretch">
           {config.packages.map((pkg) => (
             <article key={pkg.id} className={`package-card relative border border-black/[.08] bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "package-card-featured" : ""}`}>
               <div className="flex min-h-[72px] items-start justify-between gap-3">
