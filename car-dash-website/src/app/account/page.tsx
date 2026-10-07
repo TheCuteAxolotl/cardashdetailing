@@ -24,6 +24,16 @@ type Booking = {
   createdAt: string;
 };
 
+type MaintenanceSubscription = {
+  id: string;
+  manageToken: string;
+  planName: string;
+  amountCents: number;
+  status: string;
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd: string | null;
+};
+
 const statusDetails: Record<string, { label: string; description: string; className: string }> = {
   pending: {
     label: "Requested",
@@ -50,6 +60,7 @@ const statusDetails: Record<string, { label: string; description: string; classN
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [maintenanceSubscriptions, setMaintenanceSubscriptions] = useState<MaintenanceSubscription[]>([]);
   const [staffAccess, setStaffAccess] = useState(false);
   const [staffPermissions, setStaffPermissions] = useState<string[]>([]);
   const [customRoles, setCustomRoles] = useState<{ id: string; name: string }[]>([]);
@@ -92,9 +103,16 @@ export default function AccountPage() {
         setName(currentUser.name);
 
         if (!hasStaffAccess) {
-          const bookingResponse = await fetch("/api/bookings", { cache: "no-store" });
+          const [bookingResponse, maintenanceResponse] = await Promise.all([
+            fetch("/api/bookings", { cache: "no-store" }),
+            fetch("/api/maintenance/account", { cache: "no-store" }),
+          ]);
           if (bookingResponse.ok) {
             setBookings(await bookingResponse.json());
+          }
+          if (maintenanceResponse.ok) {
+            const maintenanceData = await maintenanceResponse.json();
+            setMaintenanceSubscriptions(Array.isArray(maintenanceData.subscriptions) ? maintenanceData.subscriptions : []);
           }
         }
       } catch (error) {
@@ -360,6 +378,49 @@ export default function AccountPage() {
               </button>
             </form>
           </section>
+
+          {user.role === "user" && !staffAccess && (
+            <section className="customer-panel border border-white/8 bg-white/[.028] p-6 sm:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#C0AB9A]">Monthly maintenance</p>
+                  <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Your subscriptions</h2>
+                  <p className="mt-2 text-sm leading-6 text-white/35">Manage recurring Car Dash maintenance tied to this email.</p>
+                </div>
+                <a href="/maintenance" className="rounded-full border border-white/12 px-3 py-2 text-xs font-semibold text-white/60 hover:text-white">View $60 plan</a>
+              </div>
+
+              {maintenanceSubscriptions.length ? (
+                <div className="mt-6 space-y-3">
+                  {maintenanceSubscriptions.map((item) => (
+                    <article key={item.id} className="customer-subcard border border-white/8 bg-black/15 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold">{item.planName}</p>
+                          <p className="mt-1 text-sm text-white/38">${(item.amountCents / 100).toFixed(2)} / month</p>
+                          {item.currentPeriodEnd && (
+                            <p className="mt-2 text-xs text-white/28">
+                              {item.cancelAtPeriodEnd ? "Ends" : "Current period ends"} {new Date(item.currentPeriodEnd).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <span className="rounded-full border border-white/10 bg-white/[.035] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[.1em] text-white/55">
+                          {item.cancelAtPeriodEnd ? "Canceling" : item.status.replaceAll("_", " ")}
+                        </span>
+                      </div>
+                      <a href={`/maintenance/manage/${item.manageToken}`} className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#171411]">
+                        Manage subscription
+                      </a>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-5 text-sm leading-6 text-white/32">
+                  You don’t have a maintenance subscription on this account yet.
+                </div>
+              )}
+            </section>
+          )}
 
           {user.role === "user" && !staffAccess && (
             <section className="rounded-[28px] border border-red-500/20 bg-red-500/[0.035] p-6 sm:p-8">
