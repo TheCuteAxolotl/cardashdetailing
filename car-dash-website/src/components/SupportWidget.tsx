@@ -248,7 +248,7 @@ export default function SupportWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="support-launcher fixed bottom-5 right-5 z-[70] rounded-full border border-white/15 bg-[#0B1822]/92 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(16,42,55,.22)] backdrop-blur-xl transition hover:-translate-y-0.5"
+          className="support-launcher fixed bottom-5 right-5 z-[70] rounded-full border border-white/14 bg-[#171411]/92 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(23,20,17,.22)] backdrop-blur-xl transition hover:-translate-y-0.5"
         >
           Need help?
         </button>
@@ -261,14 +261,14 @@ export default function SupportWidget() {
             if (event.currentTarget === event.target) setOpen(false);
           }}
         >
-          <section className="flex max-h-[84vh] w-full max-w-[460px] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0a] text-white shadow-2xl">
+          <section className="support-panel flex max-h-[84vh] w-full max-w-[460px] flex-col overflow-hidden border border-white/10 bg-[#171411] text-white shadow-[0_30px_100px_rgba(0,0,0,.4)]">
             <div className="flex items-start justify-between border-b border-white/10 px-5 py-5">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[.26em] text-[#6EAEC6]">
-                  Car Dash Support
+                  Car Dash
                 </p>
                 <h2 className="mt-2 text-xl font-semibold">
-                  Account Support
+                  How can we help?
                 </h2>
               </div>
 
