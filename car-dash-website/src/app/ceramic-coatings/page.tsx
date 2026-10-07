@@ -64,19 +64,19 @@ const priceRows = [
 export default function CeramicCoatingsPage() {
   return (
     <main className="min-h-screen bg-[#EEF7F5] text-[#111]">
-      <section className="border-b border-black/8 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-7 px-5 py-10 sm:px-8 sm:py-14 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch">
+      <section className="border-b border-black/8 bg-[#f5f4f1] sm:px-5 lg:px-8">
+        <div className="public-hero-shell mx-auto grid max-w-[1440px] gap-7 overflow-hidden bg-white px-5 py-10 sm:my-5 sm:px-8 sm:py-14 lg:my-7 lg:grid-cols-[.9fr_1.1fr] lg:items-stretch lg:px-10">
           <div className="flex flex-col justify-center py-3 lg:py-8">
             <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Ceramic coating</p>
             <h1 className="mt-3 text-5xl font-semibold leading-[.94] tracking-[-.06em] sm:text-7xl">Protection starts with the paint underneath.</h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-black/52">Every coating package starts with a full exterior detail and proper prep. Higher levels add more paint correction and longer-lasting protection.</p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <a href="#coating-packages" className="rounded-full bg-[#111] px-5 py-3 text-sm font-bold text-white">See packages</a>
-              <a href="/quote?service=ceramic-coating" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-bold text-white">Get exact quote</a>
+              <a href="#coating-packages" className="rounded-full bg-[#111] px-5 py-3 text-sm font-semibold text-white">See packages</a>
+              <a href="/quote?service=ceramic-coating" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-white">Get exact quote</a>
               <a href="/#book" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Book</a>
             </div>
           </div>
-          <div className="relative min-h-[300px] overflow-hidden rounded-[26px] bg-black sm:min-h-[380px]">
+          <div className="public-hero-media relative min-h-[320px] overflow-hidden bg-black sm:min-h-[420px]">
             <SitePhoto category="ceramic-coatings-hero" fallbackCategory="hero" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
           </div>
