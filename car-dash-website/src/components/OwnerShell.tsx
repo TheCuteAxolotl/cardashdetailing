@@ -6,59 +6,58 @@ import { usePathname } from "next/navigation";
 
 type OwnerUser = { name?: string | null; email?: string | null; role?: string | null };
 
+type IconName =
+  | "home" | "chart" | "calendar" | "quote" | "message" | "invoice" | "phone"
+  | "web" | "price" | "service" | "photo" | "clock" | "shield" | "book"
+  | "people" | "settings" | "support" | "external" | "menu" | "close"
+  | "search" | "plus" | "grid";
+
 type NavItem = {
   href: string;
+  adminHref?: string;
   label: string;
   icon: IconName;
   permissions?: string[];
   ownerOnly?: boolean;
 };
 
-type IconName =
-  | "home"
-  | "chart"
-  | "calendar"
-  | "quote"
-  | "message"
-  | "invoice"
-  | "phone"
-  | "web"
-  | "price"
-  | "service"
-  | "photo"
-  | "clock"
-  | "shield"
-  | "book"
-  | "people"
-  | "settings"
-  | "support"
-  | "external"
-  | "menu"
-  | "close";
-
-const groups: Array<{ label: string; items: NavItem[] }> = [
+const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
   {
-    label: "Overview",
-    items: [
-      { href: "/owner/dashboard", label: "Dashboard", icon: "home" },
-      { href: "/owner/schedule", label: "Schedule", icon: "calendar", ownerOnly: true },
-      { href: "/owner/analytics", label: "Analytics", icon: "chart", permissions: ["analytics"] },
-    ],
+    label: "Home",
+    icon: "home",
+    items: [{ href: "/owner/dashboard", adminHref: "/admin/dashboard", label: "Home", icon: "home" }],
   },
   {
     label: "Customers",
+    icon: "people",
     items: [
-      { href: "/owner/bookings", label: "Bookings", icon: "calendar", ownerOnly: true },
-      { href: "/owner/quotes", label: "Quote requests", icon: "quote", ownerOnly: true },
+      { href: "/owner/bookings", adminHref: "/admin/bookings", label: "Bookings", icon: "calendar", permissions: ["bookings"] },
+      { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
       { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", ownerOnly: true },
-      { href: "/owner/messages", label: "Messages", icon: "message", ownerOnly: true },
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", ownerOnly: true },
       { href: "/owner/maintenance", label: "Maintenance", icon: "price", ownerOnly: true },
       { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },
     ],
   },
   {
+    label: "Messages",
+    icon: "message",
+    items: [
+      { href: "/owner/messages", adminHref: "/admin/messages", label: "Messages", icon: "message", permissions: ["smsInbox"] },
+      { href: "/owner/support", adminHref: "/admin/support", label: "Support inbox", icon: "support", permissions: ["support"] },
+    ],
+  },
+  {
+    label: "Schedule",
+    icon: "calendar",
+    items: [
+      { href: "/owner/schedule", label: "Schedule", icon: "calendar", ownerOnly: true },
+      { href: "/owner/analytics", label: "Analytics", icon: "chart", permissions: ["analytics"] },
+    ],
+  },
+  {
     label: "Website",
+    icon: "web",
     items: [
       { href: "/owner/website", label: "Content", icon: "web", permissions: ["website"] },
       { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
@@ -68,17 +67,18 @@ const groups: Array<{ label: string; items: NavItem[] }> = [
   },
   {
     label: "Operations",
+    icon: "grid",
     items: [
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
       { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },
-      { href: "/staff-guide", label: "Staff guide", icon: "book" },
+      { href: "/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
     ],
   },
   {
-    label: "Administration",
+    label: "Admin",
+    icon: "settings",
     items: [
       { href: "/owner/admins", label: "Staff & accounts", icon: "people", ownerOnly: true },
-      { href: "/owner/support", label: "Support inbox", icon: "support", ownerOnly: true },
       { href: "/owner/settings", label: "Settings", icon: "settings", ownerOnly: true },
     ],
   },
@@ -105,27 +105,35 @@ const iconPaths: Record<IconName, ReactNode> = {
   external: <><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6H5V6h6"/></>,
   menu: <path d="M4 7h16M4 12h16M4 17h16"/>,
   close: <path d="m6 6 12 12M18 6 6 18"/>,
+  search: <><circle cx="11" cy="11" r="7"/><path d="m16.2 16.2 4 4"/></>,
+  plus: <path d="M12 5v14M5 12h14"/>,
+  grid: <><path d="M4 6h6M4 12h10M4 18h16"/><circle cx="17" cy="6" r="2"/></>,
 };
 
-function Icon({ name, className = "h-[18px] w-[18px]" }: { name: IconName; className?: string }) {
+function Icon({ name, className = "h-[21px] w-[21px]" }: { name: IconName; className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       {iconPaths[name]}
     </svg>
   );
 }
 
-function pageTitle(pathname: string) {
+function pageTitle(pathname: string, owner: boolean) {
   for (const group of groups) {
-    const item = group.items.find((entry) => pathname === entry.href || pathname.startsWith(`${entry.href}/`));
-    if (item) return item.label;
+    for (const item of group.items) {
+      const href = owner ? item.href : (item.adminHref || item.href);
+      if (pathname === href || pathname.startsWith(`${href}/`)) return item.label;
+    }
   }
-  return "Owner";
+  return pathname.includes("/dashboard") ? "Home" : "Workspace";
 }
 
 export default function OwnerShell({ children, user, permissions = [] }: { children: ReactNode; user: OwnerUser; permissions?: string[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [panel, setPanel] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const owner = user.role === "owner";
 
   const visibleGroups = useMemo(() => groups.map((group) => ({
@@ -133,99 +141,198 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     items: group.items.filter((item) => {
       if (owner) return true;
       if (item.ownerOnly) return false;
-      if (!item.permissions?.length) return true;
+      if (!item.permissions?.length) return group.label === "Home";
       return item.permissions.some((permission) => permissions.includes(permission));
     }),
   })).filter((group) => group.items.length), [owner, permissions]);
+
+  const allVisibleItems = useMemo(() => visibleGroups.flatMap((group) =>
+    group.items.map((item) => ({ ...item, group: group.label, resolvedHref: owner ? item.href : (item.adminHref || item.href) }))
+  ), [visibleGroups, owner]);
+
+  const searchResults = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return allVisibleItems;
+    return allVisibleItems.filter((item) => `${item.label} ${item.group}`.toLowerCase().includes(needle));
+  }, [allVisibleItems, query]);
+
+  const activeGroup = useMemo(() => visibleGroups.find((group) =>
+    group.items.some((item) => {
+      const href = owner ? item.href : (item.adminHref || item.href);
+      return pathname === href || pathname.startsWith(`${href}/`);
+    })
+  )?.label || "Home", [visibleGroups, pathname, owner]);
+
+  const homeHref = owner ? "/owner/dashboard" : "/admin/dashboard";
+  const quickHref = owner ? "/owner/detail-builder" : allVisibleItems.find((item) => item.label === "Bookings")?.resolvedHref || homeHref;
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
     window.location.assign("/");
   };
 
-  const sidebar = (
-    <div className="flex h-full flex-col bg-[#0c0c0c] text-white">
-      <div className="border-b border-white/[.08] px-5 py-5">
-        <a href="/owner/dashboard" className="flex items-center gap-3">
-          <img src="/favicon.png" alt="Car Dash" className="h-9 w-[72px] object-cover" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold tracking-[-.02em]">Car Dash</p>
-            <p className="mt-0.5 text-[10px] uppercase tracking-[.16em] text-white/35">Business console</p>
-          </div>
-        </a>
-      </div>
+  const go = (href: string) => {
+    setPanel(null);
+    setMobileOpen(false);
+    setSearchOpen(false);
+    window.location.assign(href);
+  };
 
-      <nav className="flex-1 overflow-y-auto px-3 py-5">
-        {visibleGroups.map((group) => (
-          <div key={group.label} className="mb-6">
-            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-white/28">{group.label}</p>
-            <div className="space-y-1">
-              {group.items.map((item) => {
-                const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium ${active ? "bg-white text-[#111]" : "text-white/58 hover:bg-white/[.06] hover:text-white"}`}
-                  >
-                    <Icon name={item.icon} />
-                    <span>{item.label}</span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
+  const panelGroup = visibleGroups.find((group) => group.label === panel);
 
-      <div className="border-t border-white/[.08] p-3">
-        <a href="/" target="_blank" rel="noreferrer" className="mb-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-white/52 hover:bg-white/[.06] hover:text-white">
-          <Icon name="external" />
-          View website
-        </a>
-        <div className="flex items-center gap-3 rounded-lg px-3 py-3">
-          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/[.09] text-xs font-semibold text-white/75">
-            {(user.name || user.email || "C").slice(0, 1).toUpperCase()}
+  const textualNav = (
+    <div className="space-y-5">
+      {visibleGroups.map((group) => (
+        <div key={group.label}>
+          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-black/32">{group.label}</p>
+          <div className="space-y-1">
+            {group.items.map((item) => {
+              const href = owner ? item.href : (item.adminHref || item.href);
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "bg-[#171411] text-white" : "text-black/56 hover:bg-black/[.045] hover:text-black"}`}>
+                  <Icon name={item.icon} className="h-[18px] w-[18px]" />
+                  <span>{item.label}</span>
+                </a>
+              );
+            })}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-medium text-white/78">{user.name || "Car Dash Owner"}</p>
-            <p className="truncate text-[10px] text-white/32">{user.email}</p>
-          </div>
-          <button onClick={logout} className="text-[10px] font-semibold uppercase tracking-[.12em] text-white/35 hover:text-white">Out</button>
         </div>
-      </div>
+      ))}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#f2f2f0] text-[#151515]">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[248px] border-r border-black/10 lg:block">{sidebar}</aside>
+    <div className="console-shell min-h-screen bg-[#f3f0e8] text-[#171411]">
+      <aside className="console-rail fixed inset-y-0 left-0 z-50 hidden w-[76px] border-r border-black/[.08] bg-[#f8f6f0]/95 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
+        <div className="flex w-full flex-col items-center gap-2 px-2 pt-4">
+          <button title="Quick create" onClick={() => go(quickHref)} className="grid h-12 w-12 place-items-center rounded-full bg-[#0d0d0d] text-white shadow-[0_12px_28px_rgba(23,20,17,.15)] transition hover:scale-[1.04]">
+            <Icon name="plus" className="h-6 w-6" />
+          </button>
+          <button title="Search tools" onClick={() => { setSearchOpen(true); setQuery(""); }} className="console-rail-button mt-2">
+            <Icon name="search" />
+          </button>
+        </div>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <button aria-label="Close navigation" className="absolute inset-0 bg-black/55" onClick={() => setMobileOpen(false)} />
-          <aside className="relative h-full w-[290px] max-w-[86vw] shadow-2xl">{sidebar}</aside>
+        <nav className="mt-4 flex w-full flex-1 flex-col items-center gap-1 overflow-y-auto px-2 pb-3">
+          {visibleGroups.map((group) => {
+            const isHome = group.label === "Home";
+            const active = activeGroup === group.label;
+            const target = owner ? group.items[0].href : (group.items[0].adminHref || group.items[0].href);
+            return (
+              <button
+                key={group.label}
+                title={group.label}
+                onClick={() => isHome ? go(target) : setPanel(panel === group.label ? null : group.label)}
+                className={`console-rail-button relative ${active ? "console-rail-button-active" : ""}`}
+              >
+                <Icon name={group.icon} />
+                {active && <span className="absolute -left-2 h-7 w-[3px] rounded-r-full bg-[#171411]" />}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="flex w-full flex-col items-center gap-2 border-t border-black/[.07] px-2 py-3">
+          <a title="View website" href="/" target="_blank" rel="noreferrer" className="console-rail-button"><Icon name="external" /></a>
+          <button title={user.name || user.email || "Account"} onClick={() => setPanel(panel === "Account" ? null : "Account")} className="grid h-10 w-10 place-items-center rounded-full bg-[#171411] text-xs font-semibold text-white">
+            {(user.name || user.email || "C").slice(0, 1).toUpperCase()}
+          </button>
+        </div>
+      </aside>
+
+      {panelGroup && (
+        <div className="console-flyout fixed left-[86px] top-4 z-[60] hidden w-[286px] overflow-hidden rounded-[22px] border border-black/[.09] bg-[#fbfaf6]/98 shadow-[0_30px_90px_rgba(23,20,17,.16)] backdrop-blur-2xl lg:block">
+          <div className="border-b border-black/[.07] px-5 py-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-black/30">Car Dash</p>
+            <h2 className="mt-1 text-lg font-semibold tracking-[-.025em]">{panelGroup.label}</h2>
+          </div>
+          <div className="p-2">
+            {panelGroup.items.map((item) => {
+              const href = owner ? item.href : (item.adminHref || item.href);
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <a key={href} href={href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm ${active ? "bg-[#171411] text-white" : "text-black/62 hover:bg-black/[.04] hover:text-black"}`}>
+                  <Icon name={item.icon} className="h-[18px] w-[18px]" />
+                  <span className="font-medium">{item.label}</span>
+                </a>
+              );
+            })}
+          </div>
         </div>
       )}
 
-      <div className="lg:pl-[248px]">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-black/[.08] bg-[#f8f8f6]/95 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="grid h-9 w-9 place-items-center rounded-md border border-black/10 bg-white lg:hidden" aria-label="Open navigation">
-              <Icon name="menu" />
+      {panel === "Account" && (
+        <div className="console-flyout fixed bottom-4 left-[86px] z-[60] hidden w-[300px] rounded-[22px] border border-black/[.09] bg-[#fbfaf6]/98 p-4 shadow-[0_30px_90px_rgba(23,20,17,.16)] backdrop-blur-2xl lg:block">
+          <p className="text-sm font-semibold">{user.name || (owner ? "Car Dash Owner" : "Car Dash Staff")}</p>
+          <p className="mt-1 truncate text-xs text-black/38">{user.email}</p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <a href="/account" className="rounded-xl border border-black/[.08] bg-white px-3 py-2.5 text-center text-xs font-semibold text-black/56">Account</a>
+            <button onClick={logout} className="rounded-xl bg-[#171411] px-3 py-2.5 text-xs font-semibold text-white">Sign out</button>
+          </div>
+        </div>
+      )}
+
+      {searchOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/20 p-4 backdrop-blur-[2px]" onMouseDown={(event) => { if (event.currentTarget === event.target) setSearchOpen(false); }}>
+          <div className="mx-auto mt-[10vh] w-full max-w-xl overflow-hidden rounded-[24px] border border-black/[.1] bg-[#fbfaf6] shadow-[0_38px_120px_rgba(23,20,17,.22)]">
+            <div className="flex items-center gap-3 border-b border-black/[.08] px-5">
+              <Icon name="search" className="h-5 w-5 text-black/35" />
+              <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Car Dash tools…" className="h-16 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-black/28" />
+              <button onClick={() => setSearchOpen(false)} className="text-xs font-semibold text-black/35">ESC</button>
+            </div>
+            <div className="max-h-[56vh] overflow-y-auto p-2">
+              {searchResults.map((item) => (
+                <button key={item.resolvedHref} onClick={() => go(item.resolvedHref)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-black/[.045]">
+                  <Icon name={item.icon} className="h-[18px] w-[18px] text-black/48" />
+                  <div><p className="text-sm font-medium">{item.label}</p><p className="mt-0.5 text-[10px] uppercase tracking-[.12em] text-black/28">{item.group}</p></div>
+                </button>
+              ))}
+              {!searchResults.length && <p className="px-4 py-10 text-center text-sm text-black/35">No tools found.</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[90] lg:hidden">
+          <button aria-label="Close navigation" className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="relative h-full w-[310px] max-w-[88vw] overflow-y-auto bg-[#f8f6f0] px-4 pb-8 pt-4 shadow-2xl">
+            <div className="mb-6 flex items-center justify-between">
+              <a href={homeHref} className="flex items-center gap-3">
+                <img src="/favicon.png" alt="" className="h-9 w-9 rounded-full border border-black/[.08] bg-white p-1" />
+                <div><p className="text-sm font-semibold tracking-[-.02em]">Car Dash</p><p className="text-[9px] uppercase tracking-[.16em] text-black/32">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
+              </a>
+              <button onClick={() => setMobileOpen(false)} className="grid h-9 w-9 place-items-center rounded-full border border-black/[.09] bg-white"><Icon name="close" className="h-5 w-5" /></button>
+            </div>
+            <button onClick={() => { setMobileOpen(false); setSearchOpen(true); }} className="mb-5 flex w-full items-center gap-3 rounded-xl border border-black/[.08] bg-white px-4 py-3 text-sm text-black/42">
+              <Icon name="search" className="h-4 w-4" /> Search tools
             </button>
+            {textualNav}
+            <div className="mt-7 border-t border-black/[.08] pt-4">
+              <p className="px-2 text-xs font-semibold">{user.name || user.email}</p>
+              <p className="mt-1 truncate px-2 text-[10px] text-black/32">{user.email}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2"><a href="/" className="rounded-xl border border-black/[.08] bg-white px-3 py-2.5 text-center text-xs font-semibold">Website</a><button onClick={logout} className="rounded-xl bg-[#171411] px-3 py-2.5 text-xs font-semibold text-white">Sign out</button></div>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      <div className="lg:pl-[76px]">
+        <header className="console-topbar sticky top-0 z-40 flex h-[72px] items-center justify-between border-b border-black/[.07] bg-[#f8f6f0]/92 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setMobileOpen(true)} className="grid h-10 w-10 place-items-center rounded-full border border-black/[.09] bg-white lg:hidden" aria-label="Open navigation"><Icon name="menu" /></button>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[.15em] text-black/35">Car Dash / Owner</p>
-              <h1 className="mt-0.5 text-base font-semibold tracking-[-.02em]">{pageTitle(pathname)}</h1>
+              <p className="text-[9px] font-semibold uppercase tracking-[.17em] text-black/28">Car Dash / {owner ? "Owner" : "Staff"}</p>
+              <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-.025em]">{pageTitle(pathname, owner)}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <a href="/" target="_blank" rel="noreferrer" className="hidden rounded-md border border-black/10 bg-white px-3 py-2 text-xs font-medium text-black/60 hover:border-black/20 hover:text-black sm:inline-flex">View site</a>
-            <button onClick={logout} className="rounded-md bg-[#111] px-3 py-2 text-xs font-semibold text-white hover:bg-black">Sign out</button>
+            <button onClick={() => { setSearchOpen(true); setQuery(""); }} className="hidden rounded-full border border-black/[.08] bg-white px-3.5 py-2 text-xs font-medium text-black/45 hover:text-black sm:inline-flex">⌘ Search</button>
+            <a href="/" target="_blank" rel="noreferrer" className="rounded-full border border-black/[.08] bg-white px-3.5 py-2 text-xs font-medium text-black/48 hover:text-black">View site</a>
           </div>
         </header>
-        <main className="owner-shell-content min-h-[calc(100vh-4rem)]">{children}</main>
+        <main className="owner-shell-content min-h-[calc(100vh-72px)]">{children}</main>
       </div>
     </div>
   );
