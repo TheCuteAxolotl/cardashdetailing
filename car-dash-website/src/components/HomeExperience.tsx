@@ -29,8 +29,8 @@ export default function HomeExperience({
 
   return (
     <div className="bg-[#f5f4f1] text-[#111]">
-      <section className="px-0 sm:px-5 lg:px-8">
-        <div className="relative mx-auto min-h-[650px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[720px]">
+      <section className="px-0 sm:px-5 sm:pt-5 lg:px-8 lg:pt-7">
+        <div className="home-hero-shell relative mx-auto min-h-[680px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
           <div className="absolute inset-0">
             {hero360Frames.length > 0 ? (
               <Hero360Viewer
@@ -46,32 +46,37 @@ export default function HomeExperience({
                 alt="Car Dash Detailing"
               />
             )}
-            <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.82)_0%,rgba(0,0,0,.52)_42%,rgba(0,0,0,.14)_78%,rgba(0,0,0,.12)_100%)] transition-opacity duration-200 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
-            <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.08),transparent_45%,rgba(0,0,0,.58))] transition-opacity duration-200 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
+            <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84)_0%,rgba(0,0,0,.56)_38%,rgba(0,0,0,.18)_72%,rgba(0,0,0,.08)_100%)] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
+            <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.18),transparent_38%,rgba(0,0,0,.7))] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
           </div>
 
-          <div className={`relative z-10 flex min-h-[650px] flex-col justify-between px-5 py-7 transition-opacity duration-200 sm:min-h-[720px] sm:px-8 sm:py-9 lg:px-12 lg:py-11 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
+          <div className={`relative z-10 flex min-h-[680px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
             <div className="flex items-start justify-between gap-5 text-white">
-              <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/62">{content.heroEyebrow}</p>
-              <a href="/quote" className="hidden rounded-md border border-white/30 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-sm hover:bg-white hover:text-black sm:inline-flex">Get an exact quote</a>
+              <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
+              <a href="/quote" className="hidden rounded-full border border-white/24 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-md hover:bg-white hover:text-black sm:inline-flex">Get an exact quote <span className="ml-2">↗</span></a>
             </div>
 
-            <div className="max-w-[830px] pb-4 text-white sm:pb-8">
-              <p className="mb-5 text-sm font-medium text-white/58">We come to you. No shop drop-off.</p>
-              <h1 className="max-w-[12ch] text-[clamp(3.4rem,7.5vw,7.5rem)] font-semibold leading-[.86] tracking-[-.072em]">
+            <div className="max-w-[900px] pb-5 text-white sm:pb-9">
+              <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">We come to you. No shop drop-off.</p>
+              <h1 className="max-w-[12ch] text-[clamp(3.55rem,7.8vw,7.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
                 {content.heroTitle}
               </h1>
-              <p className="mt-7 max-w-2xl text-sm leading-7 text-white/66 sm:text-base sm:leading-8">{content.heroBody}</p>
+              <p className="mt-7 max-w-[650px] text-sm leading-7 text-white/68 sm:text-base sm:leading-8">{content.heroBody}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href="#book" className="rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#111] hover:bg-[#ece9e3]">Book a detail</a>
-                <a href="#prices" className="rounded-md border border-white/28 px-5 py-3 text-sm font-medium text-white hover:border-white/60">View pricing</a>
+                <a href="#book" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ece9e3]">Book a detail</a>
+                <a href="#prices" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">View pricing</a>
               </div>
             </div>
           </div>
+          {hero360Frames.length > 1 && !heroInteracting && (
+            <div className="pointer-events-none absolute bottom-5 right-5 z-20 hidden items-center gap-2 rounded-full border border-white/16 bg-black/20 px-3 py-2 text-[10px] font-medium uppercase tracking-[.14em] text-white/58 backdrop-blur-md sm:flex">
+              <span className="text-base leading-none">↔</span> Drag to explore
+            </div>
+          )}
         </div>
       </section>
 
-      <section className="border-b border-black/[.08] bg-white">
+      <section className="border-b border-black/[.08] bg-white py-1">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
             ["01", "Mobile service", "We come to your home or work."],
@@ -79,16 +84,16 @@ export default function HomeExperience({
             ["03", "Paint correction", "We match the correction to what your paint actually needs."],
             ["04", "Protection that lasts", "Ceramic coating and maintenance options when you want them."],
           ].map(([number, title, body]) => (
-            <div key={number} className="min-h-[138px] p-5 sm:p-6 lg:p-7">
+            <div key={number} className="home-proof-card min-h-[148px] p-5 sm:p-6 lg:p-7">
               <p className="text-[10px] font-semibold tracking-[.12em] text-black/28">{number}</p>
-              <p className="mt-5 text-sm font-semibold text-[#111]">{title}</p>
+              <p className="mt-5 text-sm font-semibold tracking-[-.01em] text-[#111]">{title}</p>
               <p className="mt-1.5 max-w-[220px] text-xs leading-5 text-black/42">{body}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
+      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
         <div className="mx-auto max-w-[1320px]">
           <div className="grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
             <div>
@@ -100,11 +105,11 @@ export default function HomeExperience({
               <a href="/gallery" className="hidden shrink-0 text-sm font-semibold text-black/55 hover:text-black sm:block">View full gallery →</a>
             </div>
           </div>
-          <div className="mt-9"><DynamicGallery limit={6} /></div>
+          <div className="mt-10"><DynamicGallery limit={6} /></div>
         </div>
       </section>
 
-      <section id="prices" className="scroll-mt-24 border-y border-black/[.08] bg-white px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
+      <section id="prices" className="scroll-mt-24 border-y border-black/[.08] bg-white px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
         <div className="mx-auto max-w-[1320px]">
           <div className="mb-10 grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
             <div>
@@ -123,7 +128,7 @@ export default function HomeExperience({
         </div>
       </section>
 
-      <section id="book" className="scroll-mt-24 bg-[#111] px-5 py-16 text-white sm:px-8 sm:py-20 lg:py-24">
+      <section id="book" className="scroll-mt-24 bg-[#111] px-5 py-16 text-white sm:px-8 sm:py-24 lg:py-28">
         <div className="mx-auto grid max-w-[1320px] gap-10 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
             <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-white/35">Booking</p>
@@ -141,13 +146,13 @@ export default function HomeExperience({
             <PageMediaBand categories={["home-cta-bg"]} theme="dark" compact className="mt-8" />
           </div>
 
-          <div className="border border-white/12 bg-[#181818] p-4 sm:p-6 lg:p-7">
+          <div className="booking-shell border border-white/12 bg-[#181818] p-4 shadow-[0_28px_80px_rgba(0,0,0,.18)] sm:p-6 lg:p-7">
             <BookingForm initialSiteContent={content} />
           </div>
         </div>
       </section>
 
-      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
+      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
         <div className="mx-auto max-w-[1320px]">
           <div className="mb-9 flex items-end justify-between gap-5 border-b border-black/[.08] pb-6">
             <div>
