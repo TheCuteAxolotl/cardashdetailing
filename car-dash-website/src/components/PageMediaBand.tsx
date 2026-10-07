@@ -90,7 +90,7 @@ export default function PageMediaBand({
             {title && <h2 className={`mt-2 text-3xl font-semibold tracking-[-.04em] ${dark ? "text-[#F7F5F2]" : "text-[#171411]"}`}>{title}</h2>}
           </div>
         )}
-        <div className={`grid gap-3 ${visible.length === 1 ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-3"}`}>
+        <div className={`page-media-grid grid gap-3 ${visible.length === 1 ? "grid-cols-1" : "grid-cols-2 lg:grid-cols-3"}`}>
           {visible.map((item, index) => (
             <button
               key={item.id}
