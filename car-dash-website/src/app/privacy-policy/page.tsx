@@ -12,14 +12,14 @@ const effectiveDate = "September 12, 2026";
 
 export default function PrivacyPolicyPage() {
   return (
-    <section className="bg-[#070707] px-5 py-20 text-white sm:px-8 lg:px-10">
+    <section className="legal-luxury px-5 py-20 text-white sm:px-8 lg:px-10">
       <div className="mx-auto max-w-4xl">
-        <p className="text-xs font-semibold uppercase tracking-[.28em] text-[#6EAEC6]">Legal</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[.24em] text-white/36">Legal · Car Dash</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-.04em] sm:text-5xl">Privacy Policy</h1>
         <p className="mt-4 text-sm text-white/45">Effective {effectiveDate}</p>
 
-        <div className="mt-10 space-y-10 text-[15px] leading-7 text-white/68">
-          <section>
+        <div className="legal-copy mt-12 space-y-0 text-[15px] leading-7 text-white/64">
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Overview</h2>
             <p className="mt-3">
               Car Dash Detailing respects your privacy. This Privacy Policy explains what information we collect through
@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Information we collect</h2>
             <p className="mt-3">
               Depending on how you use the website, we may collect information such as your name, email address, phone number,
@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">How we use information</h2>
             <p className="mt-3">
               We use information to provide and improve our detailing services, respond to quote and support requests, manage
@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">SMS and mobile information</h2>
             <p className="mt-3">
               If you separately opt in to SMS, Car Dash Detailing may send transactional or customer-care text messages related to
@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Service providers</h2>
             <p className="mt-3">
               We may use service providers to host the website, store data, deliver email or SMS communications, process website
@@ -72,7 +72,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Cookies and authentication</h2>
             <p className="mt-3">
               The website may use cookies or similar browser storage that are necessary for features such as account login,
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Data retention and security</h2>
             <p className="mt-3">
               We retain information for as long as reasonably necessary to provide services, maintain business and warranty records,
@@ -90,7 +90,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Your choices</h2>
             <p className="mt-3">
               You may choose not to opt in to SMS and can still request or purchase services. If you have opted in to SMS, you can
@@ -104,7 +104,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Changes to this policy</h2>
             <p className="mt-3">
               We may update this Privacy Policy as our services or legal requirements change. The effective date at the top of this
@@ -112,7 +112,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section>
+          <section className="legal-section">
             <h2 className="text-xl font-semibold text-white">Contact us</h2>
             <p className="mt-3">
               Questions about this Privacy Policy can be sent to{" "}
