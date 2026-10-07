@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { getInvoice, saveInvoice } from "@/lib/invoices";
 import { verifyStripeWebhook } from "@/lib/stripe-invoice";
+import {
+  getMaintenanceSubscriptionById,
+  getMaintenanceSubscriptionByStripeId,
+  syncMaintenanceSubscription,
+} from "@/lib/maintenance";
+import { retrieveMaintenanceSubscription } from "@/lib/stripe-maintenance";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,6 +46,59 @@ async function recordCheckoutPayment(session: {
   });
 }
 
+async function recordMaintenanceCheckout(session: any) {
+  const localId = String(session?.metadata?.maintenance_subscription_id || session?.client_reference_id || "");
+  if (!localId) return;
+
+  const local = await getMaintenanceSubscriptionById(localId);
+  if (!local) return;
+
+  const subscriptionId =
+    typeof session?.subscription === "string"
+      ? session.subscription
+      : typeof session?.subscription?.id === "string"
+        ? session.subscription.id
+        : "";
+  if (!subscriptionId) return;
+
+  const stripe = await retrieveMaintenanceSubscription(subscriptionId);
+  await syncMaintenanceSubscription({
+    id: local.id,
+    stripeCheckoutSessionId: String(session.id || local.stripeCheckoutSessionId || ""),
+    stripeCustomerId:
+      typeof session.customer === "string"
+        ? session.customer
+        : typeof stripe.customer === "string"
+          ? stripe.customer
+          : null,
+    stripeSubscriptionId: stripe.id,
+    status: stripe.status || "active",
+    cancelAtPeriodEnd: Boolean(stripe.cancel_at_period_end),
+    currentPeriodEnd: stripe.current_period_end || null,
+  });
+}
+
+async function recordMaintenanceSubscription(object: any) {
+  const stripeId = typeof object?.id === "string" ? object.id : "";
+  if (!stripeId) return;
+
+  const localId = String(object?.metadata?.maintenance_subscription_id || "");
+  const local = localId
+    ? await getMaintenanceSubscriptionById(localId)
+    : await getMaintenanceSubscriptionByStripeId(stripeId);
+  if (!local) return;
+
+  await syncMaintenanceSubscription({
+    id: local.id,
+    stripeCustomerId: typeof object.customer === "string" ? object.customer : null,
+    stripeSubscriptionId: stripeId,
+    status: String(object.status || local.status),
+    cancelAtPeriodEnd: Boolean(object.cancel_at_period_end),
+    currentPeriodEnd:
+      typeof object.current_period_end === "number" ? object.current_period_end : null,
+  });
+}
+
 export async function POST(request: Request) {
   const rawBody = await request.text();
 
@@ -52,6 +111,18 @@ export async function POST(request: Request) {
       (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded")
     ) {
       await recordCheckoutPayment(session);
+      if (session.metadata?.maintenance_subscription_id) {
+        await recordMaintenanceCheckout(session);
+      }
+    }
+
+    if (
+      session &&
+      (event.type === "customer.subscription.created" ||
+        event.type === "customer.subscription.updated" ||
+        event.type === "customer.subscription.deleted")
+    ) {
+      await recordMaintenanceSubscription(session);
     }
 
     return NextResponse.json({ received: true });
