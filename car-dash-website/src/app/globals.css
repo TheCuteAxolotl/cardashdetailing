@@ -1211,3 +1211,64 @@ img { display: block; }
     padding-bottom: max(24px, env(safe-area-inset-bottom));
   }
 }
+
+
+@media (max-width: 639px) {
+  .pricing-package-grid {
+    display: flex !important;
+    gap: 12px !important;
+    margin-right: -20px;
+    overflow-x: auto;
+    padding: 6px 20px 14px 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pricing-package-grid::-webkit-scrollbar,
+  .page-media-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pricing-package-grid > .package-card {
+    flex: 0 0 87vw;
+    width: 87vw;
+    scroll-snap-align: center;
+    border-radius: 16px !important;
+  }
+
+  .page-media-grid {
+    display: flex !important;
+    gap: 10px !important;
+    margin-right: -20px;
+    overflow-x: auto;
+    padding-right: 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .page-media-grid > .media-band-tile {
+    flex: 0 0 76vw;
+    width: 76vw;
+    min-height: 230px !important;
+    grid-row: auto !important;
+    grid-column: auto !important;
+    scroll-snap-align: center;
+    border-radius: 14px !important;
+  }
+
+  .page-media-grid > .media-band-tile:first-child {
+    flex-basis: 84vw;
+    width: 84vw;
+  }
+
+  #pricing > div:first-child {
+    margin-bottom: 24px !important;
+  }
+
+  #pricing > div:first-child h2 {
+    font-size: 2.35rem !important;
+    line-height: .98 !important;
+  }
+}
