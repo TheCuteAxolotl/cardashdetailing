@@ -36,8 +36,10 @@ export async function createMaintenanceCheckoutSession(input: {
   form.set("customer_email", input.customerEmail);
   form.set("payment_method_types[0]", "card");
   form.set("metadata[maintenance_subscription_id]", input.subscriptionId);
+  form.set("metadata[maintenance_terms_version]", "2026-10-06");
   if (input.offerId) form.set("metadata[maintenance_offer_id]", input.offerId);
   form.set("subscription_data[metadata][maintenance_subscription_id]", input.subscriptionId);
+  form.set("subscription_data[metadata][maintenance_terms_version]", "2026-10-06");
   if (input.offerId) form.set("subscription_data[metadata][maintenance_offer_id]", input.offerId);
 
   form.set("line_items[0][price_data][currency]", "usd");
