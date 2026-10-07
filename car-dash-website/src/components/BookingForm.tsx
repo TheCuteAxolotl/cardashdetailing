@@ -112,7 +112,7 @@ const initialState: FormState = {
   policyAgreed: false,
 };
 
-const input = "mt-2 w-full rounded-2xl border border-white/10 bg-[#07131B]/50 px-4 py-3 text-white outline-none focus:border-[#6EAEC6]/60";
+const input = "customer-input mt-2 w-full border border-white/10 bg-black/20 px-4 py-3 text-white outline-none focus:border-[#C0AB9A]/55";
 
 function vehicleTypeToClass(value: string): VehicleClass {
   const normalized = value.toLowerCase();
@@ -514,9 +514,9 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const databaseServices = services.filter((service) => service.active && service.title.trim().toLowerCase() !== "headlight restoration");
 
   return (
-    <form onSubmit={submit} className="space-y-6 text-white">
+    <form onSubmit={submit} className="luxury-booking-form space-y-6 text-white">
       <div className="border-b border-white/10 pb-5">
-        <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Appointment</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-white/38">Appointment</p>
         <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Book your detail</h2>
         <p className="mt-2 text-sm leading-6 text-white/42">Pick the service, tell us what you drive, choose an open time, and send it over. You can add photos too.</p>
         <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#6EAEC6]">Get a free photo quote →</a></p>
@@ -525,7 +525,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#6EAEC6]">Get an Exact Quote →</a></div>}
 
       <section>
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Pick what you want done.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Pick what you want done.</p></div></div>
 
         {quoteLocked ? (
           <div className="rounded-2xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.055] p-4">
@@ -555,7 +555,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       </section>
 
       <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">2</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Just enough info to know who and what we’re booking.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">2</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Just enough info to know who and what we’re booking.</p></div></div>
 
         {vehicles.length > 0 && !quoteLocked && <label className="mb-4 block text-sm text-white/55">Saved vehicle<select className={input} value={form.vehicleId} onChange={(event) => chooseVehicle(event.target.value)}><option value="">Enter vehicle manually</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select></label>}
 
@@ -573,7 +573,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       </section>
 
       <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates aren’t available. Times that are already booked won’t show up.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates aren’t available. Times that are already booked won’t show up.</p></div></div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
           <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
@@ -582,25 +582,25 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
 
       {(allowCarAddOns || baseTotal != null) && (
         <section className="border-t border-white/8 pt-6">
-          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-[#111]">4</span><div><h3 className="font-semibold">Optional</h3><p className="text-xs text-white/35">Only open these if you need them.</p></div></div>
+          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">4</span><div><h3 className="font-semibold">Optional</h3><p className="text-xs text-white/35">Only open these if you need them.</p></div></div>
 
           <div className="space-y-3">
             {allowCarAddOns && (
-              <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+              <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
               </details>
             )}
 
             {baseTotal != null && (
-              <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+              <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Have a discount code?</summary>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"><label className="flex-1 text-sm text-white/55">Discount code<input className={`${input} uppercase`} value={discountInput} onChange={(e) => setDiscountInput(e.target.value)} placeholder="Enter code" /></label><button type="button" onClick={applyDiscount} disabled={discountLoading} className="rounded-xl border border-white/12 px-4 py-3 text-sm font-semibold disabled:opacity-50">{discountLoading ? "Checking…" : "Apply"}</button>{appliedDiscount && <button type="button" onClick={() => { setAppliedDiscount(null); setDiscountInput(""); setDiscountMessage(""); }} className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/50">Remove</button>}</div>
                 {discountMessage && <p className={`mt-2 text-xs ${appliedDiscount ? "text-green-300" : "text-red-300"}`}>{discountMessage}</p>}
               </details>
             )}
 
-            <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+            <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
               <summary className="cursor-pointer text-sm font-semibold">Attach photos <span className="ml-2 text-xs font-normal text-white/35">Optional · up to 3</span></summary>
               <div className="mt-4">
                 <p className="text-xs leading-5 text-white/40">Show us stains, pet hair, paint condition, scratches, or anything you want us to see before the appointment.</p>
@@ -610,7 +610,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
               </div>
             </details>
 
-            <details className="rounded-2xl border border-white/10 bg-white/[.02] p-4">
+            <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
               <summary className="cursor-pointer text-sm font-semibold">Add a note</summary>
               <label className="mt-4 block text-sm text-white/55">Anything we should know?<textarea className={`${input} min-h-24`} value={form.serviceNotes} onChange={(event) => set("serviceNotes", event.target.value)} placeholder="Stains, pet hair, parking notes, anything important…" /></label>
             </details>
@@ -619,7 +619,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       )}
 
       {baseTotal != null && (
-        <section className="rounded-[22px] border border-white/10 bg-[#07131B]/35 p-5">
+        <section className="booking-total-panel border border-white/10 bg-black/20 p-5">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-white/48"><span>Service</span><span>${Number(baseTotal).toFixed(2)}</span></div>
             {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/42"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
@@ -632,7 +632,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       <section className="space-y-3 border-t border-white/8 pt-6">
         <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request at the total shown, and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a>.</span></label>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
+        <div className="booking-option-panel border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
       </section>
 
       {status !== "idle" && <div className={`rounded-2xl border p-4 text-sm ${status === "success" ? "border-green-800 bg-green-950/30 text-green-200" : "border-red-800 bg-red-950/30 text-red-200"}`}><p>{message}</p>{status === "success" && chatUrl && <a href={chatUrl} className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black">Open booking chat</a>}</div>}
