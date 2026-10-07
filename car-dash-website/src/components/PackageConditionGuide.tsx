@@ -18,7 +18,7 @@ export default function PackageConditionGuide({
 
   return (
     <>
-      <details className="package-detail-panel mt-4 border border-black/[.08] bg-[#fffdfb] px-4 py-3">
+      <details className="group package-detail-panel mt-4 border border-black/[.08] bg-[#fffdfb] px-4 py-3">
         <summary className="cursor-pointer list-none text-sm font-semibold text-[#111] [&::-webkit-details-marker]:hidden">
           <span className="flex items-center justify-between gap-3">
             <span>When should I get this detail?</span>
