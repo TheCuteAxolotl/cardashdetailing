@@ -106,9 +106,9 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
   };
 
   const lightbox = (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#171411]/95 p-3 backdrop-blur-sm sm:p-6" role="dialog" aria-modal="true" aria-label={item.title} onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
-      <div className="flex max-h-[calc(100dvh-24px)] w-full max-w-6xl flex-col overflow-hidden rounded-[26px] border border-[#C0AB9A]/28 bg-[#3F3027] shadow-[0_28px_90px_rgba(23,20,17,.55)] sm:max-h-[92dvh]">
-        <div className="z-20 flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-[#F7F5F2]/10 bg-[#3F3027]/96 px-4 py-3 text-[#F7F5F2] backdrop-blur-xl sm:px-5">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#100e0c]/96 p-3 backdrop-blur-md sm:p-6" role="dialog" aria-modal="true" aria-label={item.title} onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }}>
+      <div className="media-lightbox-shell flex max-h-[calc(100dvh-24px)] w-full max-w-6xl flex-col overflow-hidden border border-white/10 bg-[#171411] shadow-[0_36px_120px_rgba(0,0,0,.55)] sm:max-h-[92dvh]">
+        <div className="z-20 flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-white/8 bg-[#171411]/94 px-4 py-3 text-[#F7F5F2] backdrop-blur-xl sm:px-5">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{item.title}</p>
             <p className="mt-0.5 text-[11px] text-[#F7F5F2]/42">{index + 1} of {items.length}</p>
@@ -132,14 +132,14 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
 
           {items.length > 1 && (
             <>
-              <button type="button" onClick={previous} className="absolute left-3 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#F7F5F2]/18 bg-[#3F3027]/82 text-3xl text-[#F7F5F2] shadow-lg backdrop-blur-xl sm:left-5" aria-label="Previous media">‹</button>
-              <button type="button" onClick={next} className="absolute right-3 top-1/2 z-30 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#F7F5F2]/18 bg-[#3F3027]/82 text-3xl text-[#F7F5F2] shadow-lg backdrop-blur-xl sm:right-5 sm:flex" aria-label="Next media">›</button>
+              <button type="button" onClick={previous} className="absolute left-3 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/16 bg-black/32 text-3xl text-white shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-black sm:left-5" aria-label="Previous media">‹</button>
+              <button type="button" onClick={next} className="absolute right-3 top-1/2 z-30 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/16 bg-black/32 text-3xl text-white shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-black sm:right-5 sm:flex" aria-label="Next media">›</button>
             </>
           )}
         </div>
 
         {items.length > 1 && (
-          <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[#F7F5F2]/10 bg-[#3F3027] px-4 py-3 sm:hidden">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-t border-white/8 bg-[#171411] px-4 py-3 sm:hidden">
             <button type="button" onClick={previous} className="rounded-full border border-[#F7F5F2]/15 px-4 py-2 text-sm font-semibold text-[#F7F5F2]/75">← Previous</button>
             <button type="button" onClick={next} className="rounded-full border border-[#F7F5F2]/15 px-4 py-2 text-sm font-semibold text-[#F7F5F2]">Next →</button>
           </div>
