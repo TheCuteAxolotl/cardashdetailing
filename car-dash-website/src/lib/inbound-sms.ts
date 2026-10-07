@@ -4,9 +4,42 @@ import {
   ensureBookingChatSchema,
   notifyBookingChatDiscord,
 } from "@/lib/booking-chat";
-import { listRecentInboundSms, normalizePhoneNumber } from "@/lib/twilio-sms";
+import { getPublicSiteUrl, listRecentInboundSms, normalizePhoneNumber } from "@/lib/twilio-sms";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
+
+async function notifyDirectSmsDiscord(input: {
+  phone: string;
+  body: string;
+}) {
+  const url = process.env.DISCORD_WEBHOOK_URL?.trim();
+  if (!url) return;
+
+  const inboxUrl = `${getPublicSiteUrl()}/owner/messages`;
+  const lines = [
+    "**New direct SMS**",
+    `Phone: ${input.phone}`,
+    `Message: ${input.body}`,
+    `Open Messages: ${inboxUrl}`,
+  ].join("\n");
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: lines.slice(0, 1950),
+        username: "Car Dash Detailing",
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Discord direct-SMS notification failed:", response.status, await response.text());
+    }
+  } catch (error) {
+    console.error("Discord direct-SMS notification failed:", error);
+  }
+}
 
 export type StoreInboundSmsInput = {
   from: string;
@@ -149,6 +182,11 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
         externalSid: messageSid,
         createdAt,
       },
+    });
+
+    await notifyDirectSmsDiscord({
+      phone: fromPhone,
+      body: body.slice(0, 3000),
     });
 
     console.warn(`Inbound SMS from ${fromPhone} was saved as unmatched because no booking or guest quote used that phone number.`);
