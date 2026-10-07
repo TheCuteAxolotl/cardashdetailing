@@ -25,30 +25,30 @@ export default function HomePackagePricing({ config, mediaItems = [] }: Props) {
         <p className="max-w-lg text-sm leading-6 text-black/42">Interior and exterior in one appointment.</p>
       </div>
 
-      <div className="grid gap-px overflow-hidden border border-black/[.09] bg-black/[.09] lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3 lg:items-stretch">
         {config.packages.map((pkg) => (
-          <article key={pkg.id} className={`relative bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "after:absolute after:inset-x-0 after:top-0 after:h-[3px] after:bg-[#111]" : ""}`}>
+          <article key={pkg.id} className={`package-card relative border border-black/[.08] bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "package-card-featured" : ""}`}>
             <div className="flex min-h-[72px] items-start justify-between gap-3">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-black/34">{pkg.tier}</p>
                 <h4 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#111]">{pkg.name}</h4>
               </div>
-              {pkg.badge && <span className="border border-black/10 bg-[#f5f4f1] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.08em] text-black/50">{pkg.badge}</span>}
+              {pkg.badge && <span className="rounded-full bg-[#171411] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.1em] text-white">{pkg.badge}</span>}
             </div>
 
-            <p className="mt-2 min-h-[72px] text-sm leading-6 text-black/46">{pkg.description}</p>
+            <p className="mt-3 min-h-[72px] text-sm leading-6 text-black/48">{pkg.description}</p>
 
-            <div className="mt-5 border-y border-black/[.08]">
+            <div className="mt-6 overflow-hidden rounded-xl border border-black/[.08] bg-[#f8f7f4]">
               {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
                 <a
                   key={vehicleClass}
                   href={packageBookHref(pkg.id, vehicleClass)}
-                  className={`group flex min-h-14 items-center justify-between gap-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}
+                  className={`group flex min-h-14 items-center justify-between gap-4 px-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}
                 >
                   <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
                   <span className="flex items-center gap-3">
                     <strong className="text-lg font-semibold text-[#111]">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong>
-                    <span className="text-xs font-semibold text-black/35 group-hover:text-black">Book →</span>
+                    <span className="text-xs font-semibold text-black/36 transition group-hover:translate-x-0.5 group-hover:text-black">Book →</span>
                   </span>
                 </a>
               ))}
