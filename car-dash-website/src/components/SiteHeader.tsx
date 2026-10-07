@@ -23,6 +23,7 @@ const detailingLinks = [
 
 const specialtyLinks = [
   ["/ceramic-coatings", "Ceramic coating", "Long-term paint protection."],
+  ["/maintenance", "Monthly maintenance", "$60/month ceramic maintenance membership."],
   ["/marine-detailing", "Marine detailing", "Boat cleaning, correction and protection."],
 ] as const;
 
