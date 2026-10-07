@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { MediaItem } from "@/lib/media";
 import { isImageMedia } from "@/lib/media";
 
@@ -25,6 +25,9 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
   );
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const dragX = useRef<number | null>(null);
+  const dragging = useRef(false);
+  const interactionTimer = useRef<number | null>(null);
 
   useEffect(() => {
     setIndex(0);
@@ -57,9 +60,24 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
     setIndex(wrap(nextIndex, imageFrames.length));
   };
 
+  const step = (direction: number) => {
+    if (!canAdvance) return;
+    setIndex((current) => wrap(current + direction, imageFrames.length));
+  };
+
+  const showInteraction = () => {
+    onInteractionChange?.(true);
+    if (interactionTimer.current) window.clearTimeout(interactionTimer.current);
+  };
+
+  const settleInteraction = (delay = 500) => {
+    if (interactionTimer.current) window.clearTimeout(interactionTimer.current);
+    interactionTimer.current = window.setTimeout(() => onInteractionChange?.(false), delay);
+  };
+
   return (
     <div
-      className={`relative select-none overflow-hidden bg-[#171411] outline-none ${className}`}
+      className={`group relative cursor-grab select-none overflow-hidden bg-[#171411] outline-none active:cursor-grabbing ${className}`}
       role={canAdvance ? "region" : "img"}
       aria-label={
         canAdvance
@@ -68,7 +86,39 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
       }
       tabIndex={canAdvance ? 0 : -1}
       onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseLeave={() => {
+        setPaused(false);
+        if (!dragging.current) settleInteraction(250);
+      }}
+      onPointerDown={(event) => {
+        if (!canAdvance) return;
+        dragging.current = true;
+        dragX.current = event.clientX;
+        setPaused(true);
+        showInteraction();
+        event.currentTarget.setPointerCapture?.(event.pointerId);
+      }}
+      onPointerMove={(event) => {
+        if (!canAdvance || !dragging.current || dragX.current == null) return;
+        const delta = event.clientX - dragX.current;
+        if (Math.abs(delta) < 24) return;
+        step(delta < 0 ? 1 : -1);
+        dragX.current = event.clientX;
+      }}
+      onPointerUp={(event) => {
+        if (!dragging.current) return;
+        dragging.current = false;
+        dragX.current = null;
+        event.currentTarget.releasePointerCapture?.(event.pointerId);
+        setPaused(false);
+        settleInteraction();
+      }}
+      onPointerCancel={() => {
+        dragging.current = false;
+        dragX.current = null;
+        setPaused(false);
+        settleInteraction();
+      }}
       onFocus={() => setPaused(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
@@ -78,13 +128,18 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
       onKeyDown={(event) => {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
-          goTo(index - 1);
+          showInteraction();
+          step(-1);
+          settleInteraction();
         }
         if (event.key === "ArrowRight") {
           event.preventDefault();
-          goTo(index + 1);
+          showInteraction();
+          step(1);
+          settleInteraction();
         }
       }}
+      style={{ touchAction: canAdvance ? "pan-y" : undefined }}
     >
       {imageFrames.map((frame, frameIndex) => {
         const active = frameIndex === wrap(index, imageFrames.length);
@@ -107,8 +162,12 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
         <>
           <button
             type="button"
-            onClick={() => goTo(index - 1)}
-            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/46 text-xl text-[#F7F5F2]/94 shadow-lg backdrop-blur-xl transition hover:bg-[#3F3027]/72 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] sm:left-4"
+            onClick={() => {
+              showInteraction();
+              step(-1);
+              settleInteraction();
+            }}
+            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/42 text-xl text-[#F7F5F2]/94 opacity-0 shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-[#171411] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] group-hover:opacity-100 sm:left-4"
             aria-label="Previous hero photo"
           >
             ‹
@@ -116,8 +175,12 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
 
           <button
             type="button"
-            onClick={() => goTo(index + 1)}
-            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/46 text-xl text-[#F7F5F2]/94 shadow-lg backdrop-blur-xl transition hover:bg-[#3F3027]/72 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] sm:right-4"
+            onClick={() => {
+              showInteraction();
+              step(1);
+              settleInteraction();
+            }}
+            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/42 text-xl text-[#F7F5F2]/94 opacity-0 shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-[#171411] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] group-hover:opacity-100 sm:right-4"
             aria-label="Next hero photo"
           >
             ›
@@ -128,7 +191,11 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
               <button
                 key={`dot-${frame.id || dotIndex}`}
                 type="button"
-                onClick={() => goTo(dotIndex)}
+                onClick={() => {
+                  showInteraction();
+                  goTo(dotIndex);
+                  settleInteraction();
+                }}
                 className={`h-1.5 rounded-full transition-all duration-300 ${dotIndex === wrap(index, imageFrames.length) ? "w-5 bg-[#F7F5F2]" : "w-1.5 bg-[#C0AB9A]/55 hover:bg-[#F7F5F2]/70"}`}
                 aria-label={`Show hero photo ${dotIndex + 1}`}
                 aria-current={dotIndex === wrap(index, imageFrames.length) ? "true" : undefined}
