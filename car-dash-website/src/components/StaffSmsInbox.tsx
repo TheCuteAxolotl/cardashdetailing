@@ -81,6 +81,11 @@ export default function StaffSmsInbox({
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [replySending, setReplySending] = useState<string | null>(null);
   const [replyNotes, setReplyNotes] = useState<Record<string, string>>({});
+  const [newTextOpen, setNewTextOpen] = useState(false);
+  const [newPhone, setNewPhone] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const [newTextSending, setNewTextSending] = useState(false);
+  const [newTextNote, setNewTextNote] = useState("");
 
   const load = useCallback(async (quiet = false) => {
     if (!quiet) setLoading(true);
@@ -251,6 +256,40 @@ export default function StaffSmsInbox({
     }
   };
 
+  const sendNewText = async () => {
+    const phone = newPhone.trim();
+    const message = newMessage.trim();
+    if (!phone || !message || newTextSending) return;
+
+    setNewTextSending(true);
+    setNewTextNote("");
+
+    try {
+      const response = await fetch("/api/sms/unmatched/reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, message }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || "Could not send text.");
+
+      const sentPhone = payload?.message?.toPhone || phone;
+      setNewPhone("");
+      setNewMessage("");
+      setNewTextNote("Sent as SMS.");
+      setQuery(sentPhone);
+      await load(true);
+      window.setTimeout(() => {
+        setNewTextOpen(false);
+        setNewTextNote("");
+      }, 650);
+    } catch (err) {
+      setNewTextNote(err instanceof Error ? err.message : "Could not send text.");
+    } finally {
+      setNewTextSending(false);
+    }
+  };
+
   const backHref = role === "owner" ? "/owner/dashboard" : "/admin/dashboard";
 
   return (
@@ -270,12 +309,24 @@ export default function StaffSmsInbox({
               Customer text replies are matched to their latest active booking and appear here.
             </p>
           </div>
-          <a
-            href={backHref}
-            className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/75 hover:text-white"
-          >
-            Back
-          </a>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setNewTextNote("");
+                setNewTextOpen(true);
+              }}
+              className="rounded-full bg-[#6EAEC6] px-5 py-2.5 text-sm font-semibold text-[#0B1822] shadow-[0_10px_28px_rgba(110,174,198,.14)] hover:bg-[#8FC2D5]"
+            >
+              + New Text
+            </button>
+            <a
+              href={backHref}
+              className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/75 hover:text-white"
+            >
+              Back
+            </a>
+          </div>
         </div>
       </header>
 
@@ -485,6 +536,99 @@ export default function StaffSmsInbox({
           </section>
         )}
       </div>
+
+      {newTextOpen && (
+        <div
+          className="fixed inset-0 z-[120] grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="New text message"
+          onMouseDown={(event) => {
+            if (event.currentTarget === event.target && !newTextSending) setNewTextOpen(false);
+          }}
+        >
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void sendNewText();
+            }}
+            className="w-full max-w-lg rounded-[26px] border border-white/10 bg-[#0B1822] p-5 shadow-[0_32px_100px_rgba(0,0,0,.55)] sm:p-6"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#6EAEC6]">Car Dash SMS</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-[-.035em]">New text</h2>
+                <p className="mt-2 text-sm leading-6 text-white/45">
+                  Start a direct SMS conversation. They don’t need a booking or website account.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNewTextOpen(false)}
+                disabled={newTextSending}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 text-xl text-white/55 hover:bg-white/5 hover:text-white disabled:opacity-40"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <label className="mt-6 block text-xs font-semibold text-white/60">
+              Phone number
+              <input
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={newPhone}
+                onChange={(event) => setNewPhone(event.target.value)}
+                placeholder="(630) 555-0123"
+                className="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none placeholder:text-white/25 focus:border-[#6EAEC6]/55"
+                required
+                autoFocus
+              />
+            </label>
+
+            <label className="mt-4 block text-xs font-semibold text-white/60">
+              Message
+              <textarea
+                value={newMessage}
+                onChange={(event) => setNewMessage(event.target.value)}
+                placeholder="Type your message…"
+                maxLength={3000}
+                rows={5}
+                className="mt-2 w-full resize-none rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-base leading-6 text-white outline-none placeholder:text-white/25 focus:border-[#6EAEC6]/55"
+                required
+              />
+            </label>
+
+            <div className="mt-3 rounded-2xl border border-white/8 bg-white/[.025] px-4 py-3 text-xs leading-5 text-white/38">
+              Use this for people who contacted Car Dash or agreed to receive a text. If a number has opted out with STOP, Twilio won’t deliver a new message until they opt back in.
+            </div>
+
+            {newTextNote && (
+              <p className="mt-3 text-sm text-white/60">{newTextNote}</p>
+            )}
+
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setNewTextOpen(false)}
+                disabled={newTextSending}
+                className="rounded-full border border-white/12 px-4 py-2.5 text-sm font-semibold text-white/60 hover:text-white disabled:opacity-40"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={newTextSending || !newPhone.trim() || !newMessage.trim()}
+                className="rounded-full bg-[#6EAEC6] px-5 py-2.5 text-sm font-semibold text-[#0B1822] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {newTextSending ? "Sending…" : "Send SMS"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </main>
   );
 }
