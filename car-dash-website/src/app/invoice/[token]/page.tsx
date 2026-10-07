@@ -116,17 +116,17 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
   }
 
   if (loading) {
-    return <main className="grid min-h-screen place-items-center bg-[#07131B] text-white"><div className="text-center"><div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-b-[#6EAEC6]" /><p className="mt-4 text-sm text-white/45">Loading invoice…</p></div></main>;
+    return <main className="customer-document grid min-h-screen place-items-center text-white"><div className="text-center"><div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-b-[#6EAEC6]" /><p className="mt-4 text-sm text-white/45">Loading invoice…</p></div></main>;
   }
 
   if (!invoice || error) {
-    return <main className="grid min-h-screen place-items-center bg-[#07131B] px-6 text-white"><div className="max-w-md text-center"><p className="text-xs font-semibold uppercase tracking-[.24em] text-[#6EAEC6]">Car Dash Detailing</p><h1 className="mt-3 text-3xl font-semibold">Invoice unavailable</h1><p className="mt-3 text-sm text-white/50">{error || "This invoice link is no longer available."}</p></div></main>;
+    return <main className="customer-document grid min-h-screen place-items-center px-6 text-white"><div className="max-w-md text-center"><p className="text-xs font-semibold uppercase tracking-[.24em] text-[#6EAEC6]">Car Dash Detailing</p><h1 className="mt-3 text-3xl font-semibold">Invoice unavailable</h1><p className="mt-3 text-sm text-white/50">{error || "This invoice link is no longer available."}</p></div></main>;
   }
 
   const paid = invoice.totals.balance <= 0;
 
   return (
-    <main className="min-h-screen bg-[#07131B] px-4 py-8 text-white sm:px-6 print:bg-white print:p-0 print:text-black">
+    <main className="customer-document min-h-screen px-4 py-8 text-white sm:px-6 print:bg-white print:p-0 print:text-black">
       <meta name="robots" content="noindex,nofollow" />
       <div className="mx-auto max-w-4xl">
         <div className="mb-5 flex items-center justify-between gap-4 print:hidden">
@@ -136,11 +136,11 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
 
         {paymentMessage && <div className="mb-5 rounded-2xl border border-[#6EAEC6]/20 bg-[#6EAEC6]/10 px-4 py-3 text-sm leading-6 text-[#C7E6F0] print:hidden">{paymentMessage}</div>}
 
-        <article className="overflow-hidden rounded-[2rem] border border-[#27404F] bg-[#0B1822] shadow-2xl shadow-black/20 print:rounded-none print:border-0 print:bg-white print:shadow-none">
-          <header className="border-b border-white/8 bg-gradient-to-br from-[#102838] to-[#0B1822] p-7 sm:p-10 print:border-black/10 print:bg-white">
+        <article className="invoice-card overflow-hidden border border-white/10 bg-[#171411] shadow-[0_34px_110px_rgba(0,0,0,.32)] print:rounded-none print:border-0 print:bg-white print:shadow-none">
+          <header className="border-b border-white/8 bg-[linear-gradient(135deg,#3F3027,#171411)] p-7 sm:p-10 print:border-black/10 print:bg-white">
             <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/10 text-lg font-bold text-[#A9D6E5] print:border-black/15 print:bg-transparent print:text-black">CD</div><div><p className="text-lg font-semibold tracking-wide">CAR DASH DETAILING</p><p className="text-xs uppercase tracking-[.2em] text-white/40 print:text-black/45">Professional Detailing</p></div></div>
+                <div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/8 p-1 print:border-black/15 print:bg-transparent"><img src="/favicon.png" alt="" className="h-full w-full rounded-full object-contain" /></div><div><p className="text-lg font-semibold tracking-wide">CAR DASH DETAILING</p><p className="text-xs uppercase tracking-[.2em] text-white/40 print:text-black/45">Professional Detailing</p></div></div>
                 <p className="mt-6 text-sm leading-6 text-white/45 print:text-black/55">South Elgin, Illinois<br />cardashdetailing.com</p>
               </div>
               <div className="sm:text-right">
