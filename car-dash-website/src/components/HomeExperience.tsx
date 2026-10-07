@@ -46,8 +46,8 @@ export default function HomeExperience({
                 alt="Car Dash Detailing"
               />
             )}
-            <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84)_0%,rgba(0,0,0,.56)_38%,rgba(0,0,0,.18)_72%,rgba(0,0,0,.08)_100%)] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
-            <div className={`pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.18),transparent_38%,rgba(0,0,0,.7))] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
+            <div className={`home-hero-side-gradient pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84)_0%,rgba(0,0,0,.56)_38%,rgba(0,0,0,.18)_72%,rgba(0,0,0,.08)_100%)] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
+            <div className={`home-hero-bottom-gradient pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.18),transparent_38%,rgba(0,0,0,.7))] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
           </div>
 
           <div className={`home-hero-content relative z-10 flex min-h-[680px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
