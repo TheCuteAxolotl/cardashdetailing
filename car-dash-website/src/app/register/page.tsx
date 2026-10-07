@@ -49,14 +49,15 @@ export default function RegisterPage() {
     }
   };
 
-  const inputClass = "w-full rounded-2xl border border-white/10 bg-[#07131B]/45 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#6EAEC6]/65 focus:bg-black/65 focus:shadow-[0_0_0_3px_rgba(110,174,198,.07)]";
+  const inputClass = "customer-input w-full border border-white/10 bg-black/20 px-4 py-3 text-white placeholder-white/25 outline-none transition focus:border-[#C0AB9A]/55 focus:bg-black/30 focus:shadow-[0_0_0_3px_rgba(192,171,154,.08)]";
 
   return (
-    <div className="min-h-[72vh] bg-[#0B1822] px-6 py-16 text-white sm:py-24">
+    <div className="customer-app min-h-screen px-6 py-14 text-white sm:py-20">
       <div className="mx-auto w-full max-w-md">
-        <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(145deg,rgba(74,85,104,.15),rgba(255,255,255,.02))] p-7 shadow-[0_28px_90px_rgba(0,0,0,.35)] sm:p-8">
-          <p className="text-[10px] font-bold uppercase tracking-[.28em] text-[#6EAEC6]">Car Dash Account</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-[-.04em]">Create Account</h1>
+        <a href="/" className="mb-8 flex items-center justify-center gap-3 text-white/75 hover:text-white"><img src="/favicon.png" alt="" className="h-9 w-9 rounded-full border border-white/12 bg-white/5 p-1" /><span className="text-sm font-semibold tracking-[.12em]">CAR DASH</span></a>
+        <div className="customer-auth-card border border-white/10 bg-white/[.035] p-7 shadow-[0_30px_100px_rgba(0,0,0,.28)] sm:p-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[.26em] text-white/38">Car Dash account</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-.05em]">Create your account.</h1>
           <p className="mt-2 text-sm text-white/42">Keep quotes, bookings, vehicles, and messages in one place.{claimQuoteId ? " Your guest quote will be linked automatically." : ""}</p>
 
           {error && <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100">{error}</div>}
@@ -66,7 +67,7 @@ export default function RegisterPage() {
             <div><label className="mb-2 block text-sm font-medium text-white/72">Email</label><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder="your@email.com" required /></div>
             <div><label className="mb-2 block text-sm font-medium text-white/72">Password</label><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder="••••••••" required /></div>
             <div><label className="mb-2 block text-sm font-medium text-white/72">Confirm Password</label><input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className={inputClass} placeholder="••••••••" required /></div>
-            <button type="submit" disabled={loading} className="w-full rounded-2xl bg-[#6EAEC6] py-3.5 font-semibold text-[#0B1822] shadow-[0_0_30px_rgba(110,174,198,.12)] hover:bg-[#6EAEC6] disabled:cursor-not-allowed disabled:opacity-45">
+            <button type="submit" disabled={loading} className="w-full rounded-full bg-white py-3.5 font-semibold text-[#171411] shadow-[0_12px_30px_rgba(0,0,0,.15)] hover:bg-[#EFE8E2] disabled:cursor-not-allowed disabled:opacity-45">
               {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
