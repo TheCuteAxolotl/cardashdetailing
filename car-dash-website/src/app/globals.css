@@ -719,3 +719,67 @@ img { display: block; }
       linear-gradient(180deg, #1e1915 0%, var(--eerie-black) 42%);
   }
 }
+
+
+/* Editorial utility surfaces */
+.legal-luxury {
+  background:
+    radial-gradient(circle at 15% -10%, rgba(192,171,154,.10), transparent 30rem),
+    linear-gradient(180deg, #1d1814, #11100e 42%, #0d0c0b);
+}
+
+.legal-copy {
+  border-top: 1px solid rgba(247,245,242,.10);
+}
+
+.legal-section {
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(247,245,242,.08);
+}
+
+.legal-section h2 {
+  letter-spacing: -.02em;
+}
+
+.faq-stack,
+.faq-cta,
+.editorial-image,
+.luxury-value-grid {
+  border-radius: 16px;
+}
+
+.faq-stack details {
+  transition: background-color 220ms ease;
+}
+
+.faq-stack details[open] {
+  background: rgba(239,232,226,.26);
+}
+
+.editorial-image img {
+  transition: transform 1.1s cubic-bezier(.16,1,.3,1);
+}
+
+@media (hover: hover) {
+  .editorial-image:hover img {
+    transform: scale(1.025);
+  }
+}
+
+.luxury-value-grid article {
+  background:
+    linear-gradient(145deg, rgba(247,245,242,.025), rgba(247,245,242,.008));
+}
+
+@media (max-width: 639px) {
+  .legal-section {
+    padding: 1.6rem 0;
+  }
+
+  .faq-stack,
+  .faq-cta,
+  .editorial-image,
+  .luxury-value-grid {
+    border-radius: 14px;
+  }
+}
