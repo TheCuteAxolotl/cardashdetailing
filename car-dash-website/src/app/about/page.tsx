@@ -29,11 +29,11 @@ export default async function AboutPage() {
 
       <section className="border-b border-black/8 bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-[1.05fr_.95fr] lg:items-center">
-          <div className="overflow-hidden rounded-[28px] bg-[#111]">
+          <div className="editorial-image overflow-hidden bg-[#111] shadow-[0_22px_70px_rgba(23,20,17,.08)]">
             <SitePhoto category="about-story" fallbackCategory="home-story" className="aspect-[4/3] h-full w-full object-cover" />
           </div>
           <div className="lg:pl-6">
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">About Car Dash</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-black/38">About Car Dash</p>
             <h2 className="mt-3 text-4xl font-semibold leading-[.98] tracking-[-.05em] sm:text-5xl">{content.aboutStoryTitle}</h2>
             <p className="mt-5 max-w-xl text-base leading-8 text-black/55">{content.aboutStoryBody}</p>
             <div className="mt-7 flex flex-wrap gap-3">
@@ -54,7 +54,7 @@ export default async function AboutPage() {
             <p className="max-w-2xl text-sm leading-7 text-white/45">Simple service, clear communication, and work we’re proud to stand behind. You’ll know what you’re paying for before the appointment starts.</p>
           </div>
           <PageMediaBand categories={["about-values-bg"]} theme="dark" compact className="mt-8" />
-          <div className="mt-8 grid overflow-hidden rounded-[26px] border border-white/10 md:grid-cols-3">
+          <div className="luxury-value-grid mt-8 grid overflow-hidden border border-white/10 md:grid-cols-3">
             {values.map(([title, body], index) => (
               <article key={title} className={`p-6 sm:p-7 ${index ? "border-t border-white/10 md:border-l md:border-t-0" : ""}`}>
                 <p className="text-xs font-bold text-[#6EAEC6]">0{index + 1}</p>
