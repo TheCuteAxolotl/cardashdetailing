@@ -996,18 +996,18 @@ img { display: block; }
     width: 86vw;
   }
 
-  .gallery-editorial:not(.home-gallery .gallery-editorial) {
+  .full-gallery .gallery-editorial {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-auto-rows: 190px !important;
     gap: 8px !important;
   }
 
-  .gallery-editorial:not(.home-gallery .gallery-editorial) > :first-child {
+  .full-gallery .gallery-editorial > :first-child {
     grid-column: span 2 !important;
     grid-row: span 2 !important;
   }
 
-  .gallery-editorial:not(.home-gallery .gallery-editorial) .gallery-tile {
+  .full-gallery .gallery-editorial .gallery-tile {
     border-radius: 12px !important;
   }
 
