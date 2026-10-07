@@ -3,8 +3,10 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
+import OwnerShell from "@/components/OwnerShell";
 
 type AccessState = "checking" | "allowed" | "redirecting";
+type User = { id: string; name?: string | null; email?: string | null; role?: string | null };
 
 const ADMIN_ROUTE_PERMISSIONS: Array<{ prefix: string; permission: string }> = [
   { prefix: "/admin/bookings", permission: "bookings" },
@@ -16,6 +18,8 @@ const ADMIN_ROUTE_PERMISSIONS: Array<{ prefix: string; permission: string }> = [
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [state, setState] = useState<AccessState>("checking");
+  const [user, setUser] = useState<User | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
 
   const requiredPermission = useMemo(
     () => ADMIN_ROUTE_PERMISSIONS.find((item) => pathname.startsWith(item.prefix))?.permission || null,
@@ -39,7 +43,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
         const data = await response.json();
         const role = String(data.user?.role || "user");
-        const permissions = Array.isArray(data.permissions) ? data.permissions : [];
+        const nextPermissions = Array.isArray(data.permissions) ? data.permissions : [];
 
         if (role === "owner") {
           if (!cancelled) {
@@ -57,7 +61,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (requiredPermission && !permissions.includes(requiredPermission)) {
+        if (requiredPermission && !nextPermissions.includes(requiredPermission)) {
           if (!cancelled) {
             setState("redirecting");
             window.location.assign("/admin/dashboard");
@@ -65,7 +69,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (!cancelled) setState("allowed");
+        if (!cancelled) {
+          setUser(data.user);
+          setPermissions(nextPermissions);
+          setState("allowed");
+        }
       } catch {
         if (!cancelled) {
           setState("redirecting");
@@ -79,16 +87,16 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     };
   }, [requiredPermission]);
 
-  if (state !== "allowed") {
+  if (state !== "allowed" || !user) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#07131B] px-6 text-white">
+      <main className="grid min-h-screen place-items-center bg-[#f3f0e8] px-6 text-[#171411]">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-b-[#6EAEC6]" />
-          <p className="mt-4 text-sm text-white/45">Checking staff access…</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-b-black" />
+          <p className="mt-4 text-[10px] font-semibold uppercase tracking-[.16em] text-black/32">Opening staff workspace</p>
         </div>
       </main>
     );
   }
 
-  return children;
+  return <OwnerShell user={user} permissions={permissions}>{children}</OwnerShell>;
 }
