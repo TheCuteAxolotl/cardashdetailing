@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       includeOptOutLine: false,
     });
 
-    if (!sms.sent) {
+    if (!sms.sent || !sms.sid) {
       return NextResponse.json(
         { error: "The text could not be sent through Twilio." },
         { status: 502 }
