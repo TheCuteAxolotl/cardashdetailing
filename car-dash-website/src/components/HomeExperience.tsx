@@ -53,17 +53,17 @@ export default function HomeExperience({
           <div className={`relative z-10 flex min-h-[650px] flex-col justify-between px-5 py-7 transition-opacity duration-200 sm:min-h-[720px] sm:px-8 sm:py-9 lg:px-12 lg:py-11 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
             <div className="flex items-start justify-between gap-5 text-white">
               <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/62">{content.heroEyebrow}</p>
-              <a href="/quote" className="hidden rounded-md border border-white/30 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-sm hover:bg-white hover:text-black sm:inline-flex">Request exact quote</a>
+              <a href="/quote" className="hidden rounded-md border border-white/30 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-sm hover:bg-white hover:text-black sm:inline-flex">Get an exact quote</a>
             </div>
 
             <div className="max-w-[830px] pb-4 text-white sm:pb-8">
-              <p className="mb-5 text-sm font-medium text-white/58">Professional mobile detailing, without the shop drop-off.</p>
+              <p className="mb-5 text-sm font-medium text-white/58">We come to you. No shop drop-off.</p>
               <h1 className="max-w-[12ch] text-[clamp(3.4rem,7.5vw,7.5rem)] font-semibold leading-[.86] tracking-[-.072em]">
                 {content.heroTitle}
               </h1>
               <p className="mt-7 max-w-2xl text-sm leading-7 text-white/66 sm:text-base sm:leading-8">{content.heroBody}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href="#book" className="rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#111] hover:bg-[#ece9e3]">Book an appointment</a>
+                <a href="#book" className="rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#111] hover:bg-[#ece9e3]">Book a detail</a>
                 <a href="#prices" className="rounded-md border border-white/28 px-5 py-3 text-sm font-medium text-white hover:border-white/60">View pricing</a>
               </div>
             </div>
@@ -74,10 +74,10 @@ export default function HomeExperience({
       <section className="border-b border-black/[.08] bg-white">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
-            ["01", "Mobile service", "We come to your home or workplace."],
-            ["02", "Clear pricing", "Know the package price before booking."],
-            ["03", "Real correction", "Paint work based on what the finish needs."],
-            ["04", "Professional protection", "Ceramic and maintenance options."],
+            ["01", "Mobile service", "We come to your home or work."],
+            ["02", "Clear pricing", "You’ll see the price before you book."],
+            ["03", "Paint correction", "We match the correction to what your paint actually needs."],
+            ["04", "Protection that lasts", "Ceramic coating and maintenance options when you want them."],
           ].map(([number, title, body]) => (
             <div key={number} className="min-h-[138px] p-5 sm:p-6 lg:p-7">
               <p className="text-[10px] font-semibold tracking-[.12em] text-black/28">{number}</p>
@@ -93,10 +93,10 @@ export default function HomeExperience({
           <div className="grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Recent work</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">The work should speak for itself.</h2>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what we’ve been working on.</h2>
             </div>
             <div className="flex items-end justify-between gap-5">
-              <p className="max-w-xl text-sm leading-7 text-black/48">Interior resets, exterior details, paint correction and protection completed by Car Dash.</p>
+              <p className="max-w-xl text-sm leading-7 text-black/48">Interiors, exterior details, paint correction, coatings — real jobs we’ve finished for customers.</p>
               <a href="/gallery" className="hidden shrink-0 text-sm font-semibold text-black/55 hover:text-black sm:block">View full gallery →</a>
             </div>
           </div>
@@ -109,9 +109,9 @@ export default function HomeExperience({
           <div className="mb-10 grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Pricing</p>
-              <h2 className="mt-3 max-w-xl text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Straightforward packages. No mystery pricing.</h2>
+              <h2 className="mt-3 max-w-xl text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Simple packages. You’ll know the price before you book.</h2>
             </div>
-            <p className="max-w-2xl text-sm leading-7 text-black/48">Choose your vehicle size and the level of work you want. For correction, coatings, heavy contamination or unusual conditions, request an exact quote.</p>
+            <p className="max-w-2xl text-sm leading-7 text-black/48">Choose your vehicle size and the level of detail you want. If it needs paint correction, a coating, heavy cleanup, or something out of the ordinary, send us a few photos and we’ll quote it exactly.</p>
           </div>
           <HomePackagePricing config={pricingConfig} mediaItems={pricingMedia} />
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-black/[.08] pt-6 text-sm font-medium text-black/52">
@@ -127,13 +127,13 @@ export default function HomeExperience({
         <div className="mx-auto grid max-w-[1320px] gap-10 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
             <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-white/35">Booking</p>
-            <h2 className="mt-3 max-w-lg text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Pick the service. Pick the time.</h2>
-            <p className="mt-5 max-w-lg text-sm leading-7 text-white/48">Book online with the vehicle and service details. We’ll review the appointment and confirm anything that needs clarification.</p>
+            <h2 className="mt-3 max-w-lg text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Pick the service. Pick a time. We’ll take it from there.</h2>
+            <p className="mt-5 max-w-lg text-sm leading-7 text-white/48">Tell us what you drive, what you want done, and when works for you. We’ll review it and reach out if we need to confirm anything.</p>
             <div className="mt-8 border-y border-white/10">
               {[
-                "Unavailable dates are removed automatically.",
-                "Your total is shown before you submit.",
-                "Appointment updates can be sent by text.",
+                "Dates that are already booked won’t show up.",
+                "You’ll see your total before you submit.",
+                "We can text you appointment updates.",
               ].map((item) => (
                 <p key={item} className="border-b border-white/10 py-4 text-sm text-white/55 last:border-b-0">{item}</p>
               ))}
@@ -152,7 +152,7 @@ export default function HomeExperience({
           <div className="mb-9 flex items-end justify-between gap-5 border-b border-black/[.08] pb-6">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">Reviews from real customers.</h2>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
             </div>
             <a href="/reviews" className="hidden text-sm font-semibold text-black/50 hover:text-black sm:block">All reviews →</a>
           </div>
