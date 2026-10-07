@@ -53,6 +53,7 @@ const groups: Array<{ label: string; items: NavItem[] }> = [
       { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", ownerOnly: true },
       { href: "/owner/messages", label: "Messages", icon: "message", ownerOnly: true },
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", ownerOnly: true },
+      { href: "/owner/maintenance", label: "Maintenance", icon: "price", ownerOnly: true },
       { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },
     ],
   },
