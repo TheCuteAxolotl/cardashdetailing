@@ -12,6 +12,7 @@ import {
 } from "@/lib/maintenance";
 import { normalizePhoneNumber, getPublicSiteUrl, sendTransactionalSms } from "@/lib/twilio-sms";
 import {
+  retrieveMaintenanceSubscription,
   setMaintenanceSubscriptionCancelAtPeriodEnd,
 } from "@/lib/stripe-maintenance";
 import { stripeInvoiceRuntimeInfo } from "@/lib/stripe-invoice";
@@ -30,10 +31,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Owner access required." }, { status: 403 });
     }
 
-    const [offers, subscriptions] = await Promise.all([
+    const [offers, storedSubscriptions] = await Promise.all([
       listMaintenanceOffers(),
       listMaintenanceSubscriptions(),
     ]);
+
+    const subscriptions = await Promise.all(
+      storedSubscriptions.map(async (item) => {
+        if (!item.stripeSubscriptionId) return item;
+        try {
+          const stripe = await retrieveMaintenanceSubscription(item.stripeSubscriptionId);
+          return (
+            (await syncMaintenanceSubscription({
+              id: item.id,
+              stripeCustomerId: typeof stripe.customer === "string" ? stripe.customer : null,
+              stripeSubscriptionId: stripe.id,
+              status: stripe.status || item.status,
+              cancelAtPeriodEnd: Boolean(stripe.cancel_at_period_end),
+              currentPeriodEnd: stripe.current_period_end || null,
+            })) || item
+          );
+        } catch {
+          return item;
+        }
+      })
+    );
 
     return NextResponse.json({
       standardPlan: STANDARD_MAINTENANCE_PLAN,
