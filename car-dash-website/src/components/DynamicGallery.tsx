@@ -31,20 +31,23 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
 
   return (
     <>
-      <div className="grid auto-rows-[220px] grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="gallery-editorial grid auto-rows-[220px] grid-cols-1 gap-3 sm:grid-cols-2 lg:auto-rows-[235px] lg:grid-cols-3">
         {visible.map((item, index) => (
           <button
             key={item.id}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className={`group relative overflow-hidden rounded-[22px] text-left ${index === 0 ? "sm:row-span-2 lg:col-span-2 lg:row-span-2" : ""}`}
+            className={`gallery-tile group relative overflow-hidden text-left ${index === 0 ? "sm:row-span-2 lg:col-span-2 lg:row-span-2" : index === 1 ? "lg:row-span-2" : ""}`}
             aria-label={`Open ${item.title}`}
           >
-            <MediaVisual item={item} thumbnail className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-5">
-              <p className="text-[10px] uppercase tracking-[.22em] text-[#6EAEC6]">{item.category.replaceAll("-", " ")}</p>
-              <h3 className="mt-1 text-lg font-semibold text-white">{item.title}</h3>
+            <MediaVisual item={item} thumbnail className="h-full w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.045]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.04),transparent_48%,rgba(0,0,0,.78))] transition duration-500 group-hover:bg-[linear-gradient(180deg,rgba(0,0,0,.02),transparent_42%,rgba(0,0,0,.84))]" />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold uppercase tracking-[.22em] text-white/52">{item.category.replaceAll("-", " ")}</p>
+                <h3 className="mt-1 truncate text-lg font-semibold tracking-[-.02em] text-white">{item.title}</h3>
+              </div>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/18 bg-black/20 text-sm text-white/78 opacity-80 backdrop-blur-md transition duration-300 group-hover:rotate-[-8deg] group-hover:bg-white group-hover:text-black">↗</span>
             </div>
           </button>
         ))}
