@@ -37,7 +37,7 @@ export default async function AboutPage() {
             <h2 className="mt-3 text-4xl font-semibold leading-[.98] tracking-[-.05em] sm:text-5xl">{content.aboutStoryTitle}</h2>
             <p className="mt-5 max-w-xl text-base leading-8 text-black/55">{content.aboutStoryBody}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <a href="/gallery" className="rounded-full border border-black/12 bg-[#EEF7F5] px-5 py-3 text-sm font-semibold">See our work</a>
+              <a href="/gallery" className="rounded-full border border-black/12 bg-[#EEF7F5] px-5 py-3 text-sm font-semibold">See the work</a>
               <a href="/reviews" className="rounded-full border border-black/12 px-5 py-3 text-sm font-semibold">Read reviews</a>
             </div>
           </div>
@@ -51,7 +51,7 @@ export default async function AboutPage() {
               <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">How we work</p>
               <h2 className="mt-3 text-4xl font-semibold tracking-[-.05em] sm:text-5xl">{content.aboutValuesTitle}</h2>
             </div>
-            <p className="max-w-2xl text-sm leading-7 text-white/45">Simple service, clear communication, and work we can stand behind. You should know what you are paying for before the appointment starts.</p>
+            <p className="max-w-2xl text-sm leading-7 text-white/45">Simple service, clear communication, and work we’re proud to stand behind. You’ll know what you’re paying for before the appointment starts.</p>
           </div>
           <PageMediaBand categories={["about-values-bg"]} theme="dark" compact className="mt-8" />
           <div className="mt-8 grid overflow-hidden rounded-[26px] border border-white/10 md:grid-cols-3">
@@ -70,7 +70,7 @@ export default async function AboutPage() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-12 sm:px-8 sm:py-16 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Ready when you are</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">See the price, then pick a time.</h2>
+            <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">See the price. Pick a time. We’ll take it from there.</h2>
           </div>
           <div className="flex flex-wrap gap-3">
             <a href="/#prices" className="rounded-full border border-black/12 bg-white px-5 py-3 text-sm font-semibold">See all prices</a>
