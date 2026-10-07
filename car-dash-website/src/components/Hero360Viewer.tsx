@@ -167,7 +167,7 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
               step(-1);
               settleInteraction();
             }}
-            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/42 text-xl text-[#F7F5F2]/94 opacity-0 shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-[#171411] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] group-hover:opacity-100 sm:left-4"
+            className="absolute left-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/42 text-xl text-[#F7F5F2]/94 opacity-80 shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-[#171411] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] sm:opacity-0 sm:group-hover:opacity-100 sm:left-4"
             aria-label="Previous hero photo"
           >
             ‹
@@ -180,7 +180,7 @@ export default function Hero360Viewer({ frames, className = "", onInteractionCha
               step(1);
               settleInteraction();
             }}
-            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/42 text-xl text-[#F7F5F2]/94 opacity-0 shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-[#171411] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] group-hover:opacity-100 sm:right-4"
+            className="absolute right-3 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-[#F7F5F2]/18 bg-[#171411]/42 text-xl text-[#F7F5F2]/94 opacity-80 shadow-lg backdrop-blur-xl transition hover:bg-white hover:text-[#171411] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C0AB9A] sm:opacity-0 sm:group-hover:opacity-100 sm:right-4"
             aria-label="Next hero photo"
           >
             ›
