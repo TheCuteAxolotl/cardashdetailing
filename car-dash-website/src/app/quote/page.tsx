@@ -25,7 +25,7 @@ type Thread = {
   messages: Msg[];
 };
 
-const input = "w-full rounded-2xl border border-white/10 bg-[#07131B]/50 px-4 py-3 outline-none transition focus:border-[#6EAEC6]/60 focus:shadow-[0_0_0_3px_rgba(110,174,198,.06)]";
+const input = "customer-input w-full border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-[#C0AB9A]/55 focus:shadow-[0_0_0_3px_rgba(192,171,154,.08)]";
 
 async function compressImage(file: File) {
   const source = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -227,7 +227,7 @@ export default function QuotePage() {
       const email = encodeURIComponent(guestSubmitted.email);
       const name = encodeURIComponent(guestSubmitted.name);
       return (
-        <main className="min-h-screen bg-[#0B1822] px-5 py-20 text-white sm:px-8">
+        <main className="luxury-form-page min-h-screen px-5 py-20 text-white sm:px-8">
           <div className="mx-auto max-w-2xl rounded-[32px] border border-emerald-500/20 bg-emerald-500/[.05] p-7 sm:p-10">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-emerald-300">Quote request received</p>
             <h1 className="mt-4 text-4xl font-semibold tracking-[-.05em]">Quote request sent. No account needed.</h1>
@@ -247,7 +247,7 @@ export default function QuotePage() {
     }
 
     return (
-      <main className="min-h-screen bg-[#0B1822] px-5 py-12 text-white sm:px-8 sm:py-20">
+      <main className="luxury-form-page min-h-screen px-5 py-12 text-white sm:px-8 sm:py-20">
         <div className="mx-auto max-w-4xl">
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#6EAEC6]">No login required</p>
@@ -257,7 +257,7 @@ export default function QuotePage() {
 
           <PageMediaBand categories={["quote-media"]} theme="dark" compact className="mt-8" />
 
-          <form onSubmit={create} className="mt-10 rounded-[30px] border border-white/10 bg-white/[.025] p-5 sm:p-8">
+          <form onSubmit={create} className="quote-panel mt-10 border border-white/10 bg-white/[.028] p-5 shadow-[0_24px_80px_rgba(0,0,0,.16)] sm:p-8">
             <div className="grid gap-5 md:grid-cols-2">
               <label className="text-sm text-white/65">Your name<input className={`${input} mt-2`} value={guestName} onChange={(e)=>setGuestName(e.target.value)} placeholder="Full name" required /></label>
               <label className="text-sm text-white/65">Email<input type="email" className={`${input} mt-2`} value={guestEmail} onChange={(e)=>setGuestEmail(e.target.value)} placeholder="you@example.com" required /></label>
@@ -297,7 +297,7 @@ export default function QuotePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0B1822] px-4 py-8 text-white">
+    <main className="luxury-form-page min-h-screen px-4 py-8 text-white">
       <div className="mx-auto max-w-7xl">
         <div>
           <p className="text-xs uppercase tracking-[.28em] text-[#6EAEC6]">Condition-based pricing</p>
@@ -306,12 +306,12 @@ export default function QuotePage() {
         </div>
 
         <div className="mt-7 grid gap-5 lg:grid-cols-[300px_1fr]">
-          <aside className="rounded-[26px] border border-white/10 bg-white/[.025] p-3">
+          <aside className="quote-panel border border-white/10 bg-white/[.028] p-3">
             <button onClick={() => setSelected("")} className="mb-3 w-full rounded-2xl bg-[#6EAEC6] px-4 py-3 text-left font-semibold text-[#0B1822]">+ New quote chat</button>
             {threads.map((thread) => <button key={thread.id} onClick={() => setSelected(thread.id)} className={`mb-2 w-full rounded-2xl p-4 text-left ${selected === thread.id ? "bg-white text-black" : "hover:bg-white/5"}`}><p className="font-semibold">{thread.subject}</p><p className={`mt-1 text-xs ${selected === thread.id ? "text-black/50" : "text-white/35"}`}>{thread.status}{thread.quotedPrice ? ` · $${thread.quotedPrice.toFixed(2)}` : ""}</p></button>)}
           </aside>
 
-          <section className="min-h-[650px] rounded-[26px] border border-white/10 bg-white/[.025] p-5">
+          <section className="quote-panel min-h-[650px] border border-white/10 bg-white/[.028] p-5">
             {active ? (
               <div className="flex h-full flex-col">
                 <div className="border-b border-white/10 pb-4">
