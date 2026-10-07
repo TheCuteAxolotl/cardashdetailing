@@ -423,3 +423,136 @@ img { display: block; }
 .public-clean article {
   scroll-margin-top: 92px;
 }
+
+
+/* 2026 public-site luxury polish */
+.public-clean h1,
+.public-clean h2,
+.public-clean h3 {
+  text-wrap: balance;
+}
+
+.public-clean p {
+  text-wrap: pretty;
+}
+
+.home-hero-shell,
+.public-hero-shell {
+  border-radius: 0;
+}
+
+.gallery-tile,
+.media-band-tile,
+.package-card,
+.booking-shell,
+.review-card,
+.review-summary,
+.pricing-note {
+  border-radius: 16px;
+}
+
+.home-proof-card {
+  transition: background-color 260ms ease, transform 260ms ease;
+}
+
+.package-card {
+  overflow: hidden;
+  transition:
+    transform 320ms cubic-bezier(.2,.75,.2,1),
+    box-shadow 320ms ease,
+    border-color 320ms ease;
+}
+
+.package-card-featured {
+  border-color: rgba(63,48,39,.18) !important;
+  box-shadow: 0 24px 70px rgba(23,20,17,.10);
+}
+
+.package-card-featured::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--raw-umber), var(--tuscany), var(--raw-umber));
+}
+
+.gallery-tile,
+.media-band-tile {
+  box-shadow: 0 14px 40px rgba(23,20,17,.06);
+}
+
+.public-hero-shell {
+  background: var(--pearl);
+  border: 1px solid rgba(63,48,39,.08);
+  box-shadow: 0 18px 58px rgba(23,20,17,.055);
+}
+
+.public-hero-media {
+  overflow: hidden;
+}
+
+.booking-shell {
+  box-shadow: 0 28px 80px rgba(0,0,0,.18);
+}
+
+.review-card,
+.pricing-note {
+  box-shadow: 0 14px 44px rgba(23,20,17,.035);
+}
+
+.review-summary {
+  overflow: hidden;
+}
+
+@media (hover: hover) {
+  .home-proof-card:hover {
+    background: rgba(239,232,226,.42);
+  }
+
+  .package-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(63,48,39,.16);
+    box-shadow: 0 24px 64px rgba(23,20,17,.08);
+  }
+
+  .package-card-featured:hover {
+    box-shadow: 0 30px 78px rgba(23,20,17,.13);
+  }
+}
+
+@media (min-width: 640px) {
+  .home-hero-shell,
+  .public-hero-shell {
+    border-radius: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .package-card-featured {
+    transform: translateY(-8px);
+  }
+
+  .package-card-featured:hover {
+    transform: translateY(-12px);
+  }
+}
+
+@media (max-width: 639px) {
+  body:has(.mobile-booking-bar) .support-launcher {
+    bottom: calc(5.75rem + env(safe-area-inset-bottom)) !important;
+  }
+
+  .gallery-editorial {
+    grid-auto-rows: 245px;
+  }
+
+  .gallery-editorial > :first-child {
+    grid-row: span 2;
+  }
+
+  .public-clean [class*="text-5xl"],
+  .public-clean [class*="text-6xl"],
+  .public-clean [class*="text-7xl"] {
+    overflow-wrap: anywhere;
+  }
+}
