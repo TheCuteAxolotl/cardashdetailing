@@ -166,6 +166,21 @@ const LEGACY_COPY_REPLACEMENTS: Record<string, string> = {
 };
 
 const LEGACY_PRICING_COPY_REPLACEMENTS: Record<string, string> = {
+  "Choose the detail your vehicle needs.": "Pick the detail that fits your car.",
+  "Three straightforward inside-and-out packages. Choose your vehicle size, compare what is included, and book the level that matches its condition.": "Choose your vehicle size, compare what’s included, and pick the level your car actually needs.",
+  "Standard pricing covers normal vehicle conditions. Extreme pet hair, biohazards, excessive adhesive or sticker removal, severe staining, or unusual restoration work is quoted separately before service begins.": "These prices cover normal vehicle conditions. If there’s extreme pet hair, biohazards, heavy stains, lots of adhesive, or restoration work, we’ll quote that separately before we start.",
+  "A complete maintenance-style interior and exterior detail for vehicles that are already kept up fairly well.": "A solid inside-and-out clean for cars that are already kept up pretty well.",
+  "A deeper interior and exterior reset for everyday buildup, kids, crumbs, moderate mess, and vehicles that need more attention.": "A deeper inside-and-out detail for everyday buildup, crumbs, kid mess, and cars that need more attention.",
+  "Our most complete detail: a full interior and exterior reset plus paint decontamination and a one-step machine polish for more gloss and clarity.": "Our most complete detail. You get the full interior and exterior reset, paint decontamination, and a one-step polish for more gloss and clarity.",
+  "Exterior detailing from a maintenance wash to paint enhancement.": "From a maintenance wash to a full paint enhancement.",
+  "Choose your vehicle size, then pick anything from a maintenance wash to a full exterior detail or paint enhancement.": "Choose your vehicle size, then pick how far you want to take the exterior.",
+  "Prices shown are fixed for the selected vehicle class. Severe tar, overspray, oxidation, sanding, or correction beyond the listed package is quoted separately.": "These prices cover the listed work for your vehicle size. Heavy tar, overspray, oxidation, sanding, or extra correction will need a separate quote.",
+  "A maintenance wash for vehicles that are already in good condition.": "A safe maintenance wash for cars that are already in good shape.",
+  "A deeper exterior clean with decontamination and paint protection.": "A deeper exterior clean with decontamination and protection for the paint.",
+  "Full exterior prep plus a one-step machine polish for more gloss and clarity.": "Full exterior prep plus a one-step polish to bring back more gloss and clarity.",
+  "Interior detailing from a quick refresh to a deep clean.": "From a quick interior refresh to a deep clean.",
+  "Choose your vehicle size and how much cleaning the interior needs.": "Choose your vehicle size, then pick how much cleaning the interior actually needs.",
+  "Prices shown are fixed for the selected vehicle class. Extreme pet hair, mold, biohazards, heavy bodily-fluid contamination, or excessive personal-item removal require a custom quote.": "These prices cover normal conditions for your vehicle size. Extreme pet hair, mold, biohazards, heavy contamination, or lots of personal-item removal will need a custom quote.",
   "Complete detailing packages with a clear price before you book.": "Pick a full-detail package and your vehicle size.",
   "Pick your vehicle type, compare what is included, and book the package that matches the level of reset you want.": "Choose your vehicle size, compare what is included, and pick the package that fits what you want done.",
   "A straightforward inside-and-out reset for a regularly maintained vehicle.": "A basic inside-and-out clean for a vehicle that is already kept up pretty well.",
