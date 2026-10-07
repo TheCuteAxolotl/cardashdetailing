@@ -55,11 +55,11 @@ export default function PricingMediaStrip({
             key={item.id}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className={`${index === 0 && items.length > 2 ? "col-span-2 row-span-2" : ""} group relative min-h-44 overflow-hidden rounded-[24px] border ${dark ? "border-[#F7F5F2]/10" : "border-[#C0AB9A]/35"} bg-[#171411] text-left`}
+            className={`${index === 0 && items.length > 2 ? "col-span-2 row-span-2" : ""} media-band-tile group relative min-h-44 overflow-hidden border ${dark ? "border-[#F7F5F2]/10" : "border-[#C0AB9A]/35"} bg-[#171411] text-left`}
             aria-label={`Open ${item.title}`}
           >
-            <MediaVisual item={item} thumbnail className="h-full min-h-44 w-full object-cover transition duration-500 group-hover:scale-[1.02]" />
-            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#171411]/84 to-transparent px-4 pb-3 pt-8 text-xs font-semibold text-[#F7F5F2]">{item.title}</span>
+            <MediaVisual item={item} thumbnail className="h-full min-h-44 w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.045]" />
+            <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-[#171411]/88 to-transparent px-4 pb-4 pt-10 text-xs font-semibold text-[#F7F5F2]"><span className="truncate">{item.title}</span><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/16 bg-black/15 text-[11px] opacity-80 backdrop-blur-sm transition group-hover:bg-white group-hover:text-black">↗</span></span>
           </button>
         ))}
       </div>
