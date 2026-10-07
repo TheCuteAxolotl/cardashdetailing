@@ -96,11 +96,11 @@ export default function PageMediaBand({
               key={item.id}
               type="button"
               onClick={() => setOpenIndex(index)}
-              className={`${index === 0 && visible.length >= 3 && !compact ? "col-span-2 row-span-2" : ""} group relative overflow-hidden rounded-[22px] border ${border} bg-[#171411] text-left ${compact ? "min-h-36" : "min-h-48"}`}
+              className={`${index === 0 && visible.length >= 3 && !compact ? "col-span-2 row-span-2" : ""} media-band-tile group relative overflow-hidden border ${border} bg-[#171411] text-left ${compact ? "min-h-36" : "min-h-48"}`}
               aria-label={`Open ${item.title}`}
             >
-              <MediaVisual item={item} thumbnail className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${compact ? "min-h-36 max-h-56" : "min-h-48"}`} />
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#171411]/88 to-transparent px-4 pb-3 pt-10 text-xs font-semibold text-[#F7F5F2]">{item.title}</span>
+              <MediaVisual item={item} thumbnail className={`h-full w-full object-cover transition duration-[800ms] ease-out group-hover:scale-[1.04] ${compact ? "min-h-36 max-h-56" : "min-h-48"}`} />
+              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-[#171411]/88 to-transparent px-4 pb-4 pt-12 text-xs font-semibold text-[#F7F5F2]"><span className="truncate">{item.title}</span><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/16 bg-black/15 text-[11px] opacity-80 backdrop-blur-sm transition group-hover:bg-white group-hover:text-black">↗</span></span>
             </button>
           ))}
         </div>
