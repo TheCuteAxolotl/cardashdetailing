@@ -1272,3 +1272,95 @@ img { display: block; }
     line-height: .98 !important;
   }
 }
+
+
+/* Mobile obstruction + scroll cleanup */
+@media (max-width: 639px) {
+  .mobile-booking-bar {
+    transition:
+      opacity 220ms ease,
+      transform 320ms cubic-bezier(.22,.8,.25,1),
+      visibility 0s linear 0s;
+  }
+
+  .mobile-booking-bar-hidden,
+  .mobile-nav-open .mobile-booking-bar {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(calc(100% + 24px)) !important;
+    transition:
+      opacity 180ms ease,
+      transform 280ms cubic-bezier(.4,0,.2,1),
+      visibility 0s linear 280ms;
+  }
+
+  .site-footer-main {
+    padding-top: 2.25rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .site-footer-grid {
+    gap: 1.5rem !important;
+  }
+
+  .site-footer-brand > p:first-child {
+    font-size: 2rem !important;
+  }
+
+  .site-footer-brand > p:nth-child(2) {
+    margin-top: .5rem !important;
+  }
+
+  .site-footer-brand > p:nth-child(3) {
+    margin-top: 1rem !important;
+    max-width: 34rem;
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+  }
+
+  .site-footer-cta {
+    display: none !important;
+  }
+
+  .mobile-footer-contact {
+    display: block !important;
+  }
+
+  .site-footer-social {
+    margin-top: 1rem !important;
+  }
+
+  .site-footer-social > div {
+    gap: 8px !important;
+  }
+
+  .site-footer-social a {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .site-footer-links {
+    display: none !important;
+  }
+
+  .site-footer-bottom > div {
+    gap: 8px !important;
+    padding-top: 14px !important;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+    font-size: 8px !important;
+    line-height: 1.5;
+  }
+
+  .site-footer-bottom > div > span {
+    max-width: 30ch;
+  }
+
+  .mobile-menu-panel > div {
+    max-height: calc(100dvh - 112px) !important;
+  }
+
+  .mobile-menu-panel .mt-5 {
+    margin-top: 12px !important;
+  }
+}
