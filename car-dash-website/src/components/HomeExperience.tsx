@@ -105,7 +105,7 @@ export default function HomeExperience({
               <a href="/gallery" className="hidden shrink-0 text-sm font-semibold text-black/55 hover:text-black sm:block">View full gallery →</a>
             </div>
           </div>
-          <div className="mt-10"><DynamicGallery limit={6} /></div>
+          <div className="home-gallery mt-10"><DynamicGallery limit={6} /></div>
         </div>
       </section>
 
