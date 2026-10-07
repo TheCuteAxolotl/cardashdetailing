@@ -87,7 +87,10 @@ export default function SiteChrome({ children, footerBlurb }: { children: ReactN
     );
   }
 
-  const showMobileActions = pathname !== "/quote" && pathname !== "/contact";
+  const showMobileActions =
+    pathname !== "/quote" &&
+    pathname !== "/contact" &&
+    !pathname.startsWith("/maintenance/manage/");
 
   return (
     <>
