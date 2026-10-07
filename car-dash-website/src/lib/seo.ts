@@ -3,7 +3,7 @@ import { BUSINESS_PHONE } from "@/lib/constants";
 
 export const SITE_URL = "https://cardashdetailing.com";
 export const BUSINESS_NAME = "Car Dash Detailing";
-export const BUSINESS_EMAIL = "cardashdetailing@gmail.com";
+export const BUSINESS_EMAIL = "cardashdetailing.il@gmail.com";
 
 export const SERVICE_AREAS = [
   "South Elgin, Illinois",
