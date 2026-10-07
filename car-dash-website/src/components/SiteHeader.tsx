@@ -63,10 +63,16 @@ export default function SiteHeader() {
   }, [pathname]);
 
   useEffect(() => {
-    if (!menuOpen) return;
+    document.body.classList.toggle("mobile-nav-open", menuOpen);
+    if (!menuOpen) return () => document.body.classList.remove("mobile-nav-open");
+
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previous; };
+
+    return () => {
+      document.body.style.overflow = previous;
+      document.body.classList.remove("mobile-nav-open");
+    };
   }, [menuOpen]);
 
   const owner = Boolean(user && (user.role === "owner" || user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()));
@@ -170,9 +176,9 @@ export default function SiteHeader() {
                 <a href="/#prices" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Pricing</a>
                 <a href="/gallery" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Work</a>
                 <a href="/reviews" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Reviews</a>
-                <button onClick={() => setMobileServiceOpen(!mobileServiceOpen)} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><span>{mobileServiceOpen ? "−" : "+"}</span></button>
+                <button onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><span>{mobileServiceOpen ? "−" : "+"}</span></button>
                 {mobileServiceOpen && <div className="pb-4 pl-4">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}</div>}
-                <button onClick={() => setMobileMoreOpen(!mobileMoreOpen)} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>More</span><span>{mobileMoreOpen ? "−" : "+"}</span></button>
+                <button onClick={() => { setMobileMoreOpen(!mobileMoreOpen); setMobileServiceOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>More</span><span>{mobileMoreOpen ? "−" : "+"}</span></button>
                 {mobileMoreOpen && <div className="pb-4 pl-4">{moreLinks.map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}<button onClick={openSupport} className="block py-2.5 text-sm text-black/55">Support</button></div>}
               </nav>
               <div className="mt-5 grid grid-cols-2 gap-2">
