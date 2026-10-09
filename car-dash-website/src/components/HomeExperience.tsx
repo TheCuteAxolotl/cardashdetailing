@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { SiteContent } from "@/lib/site-defaults";
+import type { PromotionSettings } from "@/lib/promotions";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import DynamicGallery from "@/components/DynamicGallery";
 import ReviewCards from "@/components/ReviewCards";
@@ -15,6 +16,7 @@ import SitePhoto from "@/components/SitePhoto";
 type Props = {
   initialContent: SiteContent;
   pricingConfig: PricingPageConfig;
+  promotions?: PromotionSettings;
   pricingMedia?: MediaItem[];
   hero360Frames?: MediaItem[];
 };
@@ -22,6 +24,7 @@ type Props = {
 export default function HomeExperience({
   initialContent: content,
   pricingConfig,
+  promotions,
   pricingMedia = [],
   hero360Frames = [],
 }: Props) {
@@ -118,7 +121,7 @@ export default function HomeExperience({
             </div>
             <p className="max-w-2xl text-sm leading-7 text-black/48">Choose your vehicle size and the level of detail you want. If it needs paint correction, a coating, heavy cleanup, or something out of the ordinary, send us a few photos and we’ll quote it exactly.</p>
           </div>
-          <HomePackagePricing config={pricingConfig} mediaItems={pricingMedia} />
+          <HomePackagePricing config={pricingConfig} mediaItems={pricingMedia} promotions={promotions} />
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-black/[.08] pt-6 text-sm font-medium text-black/52">
             <a href="/interior-detailing" className="hover:text-black">Interior only →</a>
             <a href="/exterior-detailing" className="hover:text-black">Exterior only →</a>

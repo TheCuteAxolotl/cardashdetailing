@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import PromotionBanner from "@/components/PromotionBanner";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SupportWidget from "@/components/SupportWidget";
@@ -94,6 +95,7 @@ export default function SiteChrome({ children, footerBlurb }: { children: ReactN
 
   return (
     <>
+      <PromotionBanner />
       <SiteHeader />
       <ScrollReveal />
       <div className="public-clean flex-1">{children}</div>
