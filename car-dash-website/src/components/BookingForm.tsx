@@ -164,6 +164,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [slots, setSlots] = useState<string[]>([]);
+  const [pastSlots, setPastSlots] = useState<string[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -412,11 +413,11 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   }, [prefill?.service, initialSiteContent]);
 
   useEffect(() => {
-    if (!form.preferredDate) { setSlots([]); return; }
+    if (!form.preferredDate) { setSlots([]); setPastSlots([]); return; }
     fetch(`/api/availability?date=${encodeURIComponent(form.preferredDate)}&duration=${estimatedDuration}`)
       .then((response) => response.json())
-      .then((data) => { setSlots(data.slots || []); set("preferredTime", ""); })
-      .catch(() => setSlots([]));
+      .then((data) => { setSlots(data.slots || []); setPastSlots(data.pastSlots || []); set("preferredTime", ""); })
+      .catch(() => { setSlots([]); setPastSlots([]); });
   }, [form.preferredDate, estimatedDuration]);
 
   const chooseVehicle = (id: string) => {
@@ -598,7 +599,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
         <p className="mb-3 text-sm text-white/60">Estimated appointment: {Math.floor(estimatedDuration/60)}h {estimatedDuration%60 ? `${estimatedDuration%60}m` : ""}. Available start times automatically account for this.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker duration={estimatedDuration} value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
-          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
+          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{[...slots.map(slot=>({slot,disabled:false})),...pastSlots.map(slot=>({slot,disabled:true}))].sort((a,b)=>a.slot.localeCompare(b.slot)).map(({slot,disabled}) => <option key={slot} disabled={disabled} value={slot}>{slot}{disabled ? " — past" : ""}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
         </div>
       </section>
 

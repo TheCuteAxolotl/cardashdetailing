@@ -38,7 +38,7 @@ export function slotsInRange(start:string,end:string,step=30){
  const a=Number(start.slice(0,2))*60+Number(start.slice(3)),b=Number(end.slice(0,2))*60+Number(end.slice(3));
  const slots:string[]=[];for(let t=a;t<b;t+=step)slots.push(String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0"));return slots;
 }
-const DEFAULT_SLOT_VALUES = slotsInRange("08:00","17:00");
+const DEFAULT_SLOT_VALUES = slotsInRange("08:00","16:30");
 
 export const DEFAULT_BOOKING_AVAILABILITY: BookingAvailabilityConfig = {
   timezone: "America/Chicago",
@@ -177,4 +177,23 @@ export function isConfiguredBookingSlot(
   const normalized = normalizeBookingTime(time);
   if (!normalized) return false;
   return configuredSlotsForDate(config, date).includes(normalized);
+}
+
+/** Latest allowed start time; appointments may finish after the advertised last start. */
+export function latestStartForDate(date:string){
+ const day=dayKeyForDate(date);
+ return day==="sunday"?"15:00":day==="thursday"||day==="friday"||day==="saturday"?"16:00":null;
+}
+export function chicagoNowParts(now=new Date(),timezone="America/Chicago"){
+ const parts=new Intl.DateTimeFormat("en-US",{timeZone:timezone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(now);
+ const get=(type:string)=>parts.find(part=>part.type===type)?.value||"00";
+ return {date:get("year")+"-"+get("month")+"-"+get("day"),minutes:Number(get("hour"))*60+Number(get("minute"))};
+}
+export function isStartInPast(date:string,time:string,timezone="America/Chicago",now=new Date()){
+ const current=chicagoNowParts(now,timezone);
+ const normalized=normalizeBookingTime(time);
+ if(!normalized)return true;
+ if(date!==current.date)return date<current.date;
+ const start=Number(normalized.slice(0,2))*60+Number(normalized.slice(3));
+ return start<=current.minutes;
 }

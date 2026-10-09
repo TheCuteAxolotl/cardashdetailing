@@ -9,7 +9,7 @@ import {
 } from "@/lib/booking-availability";
 
 import { savedDuration, timeMinutes } from "@/lib/booking-duration";
-import { configuredSlotsForDate, dayKeyForDate, DEFAULT_BOOKING_HOURS } from "@/lib/booking-availability";
+import { configuredSlotsForDate, latestStartForDate, isStartInPast } from "@/lib/booking-availability";
 
 const ACTIVE_STATUSES = ["pending", "confirmed"];
 
@@ -53,11 +53,11 @@ async function slotIsTaken(tx: Prisma.TransactionClient,date:string,time:string,
 async function slotIsPubliclyConfigured(tx:Prisma.TransactionClient,date:string,time:string,duration:number){
  const row=await tx.siteContent.findUnique({where:{key:BOOKING_AVAILABILITY_KEY}});
  const config=parseBookingAvailabilityConfig(row?.value);
- if(date<dateInTimeZone(config.timezone)||!isConfiguredBookingSlot(config,date,time))return false;
+ if(isStartInPast(date,time,config.timezone)||!isConfiguredBookingSlot(config,date,time))return false;
  const slots=configuredSlotsForDate(config,date);
- const day=dayKeyForDate(date);
- const defaultHours=day?DEFAULT_BOOKING_HOURS[day]:null;
- const close=defaultHours && slots[0]===defaultHours.start ? timeMinutes(defaultHours.end)! : Math.max(...slots.map(s=>timeMinutes(s)??0))+30;
+ const latest=latestStartForDate(date);
+ if(latest&&(timeMinutes(time)??9999)>timeMinutes(latest)!)return false;
+ const close=latest?timeMinutes(latest)!+duration:Math.max(0,...slots.map(s=>timeMinutes(s)??0))+30;
  return (timeMinutes(time)??9999)+duration<=close;
 }
 
