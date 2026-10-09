@@ -17,6 +17,7 @@ import {
   parseBookingPricingConfig,
   parseDiscountCodes,
 } from "@/lib/booking-pricing";
+import { PROMOTIONS_KEY, matchingPromotion, parsePromotions, promotionalPrice } from "@/lib/promotions";
 import { checkDiscountAvailability } from "@/lib/discount-usage";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 import { createBookingWithSlotProtection, BookingSlotConflictError, BookingSlotUnavailableError } from "@/lib/booking-slot";
@@ -226,10 +227,19 @@ export async function POST(request: NextRequest) {
     if (allowAddOns && selectedAddOns.length !== requestedAddOnIds.length) return NextResponse.json({ success: false, message: "One of the selected add-ons changed or is no longer available. Refresh the booking page and choose the add-ons again." }, { status: 409 });
 
     const addOnTotal = selectedAddOns.reduce((sum, item) => sum + Number(item?.price || 0), 0);
-    const subtotal = Math.round((baseTotal + addOnTotal) * 100) / 100;
+    const promotionRow=await prisma.siteContent.findUnique({where:{key:PROMOTIONS_KEY}});
+    const promotions=parsePromotions(promotionRow?.value);
+    const category=pricingPage && packageId ? pricingPage : serviceId===STANDALONE_HEADLIGHT_SERVICE_ID ? "service" : serviceId ? (await prisma.service.findUnique({where:{id:serviceId},select:{category:true}}))?.category || "service" : "service";
+    const promoId=packageId || serviceId;
+    const mainSale=!quoteThreadId && promoId ? matchingPromotion(promotions,category,promoId,packageId?"package":"service") : null;
+    const saleBase=promotionalPrice(baseTotal,mainSale);
+    const discountedAddOnTotal=selectedAddOns.reduce((sum,item)=>sum+promotionalPrice(Number(item?.price||0), matchingPromotion(promotions,"addon",item?.id||"","addon")),0);
+    const subtotal = Math.round((saleBase + discountedAddOnTotal) * 100) / 100;
+    const hasAutomaticSale=saleBase<baseTotal || discountedAddOnTotal<addOnTotal;
 
     let appliedDiscount = null as ReturnType<typeof parseDiscountCodes>[number] | null;
     if (discountCode) {
+      if(hasAutomaticSale)return NextResponse.json({success:false,message:"Coupon codes cannot be combined with an automatic promotion."},{status:409});
       const discountRow = await prisma.siteContent.findUnique({ where: { key: DISCOUNT_CODES_KEY } });
       appliedDiscount = parseDiscountCodes(discountRow?.value).find((item) => item.code === discountCode) || null;
       if (!appliedDiscount) return NextResponse.json({ success: false, message: "That discount code is no longer valid. Remove it and try again." }, { status: 409 });
@@ -264,7 +274,8 @@ export async function POST(request: NextRequest) {
     const detailsText = [
       `Base service: $${baseTotal.toFixed(2)}`,
       `Add-ons: ${addOnSummary}`,
-      `Add-ons total: $${addOnTotal.toFixed(2)}`,
+      `Add-ons total: ${discountedAddOnTotal.toFixed(2)}`,
+      hasAutomaticSale ? `Automatic promotion savings: ${(baseTotal+addOnTotal-subtotal).toFixed(2)}` : "Automatic promotion: None",
       appliedDiscount ? `Discount: ${appliedDiscount.code} (${describeDiscount(appliedDiscount)}) -$${discountAmount.toFixed(2)}` : "Discount: None",
       `Booking total: $${bookingTotal.toFixed(2)}`,
       `Booking source: ${source}`,
