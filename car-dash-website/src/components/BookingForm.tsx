@@ -224,6 +224,13 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const discountAmount = subtotal == null || hasAutomaticSale ? 0 : calculateDiscount(subtotal, appliedDiscount, baseTotal ?? subtotal);
   const bookingTotal = subtotal == null ? null : Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
 
+  useEffect(() => {
+    if (hasAutomaticSale && appliedDiscount) {
+      setAppliedDiscount(null);
+      setDiscountMessage("The automatic sale replaced the coupon; promotions cannot be stacked.");
+    }
+  }, [hasAutomaticSale, appliedDiscount]);
+
   const packageChoiceValue = packageSelection ? `package:${packageSelection.pricingPage}:${packageSelection.packageId}` : "";
   const serviceChoiceValue = packageChoiceValue || (form.serviceId ? `service:${form.serviceId}` : "");
   const bookingDiscountTarget = packageSelection
