@@ -2,6 +2,7 @@ import PricingMediaStrip from "@/components/PricingMediaStrip";
 import SitePhoto from "@/components/SitePhoto";
 import PageMediaBand from "@/components/PageMediaBand";
 import type { PricingPageConfig, VehicleClass } from "@/lib/pricing-config";
+import { matchingPromotion, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import { VEHICLE_LABELS } from "@/lib/pricing-config";
 import PackageMediaEvidence from "@/components/PackageMediaEvidence";
 import type { MediaItem } from "@/lib/media";
@@ -20,7 +21,7 @@ function bookingHref(kind: PageKind, packageId: string, vehicleClass: VehicleCla
   return `/?pricingPage=${encodeURIComponent(kind)}&packageId=${encodeURIComponent(packageId)}&vehicleClass=${encodeURIComponent(vehicleClass)}#book`;
 }
 
-export default function PricingPageExperience({ kind, initialConfig: config, mediaItems = [] }: { kind: PageKind; initialConfig: PricingPageConfig; mediaItems?: MediaItem[] }) {
+export default function PricingPageExperience({ kind, initialConfig: config, mediaItems = [], promotions }: { kind: PageKind; initialConfig: PricingPageConfig; mediaItems?: MediaItem[]; promotions?: PromotionSettings }) {
   return (
     <main className="min-h-screen bg-[#f5f4f1] text-[#111]">
       <section className="border-b border-black/[.08] bg-[#f5f4f1] sm:px-5 lg:px-8">
@@ -71,7 +72,7 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
                 {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
                   <a key={vehicleClass} href={bookingHref(kind, pkg.id, vehicleClass)} className={`group flex min-h-14 items-center justify-between gap-4 px-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}>
                     <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
-                    <span className="flex items-center gap-3"><strong className="text-lg font-semibold">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong><span className="text-xs font-semibold text-black/34 group-hover:text-black">Book →</span></span>
+                    <span className="flex items-center gap-3">{(() => { const original=Number(pkg.prices[vehicleClass]||0); const sale=promotions?matchingPromotion(promotions,kind,pkg.id,"package"):null; const final=promotionalPrice(original,sale); return <span className="flex flex-wrap items-baseline gap-2">{final<original&&<span className="text-xs text-black/40 line-through">${original.toFixed(2)}</span>}<strong className={`text-lg font-semibold ${final<original?"text-red-700":""}`}>${final.toFixed(2)}</strong></span>; })()}<span className="text-xs font-semibold text-black/34 group-hover:text-black">Book →</span></span>
                   </a>
                 ))}
               </div>
