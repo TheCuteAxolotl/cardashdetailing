@@ -8,6 +8,9 @@ import {
   parseBookingAvailabilityConfig,
 } from "@/lib/booking-availability";
 
+import { savedDuration, timeMinutes } from "@/lib/booking-duration";
+import { configuredSlotsForDate, dayKeyForDate, DEFAULT_BOOKING_HOURS } from "@/lib/booking-availability";
+
 const ACTIVE_STATUSES = ["pending", "confirmed"];
 
 function dateInTimeZone(timezone: string) {
@@ -38,37 +41,24 @@ export class BookingSlotUnavailableError extends Error {
 }
 
 async function lockSlot(tx: Prisma.TransactionClient, date: string, normalizedTime: string) {
-  const key = `car-dash-booking:${date}:${normalizedTime}`;
+  const key = `car-dash-booking:${date}`;
   await tx.$queryRaw<Array<{ lockResult: string | null }>>`SELECT pg_advisory_xact_lock(hashtext(${key}))::text AS "lockResult"`;
 }
 
-async function slotIsTaken(
-  tx: Prisma.TransactionClient,
-  date: string,
-  normalizedTime: string,
-  excludeBookingId?: string
-) {
-  const bookings = await tx.booking.findMany({
-    where: {
-      preferredDate: date,
-      status: { in: ACTIVE_STATUSES },
-      ...(excludeBookingId ? { id: { not: excludeBookingId } } : {}),
-    },
-    select: { preferredTime: true },
-  });
-
-  return bookings.some((booking) => normalizeBookingTime(booking.preferredTime) === normalizedTime);
+async function slotIsTaken(tx: Prisma.TransactionClient,date:string,time:string,duration:number,excludeBookingId?:string) {
+ const bookings=await tx.booking.findMany({where:{preferredDate:date,status:{in:ACTIVE_STATUSES},...(excludeBookingId?{id:{not:excludeBookingId}}:{})},select:{preferredTime:true,serviceName:true,notes:true}});
+ const start=timeMinutes(time);if(start===null)return true;
+ return bookings.some(b=>{const other=timeMinutes(b.preferredTime||"");return other!==null&&start<other+savedDuration(b.notes,b.serviceName)&&other<start+duration;});
 }
-
-async function slotIsPubliclyConfigured(
-  tx: Prisma.TransactionClient,
-  date: string,
-  normalizedTime: string
-) {
-  const row = await tx.siteContent.findUnique({ where: { key: BOOKING_AVAILABILITY_KEY } });
-  const config = parseBookingAvailabilityConfig(row?.value);
-  if (date < dateInTimeZone(config.timezone)) return false;
-  return isConfiguredBookingSlot(config, date, normalizedTime);
+async function slotIsPubliclyConfigured(tx:Prisma.TransactionClient,date:string,time:string,duration:number){
+ const row=await tx.siteContent.findUnique({where:{key:BOOKING_AVAILABILITY_KEY}});
+ const config=parseBookingAvailabilityConfig(row?.value);
+ if(date<dateInTimeZone(config.timezone)||!isConfiguredBookingSlot(config,date,time))return false;
+ const slots=configuredSlotsForDate(config,date);
+ const day=dayKeyForDate(date);
+ const defaultHours=day?DEFAULT_BOOKING_HOURS[day]:null;
+ const close=defaultHours && slots[0]===defaultHours.start ? timeMinutes(defaultHours.end)! : Math.max(...slots.map(s=>timeMinutes(s)??0))+30;
+ return (timeMinutes(time)??9999)+duration<=close;
 }
 
 export async function createBookingWithSlotProtection(
@@ -84,11 +74,12 @@ export async function createBookingWithSlotProtection(
   return prisma.$transaction(async (tx) => {
     await lockSlot(tx, date, normalizedTime);
 
-    if (options.enforcePublicAvailability && !(await slotIsPubliclyConfigured(tx, date, normalizedTime))) {
+    const duration=savedDuration(String(data.notes||""),String(data.serviceName||""));
+    if (options.enforcePublicAvailability && !(await slotIsPubliclyConfigured(tx, date, normalizedTime,duration))) {
       throw new BookingSlotUnavailableError();
     }
 
-    if (await slotIsTaken(tx, date, normalizedTime)) {
+    if (await slotIsTaken(tx, date, normalizedTime,duration)) {
       throw new BookingSlotConflictError();
     }
 
@@ -115,7 +106,8 @@ export async function updateBookingScheduleWithSlotProtection(
 
   return prisma.$transaction(async (tx) => {
     await lockSlot(tx, cleanDate, normalizedTime);
-    if (await slotIsTaken(tx, cleanDate, normalizedTime, bookingId)) {
+    const existing=await tx.booking.findUnique({where:{id:bookingId},select:{serviceName:true,notes:true}});
+    if (await slotIsTaken(tx, cleanDate, normalizedTime,savedDuration(existing?.notes,existing?.serviceName||""), bookingId)) {
       throw new BookingSlotConflictError();
     }
 
@@ -135,7 +127,7 @@ export async function activateBookingStatusWithSlotProtection(
 ) {
   const current = await prisma.booking.findUnique({
     where: { id: bookingId },
-    select: { preferredDate: true, preferredTime: true },
+    select: { preferredDate: true, preferredTime: true, serviceName:true,notes:true },
   });
   if (!current) return null;
 
@@ -147,7 +139,7 @@ export async function activateBookingStatusWithSlotProtection(
 
   return prisma.$transaction(async (tx) => {
     await lockSlot(tx, date, normalizedTime);
-    if (await slotIsTaken(tx, date, normalizedTime, bookingId)) {
+    if (await slotIsTaken(tx, date, normalizedTime,savedDuration(current.notes,current.serviceName), bookingId)) {
       throw new BookingSlotConflictError("That time is already booked by another active appointment. Move this booking before reactivating it.");
     }
     return tx.booking.update({ where: { id: bookingId }, data: { status } });
