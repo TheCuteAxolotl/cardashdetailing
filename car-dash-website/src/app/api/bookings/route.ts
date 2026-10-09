@@ -276,6 +276,7 @@ export async function POST(request: NextRequest) {
       `Add-ons: ${addOnSummary}`,
       `Add-ons total: ${discountedAddOnTotal.toFixed(2)}`,
       hasAutomaticSale ? `Automatic promotion savings: ${(baseTotal+addOnTotal-subtotal).toFixed(2)}` : "Automatic promotion: None",
+      hasAutomaticSale ? `Automatic promotion campaign: ${mainSale?.id || "add-on-promotion"}` : null,
       appliedDiscount ? `Discount: ${appliedDiscount.code} (${describeDiscount(appliedDiscount)}) -$${discountAmount.toFixed(2)}` : "Discount: None",
       `Booking total: $${bookingTotal.toFixed(2)}`,
       `Booking source: ${source}`,
