@@ -92,11 +92,14 @@ export async function GET(request: NextRequest) {
 
   const configured = configuredSlotsForDate(config, date);
   const open=availableFor(date,existing);
+  const latest=latestStartForDate(date);
+  const pastSlots=configured.filter(slot=>(!latest || (timeMinutes(slot)??9999)<=timeMinutes(latest)!) && isStartInPast(date,slot,config.timezone));
 
   return NextResponse.json({
     date,
     today,
     closed: configured.length === 0,
     slots: open.map(formatBookingTime),
+    pastSlots: pastSlots.map(formatBookingTime),
   });
 }
