@@ -10,7 +10,7 @@ import {
 } from "@/lib/booking-availability";
 
 import { timeMinutes, savedDuration, fitsWithoutOverlap } from "@/lib/booking-duration";
-import { DEFAULT_BOOKING_HOURS, dayKeyForDate } from "@/lib/booking-availability";
+import { latestStartForDate, isStartInPast } from "@/lib/booking-availability";
 
 function dateInTimeZone(timezone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -38,10 +38,10 @@ export async function GET(request: NextRequest) {
   const duration=Number.isFinite(requested)&&requested>=30&&requested<=960?Math.ceil(requested/15)*15:180;
   const availableFor=(date:string,bookings:{preferredTime:string|null;serviceName:string;notes:string|null}[])=>{
     const slots=configuredSlotsForDate(config,date);
-    const day=dayKeyForDate(date);const hours=day?DEFAULT_BOOKING_HOURS[day]:null;
-    const close=hours&&slots[0]===hours.start ? timeMinutes(hours.end)! : Math.max(0,...slots.map(s=>timeMinutes(s)??0))+30;
+    const latest=latestStartForDate(date);
+    const close=latest?timeMinutes(latest)!+duration:Math.max(0,...slots.map(s=>timeMinutes(s)??0))+30;
     const busy=bookings.map(b=>({start:timeMinutes(b.preferredTime||"")??-1000,duration:savedDuration(b.notes,b.serviceName)}));
-    return slots.filter(slot=>fitsWithoutOverlap(timeMinutes(slot)??9999,duration,busy,close));
+    return slots.filter(slot=>(!latest || (timeMinutes(slot)??9999)<=timeMinutes(latest)!) && !isStartInPast(date,slot,config.timezone) && fitsWithoutOverlap(timeMinutes(slot)??9999,duration,busy,close));
   };
 
   const configRow = await prisma.siteContent.findUnique({ where: { key: BOOKING_AVAILABILITY_KEY } });
