@@ -48,7 +48,7 @@ function chicagoDay(now: Date): string {
 export function matchingPromotion(settings: PromotionSettings, category: string, itemId: string, itemType: "package" | "service" | "addon", now = new Date()) {
   const day=chicagoDay(now);
   const matches=settings.promotions.filter(p=>p.enabled && (!p.startsAt || p.startsAt<=day) && (!p.endsAt || p.endsAt>=day) &&
-    (p.scope==="all" || (p.scope==="category" && p.target===category) || (p.scope===itemType && p.target===category+":"+itemId) || (p.scope===itemType && p.target===itemId)));
+    (p.scope==="all" || (p.scope==="category" && p.target===category) || (p.scope===itemType && (p.target===category+":"+itemId || p.target===itemType+":"+itemId || p.target===itemId))));
   // One non-stacking promotion. Owner-created order wins.
   return matches[0] || null;
 }
