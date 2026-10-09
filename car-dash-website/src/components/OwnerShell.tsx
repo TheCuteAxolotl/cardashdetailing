@@ -61,6 +61,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     items: [
       { href: "/owner/website", label: "Content", icon: "web", permissions: ["website"] },
       { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
+      { href: "/owner/promotions", label: "Promotions", icon: "price", ownerOnly: true },
       { href: "/owner/services", label: "Services", icon: "service", permissions: ["services"] },
       { href: "/owner/gallery", label: "Photos & media", icon: "photo", permissions: ["gallery"] },
     ],
