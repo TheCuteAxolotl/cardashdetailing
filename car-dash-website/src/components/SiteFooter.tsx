@@ -10,7 +10,8 @@ export default function SiteFooter({ blurb }: { blurb: string }) {
           <div className="site-footer-brand">
             <p className="text-4xl font-semibold tracking-[-.045em] sm:text-5xl">CAR DASH</p>
             <p className="mt-3 text-[9px] font-semibold uppercase tracking-[.24em] text-white/32">South Elgin · Mobile detailing</p>
-            <p className="mt-7 max-w-lg text-sm leading-7 text-white/44">{blurb}</p>
+            <p className="mt-6 max-w-lg border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 text-white/80">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>
+            <p className="mt-5 max-w-lg text-sm leading-7 text-white/44">{blurb}</p>
             <div className="site-footer-cta mt-7 flex flex-wrap gap-3">
               <a href="/#book" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#111]">Book a detail</a>
               <a href="/quote" className="rounded-full border border-white/16 px-5 py-3 text-sm font-medium text-white/72 hover:border-white/32 hover:text-white">Exact quote</a>
