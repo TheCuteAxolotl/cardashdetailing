@@ -1,10 +1,13 @@
 import PricingPageExperience from "@/components/PricingPageExperience";
 import { DEFAULT_PRICING_PAGES, parsePricingConfig } from "@/lib/pricing-config";
 import { getSiteContent } from "@/lib/site-content";
+import { PROMOTIONS_KEY, parsePromotions } from "@/lib/promotions";
 import { prisma } from "@/lib/prisma";
 
 export default async function ExteriorDetailingPage() {
   const content = await getSiteContent();
+  const promoRow=await prisma.siteContent.findUnique({where:{key:PROMOTIONS_KEY}}).catch(()=>null);
+  const promotions=parsePromotions(promoRow?.value);
   const config = parsePricingConfig(content.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior);
   let mediaItems: Array<{ id: string; url: string; title: string; category: string }> = [];
   try {
@@ -16,5 +19,5 @@ export default async function ExteriorDetailingPage() {
   } catch (error) {
     console.error("Error loading package media:", error);
   }
-  return <PricingPageExperience kind="exterior" initialConfig={config} mediaItems={mediaItems} />;
+  return <PricingPageExperience kind="exterior" initialConfig={config} mediaItems={mediaItems} promotions={promotions} />;
 }
