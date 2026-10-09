@@ -16,6 +16,7 @@ import {
   calculateDiscount,
   parseBookingPricingConfig,
 } from "@/lib/booking-pricing";
+import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import type { SiteContent } from "@/lib/site-defaults";
 import BookingDatePicker from "@/components/BookingDatePicker";
 
@@ -180,6 +181,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
   const [discountMessage, setDiscountMessage] = useState("");
   const [discountLoading, setDiscountLoading] = useState(false);
+  const [promotions, setPromotions] = useState<PromotionSettings>(DEFAULT_PROMOTIONS);
   const [bookingPhotos, setBookingPhotos] = useState<string[]>([]);
   const [photoMessage, setPhotoMessage] = useState("");
 
@@ -211,8 +213,15 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
     [allowCarAddOns, activeAddOns, form.addOns]
   );
   const addOnTotal = useMemo(() => selectedAddOns.reduce((sum, item) => sum + Number(item.price || 0), 0), [selectedAddOns]);
-  const subtotal = baseTotal == null ? null : Math.max(0, baseTotal + addOnTotal);
-  const discountAmount = subtotal == null ? 0 : calculateDiscount(subtotal, appliedDiscount, baseTotal ?? subtotal);
+  const saleCategory=packageSelection?.pricingPage || (isStandaloneHeadlight ? "service" : String(selectedService?.category || "service"));
+  const saleId=packageSelection?.packageId || (isStandaloneHeadlight ? STANDALONE_HEADLIGHT_SERVICE_ID : selectedService?.id || "");
+  const autoSale=quoteLocked || !saleId ? null : matchingPromotion(promotions,saleCategory,saleId,packageSelection?"package":"service");
+  const saleBase=baseTotal==null?null:promotionalPrice(baseTotal,autoSale);
+  const discountedAddOns=selectedAddOns.map(item=>({...item, salePrice:promotionalPrice(item.price,matchingPromotion(promotions,"addon",item.id,"addon"))}));
+  const saleAddOnTotal=discountedAddOns.reduce((sum,item)=>sum+item.salePrice,0);
+  const subtotal = baseTotal == null ? null : Math.max(0, (saleBase ?? baseTotal) + saleAddOnTotal);
+  const hasAutomaticSale = (saleBase != null && baseTotal != null && saleBase < baseTotal) || saleAddOnTotal < addOnTotal;
+  const discountAmount = subtotal == null || hasAutomaticSale ? 0 : calculateDiscount(subtotal, appliedDiscount, baseTotal ?? subtotal);
   const bookingTotal = subtotal == null ? null : Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
 
   const packageChoiceValue = packageSelection ? `package:${packageSelection.pricingPage}:${packageSelection.packageId}` : "";
@@ -290,12 +299,14 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       const contentRequest = initialSiteContent
         ? Promise.resolve(null)
         : fetch("/api/site-content", { cache: "no-store" });
-      const [servicesResponse, authResponse, contentResponse] = await Promise.all([
+      const [servicesResponse, authResponse, contentResponse, promoResponse] = await Promise.all([
         fetch("/api/services", { cache: "no-store" }),
         fetch("/api/auth/me", { cache: "no-store" }),
         contentRequest,
+        fetch("/api/promotions", { cache: "no-store" }),
       ]);
 
+      if(!cancelled && promoResponse.ok) setPromotions(parsePromotions(JSON.stringify(await promoResponse.json())));
       const serviceData = servicesResponse.ok ? await servicesResponse.json() : [];
       const loadedServices: Service[] = Array.isArray(serviceData) ? serviceData : [];
       const content = initialSiteContent ?? (contentResponse?.ok ? await contentResponse.json() : {});
@@ -450,6 +461,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   }, [bookingDiscountTarget, appliedDiscount?.appliesTo]);
 
   const applyDiscount = async () => {
+    if (hasAutomaticSale) { setDiscountMessage("An automatic sale is already applied. Coupon codes cannot be combined."); return; }
     if (!discountInput.trim()) { setDiscountMessage("Enter a discount code."); return; }
     setDiscountLoading(true);
     setDiscountMessage("");
