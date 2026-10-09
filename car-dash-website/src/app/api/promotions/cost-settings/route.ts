@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest } from "@/lib/permissions";
 
-const KEY="promotionCostAssumptions";
-export type CostAssumptions={laborHourlyRate:number;laborHoursPerBooking:number;suppliesPercent:number;travelCostPerBooking:number;otherCostPerBooking:number};
-export const DEFAULT_COSTS:CostAssumptions={laborHourlyRate:0,laborHoursPerBooking:0,suppliesPercent:0,travelCostPerBooking:0,otherCostPerBooking:0};
-export function parseCosts(raw:string|null|undefined):CostAssumptions{
-  try{
-    const value=JSON.parse(raw||"{}");
-    const n=(key:keyof CostAssumptions,max:number)=>{const x=Number(value[key]);return Number.isFinite(x)&&x>=0?Math.min(x,max):0};
-    return {laborHourlyRate:n("laborHourlyRate",500),laborHoursPerBooking:n("laborHoursPerBooking",72),suppliesPercent:n("suppliesPercent",100),travelCostPerBooking:n("travelCostPerBooking",10000),otherCostPerBooking:n("otherCostPerBooking",10000)};
-  }catch{return DEFAULT_COSTS;}
-}
+import { PROMOTION_COSTS_KEY as KEY, parseCosts } from "@/lib/promotion-costs";
 export async function GET(request:NextRequest){
   const user=await getCurrentAccountFromRequest(request);
   if(user?.role!=="owner")return NextResponse.json({error:"Owner only"},{status:403});
