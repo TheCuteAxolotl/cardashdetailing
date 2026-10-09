@@ -27,13 +27,11 @@ export const metadata: Metadata = {
     "Mobile car and marine detailing based in South Elgin, Illinois. Interior detailing, exterior detailing, paint correction, ceramic coatings, and condition-based exact quotes.",
   applicationName: "Car Dash Detailing",
   category: "automotive detailing",
+  // Google Search should see a single canonical, stable, crawlable favicon URL.
+  // Keep the legacy /favicon.ico route for backward compatibility.
   icons: {
-    icon: [
-      { url: "/favicon.ico?v=20261006-1", type: "image/png", sizes: "64x64" },
-      { url: "/favicon.png?v=20261006-1", type: "image/png", sizes: "64x64" },
-    ],
-    shortcut: ["/favicon.ico?v=20261006-1"],
-    apple: [{ url: "/favicon.png?v=20261006-1", type: "image/png", sizes: "64x64" }],
+    icon: [{ url: "/favicon.png", type: "image/png", sizes: "64x64" }],
+    apple: [{ url: "/favicon.png", type: "image/png", sizes: "64x64" }],
   },
   openGraph: {
     siteName: "Car Dash Detailing",
