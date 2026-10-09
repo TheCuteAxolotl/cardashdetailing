@@ -45,7 +45,7 @@ function shiftMonth(month: string, amount: number) {
   return monthFromDate(next);
 }
 
-export default function BookingDatePicker({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+export default function BookingDatePicker({ value, onChange, duration = 180 }: { value: string; onChange: (value: string) => void; duration?: number }) {
   const [open, setOpen] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => value?.slice(0, 7) || monthFromDate(new Date()));
   const [availability, setAvailability] = useState<MonthAvailability | null>(null);
@@ -60,7 +60,7 @@ export default function BookingDatePicker({ value, onChange }: { value: string; 
     let cancelled = false;
     setLoading(true);
     setError("");
-    fetch(`/api/availability?month=${encodeURIComponent(visibleMonth)}`, { cache: "no-store" })
+    fetch(`/api/availability?month=${encodeURIComponent(visibleMonth)}&duration=${duration}`, { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data?.error || "Could not load calendar availability.");
@@ -81,7 +81,7 @@ export default function BookingDatePicker({ value, onChange }: { value: string; 
     return () => {
       cancelled = true;
     };
-  }, [visibleMonth]);
+  }, [visibleMonth, duration]);
 
   const calendar = useMemo(() => {
     const [year, monthNumber] = visibleMonth.split("-").map(Number);

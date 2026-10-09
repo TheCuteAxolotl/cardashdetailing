@@ -17,6 +17,7 @@ import {
   parseBookingPricingConfig,
   parseDiscountCodes,
 } from "@/lib/booking-pricing";
+import { durationForBooking } from "@/lib/booking-duration";
 import { PROMOTIONS_KEY, matchingPromotion, parsePromotions, promotionalPrice } from "@/lib/promotions";
 import { checkDiscountAvailability } from "@/lib/discount-usage";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
@@ -271,7 +272,9 @@ export async function POST(request: NextRequest) {
     }
 
     const addOnSummary = selectedAddOns.length ? selectedAddOns.map((item) => `${item?.name} (+$${Number(item?.price || 0).toFixed(2)})`).join(", ") : "None";
+    const estimatedDuration=durationForBooking(serviceName,selectedAddOns.map(item=>String(item?.name||"")));
     const detailsText = [
+      `Estimated duration minutes: ${estimatedDuration}`,
       `Base service: $${baseTotal.toFixed(2)}`,
       `Add-ons: ${addOnSummary}`,
       `Add-ons total: ${discountedAddOnTotal.toFixed(2)}`,

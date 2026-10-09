@@ -30,15 +30,23 @@ export type BookingAvailabilityConfig = {
   overrides: BookingDateOverride[];
 };
 
-const DEFAULT_SLOT_VALUES = ["09:00", "11:30", "14:00", "16:30"];
+export const DEFAULT_BOOKING_HOURS: Record<BookingDayKey, {start:string;end:string}|null> = {
+ sunday:{start:"06:00",end:"15:30"},monday:null,tuesday:null,wednesday:null,
+ thursday:{start:"08:00",end:"17:00"},friday:{start:"08:00",end:"17:00"},saturday:{start:"08:00",end:"17:00"},
+};
+export function slotsInRange(start:string,end:string,step=30){
+ const a=Number(start.slice(0,2))*60+Number(start.slice(3)),b=Number(end.slice(0,2))*60+Number(end.slice(3));
+ const slots:string[]=[];for(let t=a;t<b;t+=step)slots.push(String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0"));return slots;
+}
+const DEFAULT_SLOT_VALUES = slotsInRange("08:00","17:00");
 
 export const DEFAULT_BOOKING_AVAILABILITY: BookingAvailabilityConfig = {
   timezone: "America/Chicago",
   weekly: {
-    sunday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
-    monday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
-    tuesday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
-    wednesday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
+    sunday: { enabled: true, slots: slotsInRange("06:00","15:30") },
+    monday: { enabled: false, slots: [] },
+    tuesday: { enabled: false, slots: [] },
+    wednesday: { enabled: false, slots: [] },
     thursday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
     friday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
     saturday: { enabled: true, slots: [...DEFAULT_SLOT_VALUES] },
@@ -110,8 +118,10 @@ export function parseBookingAvailabilityConfig(value: unknown): BookingAvailabil
       ? (weeklySource[day] as Record<string, unknown>)
       : {};
     weekly[day] = {
-      enabled: typeof rawDay.enabled === "boolean" ? rawDay.enabled : fallback.enabled,
-      slots: rawDay.slots === undefined ? [...fallback.slots] : sanitizeSlots(rawDay.slots),
+      enabled: typeof rawDay.enabled === "boolean" && !(Array.isArray(rawDay.slots) && JSON.stringify(sanitizeSlots(rawDay.slots)) === JSON.stringify(["09:00","11:30","14:00","16:30"])) ? rawDay.enabled : fallback.enabled,
+      // Migrate the former 9/11:30/2/4:30 defaults without removing owner-customized schedules.
+      slots: rawDay.slots === undefined || (Array.isArray(rawDay.slots) && JSON.stringify(sanitizeSlots(rawDay.slots)) === JSON.stringify(["09:00","11:30","14:00","16:30"]))
+        ? [...fallback.slots] : sanitizeSlots(rawDay.slots),
     };
   }
 
