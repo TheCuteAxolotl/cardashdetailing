@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       userId: null,
       vehicleId: null,
       serviceName,
-      serviceMethod: clean(body.serviceMethod, 60) || "mobile",
+      serviceMethod: "mobile",
       customerName,
       customerEmail: clean(body.customerEmail, 240),
       customerPhone: clean(body.customerPhone, 60),
