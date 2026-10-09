@@ -4,6 +4,7 @@ import StructuredData from "@/components/StructuredData";
 import { absoluteUrl, pageMetadata, SITE_URL } from "@/lib/seo";
 import { getSiteContent } from "@/lib/site-content";
 import { DEFAULT_PRICING_PAGES, parsePricingConfig } from "@/lib/pricing-config";
+import { PROMOTIONS_KEY, parsePromotions } from "@/lib/promotions";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = pageMetadata({
@@ -36,6 +37,8 @@ const websiteSchema = {
 
 export default async function Home() {
   const content = await getSiteContent();
+  const promoRow = await prisma.siteContent.findUnique({where:{key:PROMOTIONS_KEY}}).catch(()=>null);
+  const promotions = parsePromotions(promoRow?.value);
   const pricingConfig = parsePricingConfig(content.pricingPackagesConfig, DEFAULT_PRICING_PAGES.packages);
 
   let hero360Frames: Array<{ id: string; url: string; title: string; category: string }> = [];
@@ -67,6 +70,7 @@ export default async function Home() {
       <HomeExperience
         initialContent={content}
         pricingConfig={pricingConfig}
+        promotions={promotions}
         pricingMedia={pricingMedia}
         hero360Frames={hero360Frames}
       />
