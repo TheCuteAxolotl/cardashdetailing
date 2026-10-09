@@ -633,8 +633,9 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       {baseTotal != null && (
         <section className="booking-total-panel border border-white/10 bg-black/20 p-5">
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between text-white/48"><span>Service</span><span>${Number(baseTotal).toFixed(2)}</span></div>
-            {selectedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/42"><span>{item.name}</span><span>+${item.price.toFixed(2)}</span></div>)}
+            <div className="flex justify-between text-white/48"><span>Service</span><span>{saleBase != null && saleBase < Number(baseTotal) ? <><s className="mr-2 text-white/30">${Number(baseTotal).toFixed(2)}</s><strong className="text-red-300">${saleBase.toFixed(2)}</strong></> : `${Number(baseTotal).toFixed(2)}`}</span></div>
+            {discountedAddOns.map((item) => <div key={item.id} className="flex justify-between text-white/42"><span>{item.name}</span><span>{item.salePrice < item.price && <s className="mr-2 text-white/30">${item.price.toFixed(2)}</s>}+${item.salePrice.toFixed(2)}</span></div>)}
+            {hasAutomaticSale && <div className="flex justify-between text-red-300"><span>Automatic promotion savings</span><span>−${(Number(baseTotal) + addOnTotal - Number(subtotal)).toFixed(2)}</span></div>}
             {discountAmount > 0 && <div className="flex justify-between text-green-300"><span>Discount {appliedDiscount?.code ? `(${appliedDiscount.code})` : ""}</span><span>−${discountAmount.toFixed(2)}</span></div>}
             <div className="mt-3 flex items-end justify-between border-t border-white/10 pt-4"><div><p className="text-[10px] uppercase tracking-[.18em] text-white/28">Total</p><p className="mt-1 text-xs text-white/32">We’ll double-check this when you submit</p></div><p className="text-3xl font-semibold">${Number(bookingTotal || 0).toFixed(2)}</p></div>
           </div>
