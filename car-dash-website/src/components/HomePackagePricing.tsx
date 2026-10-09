@@ -1,4 +1,5 @@
 import type { PricingPageConfig, VehicleClass } from "@/lib/pricing-config";
+import { matchingPromotion, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import { VEHICLE_LABELS } from "@/lib/pricing-config";
 import PackageMediaEvidence from "@/components/PackageMediaEvidence";
 import type { MediaItem } from "@/lib/media";
@@ -7,6 +8,7 @@ import { getPackageConditionGuide } from "@/lib/package-condition-guide";
 
 type Props = {
   config: PricingPageConfig;
+  promotions?: PromotionSettings;
   mediaItems?: MediaItem[];
 };
 
@@ -14,7 +16,7 @@ function packageBookHref(packageId: string, vehicleClass: VehicleClass) {
   return `/?pricingPage=packages&packageId=${encodeURIComponent(packageId)}&vehicleClass=${encodeURIComponent(vehicleClass)}#book`;
 }
 
-export default function HomePackagePricing({ config, mediaItems = [] }: Props) {
+export default function HomePackagePricing({ config, mediaItems = [], promotions }: Props) {
   return (
     <section id="prices-packages" className="scroll-mt-24">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -47,7 +49,7 @@ export default function HomePackagePricing({ config, mediaItems = [] }: Props) {
                 >
                   <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
                   <span className="flex items-center gap-3">
-                    <strong className="text-lg font-semibold text-[#111]">${Number(pkg.prices[vehicleClass] || 0).toFixed(0)}</strong>
+                    {(() => { const original=Number(pkg.prices[vehicleClass] || 0); const sale=promotions?matchingPromotion(promotions,"packages",pkg.id,"package"):null; const final=promotionalPrice(original,sale); return <span className="flex flex-wrap items-baseline gap-2">{final<original&&<span className="text-xs text-black/40 line-through">${original.toFixed(2)}</span>}<strong className={`text-lg font-semibold ${final<original?"text-red-700":"text-[#111]"}`}>${final.toFixed(2)}</strong></span>; })()}
                     <span className="text-xs font-semibold text-black/36 transition group-hover:translate-x-0.5 group-hover:text-black">Book →</span>
                   </span>
                 </a>
