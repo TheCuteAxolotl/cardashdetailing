@@ -9,6 +9,9 @@ import {
   parseBookingAvailabilityConfig,
 } from "@/lib/booking-availability";
 
+import { timeMinutes, savedDuration, fitsWithoutOverlap } from "@/lib/booking-duration";
+import { DEFAULT_BOOKING_HOURS, dayKeyForDate } from "@/lib/booking-availability";
+
 function dateInTimeZone(timezone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
@@ -31,6 +34,15 @@ function monthIsValid(value: string) {
 export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get("date")?.trim() || "";
   const month = request.nextUrl.searchParams.get("month")?.trim() || "";
+  const requested=Number(request.nextUrl.searchParams.get("duration"));
+  const duration=Number.isFinite(requested)&&requested>=30&&requested<=960?Math.ceil(requested/15)*15:180;
+  const availableFor=(date:string,bookings:{preferredTime:string|null;serviceName:string;notes:string|null}[])=>{
+    const slots=configuredSlotsForDate(config,date);
+    const day=dayKeyForDate(date);const hours=day?DEFAULT_BOOKING_HOURS[day]:null;
+    const close=hours&&slots[0]===hours.start ? timeMinutes(hours.end)! : Math.max(0,...slots.map(s=>timeMinutes(s)??0))+30;
+    const busy=bookings.map(b=>({start:timeMinutes(b.preferredTime||"")??-1000,duration:savedDuration(b.notes,b.serviceName)}));
+    return slots.filter(slot=>fitsWithoutOverlap(timeMinutes(slot)??9999,duration,busy,close));
+  };
 
   const configRow = await prisma.siteContent.findUnique({ where: { key: BOOKING_AVAILABILITY_KEY } });
   const config = parseBookingAvailabilityConfig(configRow?.value);
@@ -48,25 +60,17 @@ export async function GET(request: NextRequest) {
         preferredDate: { gte: firstDate, lte: lastDate },
         status: { in: ["pending", "confirmed"] },
       },
-      select: { preferredDate: true, preferredTime: true },
+      select: { preferredDate: true, preferredTime: true, serviceName:true,notes:true },
     });
 
-    const takenByDate = new Map<string, Set<string>>();
-    for (const booking of existing) {
-      const bookingDate = String(booking.preferredDate || "").trim();
-      const normalized = normalizeBookingTime(booking.preferredTime);
-      if (!bookingDate || !normalized) continue;
-      const set = takenByDate.get(bookingDate) || new Set<string>();
-      set.add(normalized);
-      takenByDate.set(bookingDate, set);
-    }
+    const bookedByDate=new Map<string,typeof existing>();
+    for(const booking of existing){const list=bookedByDate.get(booking.preferredDate||"")||[];list.push(booking);bookedByDate.set(booking.preferredDate||"",list);}
 
     const days: Record<string, { available: boolean; remaining: number; closed: boolean }> = {};
     for (let day = 1; day <= daysInMonth; day += 1) {
       const currentDate = `${month}-${String(day).padStart(2, "0")}`;
       const configured = configuredSlotsForDate(config, currentDate);
-      const taken = takenByDate.get(currentDate) || new Set<string>();
-      const remaining = configured.filter((slot) => !taken.has(slot)).length;
+      const remaining=availableFor(currentDate,bookedByDate.get(currentDate)||[]).length;
       const isPast = currentDate < today;
       days[currentDate] = {
         available: !isPast && remaining > 0,
@@ -83,16 +87,11 @@ export async function GET(request: NextRequest) {
 
   const existing = await prisma.booking.findMany({
     where: { preferredDate: date, status: { in: ["pending", "confirmed"] } },
-    select: { preferredTime: true },
+    select: { preferredTime: true,serviceName:true,notes:true },
   });
 
   const configured = configuredSlotsForDate(config, date);
-  const taken = new Set(
-    existing
-      .map((booking) => normalizeBookingTime(booking.preferredTime))
-      .filter((value): value is string => Boolean(value))
-  );
-  const open = configured.filter((slot) => !taken.has(slot));
+  const open=availableFor(date,existing);
 
   return NextResponse.json({
     date,
