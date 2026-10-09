@@ -9,7 +9,7 @@ export async function GET() {
 }
 export async function PUT(request: NextRequest) {
   const auth=await getCurrentAccountFromRequest(request);
-  if (auth?.user?.role !== "owner") return NextResponse.json({error:"Owner access required"}, {status:403});
+  if (auth?.role !== "owner") return NextResponse.json({error:"Owner access required"}, {status:403});
   const body=await request.json();
   const next=parsePromotions(JSON.stringify(body));
   if(next.promotions.some(p=>p.startsAt && p.endsAt && p.startsAt>p.endsAt)) return NextResponse.json({error:"End date must be after start date"}, {status:400});
