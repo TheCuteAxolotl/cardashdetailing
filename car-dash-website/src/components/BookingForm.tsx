@@ -19,6 +19,7 @@ import {
 import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import type { SiteContent } from "@/lib/site-defaults";
 import BookingDatePicker from "@/components/BookingDatePicker";
+import { durationForBooking } from "@/lib/booking-duration";
 
 
  type PricingKind = "packages" | "exterior" | "interior";
@@ -220,6 +221,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const discountedAddOns=selectedAddOns.map(item=>({...item, salePrice:promotionalPrice(item.price,matchingPromotion(promotions,"addon",item.id,"addon"))}));
   const saleAddOnTotal=discountedAddOns.reduce((sum,item)=>sum+item.salePrice,0);
   const subtotal = baseTotal == null ? null : Math.max(0, (saleBase ?? baseTotal) + saleAddOnTotal);
+  const estimatedDuration = durationForBooking(packageSelection?.packageName || quote?.subject || selectedService?.title || (isStandaloneHeadlight ? "Headlight Restoration" : "Detail"), selectedAddOns.map(a=>a.name));
   const hasAutomaticSale = (saleBase != null && baseTotal != null && saleBase < baseTotal) || saleAddOnTotal < addOnTotal;
   const discountAmount = subtotal == null || hasAutomaticSale ? 0 : calculateDiscount(subtotal, appliedDiscount, baseTotal ?? subtotal);
   const bookingTotal = subtotal == null ? null : Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
@@ -411,11 +413,11 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
 
   useEffect(() => {
     if (!form.preferredDate) { setSlots([]); return; }
-    fetch(`/api/availability?date=${encodeURIComponent(form.preferredDate)}`)
+    fetch(`/api/availability?date=${encodeURIComponent(form.preferredDate)}&duration=${estimatedDuration}`)
       .then((response) => response.json())
       .then((data) => { setSlots(data.slots || []); set("preferredTime", ""); })
       .catch(() => setSlots([]));
-  }, [form.preferredDate]);
+  }, [form.preferredDate, estimatedDuration]);
 
   const chooseVehicle = (id: string) => {
     const vehicle = vehicles.find((item) => item.id === id);
@@ -593,8 +595,9 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
 
       <section className="border-t border-white/8 pt-6">
         <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates aren’t available. Times that are already booked won’t show up.</p></div></div>
+        <p className="mb-3 text-sm text-white/60">Estimated appointment: {Math.floor(estimatedDuration/60)}h {estimatedDuration%60 ? `${estimatedDuration%60}m` : ""}. Available start times automatically account for this.</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
+          <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker duration={estimatedDuration} value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
           <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{slots.map((slot) => <option key={slot}>{slot}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
         </div>
       </section>
