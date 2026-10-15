@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import OutboundCallPanel from "@/components/OutboundCallPanel";
 
 type VoiceConnection = {
   ok?: boolean;
@@ -275,6 +276,8 @@ export default function OwnerCallsPage() {
             Save your Car Dash business number as a contact on your iPhone. When you answer, Car Dash asks you to press 1 before connecting the customer. If you do not press 1 — including when your personal voicemail answers — the customer is sent to Car Dash voicemail instead.
           </p>
         </section>
+
+        <OutboundCallPanel />
 
         {error && <p className="rounded-2xl border border-red-500/20 bg-red-500/[.06] p-4 text-sm text-red-200">{error}</p>}
         {note && <p className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[.06] p-4 text-sm text-emerald-200">{note}</p>}
