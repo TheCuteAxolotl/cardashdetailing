@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
-import { forwardToNumber, voiceNumber, twilioVoiceRuntimeInfo } from "@/lib/twilio-voice";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import { forwardToNumber, voiceNumber } from "@/lib/twilio-voice";
 import { getPublicSiteUrl, normalizePhoneNumber } from "@/lib/twilio-sms";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   const account = await getCurrentAccountFromRequest(request);
-  if (!isOwnerAccount(account)) {
-    return NextResponse.json({ error: "Owner access required." }, { status: 403 });
+  if (!hasStaffPermission(account, "businessPhone")) {
+    return NextResponse.json({ error: "Business Phone access required." }, { status: 403 });
   }
 
   const body = await request.json().catch(() => ({}));
