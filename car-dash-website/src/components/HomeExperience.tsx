@@ -49,6 +49,7 @@ export default function HomeExperience({
 
   return (
     <div ref={rootRef} className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
+      <div className={styles.brandIntro} aria-hidden="true"><span>CAR DASH</span><small>DETAILING · SOUTH ELGIN</small></div>
       <section className={styles.hero}>
         <div className="home-hero-shell relative mx-auto min-h-[680px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
           <div className="absolute inset-0">
@@ -97,6 +98,11 @@ export default function HomeExperience({
         </div>
       </section>
 
+      <section className={styles.manifesto} aria-labelledby="care-heading">
+        <div data-reveal><p className={styles.eyebrow}>Care you can see. A difference you can feel.</p><h2 id="care-heading">Some details change<br />how your car looks.<br /><em>Ours change how it feels.</em></h2><p>A fresh interior. A finish that catches the light. Thoughtful care, brought to your driveway.</p></div>
+        <div className={styles.locations} aria-label="Serving South Elgin, St. Charles, Geneva, and Naperville"><span>South Elgin</span><span>St. Charles</span><span>Geneva</span><span>Naperville</span></div>
+      </section>
+
       <section className={styles.proof}>
         <div className="home-proof-grid mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
@@ -141,19 +147,19 @@ export default function HomeExperience({
         <div className={styles.transformCopy} data-reveal><p className={styles.eyebrow}>Paint correction · South Elgin & nearby suburbs</p><h2 id="finish-heading">Bring back<br />the brilliance.</h2><p>Swirls and dullness can hide what’s underneath. Explore paint correction matched to your paint’s condition, then choose the protection that fits.</p><a href="/paint-correction" className={styles.goldButton}>Explore paint correction</a></div>
       </section>
 
-      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
+      <section className={styles.portfolio}>
         <div className="mx-auto max-w-[1320px]">
           <div className="grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Recent work</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what we’ve been working on.</h2>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">A closer look at the details.</h2>
             </div>
             <div className="flex items-end justify-between gap-5">
               <p className="max-w-xl text-sm leading-7 text-black/48">Interiors, exterior details, paint correction, coatings — real jobs we’ve finished for customers.</p>
               <a href="/gallery" className="hidden shrink-0 text-sm font-semibold text-black/55 hover:text-black sm:block">View full gallery →</a>
             </div>
           </div>
-          <div className="home-gallery mt-10"><DynamicGallery limit={6} /></div>
+          <div className="home-gallery mt-10"><DynamicGallery limit={6} cinematic /></div>
         </div>
       </section>
 

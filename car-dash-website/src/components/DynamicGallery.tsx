@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MediaLightbox, { MediaVisual } from "@/components/MediaLightbox";
+import styles from "./HomeExperience.module.css";
 import type { MediaItem } from "@/lib/media";
 
-export default function DynamicGallery({ limit }: { limit?: number }) {
+export default function DynamicGallery({ limit, cinematic = false }: { limit?: number; cinematic?: boolean }) {
+  const railRef = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -31,13 +33,14 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
 
   return (
     <>
-      <div className="gallery-editorial grid auto-rows-[220px] grid-cols-1 gap-3 sm:grid-cols-2 lg:auto-rows-[235px] lg:grid-cols-3">
+      {cinematic && <div className={styles.railControls}><p>Swipe to explore the work</p><div><button type="button" aria-label="Scroll gallery backward" onClick={() => railRef.current?.scrollBy({left: -railRef.current.clientWidth * .8, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'})}>Previous</button><button type="button" aria-label="Scroll gallery forward" onClick={() => railRef.current?.scrollBy({left: railRef.current.clientWidth * .8, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'})}>Next</button></div></div>}
+      <div ref={railRef} className={cinematic ? styles.filmRail : "gallery-editorial grid auto-rows-[220px] grid-cols-1 gap-3 sm:grid-cols-2 lg:auto-rows-[235px] lg:grid-cols-3"}>
         {visible.map((item, index) => (
           <button
             key={item.id}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className={`gallery-tile group relative overflow-hidden text-left ${index === 0 ? "sm:row-span-2 lg:col-span-2 lg:row-span-2" : index === 1 ? "lg:row-span-2" : ""}`}
+            className={`${cinematic ? styles.filmFrame : "gallery-tile"} group relative overflow-hidden text-left ${!cinematic && index === 0 ? "sm:row-span-2 lg:col-span-2 lg:row-span-2" : !cinematic && index === 1 ? "lg:row-span-2" : ""}`}
             aria-label={`Open ${item.title}`}
           >
             <MediaVisual item={item} thumbnail className="h-full w-full object-cover transition duration-[900ms] ease-out group-hover:scale-[1.045]" />
