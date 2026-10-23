@@ -125,7 +125,7 @@ export default function OwnerPricingPages() {
         </div>
 
         <section className="mt-7 rounded-[28px] border border-white/10 bg-white/[.025] p-5 sm:p-7">
-          <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold">{labels[active]} page</h2><p className="mt-1 text-sm text-white/40">Public page: {routes[active]}</p></div><a href={routes[active]} target="_blank" className="rounded-full border border-white/15 px-4 py-2 text-sm">Preview page ↗</a></div>
+          <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold">{labels[active]} page</h2><p className="mt-1 text-sm text-white/40">Public page: {routes[active]}</p></div><a href={routes[active]} target="_blank" className="rounded-full border border-white/15 px-4 py-2 text-sm">Preview page</a></div>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <label className="text-sm text-white/55">Small heading<input className={input} value={config.eyebrow} onChange={(e) => setConfig({ ...config, eyebrow: e.target.value })} /></label>
             <label className="text-sm text-white/55 md:col-span-2">Main headline<textarea className={`${input} min-h-24`} value={config.title} onChange={(e) => setConfig({ ...config, title: e.target.value })} /></label>

@@ -15,7 +15,7 @@ type MediaVisualProps = {
 function PlayBadge() {
   return (
     <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#F7F5F2]/25 bg-[#171411]/68 text-lg text-[#F7F5F2] backdrop-blur">▶</span>
+      <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#F7F5F2]/25 bg-[#171411]/68 text-lg text-[#F7F5F2] backdrop-blur"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg></span>
     </span>
   );
 }

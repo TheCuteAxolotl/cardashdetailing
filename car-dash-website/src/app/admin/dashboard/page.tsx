@@ -136,7 +136,7 @@ export default function AdminDashboard() {
                       <p className="text-sm font-semibold">{tool.title}</p>
                       <p className="mt-1 truncate text-xs text-black/34">{tool.description}</p>
                     </div>
-                    <span className="text-lg text-black/18 transition group-hover:text-black/52">↗</span>
+
                   </a>
                 ))}
               </div>

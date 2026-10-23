@@ -100,7 +100,7 @@ export default function PageMediaBand({
               aria-label={`Open ${item.title}`}
             >
               <MediaVisual item={item} thumbnail className={`h-full w-full object-cover transition duration-[800ms] ease-out group-hover:scale-[1.04] ${compact ? "min-h-36 max-h-56" : "min-h-48"}`} />
-              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-[#171411]/88 to-transparent px-4 pb-4 pt-12 text-xs font-semibold text-[#F7F5F2]"><span className="truncate">{item.title}</span><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/16 bg-black/15 text-[11px] opacity-80 backdrop-blur-sm transition group-hover:bg-white group-hover:text-black">↗</span></span>
+              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-[#171411]/88 to-transparent px-4 pb-4 pt-12 text-xs font-semibold text-[#F7F5F2]"><span className="truncate">{item.title}</span></span>
             </button>
           ))}
         </div>

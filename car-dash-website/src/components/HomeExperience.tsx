@@ -91,7 +91,7 @@ export default function HomeExperience({
           </div>
           {hero360Frames.length > 1 && !heroInteracting && (
             <div className="pointer-events-none absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-full border border-white/16 bg-black/25 px-3 py-2 text-[9px] font-medium uppercase tracking-[.14em] text-white/62 backdrop-blur-md sm:bottom-5 sm:right-5 sm:text-[10px]">
-              <span className="text-base leading-none">↔</span><span className="sm:hidden">Swipe</span><span className="hidden sm:inline">Drag to explore</span>
+              <span className="sm:hidden">Swipe</span><span className="hidden sm:inline">Drag to explore</span>
             </div>
           )}
         </div>

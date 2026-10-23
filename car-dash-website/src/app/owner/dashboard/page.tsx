@@ -256,7 +256,7 @@ export default function OwnerDashboard() {
                   <span className="grid h-9 w-9 place-items-center rounded-xl border border-black/[.07] bg-white text-black/58">
                     <ToolGlyph kind={kind} />
                   </span>
-                  <span className="text-lg text-black/18 transition group-hover:text-black/55">↗</span>
+
                 </div>
                 <p className="mt-4 text-sm font-semibold">{label}</p>
                 <p className="mt-1 text-xs leading-5 text-black/36">{description}</p>

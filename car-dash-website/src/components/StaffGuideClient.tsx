@@ -53,7 +53,7 @@ export default function StaffGuideClient({ sections, isOwner, permissions }: { s
             <div className="mt-5 flex flex-wrap gap-2">
               {quickLinks.map((item) => (
                 <a key={item.label} href={item.href} className="rounded-full border border-[#F7F5F2]/10 bg-[#F7F5F2]/4 px-4 py-2 text-xs font-semibold text-[#F7F5F2]/58 transition hover:border-[#C0AB9A]/38 hover:text-[#F7F5F2]">
-                  {item.label} ↗
+                  {item.label}
                 </a>
               ))}
             </div>

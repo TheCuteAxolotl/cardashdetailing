@@ -46,7 +46,7 @@ export default function OwnerSetup() {
 
           <div className="space-y-6">
             <div className="flex gap-4">
-              <div className="text-3xl">⚙️</div>
+
               <div>
                 <h3 className="text-xl font-semibold mb-2">Manage Services</h3>
                 <p className="text-white/52">Edit service descriptions and prices for your customers</p>
@@ -54,7 +54,7 @@ export default function OwnerSetup() {
             </div>
 
             <div className="flex gap-4">
-              <div className="text-3xl">🖼️</div>
+
               <div>
                 <h3 className="text-xl font-semibold mb-2">Upload Gallery Images</h3>
                 <p className="text-white/52">Showcase your best work with before and after photos</p>
@@ -62,7 +62,7 @@ export default function OwnerSetup() {
             </div>
 
             <div className="flex gap-4">
-              <div className="text-3xl">📅</div>
+
               <div>
                 <h3 className="text-xl font-semibold mb-2">Manage Bookings</h3>
                 <p className="text-white/52">View and manage all customer booking requests</p>
@@ -70,7 +70,7 @@ export default function OwnerSetup() {
             </div>
 
             <div className="flex gap-4">
-              <div className="text-3xl">⚙️</div>
+
               <div>
                 <h3 className="text-xl font-semibold mb-2">Update Settings</h3>
                 <p className="text-white/52">Manage your account information and preferences</p>

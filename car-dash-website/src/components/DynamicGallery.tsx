@@ -47,7 +47,7 @@ export default function DynamicGallery({ limit }: { limit?: number }) {
                 <p className="text-[9px] font-semibold uppercase tracking-[.22em] text-white/52">{item.category.replaceAll("-", " ")}</p>
                 <h3 className="mt-1 truncate text-lg font-semibold tracking-[-.02em] text-white">{item.title}</h3>
               </div>
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/18 bg-black/20 text-sm text-white/78 opacity-80 backdrop-blur-md transition duration-300 group-hover:rotate-[-8deg] group-hover:bg-white group-hover:text-black">↗</span>
+
             </div>
           </button>
         ))}
