@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./HomeExperience.module.css";
 import type { SiteContent } from "@/lib/site-defaults";
+import { SERVICE_AREAS } from "@/lib/seo";
 import type { PromotionSettings } from "@/lib/promotions";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import DynamicGallery from "@/components/DynamicGallery";
@@ -100,7 +101,13 @@ export default function HomeExperience({
 
       <section className={styles.manifesto} aria-labelledby="care-heading">
         <div data-reveal><p className={styles.eyebrow}>Care you can see. A difference you can feel.</p><h2 id="care-heading">Some details change<br />how your car looks.<br /><em>Ours change how it feels.</em></h2><p>A fresh interior. A finish that catches the light. Thoughtful care, brought to your driveway.</p></div>
-        <div className={styles.locations} aria-label="Serving South Elgin, St. Charles, Geneva, and Naperville"><span>South Elgin</span><span>St. Charles</span><span>Geneva</span><span>Naperville</span></div>
+        <div className={styles.locations} aria-label="Communities within about 20 miles of South Elgin">
+          <p className={styles.locationsHeading}>Mobile detailing within 20 miles of South Elgin</p>
+          <div className={styles.locationList}>
+            {SERVICE_AREAS.map((area) => <span key={area}>{area.replace(", Illinois", "")}</span>)}
+          </div>
+          <p className={styles.locationsNote}>Service availability depends on your exact address and appointment schedule.</p>
+        </div>
       </section>
 
       <section className={styles.proof}>
