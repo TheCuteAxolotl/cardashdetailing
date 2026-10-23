@@ -73,7 +73,7 @@ export default function HomeExperience({
           <div className={`home-hero-content relative z-10 flex min-h-[680px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
             <div className="flex items-start justify-between gap-5 text-white">
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
-              <a href="/quote" className="hidden rounded-full border border-white/24 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-md hover:bg-white hover:text-black sm:inline-flex">Get an exact quote <span className="ml-2">↗</span></a>
+              <a href="/quote" className="hidden rounded-full border border-white/24 bg-black/15 px-4 py-2.5 text-xs font-medium text-white backdrop-blur-md hover:bg-white hover:text-black sm:inline-flex">Get an exact quote</a>
             </div>
 
             <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
@@ -117,7 +117,7 @@ export default function HomeExperience({
       <section className={styles.services} aria-labelledby="craft-heading">
         <div className={styles.sectionHeading} data-reveal>
           <div><p className={styles.eyebrow}>The Car Dash approach</p><h2 id="craft-heading">Every surface.<br /><span>Every detail.</span></h2></div>
-          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Get an exact quote <span aria-hidden="true">↗</span></a></div>
+          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Get an exact quote</a></div>
         </div>
         <div className={styles.serviceGrid}>
           {[
@@ -127,18 +127,18 @@ export default function HomeExperience({
           ].map((service) => (
             <a key={service.number} href={service.href} className={styles.serviceCard} data-reveal>
               <div className={styles.cardPhoto}><SitePhoto category={service.image} fallbackCategory={service.fallback} className="absolute inset-0 h-full w-full" alt={service.label} /><span className={styles.cardNumber}>{service.number}</span></div>
-              <div className={styles.cardCopy}><p className={styles.eyebrow}>{service.label}</p><h3>{service.title}<span aria-hidden="true">↗</span></h3><p>{service.text}</p></div>
+              <div className={styles.cardCopy}><p className={styles.eyebrow}>{service.label}</p><h3>{service.title}</h3><p>{service.text}</p></div>
             </a>
           ))}
         </div>
         <div className={styles.standard} data-reveal>
-          <p className={styles.eyebrow}>Our standard</p><h2>We’re not satisfied<br />until you’re satisfied.</h2><a href="/about">Meet Daniel <span aria-hidden="true">↗</span></a>
+          <p className={styles.eyebrow}>Our standard</p><h2>We’re not satisfied<br />until you’re satisfied.</h2><a href="/about">Meet Daniel</a>
         </div>
       </section>
 
       <section className={styles.transformation} aria-labelledby="finish-heading">
         <div className={styles.transformPhoto}><SitePhoto category="paint-correction-hero" fallbackCategory="home-showcase-primary" className="absolute inset-0 h-full w-full" alt="Vehicle finish from Car Dash Detailing’s work gallery" /></div>
-        <div className={styles.transformCopy} data-reveal><p className={styles.eyebrow}>Paint correction · South Elgin & nearby suburbs</p><h2 id="finish-heading">Bring back<br />the brilliance.</h2><p>Swirls and dullness can hide what’s underneath. Explore paint correction matched to your paint’s condition, then choose the protection that fits.</p><a href="/paint-correction" className={styles.goldButton}>Explore paint correction <span aria-hidden="true">↗</span></a></div>
+        <div className={styles.transformCopy} data-reveal><p className={styles.eyebrow}>Paint correction · South Elgin & nearby suburbs</p><h2 id="finish-heading">Bring back<br />the brilliance.</h2><p>Swirls and dullness can hide what’s underneath. Explore paint correction matched to your paint’s condition, then choose the protection that fits.</p><a href="/paint-correction" className={styles.goldButton}>Explore paint correction</a></div>
       </section>
 
       <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
