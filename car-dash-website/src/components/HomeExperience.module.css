@@ -72,8 +72,11 @@
 .manifesto h2 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(34px,5vw,76px); line-height: 1.12; letter-spacing: -.045em; font-weight: 400; margin: 36px auto 28px; }
 .manifesto h2 em { color: #d6b779; }
 .manifesto > div > p:last-child { max-width: 430px; margin: auto; color: #b7b5b1; font-size: 14px; line-height: 1.9; }
-.locations { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 24px 40px; max-width: 1320px; margin: 90px auto 0; padding: 36px 0; border-top: 1px solid #ffffff20; border-bottom: 1px solid #ffffff20; }
-.locations span { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(22px,2.8vw,40px); color: #b7b5b1; }
+.locations { max-width: 1320px; margin: 90px auto 0; padding: 36px 0; border-top: 1px solid #ffffff20; border-bottom: 1px solid #ffffff20; }
+.locationsHeading { margin: 0 0 24px; color: #d6b779; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+.locationList { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 24px; }
+.locationList span { color: #c3c0ba; font-size: 13px; letter-spacing: .015em; }
+.locationsNote { margin: 24px 0 0; color: #8f8b84; font-size: 12px; line-height: 1.6; }
 .experience .sectionHeading h2, .experience .transformCopy h2, .experience .standard h2 { font-family: Georgia, 'Times New Roman', serif; text-transform: none; font-weight: 400; line-height: 1.06; }
 .experience .sectionHeading h2 span { font-style: italic; color: #d6b779; }
 .experience .goldButton { border-radius: 999px; }
