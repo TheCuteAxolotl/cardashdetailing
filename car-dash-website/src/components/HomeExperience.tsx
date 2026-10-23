@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import styles from "./HomeExperience.module.css";
 import type { SiteContent } from "@/lib/site-defaults";
 import type { PromotionSettings } from "@/lib/promotions";
 import type { PricingPageConfig } from "@/lib/pricing-config";
@@ -30,9 +31,25 @@ export default function HomeExperience({
 }: Props) {
   const [heroInteracting, setHeroInteracting] = useState(false);
 
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!rootRef.current || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove(styles.waiting);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    const sections = rootRef.current.querySelectorAll('[data-reveal]');
+    sections.forEach((section) => { section.classList.add(styles.waiting); observer.observe(section); });
+    return () => { observer.disconnect(); sections.forEach((section) => section.classList.remove(styles.waiting)); };
+  }, []);
+
   return (
-    <div className="bg-[#f5f4f1] text-[#111]">
-      <section className="px-0 sm:px-5 sm:pt-5 lg:px-8 lg:pt-7">
+    <div ref={rootRef} className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
+      <section className={styles.hero}>
         <div className="home-hero-shell relative mx-auto min-h-[680px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
           <div className="absolute inset-0">
             {hero360Frames.length > 0 ? (
@@ -80,7 +97,7 @@ export default function HomeExperience({
         </div>
       </section>
 
-      <section className="border-b border-black/[.08] bg-white py-1">
+      <section className={styles.proof}>
         <div className="home-proof-grid mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
             ["01", "Mobile service", "We come to your home or work."],
@@ -95,6 +112,33 @@ export default function HomeExperience({
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={styles.services} aria-labelledby="craft-heading">
+        <div className={styles.sectionHeading} data-reveal>
+          <div><p className={styles.eyebrow}>The Car Dash approach</p><h2 id="craft-heading">Every surface.<br /><span>Every detail.</span></h2></div>
+          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Get an exact quote <span aria-hidden="true">↗</span></a></div>
+        </div>
+        <div className={styles.serviceGrid}>
+          {[
+            { number: "01", title: "A fresh start inside.", label: "Interior detailing", href: "/interior-detailing", image: "pricing-interior-hero", fallback: "home-showcase-secondary", text: "Seats, carpets, vents, and the little places everyday life leaves its mark." },
+            { number: "02", title: "Make an entrance.", label: "Exterior detailing", href: "/exterior-detailing", image: "pricing-exterior-hero", fallback: "home-showcase-primary", text: "Careful cleaning and finishing for paint, wheels, glass, and trim." },
+            { number: "03", title: "Protect the finish.", label: "Ceramic coatings", href: "/ceramic-coatings", image: "ceramic-coatings-hero", fallback: "hero", text: "Explore coating options and preparation tailored to your vehicle." },
+          ].map((service) => (
+            <a key={service.number} href={service.href} className={styles.serviceCard} data-reveal>
+              <div className={styles.cardPhoto}><SitePhoto category={service.image} fallbackCategory={service.fallback} className="absolute inset-0 h-full w-full" alt={service.label} /><span className={styles.cardNumber}>{service.number}</span></div>
+              <div className={styles.cardCopy}><p className={styles.eyebrow}>{service.label}</p><h3>{service.title}<span aria-hidden="true">↗</span></h3><p>{service.text}</p></div>
+            </a>
+          ))}
+        </div>
+        <div className={styles.standard} data-reveal>
+          <p className={styles.eyebrow}>Our standard</p><h2>We’re not satisfied<br />until you’re satisfied.</h2><a href="/about">Meet Daniel <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section className={styles.transformation} aria-labelledby="finish-heading">
+        <div className={styles.transformPhoto}><SitePhoto category="paint-correction-hero" fallbackCategory="home-showcase-primary" className="absolute inset-0 h-full w-full" alt="Vehicle finish from Car Dash Detailing’s work gallery" /></div>
+        <div className={styles.transformCopy} data-reveal><p className={styles.eyebrow}>Paint correction · South Elgin & nearby suburbs</p><h2 id="finish-heading">Bring back<br />the brilliance.</h2><p>Swirls and dullness can hide what’s underneath. Explore paint correction matched to your paint’s condition, then choose the protection that fits.</p><a href="/paint-correction" className={styles.goldButton}>Explore paint correction <span aria-hidden="true">↗</span></a></div>
       </section>
 
       <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
