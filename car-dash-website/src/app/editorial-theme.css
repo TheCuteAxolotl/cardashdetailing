@@ -1,0 +1,286 @@
+/* Shared presentation layer for public pages, customer flows, and staff tools.
+   Screen-only palette leaves existing printable invoice styles intact. */
+:root {
+  --tuscany: #d6b779;
+  --raw-umber: #bda16f;
+  --old-burgundy: #191919;
+  --eerie-black: #101010;
+  --theme-canvas: #101010;
+  --theme-canvas-alt: #191919;
+  --theme-canvas-blue: #191919;
+  --theme-panel: #1c1c1c;
+  --theme-panel-strong: #242424;
+  --theme-ink: #f4efe5;
+  --theme-muted: #b9b5ad;
+  --theme-dark: #191919;
+  --theme-dark-deep: #101010;
+  --theme-dark-2: #242424;
+  --theme-accent: #d6b779;
+  --theme-accent-strong: #e5c995;
+  --theme-accent-soft: #d6b77918;
+  --theme-accent-line: #d6b77955;
+  --theme-border-dark: #ffffff22;
+  --theme-border-light: #ffffff22;
+}
+@media screen {
+.editorial-theme { color-scheme: dark; background: #101010; color: #f4efe5; }
+.editorial-theme :is(h1,h2,h3) { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.035em; text-wrap: balance; }
+.editorial-theme :is(input,select,textarea,button,table) { font-family: var(--font-geist-sans), Arial, sans-serif; }
+.editorial-theme :is(.public-clean,.console-shell,.console-home,.customer-app,.luxury-form-page,.customer-document) { background: #101010 !important; color: #f4efe5; }
+.editorial-theme :is(.mobile-site-header,.mobile-menu-panel,.console-topbar,.console-rail,.console-flyout) { background: #161616 !important; color: #f4efe5 !important; border-color: #ffffff22 !important; }
+.editorial-theme :is(.customer-panel,.customer-auth-card,.quote-panel,.estimate-result-panel,.invoice-card,.support-panel,.calendar-popover,.booking-option-panel,.booking-total-panel,.package-detail-panel) { background: #1c1c1c; border-color: #ffffff22; border-radius: 10px; }
+.editorial-theme .home-proof-card { background: #191919 !important; }
+.editorial-theme .console-rail-button { color: #c9c4ba; }
+.editorial-theme .console-rail-button:hover { color: #f4efe5; background: #ffffff12; }
+.editorial-theme .console-rail-button-active { background: #d6b779; color: #101010; }
+.editorial-theme .mobile-booking-inner { background: #161616 !important; border-color: #ffffff30; }
+.editorial-theme .mobile-book-primary { background: #d6b779 !important; color: #101010 !important; }
+.editorial-theme .mobile-book-secondary { background: #242424 !important; color: #f4efe5 !important; }
+.editorial-theme :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),select,textarea) { background-color: #202020 !important; color: #f4efe5 !important; border-color: #ffffff30 !important; }
+.editorial-theme :is(input,textarea)::placeholder { color: #aaa69f !important; }
+.editorial-theme :is(input,select,textarea):focus { outline: 2px solid #d6b779; outline-offset: 2px; }
+.editorial-theme :is(a,button,summary):focus-visible { outline: 2px solid #d6b779; outline-offset: 3px; }
+.editorial-theme :is(input[type="checkbox"],input[type="radio"]) { accent-color: #d6b779; }
+.editorial-theme table { color: #f4efe5; }
+.editorial-theme thead { background-color: #242424; }
+.editorial-theme :is(th,td) { border-color: #ffffff22; }
+.editorial-theme [class~="bg-[#070707]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#07131B]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#07131B]/20"] { background-color: rgba(16,16,16,0.2) !important; }
+.editorial-theme [class~="bg-[#07131B]/45"] { background-color: rgba(16,16,16,0.45) !important; }
+.editorial-theme [class~="bg-[#07131B]/50"] { background-color: rgba(16,16,16,0.5) !important; }
+.editorial-theme [class~="bg-[#07131B]/60"] { background-color: rgba(16,16,16,0.6) !important; }
+.editorial-theme [class~="bg-[#080808]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#0B1822]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#0B1822]/95"] { background-color: rgba(16,16,16,0.95) !important; }
+.editorial-theme [class~="bg-[#0c0c0c]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#0d0d0d]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#100e0c]/96"] { background-color: rgba(16,16,16,0.96) !important; }
+.editorial-theme [class~="bg-[#111]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#111]/95"] { background-color: rgba(16,16,16,0.95) !important; }
+.editorial-theme [class~="bg-[#13232F]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#13232F]/70"] { background-color: rgba(16,16,16,0.7) !important; }
+.editorial-theme [class~="bg-[#171411]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#171411]/25"] { background-color: rgba(16,16,16,0.25) !important; }
+.editorial-theme [class~="bg-[#171411]/38"] { background-color: rgba(16,16,16,0.38) !important; }
+.editorial-theme [class~="bg-[#171411]/42"] { background-color: rgba(16,16,16,0.42) !important; }
+.editorial-theme [class~="bg-[#171411]/68"] { background-color: rgba(16,16,16,0.68) !important; }
+.editorial-theme [class~="bg-[#171411]/92"] { background-color: rgba(16,16,16,0.92) !important; }
+.editorial-theme [class~="bg-[#171411]/94"] { background-color: rgba(16,16,16,0.94) !important; }
+.editorial-theme [class~="bg-[#171411]/98"] { background-color: rgba(16,16,16,0.98) !important; }
+.editorial-theme [class~="bg-[#181818]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#1B3241]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#3F3027]"] { background-color: rgba(16,16,16,1) !important; }
+.editorial-theme [class~="bg-[#3F3027]/30"] { background-color: rgba(16,16,16,0.3) !important; }
+.editorial-theme [class~="bg-[#3F3027]/45"] { background-color: rgba(16,16,16,0.45) !important; }
+.editorial-theme [class~="bg-[#6EAEC6]"] { background-color: rgba(214,183,121,1) !important; }
+.editorial-theme [class~="bg-[#6EAEC6]/10"] { background-color: rgba(214,183,121,0.1) !important; }
+.editorial-theme [class~="bg-[#6EAEC6]/12"] { background-color: rgba(214,183,121,0.12) !important; }
+.editorial-theme [class~="bg-[#6EAEC6]/15"] { background-color: rgba(214,183,121,0.15) !important; }
+.editorial-theme [class~="bg-[#6EAEC6]/5"] { background-color: rgba(214,183,121,0.05) !important; }
+.editorial-theme [class~="bg-[#6EAEC6]/8"] { background-color: rgba(214,183,121,0.08) !important; }
+.editorial-theme [class~="bg-[#7B5C4B]"] { background-color: rgba(214,183,121,1) !important; }
+.editorial-theme [class~="bg-[#C0AB9A]/10"] { background-color: rgba(214,183,121,0.1) !important; }
+.editorial-theme [class~="bg-[#C0AB9A]/18"] { background-color: rgba(214,183,121,0.18) !important; }
+.editorial-theme [class~="bg-[#C0AB9A]/55"] { background-color: rgba(214,183,121,0.55) !important; }
+.editorial-theme [class~="bg-[#C0AB9A]/7"] { background-color: rgba(214,183,121,0.07) !important; }
+.editorial-theme [class~="bg-[#C0AB9A]/8"] { background-color: rgba(214,183,121,0.08) !important; }
+.editorial-theme [class~="bg-[#EEF7F5]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#EFE8E2]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#F7F5F2]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#F7F5F2]/3"] { background-color: rgba(25,25,25,0.03) !important; }
+.editorial-theme [class~="bg-[#F7F5F2]/4"] { background-color: rgba(25,25,25,0.04) !important; }
+.editorial-theme [class~="bg-[#F7F5F2]/6"] { background-color: rgba(25,25,25,0.06) !important; }
+.editorial-theme [class~="bg-[#F7F5F2]/66"] { background-color: rgba(25,25,25,0.66) !important; }
+.editorial-theme [class~="bg-[#F7F7F5]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f2eee8]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f2f2f0]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f3f0e8]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f5f4f1]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f7f7f5]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f8f6f0]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#f8f6f0]/92"] { background-color: rgba(25,25,25,0.92) !important; }
+.editorial-theme [class~="bg-[#f8f6f0]/95"] { background-color: rgba(25,25,25,0.95) !important; }
+.editorial-theme [class~="bg-[#f8f7f4]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#faf9f7]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#faf9f7]/92"] { background-color: rgba(25,25,25,0.92) !important; }
+.editorial-theme [class~="bg-[#fafafa]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#fbfaf6]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="bg-[#fbfaf6]/98"] { background-color: rgba(25,25,25,0.98) !important; }
+.editorial-theme [class~="bg-[#fffdfb]"] { background-color: rgba(25,25,25,1) !important; }
+.editorial-theme [class~="border-[#111]"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#27404F]"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#365262]"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#3F3027]/10"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/15"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/18"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/20"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/25"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/30"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/35"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/45"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/50"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/55"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#6EAEC6]/60"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#C0AB9A]/22"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#C0AB9A]/25"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#C0AB9A]/28"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#C0AB9A]/35"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#F7F5F2]/10"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#F7F5F2]/14"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#F7F5F2]/15"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#F7F5F2]/18"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#F7F5F2]/25"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#F7F5F2]/8"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="border-[#d6b779]"] { border-color: #ffffff30 !important; }
+.editorial-theme [class~="text-[#07131B]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-[#0B1822]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-[#0B1822]/50"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#111]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-[#151515]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-[#171411]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-[#3F3027]/55"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#6EAEC6]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#7B5C4B]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#8EC5D8]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#A9D6E5]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#B9E0EC]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#C0AB9A]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#C5E5EF]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#C7E6F0]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#F7F5F2]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-[#F7F5F2]/38"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/42"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/45"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/48"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/58"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/62"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/70"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/72"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/75"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#F7F5F2]/94"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-[#d6b779]"] { color: #d6b779 !important; }
+.editorial-theme [class~="text-[#f5f3ef]"] { color: #f4efe5 !important; }
+.editorial-theme [class~="bg-white"] { background-color: #1c1c1c !important; }
+.editorial-theme [class~="bg-white/10"] { background-color: rgba(244,239,229,0.1) !important; }
+.editorial-theme [class~="bg-white/35"] { background-color: #1c1c1c !important; }
+.editorial-theme [class~="bg-white/45"] { background-color: #1c1c1c !important; }
+.editorial-theme [class~="bg-white/5"] { background-color: rgba(244,239,229,0.05) !important; }
+.editorial-theme [class~="bg-white/50"] { background-color: #1c1c1c !important; }
+.editorial-theme [class~="bg-white/7"] { background-color: rgba(244,239,229,0.07) !important; }
+.editorial-theme [class~="bg-white/8"] { background-color: rgba(244,239,229,0.08) !important; }
+.editorial-theme [class~="bg-white/96"] { background-color: #1c1c1c !important; }
+.editorial-theme [class~="bg-white/[.025]"] { background-color: rgba(244,239,229,0.025) !important; }
+.editorial-theme [class~="bg-white/[.028]"] { background-color: rgba(244,239,229,0.028) !important; }
+.editorial-theme [class~="bg-white/[.02]"] { background-color: rgba(244,239,229,0.02) !important; }
+.editorial-theme [class~="bg-white/[.035]"] { background-color: rgba(244,239,229,0.035) !important; }
+.editorial-theme [class~="bg-white/[.03]"] { background-color: rgba(244,239,229,0.03) !important; }
+.editorial-theme [class~="bg-white/[.04]"] { background-color: rgba(244,239,229,0.04) !important; }
+.editorial-theme [class~="bg-white/[.055]"] { background-color: rgba(244,239,229,0.055) !important; }
+.editorial-theme [class~="bg-white/[.08]"] { background-color: rgba(244,239,229,0.08) !important; }
+.editorial-theme [class~="bg-white/[0.022]"] { background-color: rgba(244,239,229,0.022) !important; }
+.editorial-theme [class~="bg-white/[0.025]"] { background-color: rgba(244,239,229,0.025) !important; }
+.editorial-theme [class~="bg-white/[0.02]"] { background-color: rgba(244,239,229,0.02) !important; }
+.editorial-theme [class~="bg-white/[0.035]"] { background-color: rgba(244,239,229,0.035) !important; }
+.editorial-theme [class~="border-black/10"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/12"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/15"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/8"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.055]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.065]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.06]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.075]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.07]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.08]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.09]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-black/[.1]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/10"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/12"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/14"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/15"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/16"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/20"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/24"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/40"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/5"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/6"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/7"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/8"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/[.06]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/[.07]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="border-white/[.08]"] { border-color: #ffffff22 !important; }
+.editorial-theme [class~="divide-black/[.065]"] > :not(:last-child) { border-color: #ffffff22 !important; }
+.editorial-theme [class~="divide-black/[.07]"] > :not(:last-child) { border-color: #ffffff22 !important; }
+.editorial-theme [class~="text-black"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-black/12"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/25"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/28"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/30"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/32"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/34"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/35"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/36"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/38"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/40"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/42"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/45"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/48"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/50"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/52"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/55"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/56"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/58"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/60"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/62"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/65"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-black/70"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white"] { color: #f4efe5 !important; }
+.editorial-theme [class~="text-white/15"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/20"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/25"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/26"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/28"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/30"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/32"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/34"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/35"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/36"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/38"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/40"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/42"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/44"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/45"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/46"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/48"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/50"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/52"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/55"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/58"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/60"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/62"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/64"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/65"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/68"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/70"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/72"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/75"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/80"] { color: #b9b5ad !important; }
+.editorial-theme [class~="text-white/90"] { color: #b9b5ad !important; }
+
+/* Filled actions retain a dark label on gold across all application areas. */
+.editorial-theme :is(button,a,input[type="submit"]):is([class~="bg-white"],[class~="bg-[#111]"],[class~="bg-[#171411]"],[class~="bg-[#0d0d0d]"],[class~="bg-[#6EAEC6]"]) { background-color: #d6b779 !important; color: #101010 !important; border-radius: 999px; }
+.editorial-theme :is(button,a)[class~="bg-[#6EAEC6]"] * { color: inherit !important; }
+.editorial-theme :is(a,button)[class~="hover:text-black"]:hover { color: #d6b779 !important; }
+.editorial-theme :is(a,button)[class~="hover:bg-white"]:hover { background-color: #e5c995 !important; color: #101010 !important; }
+/* Keep errors and successes distinguishable from decorative gold. */
+.editorial-theme [class*="text-red-"] { color: #fca5a5 !important; }
+.editorial-theme :is([class*="text-green-"],[class*="text-emerald-"]) { color: #9bd5b0 !important; }
+.editorial-theme :is([class*="text-amber-"],[class*="text-yellow-"]) { color: #e5c995 !important; }
+.editorial-theme .public-hero-copy :is(h1,h2) { font-weight: 400; line-height: 1.05; }
+.editorial-theme .public-hero-shell { border-radius: 0; }
+.editorial-theme .customer-app::before,.editorial-theme .luxury-form-page::before { opacity: .08; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}

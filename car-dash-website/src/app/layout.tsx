@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./scroll-reveal.css";
+import "./editorial-theme.css";
 import SiteChrome from "@/components/SiteChrome";
 import StructuredData from "@/components/StructuredData";
 import { localBusinessSchema, SITE_URL } from "@/lib/seo";
@@ -54,7 +55,7 @@ export default async function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased bg-[#171411] text-[#F7F5F2]`}
     >
-      <body className="flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
+      <body className="editorial-theme flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
         <StructuredData data={localBusinessSchema} />
         <SiteChrome footerBlurb={siteContent.footerBlurb}>{children}</SiteChrome>
       </body>
