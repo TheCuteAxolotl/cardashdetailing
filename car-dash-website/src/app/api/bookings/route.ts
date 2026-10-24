@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     if (!policyAgreed) return NextResponse.json({ success: false, message: "Please confirm the booking acknowledgement before submitting." }, { status: 400 });
 
     const vehicleTrim = String(form.get("vehicleTrim") || "").trim();
-    const serviceMethod = String(form.get("serviceMethod") || "Not specified").trim();
+    const serviceMethod = "mobile";
     const preferredDate = String(form.get("preferredDate") || "").trim();
     const preferredTime = String(form.get("preferredTime") || "").trim();
     if (!isDateString(preferredDate) || !normalizeBookingTime(preferredTime)) {
