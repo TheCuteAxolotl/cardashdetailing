@@ -35,6 +35,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
       { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", ownerOnly: true },
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", ownerOnly: true },
+      { href: "/owner/loyalty", label: "Loyalty cards", icon: "shield", ownerOnly: true },
       { href: "/owner/maintenance", label: "Maintenance", icon: "price", ownerOnly: true },
       { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },
     ],

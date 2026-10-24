@@ -25,6 +25,7 @@ const toolRows = [
   ["Messages", "/owner/messages", "Customer SMS conversations", "message"],
   ["Build a Detail", "/owner/detail-builder", "Inspect a vehicle and build a custom price", "detail"],
   ["Invoices", "/owner/invoices", "Create, send and record payments", "invoice"],
+  ["Loyalty cards", "/owner/loyalty", "Verify paid visits and free-detail rewards", "maintenance"],
   ["Maintenance", "/owner/maintenance", "Monthly subscriptions and client plans", "maintenance"],
   ["Pricing", "/owner/pricing-pages", "Packages and service pricing", "pricing"],
   ["Website", "/owner/website", "Homepage copy and public content", "website"],
