@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
     const row = await prisma.siteContent.findUnique({where:{key:GIFT_PREFIX+code}});
     if (!row) return NextResponse.json({error:'Gift card not found. Check the code or contact Car Dash.'},{status:404,headers});
     const card = JSON.parse(row.value) as GiftCard;
+    if (card.deletedAt) return NextResponse.json({error:'This gift card is no longer available.'},{status:404,headers});
     return NextResponse.json({balance:card.balance,paused:card.paused,lastFour:card.code.slice(-4)},{headers});
   } catch { return NextResponse.json({error:'Unable to check the balance right now. Please retry.'},{status:503,headers}); }
 }

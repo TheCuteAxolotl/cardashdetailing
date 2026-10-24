@@ -284,9 +284,13 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
-
 @media screen {
-.editorial-theme :is(.public-hero-shell,.public-hero-copy,.legal-luxury) { background: #191919 !important; color: #f4efe5; }
-.editorial-theme [class*="bg-[linear-gradient(135deg,#EFE8E2"] { background: linear-gradient(135deg,#242424,#161616) !important; }
-.editorial-theme [class*="bg-[radial-gradient(circle_at_28%_22%"] { background: radial-gradient(circle at 28% 22%,#d6b77912,transparent 60%) !important; }
+  .editorial-theme :is(.public-hero-shell,.public-hero-copy,.legal-luxury) { background: #191919 !important; color: #f4efe5; }
+  .editorial-theme [class*="bg-[linear-gradient(135deg,#EFE8E2"] { background: linear-gradient(135deg,#242424,#161616) !important; }
+  .editorial-theme [class*="bg-[radial-gradient(circle_at_28%_22%"] { background: radial-gradient(circle at 28% 22%,#d6b77912,transparent 60%) !important; }
 }
+
+/* Keep the mobile menu dark even when the legacy light menu styles load. */
+.editorial-theme .mobile-menu-nav { background: #202020 !important; color: #f4efe5 !important; border-color: #ffffff22 !important; }
+.editorial-theme .mobile-menu-nav > :is(a,button) { background: transparent !important; color: #f4efe5 !important; border-color: #ffffff18 !important; }
+.editorial-theme .mobile-menu-nav > :is(a,button):hover { background: #ffffff0d !important; }

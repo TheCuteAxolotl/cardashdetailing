@@ -1,6 +1,6 @@
 export const GIFT_PREFIX = 'owner:gift-card:';
-export type GiftEvent = { id: string; kind: 'issue' | 'load' | 'spend' | 'set' | 'pause' | 'resume'; delta: number; balance: number; note: string; actor: string; at: string };
-export type GiftCard = { code: string; id: string; label: string; balance: number; paused: boolean; version: number; createdAt: string; events: GiftEvent[] };
+export type GiftEvent = { id: string; kind: 'issue' | 'load' | 'spend' | 'set' | 'pause' | 'resume' | 'used' | 'delete'; delta: number; balance: number; note: string; actor: string; at: string };
+export type GiftCard = { code: string; id: string; label: string; balance: number; paused: boolean; used?: boolean; deletedAt?: string; version: number; createdAt: string; events: GiftEvent[] };
 export function cleanGiftCode(value: unknown) { return typeof value === 'string' ? value.replace(/[\s-]/g, '').toUpperCase() : ''; }
 export function giftCodeFromId(id: string) { const raw = cleanGiftCode(id); return raw.slice(0, 12) + raw.slice(-8); }
 export function validGiftCode(value: string) { return /^[A-F0-9]{20}$/.test(value); }
@@ -15,9 +15,14 @@ export function parseGiftAmount(value: unknown) {
 }
 export function changeGiftCard(card: GiftCard, input: { id: string; kind: GiftEvent['kind']; amount: unknown; note: string; actor: string; at: string }): GiftCard {
   if (card.events.some(e => e.id === input.id)) return card;
+  if (card.deletedAt) throw new Error('This card was deleted.');
   if (!input.note) throw new Error('Enter a receipt reference or reason for this change.');
   let balance = card.balance, paused = card.paused;
-  if (input.kind === 'pause') { if (paused) throw new Error('This card is already paused.'); paused = true; }
+  if (input.kind === 'delete') {
+    if (balance !== 0) throw new Error('Use or resolve the remaining balance before deleting this card.');
+  }
+  else if (input.kind === 'used') balance = 0;
+  else if (input.kind === 'pause') { if (paused) throw new Error('This card is already paused.'); paused = true; }
   else if (input.kind === 'resume') { if (!paused) throw new Error('This card is already active.'); paused = false; }
   else {
     if (paused) throw new Error('Resume this card before changing its balance.');
@@ -29,5 +34,5 @@ export function changeGiftCard(card: GiftCard, input: { id: string; kind: GiftEv
     if (balance < 0) throw new Error('This card does not have enough money for that purchase.');
     if (balance > 1000000) throw new Error('The maximum balance is $10,000.');
   }
-  return { ...card, balance, paused, version: card.version + 1, events: [...card.events, { id: input.id, kind: input.kind, delta: balance - card.balance, balance, note: input.note, actor: input.actor, at: input.at }] };
+  return { ...card, balance, paused, used: input.kind === 'used' || (balance === 0 && (input.kind === 'spend' || !!card.used)), deletedAt: input.kind === 'delete' ? input.at : card.deletedAt, version: card.version + 1, events: [...card.events, { id: input.id, kind: input.kind, delta: balance - card.balance, balance, note: input.note, actor: input.actor, at: input.at }] };
 }

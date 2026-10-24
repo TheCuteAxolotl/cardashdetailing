@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     if (!isOwnerAccount(await getCurrentAccountFromRequest(request))) return reply({error:'Owner access required'},403);
     const rows = await prisma.siteContent.findMany({where:{key:{startsWith:GIFT_PREFIX}},orderBy:{updatedAt:'desc'}});
-    return reply({cards:rows.map(row => JSON.parse(row.value) as GiftCard)});
+    return reply({cards:rows.map(row => JSON.parse(row.value) as GiftCard).filter(card=>!card.deletedAt)});
   } catch { return reply({error:'Could not load gift cards. Please retry.'},500); }
 }
 export async function POST(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const card = JSON.parse(row.value) as GiftCard;
     if (card.events.some(e=>e.id===body.requestId)) return reply({card});
     if (body.version!==card.version) return reply({error:'The balance changed in another session. Refresh before trying again.'},409);
-    if (!['load','spend','set','pause','resume'].includes(body.action)) return reply({error:'Invalid action'},400);
+    if (!['load','spend','set','pause','resume','used','delete'].includes(body.action)) return reply({error:'Invalid action'},400);
     let next: GiftCard;
     try { next = changeGiftCard(card,{id:body.requestId,kind:body.action,amount:body.amount,note,actor:account.email,at:now}); } catch(e) { return reply({error:(e as Error).message},400); }
     const result = await prisma.siteContent.updateMany({where:{key,value:row.value},data:{value:JSON.stringify(next)}});
