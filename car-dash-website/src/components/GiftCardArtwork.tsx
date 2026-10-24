@@ -15,7 +15,7 @@ export default function GiftCardArtwork({code}:{code:string}) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/gift-cards/qr" alt="Scan to enter your gift-card number" width={91} height={91} style={{background:'white',width:'.95in',height:'.95in'}}/>
       </div>
-      <div style={{borderTop:'1px solid #ffffff30',marginTop:10,paddingTop:8}}><span style={{fontSize:6,color:'#cbb078',letterSpacing:1}}>CARD NUMBER</span><div style={{fontFamily:'monospace',fontSize:10,letterSpacing:.4,marginTop:4}}>{displayGiftCode(code)}</div></div>
+      <div style={{position:'absolute',bottom:'.16in',left:'.16in',right:'.16in',borderTop:'1px solid #ffffff30',paddingTop:6}}><span style={{fontSize:6,color:'#cbb078',letterSpacing:1}}>CARD NUMBER</span><div style={{fontFamily:'monospace',fontSize:10,letterSpacing:.4,marginTop:4}}>{displayGiftCode(code)}</div></div>
     </div>
   </>;
 }
