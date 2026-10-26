@@ -269,10 +269,13 @@
 .editorial-theme [class~="text-white/90"] { color: #b9b5ad !important; }
 
 /* Filled actions retain a dark label on gold across all application areas. */
-.editorial-theme :is(button,a,input[type="submit"]):is([class~="bg-white"],[class~="bg-[#111]"],[class~="bg-[#171411]"],[class~="bg-[#0d0d0d]"],[class~="bg-[#6EAEC6]"]) { background-color: #d6b779 !important; color: #101010 !important; border-radius: 999px; }
-.editorial-theme :is(button,a)[class~="bg-[#6EAEC6]"] * { color: inherit !important; }
+.editorial-theme :is(button,a,input[type="submit"]):is([class~="bg-white"],[class~="bg-[#111]"],[class~="bg-[#171411]"],[class~="bg-[#0d0d0d]"],[class~="bg-[#6EAEC6]"]) { background-color: #d6b779 !important; color: #101010 !important; }
+/* Filled controls and linked cards keep their component-defined corner radius.
+   Their nested labels must use dark ink too, rather than the dark-theme muted ink. */
+.editorial-theme :is(button,a,input[type="submit"]):is([class~="bg-white"],[class~="bg-[#111]"],[class~="bg-[#171411]"],[class~="bg-[#0d0d0d]"],[class~="bg-[#6EAEC6]"]) * { color: inherit !important; }
 .editorial-theme :is(a,button)[class~="hover:text-black"]:hover { color: #d6b779 !important; }
 .editorial-theme :is(a,button)[class~="hover:bg-white"]:hover { background-color: #e5c995 !important; color: #101010 !important; }
+.editorial-theme :is(button,a,input[type="submit"]):is([class~="bg-white"],[class~="bg-[#111]"],[class~="bg-[#171411]"],[class~="bg-[#0d0d0d]"],[class~="bg-[#6EAEC6]"]):hover { background-color: #e5c995 !important; color: #101010 !important; }
 /* Keep errors and successes distinguishable from decorative gold. */
 .editorial-theme [class*="text-red-"] { color: #fca5a5 !important; }
 .editorial-theme :is([class*="text-green-"],[class*="text-emerald-"]) { color: #9bd5b0 !important; }
