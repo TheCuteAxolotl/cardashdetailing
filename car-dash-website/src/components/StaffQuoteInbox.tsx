@@ -1,11 +1,13 @@
 "use client";
 
+import SmsAttachments from "@/components/SmsAttachments";
+
 import NumberInput from "@/components/NumberInput";
 
 import QuoteBookingForm from "@/components/QuoteBookingForm";
 import { useEffect, useMemo, useState } from "react";
 
-type Msg = { id: string; sender: string; body: string; attachmentsJson: string | null; createdAt: string };
+type Msg = { externalSid?: string | null; id: string; sender: string; body: string; attachmentsJson: string | null; createdAt: string };
 type Thread = {
   id: string;
   subject: string;
@@ -233,6 +235,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                       return (
                         <div key={message.id} className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.sender === "team" ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8"}`}>
                           <p className="text-sm leading-6">{message.body}</p>
+                          {message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                           {message.attachmentsJson && (
                             <div className="mt-3 grid grid-cols-2 gap-2">
                               {JSON.parse(message.attachmentsJson).map((src: string, index: number) => (

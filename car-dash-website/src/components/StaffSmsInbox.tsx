@@ -1,5 +1,7 @@
 "use client";
 
+import SmsAttachments from "@/components/SmsAttachments";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type InboxMessage = {
@@ -7,6 +9,7 @@ type InboxMessage = {
   sender: string;
   body: string;
   channel?: string;
+  externalSid?: string | null;
   createdAt: string;
 };
 
@@ -492,6 +495,7 @@ export default function StaffSmsInbox({
                         <div key={message.id} className={`flex ${outbound ? "justify-end" : "justify-start"}`}>
                           <div className={`max-w-[86%] rounded-2xl px-4 py-3 ${outbound ? "bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8 text-white"}`}>
                             <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
+                      {!outbound && <SmsAttachments sid={message.externalSid} body={message.body} />}
                             <p className={`mt-2 text-[10px] ${outbound ? "text-[#0B1822]/50" : "text-white/30"}`}>
                               {outbound ? "Car Dash" : "Customer"} · {new Date(message.createdAt).toLocaleString()}
                             </p>

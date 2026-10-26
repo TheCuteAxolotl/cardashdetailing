@@ -13,7 +13,7 @@ const select = {
   user: { select: { id: true, name: true, email: true } },
   vehicle: true,
   service: { select: { id: true, title: true, category: true, pricingType: true } },
-  messages: { orderBy: { createdAt: "asc" as const }, select: { id: true, sender: true, body: true, attachmentsJson: true, createdAt: true } },
+  messages: { orderBy: { createdAt: "asc" as const }, select: { id: true, sender: true, body: true, attachmentsJson: true, externalSid: true, createdAt: true } },
 };
 
 export async function GET(request: NextRequest) {

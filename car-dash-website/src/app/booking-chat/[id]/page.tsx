@@ -1,5 +1,7 @@
 "use client";
 
+import SmsAttachments from "@/components/SmsAttachments";
+
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -26,6 +28,7 @@ type BookingMessage = {
   sender: string;
   body: string;
   channel?: string;
+  externalSid?: string | null;
   createdAt: string;
 };
 
@@ -218,6 +221,7 @@ export default function BookingChatPage() {
                       className={`max-w-[86%] rounded-2xl px-4 py-3 ${mine ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8"}`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
+                      {staff && message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                       <div className="mt-2 flex items-center gap-2 text-[10px] opacity-45">
                         <span>{new Date(message.createdAt).toLocaleString()}</span>
                         {message.channel === "sms" && (
