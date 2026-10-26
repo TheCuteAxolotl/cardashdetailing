@@ -1,4 +1,6 @@
 "use client";
+
+import NumberInput from "@/components/NumberInput";
 import { useEffect, useState } from "react";
 
 type Service = { id:string; title:string; description:string; price:number; startingPrice:number|null; maxPrice:number|null; pricingType:string; category:string; subcategory:string; active:boolean; sortOrder:number };
@@ -18,10 +20,10 @@ export default function OwnerServices(){
    <label className="text-sm text-white/55">Category<select className={`${input} mt-2`} value={d.category} onChange={e=>setD({...d,category:e.target.value})}><option>Car Detailing</option><option>Marine Detailing</option><option>Ceramic Coatings</option></select></label>
    <label className="text-sm text-white/55">Subcategory<input className={`${input} mt-2`} value={d.subcategory} onChange={e=>setD({...d,subcategory:e.target.value})} placeholder="Exterior / Interior / Buff and Polish"/></label>
    <label className="text-sm text-white/55">Pricing type<select className={`${input} mt-2`} value={d.pricingType} onChange={e=>setD({...d,pricingType:e.target.value})}><option value="fixed">Fixed price</option><option value="starting">Starting price</option><option value="range">Estimate range</option><option value="quote">Quote required</option></select></label>
-   {d.pricingType==='fixed'&&<label className="text-sm text-white/55">Fixed price<input type="number" className={`${input} mt-2`} value={d.price} onChange={e=>setD({...d,price:e.target.value})}/></label>}
-   {d.pricingType==='starting'&&<label className="text-sm text-white/55">Starting price<input type="number" className={`${input} mt-2`} value={d.startingPrice} onChange={e=>setD({...d,startingPrice:e.target.value})}/></label>}{d.pricingType==='range'&&<label className="text-sm text-white/55">Estimate minimum<input type="number" className={`${input} mt-2`} value={d.startingPrice} onChange={e=>setD({...d,startingPrice:e.target.value})}/><span className="mt-1 block text-xs text-white/30">Lowest normal estimate before vehicle/condition adjustments.</span></label>}
-   {d.pricingType==='range'&&<label className="text-sm text-white/55">Estimate maximum<input type="number" className={`${input} mt-2`} value={d.maxPrice} onChange={e=>setD({...d,maxPrice:e.target.value})}/><span className="mt-1 block text-xs text-white/30">Normal high end shown before vehicle/condition adjustments.</span></label>}
-   <label className="text-sm text-white/55">Menu order<input type="number" className={`${input} mt-2`} value={d.sortOrder} onChange={e=>setD({...d,sortOrder:e.target.value})}/></label>
+   {d.pricingType==='fixed'&&<label className="text-sm text-white/55">Fixed price<NumberInput type="number" className={`${input} mt-2`} value={d.price} onChange={e=>setD({...d,price:e.target.value})}/></label>}
+   {d.pricingType==='starting'&&<label className="text-sm text-white/55">Starting price<NumberInput type="number" className={`${input} mt-2`} value={d.startingPrice} onChange={e=>setD({...d,startingPrice:e.target.value})}/></label>}{d.pricingType==='range'&&<label className="text-sm text-white/55">Estimate minimum<NumberInput type="number" className={`${input} mt-2`} value={d.startingPrice} onChange={e=>setD({...d,startingPrice:e.target.value})}/><span className="mt-1 block text-xs text-white/30">Lowest normal estimate before vehicle/condition adjustments.</span></label>}
+   {d.pricingType==='range'&&<label className="text-sm text-white/55">Estimate maximum<NumberInput type="number" className={`${input} mt-2`} value={d.maxPrice} onChange={e=>setD({...d,maxPrice:e.target.value})}/><span className="mt-1 block text-xs text-white/30">Normal high end shown before vehicle/condition adjustments.</span></label>}
+   <label className="text-sm text-white/55">Menu order<NumberInput type="number" className={`${input} mt-2`} value={d.sortOrder} onChange={e=>setD({...d,sortOrder:e.target.value})}/></label>
    <label className="md:col-span-2 text-sm text-white/55">Description<textarea className={`${input} mt-2 min-h-28`} value={d.description} onChange={e=>setD({...d,description:e.target.value})}/></label>
    <label className="flex items-center gap-3 text-sm text-white/65"><input type="checkbox" checked={d.active} onChange={e=>setD({...d,active:e.target.checked})}/> Show on website</label>
  </div>;

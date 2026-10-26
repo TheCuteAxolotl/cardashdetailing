@@ -1,5 +1,7 @@
 "use client";
 
+import NumberInput from "@/components/NumberInput";
+
 import { useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_DETAIL_BUILDER_CATALOG,
@@ -409,7 +411,7 @@ export default function DetailBuilderPage() {
                       <td className="px-2 py-2"><input value={item.name} onChange={(e) => updateCatalogItem(item.id, { name: e.target.value })} className="w-full rounded border border-black/10 bg-[#fafafa] px-2.5 py-2 text-sm outline-none focus:border-black/30" /></td>
                       <td className="px-2 py-2"><input value={item.category} onChange={(e) => updateCatalogItem(item.id, { category: e.target.value })} className="w-full rounded border border-black/10 bg-[#fafafa] px-2.5 py-2 outline-none focus:border-black/30" /></td>
                       {(["sedan", "suv", "truck"] as DetailBuilderVehicleClass[]).map((vehicle) => (
-                        <td key={vehicle} className="px-2 py-2"><input type="number" min="0" step="1" value={item.prices[vehicle]} onChange={(e) => updateCatalogItem(item.id, { prices: { ...item.prices, [vehicle]: Number(e.target.value) } })} className="w-24 rounded border border-black/10 bg-[#fafafa] px-2.5 py-2 outline-none focus:border-black/30" /></td>
+                        <td key={vehicle} className="px-2 py-2"><NumberInput type="number" min="0" step="1" value={item.prices[vehicle]} onChange={(e) => updateCatalogItem(item.id, { prices: { ...item.prices, [vehicle]: Number(e.target.value) } })} className="w-24 rounded border border-black/10 bg-[#fafafa] px-2.5 py-2 outline-none focus:border-black/30" /></td>
                       ))}
                       <td className="px-2 py-2"><input type="checkbox" checked={item.active} onChange={(e) => updateCatalogItem(item.id, { active: e.target.checked })} /></td>
                     </tr>
@@ -533,8 +535,8 @@ export default function DetailBuilderPage() {
                       <button onClick={() => setSelected((current) => current.filter((entry) => entry.id !== item.id))} className="text-lg leading-none text-black/25 hover:text-black">×</button>
                     </div>
                     <div className="mt-2 grid grid-cols-[72px_1fr_auto] items-center gap-2">
-                      <input type="number" min="0.25" step="0.25" value={item.quantity} onChange={(e) => updateSelected(item.id, { quantity: Number(e.target.value) })} className="rounded border border-black/10 bg-[#fafafa] px-2 py-2 text-xs outline-none" />
-                      <input type="number" min="0" step="1" value={item.rate} onChange={(e) => updateSelected(item.id, { rate: Number(e.target.value) })} className="rounded border border-black/10 bg-[#fafafa] px-2 py-2 text-xs outline-none" />
+                      <NumberInput type="number" min="0.25" step="0.25" value={item.quantity} onChange={(e) => updateSelected(item.id, { quantity: Number(e.target.value) })} className="rounded border border-black/10 bg-[#fafafa] px-2 py-2 text-xs outline-none" />
+                      <NumberInput type="number" min="0" step="1" value={item.rate} onChange={(e) => updateSelected(item.id, { rate: Number(e.target.value) })} className="rounded border border-black/10 bg-[#fafafa] px-2 py-2 text-xs outline-none" />
                       <span className="text-xs font-semibold text-black/55">{currency.format(item.quantity * item.rate)}</span>
                     </div>
                   </div>

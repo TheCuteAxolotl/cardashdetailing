@@ -38,7 +38,7 @@ export async function PUT(
         id: params.id,
       },
       data: {
-        title: String(title || "Untitled")
+        title: String(title ?? "")
           .trim()
           .slice(0, 120),
         category: nextCategory,

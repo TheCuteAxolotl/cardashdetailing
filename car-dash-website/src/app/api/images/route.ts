@@ -80,9 +80,9 @@ export async function POST(request: NextRequest) {
 
     const { url, title, category } = await request.json();
 
-    if (!url || !title || !category) {
+    if (!url || !category) {
       return NextResponse.json(
-        { error: "Image, title, and category are required" },
+        { error: "Image and category are required" },
         { status: 400 }
       );
     }
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     const image = await prisma.galleryImage.create({
       data: {
         url: mediaUrl,
-        title: String(title).trim().slice(0, 120),
+        title: String(title ?? "").trim().slice(0, 120),
         category: String(category).trim().slice(0, 120),
       },
     });

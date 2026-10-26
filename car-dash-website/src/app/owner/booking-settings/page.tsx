@@ -1,5 +1,7 @@
 "use client";
 
+import NumberInput from "@/components/NumberInput";
+
 import { useEffect, useState } from "react";
 import {
   BookingAddOn,
@@ -398,7 +400,7 @@ export default function BookingSettingsPage() {
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Car Detailing Add-Ons</p><h2 className="mt-2 text-2xl font-semibold">Booking add-ons</h2><p className="mt-2 text-sm text-white/40">These prices appear in the booking form and are added to the exact total.</p></div>
                 <label className="text-sm text-white/55">Headlight Restoration booked alone
-                  <input type="number" min="0" step="1" className={`${input} mt-2 w-56`} value={pricing.headlightStandalonePrice} onChange={(e) => setPricing((current) => ({ ...current, headlightStandalonePrice: Number(e.target.value) }))} />
+                  <NumberInput type="number" min="0" step="1" className={`${input} mt-2 w-56`} value={pricing.headlightStandalonePrice} onChange={(e) => setPricing((current) => ({ ...current, headlightStandalonePrice: Number(e.target.value) }))} />
                 </label>
               </div>
 
@@ -406,7 +408,7 @@ export default function BookingSettingsPage() {
                 {pricing.addOns.map((item, index) => (
                   <div key={item.id} className="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-[1fr_150px_auto_auto] md:items-end">
                     <label className="text-sm text-white/55">Add-on name<input className={`${input} mt-2`} value={item.name} onChange={(e) => updateAddOn(index, { name: e.target.value })} /></label>
-                    <label className="text-sm text-white/55">Price<input type="number" min="0" step="1" className={`${input} mt-2`} value={item.price} onChange={(e) => updateAddOn(index, { price: Number(e.target.value) })} /></label>
+                    <label className="text-sm text-white/55">Price<NumberInput type="number" min="0" step="1" className={`${input} mt-2`} value={item.price} onChange={(e) => updateAddOn(index, { price: Number(e.target.value) })} /></label>
                     <label className="flex h-12 items-center gap-2 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateAddOn(index, { active: e.target.checked })} /> Active</label>
                     <button type="button" onClick={() => deleteAddOn(index)} className="h-12 rounded-xl border border-red-500/25 px-4 text-sm text-red-300">Delete</button>
                   </div>
@@ -445,9 +447,9 @@ export default function BookingSettingsPage() {
                         <label className="text-sm text-white/55">Code<input className={`${input} mt-2 uppercase`} value={item.code} onChange={(e) => updateDiscount(index, { code: normalizeDiscountCode(e.target.value) })} placeholder="SAVE10" /></label>
                         <label className="text-sm text-white/55">Customer label<input className={`${input} mt-2`} value={item.label} onChange={(e) => updateDiscount(index, { label: e.target.value })} placeholder="10% off detailing" /></label>
                         <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as DiscountCode["type"] })}><option value="percent">Percent off %</option><option value="fixed">Fixed dollars off $</option><option value="set_service_price">Set service price to $</option></select></label>
-                        <label className="text-sm text-white/55">{item.type === "set_service_price" ? "Promo service price" : "Amount"}<input type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} placeholder={item.type === "set_service_price" ? "40" : undefined} /></label>
+                        <label className="text-sm text-white/55">{item.type === "set_service_price" ? "Promo service price" : "Amount"}<NumberInput type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} placeholder={item.type === "set_service_price" ? "40" : undefined} /></label>
                         <label className="text-sm text-white/55 md:col-span-2">Applies to<select className={`${input} mt-2`} value={item.appliesTo || ""} onChange={(e) => updateDiscount(index, { appliesTo: e.target.value || null })}><option value="">All services and packages</option>{["Full Detailing", "Interior Only", "Exterior Only", "Standalone", "Other Services"].map((group) => { const options = discountTargets.filter((option) => option.group === group); return options.length ? <optgroup key={group} label={group}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</optgroup> : null; })}</select><span className="mt-2 block text-xs leading-5 text-white/32">Pick one service/package to prevent this code from working anywhere else.</span></label>
-                        <label className="text-sm text-white/55">Total usage limit<input type="number" min="1" step="1" className={`${input} mt-2`} value={item.usageLimit ?? ""} onChange={(e) => updateDiscount(index, { usageLimit: e.target.value ? Math.max(1, Math.floor(Number(e.target.value))) : null })} placeholder="Unlimited" /></label>
+                        <label className="text-sm text-white/55">Total usage limit<NumberInput type="number" min="1" step="1" className={`${input} mt-2`} value={item.usageLimit ?? ""} onChange={(e) => updateDiscount(index, { usageLimit: e.target.value ? Math.max(1, Math.floor(Number(e.target.value))) : null })} placeholder="Unlimited" /></label>
                         <label className="text-sm text-white/55">Expiration date<input type="date" className={`${input} mt-2`} value={item.expiresAt || ""} onChange={(e) => updateDiscount(index, { expiresAt: e.target.value || null })} /></label>
                         <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.onePerCustomer} onChange={(e) => updateDiscount(index, { onePerCustomer: e.target.checked })} /> One use per customer</label>
                         <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateDiscount(index, { active: e.target.checked })} /> Active</label>

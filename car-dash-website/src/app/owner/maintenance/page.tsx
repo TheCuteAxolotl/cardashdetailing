@@ -1,5 +1,7 @@
 "use client";
 
+import NumberInput from "@/components/NumberInput";
+
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Offer = {
@@ -196,7 +198,7 @@ export default function OwnerMaintenancePage() {
                 <input required value={form.customerName} onChange={(e)=>setForm({...form,customerName:e.target.value})} className="mt-2 w-full rounded-xl border border-black/10 bg-[#fafafa] px-4 py-3 text-sm outline-none focus:border-black/25" placeholder="Steve" />
               </label>
               <label className="text-xs font-semibold text-black/55">Monthly price
-                <div className="mt-2 flex rounded-xl border border-black/10 bg-[#fafafa] focus-within:border-black/25"><span className="px-4 py-3 text-sm text-black/35">$</span><input required min="1" step="0.01" type="number" value={form.monthlyPrice} onChange={(e)=>setForm({...form,monthlyPrice:e.target.value})} className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-sm outline-none" /></div>
+                <div className="mt-2 flex rounded-xl border border-black/10 bg-[#fafafa] focus-within:border-black/25"><span className="px-4 py-3 text-sm text-black/35">$</span><NumberInput required min="1" step="0.01" type="number" value={form.monthlyPrice} onChange={(e)=>setForm({...form,monthlyPrice:e.target.value})} className="min-w-0 flex-1 bg-transparent py-3 pr-4 text-sm outline-none" /></div>
               </label>
               <label className="text-xs font-semibold text-black/55">Client email
                 <input type="email" value={form.customerEmail} onChange={(e)=>setForm({...form,customerEmail:e.target.value})} className="mt-2 w-full rounded-xl border border-black/10 bg-[#fafafa] px-4 py-3 text-sm outline-none focus:border-black/25" placeholder="client@email.com" />

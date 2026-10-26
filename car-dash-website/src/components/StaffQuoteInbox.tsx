@@ -1,5 +1,7 @@
 "use client";
 
+import NumberInput from "@/components/NumberInput";
+
 import QuoteBookingForm from "@/components/QuoteBookingForm";
 import { useEffect, useMemo, useState } from "react";
 
@@ -260,7 +262,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                   <p className="text-xs uppercase tracking-[.22em] text-[#6EAEC6]">Final quote</p>
                   <label className="mt-4 block text-xs text-white/45">
                     Exact price
-                    <input type="number" min="1" step="0.01" className={`${input} mt-2`} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="275" />
+                    <NumberInput type="number" min="1" step="0.01" className={`${input} mt-2`} value={price} onChange={(event) => setPrice(event.target.value)} placeholder="275" />
                   </label>
                   <label className="mt-4 block text-xs text-white/45">
                     Quote notes

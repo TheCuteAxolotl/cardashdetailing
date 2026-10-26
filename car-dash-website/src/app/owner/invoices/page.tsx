@@ -1,5 +1,7 @@
 "use client";
 
+import NumberInput from "@/components/NumberInput";
+
 import { useEffect, useMemo, useState } from "react";
 
 type LineItem = { id: string; description: string; quantity: number; rate: number };
@@ -333,8 +335,8 @@ export default function OwnerInvoicesPage() {
                 {form.lineItems.map((item, index) => (
                   <div key={item.id} className="grid gap-3 rounded-2xl border border-white/7 bg-white/[0.025] p-3 sm:grid-cols-[1fr_90px_120px_38px]">
                     <input value={item.description} onChange={(e) => setForm({ ...form, lineItems: form.lineItems.map((x, i) => i === index ? { ...x, description: e.target.value } : x) })} className="input" placeholder="Service / item" />
-                    <input type="number" min="0" step="1" value={item.quantity} onChange={(e) => setForm({ ...form, lineItems: form.lineItems.map((x, i) => i === index ? { ...x, quantity: Number(e.target.value) } : x) })} className="input" aria-label="Quantity" />
-                    <input type="number" min="0" step="0.01" value={item.rate} onChange={(e) => setForm({ ...form, lineItems: form.lineItems.map((x, i) => i === index ? { ...x, rate: Number(e.target.value) } : x) })} className="input" aria-label="Rate" />
+                    <NumberInput type="number" min="0" step="1" value={item.quantity} onChange={(e) => setForm({ ...form, lineItems: form.lineItems.map((x, i) => i === index ? { ...x, quantity: Number(e.target.value) } : x) })} className="input" aria-label="Quantity" />
+                    <NumberInput type="number" min="0" step="0.01" value={item.rate} onChange={(e) => setForm({ ...form, lineItems: form.lineItems.map((x, i) => i === index ? { ...x, rate: Number(e.target.value) } : x) })} className="input" aria-label="Rate" />
                     <button onClick={() => setForm({ ...form, lineItems: form.lineItems.filter((_, i) => i !== index) })} className="rounded-xl border border-white/8 text-white/35 hover:border-red-300/20 hover:text-red-200" aria-label="Remove line item">×</button>
                   </div>
                 ))}
@@ -342,8 +344,8 @@ export default function OwnerInvoicesPage() {
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <Field label="Discount ($)"><input type="number" min="0" step="0.01" value={form.discountAmount} onChange={(e) => setForm({ ...form, discountAmount: Number(e.target.value) })} className="input" /></Field>
-              <Field label="Sales tax (%)"><input type="number" min="0" step="0.01" value={form.taxRate} onChange={(e) => setForm({ ...form, taxRate: Number(e.target.value) })} className="input" /></Field>
+              <Field label="Discount ($)"><NumberInput type="number" min="0" step="0.01" value={form.discountAmount} onChange={(e) => setForm({ ...form, discountAmount: Number(e.target.value) })} className="input" /></Field>
+              <Field label="Sales tax (%)"><NumberInput type="number" min="0" step="0.01" value={form.taxRate} onChange={(e) => setForm({ ...form, taxRate: Number(e.target.value) })} className="input" /></Field>
             </div>
             <p className="mt-2 text-xs text-white/35">Tax is fully manual. Leave it at 0% when the invoice should not collect sales tax.</p>
 
@@ -382,7 +384,7 @@ export default function OwnerInvoicesPage() {
                   <span className="text-sm text-white/55">Balance {currency.format(totals.balance)}</span>
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_1.2fr_auto]">
-                  <input type="number" step="0.01" min="0" value={paymentDraft.amount} onChange={(e) => setPaymentDraft({ ...paymentDraft, amount: e.target.value })} className="input" placeholder="Amount" />
+                  <NumberInput type="number" step="0.01" min="0" value={paymentDraft.amount} onChange={(e) => setPaymentDraft({ ...paymentDraft, amount: e.target.value })} className="input" placeholder="Amount" />
                   <select value={paymentDraft.method} onChange={(e) => setPaymentDraft({ ...paymentDraft, method: e.target.value })} className="input"><option>Check</option><option>Cash</option><option>ACH / Bank</option><option>Card</option><option>Zelle</option><option>Other</option></select>
                   <input value={paymentDraft.reference} onChange={(e) => setPaymentDraft({ ...paymentDraft, reference: e.target.value })} className="input" placeholder="Check # / reference (optional)" />
                   <button disabled={saving} onClick={recordPayment} className="rounded-xl border border-[#6EAEC6]/30 px-4 py-2 text-sm font-semibold text-[#B9E0EC]">Record</button>

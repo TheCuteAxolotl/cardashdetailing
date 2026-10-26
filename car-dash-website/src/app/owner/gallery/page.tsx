@@ -115,13 +115,9 @@ export default function OwnerGallery() {
     setMessage("");
     try {
       let url = "";
-      let fallbackTitle = "Media";
       if (mode === "photo") {
         if (!file) throw new Error("Choose a photo first.");
         url = await fileToCompressedDataUrl(file);
-        fallbackTitle = category === "home-360"
-          ? `Slide ${String(media.filter((item) => item.category === "home-360").length + 1).padStart(2, "0")}`
-          : file.name.replace(/\.[^.]+$/, "");
       } else if (mode === "video-file") {
         if (!file) throw new Error("Choose a video first.");
         if (!file.type.startsWith("video/")) throw new Error("Please choose a video file.");
@@ -137,17 +133,15 @@ export default function OwnerGallery() {
           onUploadProgress: ({ percentage }) => setUploadProgress(Math.max(1, Math.round(percentage))),
         });
         url = blob.url;
-        fallbackTitle = file.name.replace(/\.[^.]+$/, "");
       } else {
         url = videoUrl.trim();
         if (!url) throw new Error("Paste a video link first.");
-        fallbackTitle = "Video";
       }
 
       const response = await fetch("/api/images", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, title: title || fallbackTitle, category }),
+        body: JSON.stringify({ url, title: title.trim(), category }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Upload failed");
@@ -248,7 +242,7 @@ export default function OwnerGallery() {
             )}
           </div>
 
-          <div><label className="mb-2 block text-sm font-medium">Label</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === "home-360" ? "Frame 01 (optional)" : "Before, After, Hand wash…"} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" /></div>
+          <div><label className="mb-2 block text-sm font-medium">Title (optional)</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === "home-360" ? "Frame 01 (optional)" : "Before, After, Hand wash…"} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" /></div>
           <div className="md:col-span-3"><label className="mb-2 block text-sm font-medium">Where should it appear?</label><PlacementSelect value={category} onChange={(value) => { setCategory(value); if (placementByValue.get(value)?.photoOnly) { setMode("photo"); setVideoUrl(""); setFile(null); const input = document.getElementById("gallery-file") as HTMLInputElement | null; if (input) input.value = ""; } }} /><p className="mt-2 text-[11px] leading-4 text-white/38">Current destination: {placementByValue.get(category)?.label || category}{getMediaPlacementPath(category) && <> · <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer" className="text-[#6EAEC6] hover:underline">Open page</a></>}</p></div>
           <div className="flex items-end"><button disabled={saving} className="w-full rounded-xl bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{saving ? (mode === "video-file" && uploadProgress > 0 ? `Uploading ${uploadProgress}%` : "Processing…") : "Add Media"}</button></div>
           {message && <div className="md:col-span-4 text-sm text-white/72">{message}</div>}
