@@ -18,6 +18,7 @@ export default function SitePhoto({
   fallbackCategory = "gallery",
   alt = "",
 }: Props) {
+  const positioning = /(?:^|\s)(?:absolute|fixed|sticky|relative)(?:\s|$)/.test(className) ? "" : "relative";
   const [image, setImage] = useState<GalleryImage | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageReady, setImageReady] = useState(false);
@@ -64,7 +65,7 @@ export default function SitePhoto({
   if (!image) {
     return (
       <div
-        className={`relative flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2_48%,#C0AB9A)] ${className}`}
+        className={`${positioning} flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2_48%,#C0AB9A)] ${className}`}
         aria-label={loading ? "Loading photo" : "Photo placeholder"}
       >
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_22%,rgba(247,245,242,.88),transparent_32%),radial-gradient(circle_at_80%_70%,rgba(123,92,75,.16),transparent_30%)]" />
@@ -79,7 +80,7 @@ export default function SitePhoto({
   }
 
   return (
-    <div className={`relative overflow-hidden bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2)] ${className}`}>
+    <div className={`${positioning} overflow-hidden bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2)] ${className}`}>
       {!imageReady && (
         <div className="absolute inset-0 z-0 animate-pulse bg-[linear-gradient(135deg,#EFE8E2,#F7F5F2_48%,#C0AB9A)]" aria-hidden="true" />
       )}
