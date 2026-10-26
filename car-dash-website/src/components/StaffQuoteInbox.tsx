@@ -1,5 +1,6 @@
 "use client";
 
+import QuoteBookingForm from "@/components/QuoteBookingForm";
 import { useEffect, useMemo, useState } from "react";
 
 type Msg = { id: string; sender: string; body: string; attachmentsJson: string | null; createdAt: string };
@@ -255,6 +256,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                 </div>
 
                 <aside className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  {!readOnly && <QuoteBookingForm key={active.id} quote={active} onBooked={() => { void load(); setMsg("Quote converted to a confirmed booking. View it in your schedule."); }} />}
                   <p className="text-xs uppercase tracking-[.22em] text-[#6EAEC6]">Final quote</p>
                   <label className="mt-4 block text-xs text-white/45">
                     Exact price

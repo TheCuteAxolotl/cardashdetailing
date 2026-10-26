@@ -63,7 +63,7 @@ async function slotIsPubliclyConfigured(tx:Prisma.TransactionClient,date:string,
 
 export async function createBookingWithSlotProtection(
   data: Prisma.BookingUncheckedCreateInput,
-  options: { enforcePublicAvailability?: boolean } = {}
+  options: { enforcePublicAvailability?: boolean; quoteThreadId?: string } = {}
 ) {
   const date = String(data.preferredDate || "").trim();
   const normalizedTime = normalizeBookingTime(String(data.preferredTime || ""));
@@ -72,6 +72,11 @@ export async function createBookingWithSlotProtection(
   }
 
   return prisma.$transaction(async (tx) => {
+    if(options.quoteThreadId){
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"quote-booking:"+options.quoteThreadId}))::text`;
+      const quote=await tx.quoteThread.findUnique({where:{id:options.quoteThreadId}});
+      if(!quote || ["closed","booked"].includes(quote.status)) throw new BookingSlotConflictError("This quote is already booked or closed. Refresh the quote inbox.");
+    }
     await lockSlot(tx, date, normalizedTime);
 
     const duration=savedDuration(String(data.notes||""),String(data.serviceName||""));
@@ -83,13 +88,15 @@ export async function createBookingWithSlotProtection(
       throw new BookingSlotConflictError();
     }
 
-    return tx.booking.create({
+    const booking = await tx.booking.create({
       data: {
         ...data,
         preferredDate: date,
         preferredTime: formatBookingTime(normalizedTime),
       },
     });
+    if(options.quoteThreadId) await tx.quoteThread.update({where:{id:options.quoteThreadId},data:{status:"booked"}});
+    return booking;
   });
 }
 

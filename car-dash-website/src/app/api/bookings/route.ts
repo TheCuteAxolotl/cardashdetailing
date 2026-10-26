@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
         quotedPrice: bookingTotal,
         notes: details,
       },
-      { enforcePublicAvailability: true }
+      { enforcePublicAvailability: true, quoteThreadId: quoteThreadId || undefined }
     );
 
     const bookingChatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(auth?.id));
