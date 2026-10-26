@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { bookingCalendar,foldIcs } from '../src/lib/calendar-feed';
+const row={id:'test',serviceName:'Full Detail',customerName:'Daniel, Test\nBEGIN:VEVENT',preferredDate:'2026-11-02',preferredTime:'1:30 PM',notes:null,status:'confirmed',updatedAt:new Date('2026-10-26T01:00:00Z')};
+const text=bookingCalendar([row]);
+assert.match(text,/DTSTART;TZID=America\/Chicago:20261102T133000/);
+assert.match(text,/DURATION:PT240M/);
+assert.equal((text.match(/\r\nBEGIN:VEVENT/g)||[]).length,1);
+assert.match(text,/Daniel\\, Test\\nBEGIN:VEVENT/);
+assert.match(bookingCalendar([{...row,status:'cancelled'}]),/STATUS:CANCELLED/);
+assert.equal(bookingCalendar([{...row,preferredTime:null}]).includes('BEGIN:VEVENT'),false);
+assert.ok(foldIcs('é'.repeat(150)).split('\r\n').every(s=>Buffer.byteLength(s)<=75));
+console.log('Calendar: timezone, duration, escaping, cancellation, missing times and UTF-8 folding passed.');

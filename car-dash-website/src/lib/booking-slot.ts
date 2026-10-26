@@ -145,3 +145,17 @@ export async function activateBookingStatusWithSlotProtection(
     return tx.booking.update({ where: { id: bookingId }, data: { status } });
   });
 }
+
+export async function confirmBookingWithDetails(bookingId: string, data: Prisma.BookingUncheckedUpdateInput, date: string, time: string) {
+ const normalized=normalizeBookingTime(time);
+ if(!normalized) throw new BookingSlotUnavailableError("Choose a valid time.");
+ return prisma.$transaction(async tx=>{
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"confirm:"+bookingId}))::text`;
+  const existing=await tx.booking.findUnique({where:{id:bookingId}});
+  if(!existing) throw new Error("Booking not found");
+  if(existing.status!=="pending") return existing;
+  await lockSlot(tx,date,normalized);
+  if(await slotIsTaken(tx,date,normalized,savedDuration(String(data.notes??existing.notes??""),String(data.serviceName??existing.serviceName)),bookingId)) throw new BookingSlotConflictError();
+  return tx.booking.update({where:{id:bookingId},data:{...data,preferredDate:date,preferredTime:formatBookingTime(normalized),status:"confirmed"}});
+ });
+}

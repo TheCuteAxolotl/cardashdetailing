@@ -12,7 +12,7 @@ export function savedDuration(notes:string|null|undefined,serviceName:string){
  const match=String(notes||"").match(/^Estimated duration minutes:\s*(\d+)/m);
  if(match)return durationForBooking(serviceName,[],Number(match[1]));
  const add=String(notes||"").match(/^Add-ons:\s*(.*)$/m)?.[1]||"";
- const names=add==="None"?[]:add.split(/,\s*/).map(x=>x.replace(/\s*\(\+\$.*$/,""));
+ const names=add==="None"?[]:add.split(/,\s*/).filter(Boolean).map(x=>x.replace(/\s*\(\+\$.*$/,""));
  return durationForBooking(serviceName,names);
 }
 export function fitsWithoutOverlap(start:number,duration:number,busy:{start:number;duration:number}[],close:number){

@@ -9,6 +9,7 @@ import { sendTransactionalSms } from "@/lib/twilio-sms";
 import { addBookingSystemMessage, bookingHasSmsConsent, getBookingChatUrl } from "@/lib/booking-chat";
 import {
   activateBookingStatusWithSlotProtection,
+  confirmBookingWithDetails,
   BookingSlotConflictError,
   BookingSlotUnavailableError,
   updateBookingScheduleWithSlotProtection,
@@ -58,6 +59,20 @@ export async function PUT(
 
     if (!existing) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    if (body.action === "confirmWithDetails") {
+      const date=String(body.preferredDate||"").trim(), time=String(body.preferredTime||"").trim();
+      if(!isDateString(date)||!normalizeBookingTime(time)||!String(body.customerName||"").trim()||!String(body.serviceName||"").trim()) return NextResponse.json({error:"Name, service, date and time are required."},{status:400});
+      const price=body.quotedPrice===""||body.quotedPrice==null?null:Number(body.quotedPrice);
+      if(price!==null&&(!Number.isFinite(price)||price<0)) return NextResponse.json({error:"Enter a valid price."},{status:400});
+      const details: Record<string,string>={};
+      for(const field of ["customerName","customerEmail","customerPhone","vehicleMake","vehicleModel","vehicleYear","vehicleTrim","serviceName"]) details[field]=String(body[field]??existing[field as keyof typeof existing]??"").trim().slice(0,240);
+      // Preserve original consent, evidence and duration metadata.
+      const notes=existing.notes||"";
+      const extra=String(body.notes||"").trim().slice(0,2000);
+      const booking=await confirmBookingWithDetails(existing.id,{...details,quotedPrice:price,notes:extra&&extra!==notes?notes+"\nOwner scheduling notes: "+extra:notes},date,time);
+      return NextResponse.json(booking);
     }
 
     const wantsScheduleChange = body.preferredDate !== undefined || body.preferredTime !== undefined;

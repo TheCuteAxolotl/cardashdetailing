@@ -1,5 +1,6 @@
 "use client";
 
+import CalendarSubscription from "@/components/CalendarSubscription";
 import { useEffect, useMemo, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
@@ -324,6 +325,7 @@ export default function OwnerSchedulePage() {
   return (
     <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mx-auto max-w-[1500px]">
+        <CalendarSubscription />
         <div className="flex flex-col gap-5 border-b border-black/[.08] pb-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/36">Weekly planning + customer bookings</p>

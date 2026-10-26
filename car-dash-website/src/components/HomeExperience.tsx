@@ -81,7 +81,7 @@ export default function HomeExperience({
             <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
               <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">We come to you. No shop drop-off.</p>
               <h1 className="max-w-[12ch] text-[clamp(3.55rem,7.8vw,7.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
-                {content.heroTitle}
+                <>Clean.<br />Refined.<br />Protected.</>
               </h1>
               <p className="mt-7 max-w-[650px] text-sm leading-7 text-white/68 sm:text-base sm:leading-8">{content.heroBody}</p>
               <p className="mt-5 max-w-[650px] border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 tracking-[-.01em] text-white/90 sm:text-base">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>

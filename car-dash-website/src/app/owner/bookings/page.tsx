@@ -64,6 +64,7 @@ export default function OwnerBookings() {
   const [message, setMessage] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [arrivalSendingId, setArrivalSendingId] = useState<string | null>(null);
+  const [convertingId, setConvertingId] = useState<string | null>(null);
   const [showManual, setShowManual] = useState(false);
   const [manual, setManual] = useState<ManualBookingForm>(EMPTY_MANUAL);
   const [manualSaving, setManualSaving] = useState(false);
@@ -110,19 +111,20 @@ export default function OwnerBookings() {
     setMessage("");
     setManualSaving(true);
     try {
-      const response = await fetch("/api/bookings/manual", {
-        method: "POST",
+      const response = await fetch(convertingId ? `/api/bookings/${convertingId}` : "/api/bookings/manual", {
+        method: convertingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(manual),
+        body: JSON.stringify({...manual, ...(convertingId ? {action:"confirmWithDetails"} : {})}),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         setMessage(data.error || "Could not add the booking.");
         return;
       }
+      setConvertingId(null);
       setManual(EMPTY_MANUAL);
       setShowManual(false);
-      setMessage("Outside booking added. That time is now blocked from online booking.");
+      setMessage("Booking saved to your schedule. That time is now reserved.");
       await load();
     } catch {
       setMessage("Could not add the booking.");
@@ -196,7 +198,7 @@ export default function OwnerBookings() {
     setArrivalSendingId(booking.id);
     try {
       const response = await fetch(`/api/bookings/${booking.id}/arrival`, {
-        method: "POST",
+        method: convertingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode, eta }),
       });
@@ -229,7 +231,7 @@ export default function OwnerBookings() {
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/owner/booking-settings" className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium">Availability</a>
-            <button type="button" onClick={() => setShowManual((value) => !value)} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-sm font-semibold text-[#6EAEC6]">{showManual ? "Close form" : "+ Add outside booking"}</button>
+            <button type="button" onClick={() => { setConvertingId(null); setManual(EMPTY_MANUAL); setShowManual((value) => !value); }} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-sm font-semibold text-[#6EAEC6]">{showManual ? "Close form" : "+ Add outside booking"}</button>
             <a href="/owner/dashboard" className="rounded-lg bg-[#6EAEC6] px-4 py-2 text-sm font-medium text-[#0B1822]">Back</a>
           </div>
         </div>
@@ -240,7 +242,7 @@ export default function OwnerBookings() {
           <form onSubmit={submitManualBooking} className="mb-8 rounded-3xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.04] p-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Manual Booking</p>
-              <h2 className="mt-2 text-2xl font-semibold">Add a booking from somewhere else</h2>
+              <h2 className="mt-2 text-2xl font-semibold">{convertingId ? "Confirm request and add to schedule" : "Add a booking from somewhere else"}</h2>
               <p className="mt-2 text-sm text-white/40">Use this when someone books by phone, text, in person, or anywhere outside the website. Saving it blocks the same date and time from online booking.</p>
             </div>
 
@@ -260,7 +262,7 @@ export default function OwnerBookings() {
             </div>
             <label className="mt-4 block text-sm text-white/55">Notes<textarea className={`${input} mt-2 min-h-24`} value={manual.notes} onChange={(e) => setManual((current) => ({ ...current, notes: e.target.value }))} placeholder="Anything you want saved with this booking" /></label>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button type="submit" disabled={manualSaving} className="rounded-full bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{manualSaving ? "Adding…" : "Add & Block Time"}</button>
+              <button type="submit" disabled={manualSaving} className="rounded-full bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{manualSaving ? "Saving…" : convertingId ? "Confirm & Add to Schedule" : "Add & Block Time"}</button>
               <button type="button" onClick={() => { setShowManual(false); setManual(EMPTY_MANUAL); }} className="rounded-full border border-white/10 px-6 py-3 text-sm text-white/60">Cancel</button>
             </div>
           </form>
@@ -326,7 +328,7 @@ export default function OwnerBookings() {
                         <button onClick={() => sendArrivalUpdate(booking, "eta")} disabled={arrivalSendingId === booking.id} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 disabled:opacity-50">Send arrival time</button>
                       </>
                     )}
-                    <button onClick={() => updateStatus(booking.id, "confirmed")} className="rounded-lg bg-blue-700 px-4 py-2 text-sm">Confirm</button>
+                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); window.scrollTo({top:0,behavior:"smooth"}); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
                     <button onClick={() => updateStatus(booking.id, "completed")} className="rounded-lg bg-green-700 px-4 py-2 text-sm">Complete</button>
                     <button onClick={() => updateStatus(booking.id, "cancelled")} className="rounded-lg bg-red-800 px-4 py-2 text-sm">Cancel</button>
 

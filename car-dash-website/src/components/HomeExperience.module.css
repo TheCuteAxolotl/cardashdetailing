@@ -111,3 +111,14 @@
   .hero :global(.home-hero-copy), .transformPhoto { animation: none; }
   .filmRail { scroll-snap-type: none; }
 }
+
+/* Cinematic homepage, using the existing real gallery media. */
+.experience .brandIntro { display:none; }
+.experience .hero h1 { font-family:Arial,Helvetica,sans-serif !important; font-weight:300 !important; text-transform:none !important; font-size:clamp(52px,7vw,106px) !important; line-height:1.02 !important; letter-spacing:-.065em !important; max-width:10ch !important; }
+.experience .hero :global(.home-hero-content) { justify-content:center; min-height: min(900px,90svh) !important; padding-top:85px; padding-bottom:85px; gap:38px; }
+.experience .hero :global(.home-hero-shell) { min-height: min(900px,90svh) !important; }
+.experience .hero :global(.home-hero-copy) { max-width:600px; }
+.experience .hero :global(.home-hero-copy) > p { max-width:440px; }
+.experience .hero :global(.home-hero-actions) a { border-radius:2px; box-shadow:none; }
+.experience .sectionHeading h2,.experience .transformCopy h2,.portfolio h2 { font-family:Arial,Helvetica,sans-serif; font-weight:300; letter-spacing:-.055em; }
+@media(max-width:767px) { .experience .hero :global(.home-hero-content),.experience .hero :global(.home-hero-shell) { min-height:760px !important; } }
