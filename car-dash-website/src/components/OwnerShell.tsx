@@ -45,6 +45,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Messages",
     icon: "message",
     items: [
+      { href: "/owner/email", label: "Email", icon: "message", ownerOnly: true },
       { href: "/owner/messages", adminHref: "/admin/messages", label: "Messages", icon: "message", permissions: ["smsInbox"] },
       { href: "/owner/support", adminHref: "/admin/support", label: "Support inbox", icon: "support", permissions: ["support"] },
     ],
