@@ -354,3 +354,10 @@
 @media (prefers-reduced-motion: reduce) {
   .console-rail-reveal { transition: none; }
 }
+
+/* Notification counts retain high contrast inside gold active navigation. */
+.editorial-theme .console-shell .console-notification-badge {
+  background-color: #dc2626 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 2px #161616;
+}

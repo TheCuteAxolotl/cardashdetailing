@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 type OwnerUser = { name?: string | null; email?: string | null; role?: string | null };
@@ -132,6 +132,11 @@ function pageTitle(pathname: string, owner: boolean) {
   return pathname.includes("/dashboard") ? "Home" : "Workspace";
 }
 
+function NotificationBadge({count=0}:{count?:number}) {
+  if(count<1)return null;
+  return <span aria-label={`${count} notifications`} className="console-notification-badge inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold leading-4 text-white">{count>99?"99+":count}</span>;
+}
+
 export default function OwnerShell({ children, user, permissions = [] }: { children: ReactNode; user: OwnerUser; permissions?: string[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -139,6 +144,28 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const owner = user.role === "owner";
+  const [notificationCounts,setNotificationCounts]=useState<Record<string,number>>({});
+  useEffect(()=>{
+    let disposed=false;
+    let loading=false;
+    const refresh=async()=>{
+      if(document.hidden||loading)return;
+      loading=true;
+      try{
+        const response=await fetch("/api/owner/notifications",{cache:"no-store"});
+        if(response.ok){const data=await response.json();if(!disposed)setNotificationCounts(current=>({...current,...data.counts}));}
+      }catch{}finally{loading=false;}
+    };
+    const section=pathname.endsWith("/messages")?"sms":pathname.endsWith("/quotes")?"quotes":pathname.endsWith("/support")?"support":pathname.endsWith("/calls")?"calls":null;
+    void (async()=>{
+      if(section)await fetch("/api/owner/notifications",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({section})}).catch(()=>undefined);
+      if(!disposed)await refresh();
+    })();
+    const timer=setInterval(refresh,30000);
+    window.addEventListener("focus",refresh);
+    return()=>{disposed=true;clearInterval(timer);window.removeEventListener("focus",refresh);};
+  },[pathname]);
+
 
   const visibleGroups = useMemo(() => groups.map((group) => ({
     ...group,
@@ -196,7 +223,8 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               return (
                 <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "bg-[#171411] text-white" : "text-black/56 hover:bg-black/[.045] hover:text-black"}`}>
                   <Icon name={item.icon} className="h-[18px] w-[18px]" />
-                  <span>{item.label}</span>
+                  <span className="min-w-0 flex-1">{item.label}</span>
+                  <NotificationBadge count={notificationCounts[item.href]} />
                 </a>
               );
             })}
@@ -231,6 +259,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 className={`console-rail-button relative ${active ? "console-rail-button-active" : ""}`}
               >
                 <Icon name={group.icon} />
+                <span className="absolute -right-1 -top-1"><NotificationBadge count={group.items.reduce((sum,item)=>sum+(notificationCounts[item.href]||0),0)} /></span>
                 {active && <span className="absolute -left-2 h-7 w-[3px] rounded-r-full bg-[#171411]" />}
               </button>
             );
@@ -262,7 +291,8 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               return (
                 <a key={href} href={href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm ${active ? "bg-[#171411] text-white" : "text-black/62 hover:bg-black/[.04] hover:text-black"}`}>
                   <Icon name={item.icon} className="h-[18px] w-[18px]" />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="min-w-0 flex-1 font-medium">{item.label}</span>
+                  <NotificationBadge count={notificationCounts[item.href]} />
                 </a>
               );
             })}
@@ -329,7 +359,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       <div className="lg:pl-[76px]">
         <header className="console-topbar sticky top-0 z-40 flex h-[72px] items-center justify-between border-b border-black/[.07] bg-[#f8f6f0]/92 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="grid h-10 w-10 place-items-center rounded-full border border-black/[.09] bg-white lg:hidden" aria-label="Open navigation"><Icon name="menu" /></button>
+            <button onClick={() => setMobileOpen(true)} className="relative grid h-10 w-10 place-items-center rounded-full border border-black/[.09] bg-white lg:hidden" aria-label="Open navigation"><Icon name="menu" /><span className="absolute -right-1 -top-1"><NotificationBadge count={allVisibleItems.reduce((sum,item)=>sum+(notificationCounts[item.href]||0),0)} /></span></button>
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[.17em] text-black/28">Car Dash / {owner ? "Owner" : "Staff"}</p>
               <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-.025em]">{pageTitle(pathname, owner)}</h1>

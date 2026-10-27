@@ -5,7 +5,7 @@ export const maxDuration=60;
 export async function GET(request:NextRequest){
  const denied=await emailAccess(request);if(denied)return denied;
  try{
-  const {folder,uid,validity}=emailLocation(request),mail=await readGmail(folder,uid,validity);
+  const {folder,uid,validity}=emailLocation(request),mail=await readGmail(folder,uid,validity,request.nextUrl.searchParams.get("attachment")===null);
   const attachment=request.nextUrl.searchParams.get("attachment");
   if(attachment!==null){
    const index=Number(attachment);if(!Number.isInteger(index)||index<0||!mail.attachments[index])return NextResponse.json({error:"Attachment not found"},{status:404});

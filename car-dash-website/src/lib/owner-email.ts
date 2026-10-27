@@ -72,7 +72,7 @@ export async function listGmail(folder: string) {
     return result.reverse();
   });
 }
-export async function readGmail(folder: string, uid: number, validity: string) {
+export async function readGmail(folder: string, uid: number, validity: string, markRead = false) {
   return withMailbox(folder,async client => {
     if (!client.mailbox || String(client.mailbox.uidValidity)!==validity) throw new Error("Inbox changed. Refresh and reopen this message.");
     const meta = await client.fetchOne(uid,{size:true},{uid:true});
@@ -80,7 +80,9 @@ export async function readGmail(folder: string, uid: number, validity: string) {
     if ((meta.size || 0)>25*1024*1024) throw new Error("This email is larger than 25 MB. Open it in Gmail.");
     const message = await client.fetchOne(uid,{source:true},{uid:true});
     if (!message || !message.source) throw new Error("Message no longer available.");
-    return simpleParser(message.source,{skipHtmlToText:false,skipTextToHtml:true,skipImageLinks:true});
+    const parsed=await simpleParser(message.source,{skipHtmlToText:false,skipTextToHtml:true,skipImageLinks:true});
+    if(markRead) await client.messageFlagsAdd(uid,["\\Seen"],{uid:true});
+    return parsed;
   });
 }
 export async function syncEmailDiscord() {
