@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     });
     gather.say(
       { voice: "alice" },
-      `Thanks for calling Car Dash Detailing. To continue, press ${expectedDigit} now.`
+      `Calling Car Dash Detailing. Press ${expectedDigit} to call.`
     );
 
     return xml(response);
