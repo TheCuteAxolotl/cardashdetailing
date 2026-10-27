@@ -18,7 +18,7 @@ function canEditKey(auth: Awaited<ReturnType<typeof getCurrentAccountFromRequest
 
 export async function GET() {
   try {
-    const rows = await prisma.siteContent.findMany();
+    const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
     return NextResponse.json(normalizeLegacySiteContent({ ...SITE_DEFAULTS, ...stored }), { status: 200 });
@@ -55,7 +55,7 @@ export async function PUT(request: NextRequest) {
       )
     );
 
-    const rows = await prisma.siteContent.findMany();
+    const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
     const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
     return NextResponse.json(normalizeLegacySiteContent({ ...SITE_DEFAULTS, ...stored }), { status: 200 });
   } catch (error) {

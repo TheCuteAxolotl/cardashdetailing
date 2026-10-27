@@ -20,7 +20,7 @@ export const getSiteContent = cache(async (): Promise<SiteContent> => {
   await connection();
 
   try {
-    const rows = await prisma.siteContent.findMany();
+    const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const stored = Object.fromEntries(
       rows
