@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import {giftCodeFromId,validGiftCode,changeGiftCard,type GiftCard} from "../src/lib/gift-cards";
+import {giftDocument} from "../src/lib/gift-card-documents";
+assert.equal(giftCodeFromId('12345678-1234-4234-8234-123456789abc').length,16);
+assert.ok(validGiftCode('A'.repeat(16)));assert.ok(validGiftCode('A'.repeat(20)));assert.ok(!validGiftCode('A'.repeat(15)));
+const card:GiftCard={id:'test',code:'A'.repeat(16),label:'<script>bad</script>',balance:10000,paused:false,version:1,createdAt:new Date().toISOString(),paymentStatus:'unpaid',events:[{id:'issue',kind:'issue',delta:10000,balance:10000,note:'private',actor:'Owner',at:new Date().toISOString()}]};
+assert.throws(()=>giftDocument(card,'receipt'));
+assert.ok(giftDocument(card,'invoice').includes('&lt;script&gt;bad&lt;/script&gt;'));
+const paid=changeGiftCard(card,{id:'paid',kind:'payment',amount:'',note:'Cash received',actor:'Owner',at:new Date().toISOString()});
+assert.equal(paid.balance,10000);assert.equal(paid.paidValue,10000);assert.ok(giftDocument(paid,'receipt').includes('PAID'));
+const loaded=changeGiftCard(paid,{id:'load',kind:'load',amount:'25',note:'New funds',actor:'Owner',at:new Date().toISOString()});assert.equal(loaded.paymentStatus,'unpaid');assert.equal(loaded.paidValue,10000);assert.throws(()=>giftDocument(loaded,'receipt'));
+console.log('16-character and legacy codes, escaped documents, unpaid receipt rejection, and payment records passed.');

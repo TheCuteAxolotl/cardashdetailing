@@ -3,12 +3,12 @@ import {prisma} from "@/lib/prisma";
 import {stripeRequest,stripeInvoiceRuntimeInfo} from "@/lib/stripe-invoice";
 import {GIFT_PREFIX,giftCodeFromId,type GiftCard} from "@/lib/gift-cards";
 export const GIFT_ORDER_PREFIX="gift_purchase_";
-type Order={id:string;token:string;amount:number;code:string;sessionId?:string;url?:string;paid?:boolean;createdAt:string};
-export async function startGiftCheckout(amount:number){
+type Order={id:string;token:string;amount:number;code:string;sessionId?:string;url?:string;paid?:boolean;createdAt:string;purchaserName?:string;recipientName?:string};
+export async function startGiftCheckout(amount:number,names:{purchaserName?:string;recipientName?:string}={}){
  if(!stripeInvoiceRuntimeInfo.fullyConfigured)throw new Error("Gift-card checkout is not configured yet.");
  if(!Number.isSafeInteger(amount)||amount<1000||amount>100000)throw new Error("Choose a gift card between $10 and $1,000.");
  const id=randomUUID(),token=randomBytes(32).toString("hex");
- const order:Order={id,token,amount,code:giftCodeFromId(id),createdAt:new Date().toISOString()};
+ const order:Order={id,token,amount,code:giftCodeFromId(id),purchaserName:names.purchaserName?.trim().slice(0,120),recipientName:names.recipientName?.trim().slice(0,120),createdAt:new Date().toISOString()};
  const key=GIFT_ORDER_PREFIX+token;
  await prisma.siteContent.create({data:{key,value:JSON.stringify(order)}});
  const site=(process.env.NEXT_PUBLIC_SITE_URL||"https://cardashdetailing.com").replace(/\/$/,"");
@@ -30,7 +30,7 @@ export async function fulfillGiftCheckout(session:{id:string;payment_status?:str
   if(order.paid)return;
   if(order.sessionId!==session.id||session.currency!=="usd"||session.amount_total!==order.amount)throw new Error("Gift payment does not match order");
   const now=new Date().toISOString();
-  const card:GiftCard={id:order.id,code:order.code,label:"Online gift card purchase",balance:order.amount,paused:false,version:1,createdAt:now,events:[{id:session.id,kind:"issue",delta:order.amount,balance:order.amount,note:`Stripe payment ${session.id}`,actor:"Stripe checkout",at:now}]};
+  const card:GiftCard={id:order.id,code:order.code,label:order.recipientName||order.purchaserName||"Online gift card purchase",purchaserName:order.purchaserName,recipientName:order.recipientName,paidValue:order.amount,paymentStatus:"paid",balance:order.amount,paused:false,version:1,createdAt:now,events:[{id:session.id,kind:"issue",delta:order.amount,balance:order.amount,note:`Stripe payment ${session.id}`,actor:"Stripe checkout",at:now}]};
   await tx.siteContent.create({data:{key:GIFT_PREFIX+order.code,value:JSON.stringify(card)}});
   await tx.siteContent.update({where:{key},data:{value:JSON.stringify({...order,paid:true})}});
  });

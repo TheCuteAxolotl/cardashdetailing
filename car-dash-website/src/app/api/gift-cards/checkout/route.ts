@@ -12,6 +12,6 @@ export async function POST(request:NextRequest){
   const key="gift_checkout_limit_"+createHash("sha256").update(ip).digest("hex");
   const allowed=await prisma.$transaction(async tx=>{await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${key}))::text`;const row=await tx.siteContent.findUnique({where:{key}});const now=Date.now();let value=row?JSON.parse(row.value):{start:now,count:0};if(now-value.start>600000)value={start:now,count:0};if(value.count>=8)return false;value.count++;await tx.siteContent.upsert({where:{key},create:{key,value:JSON.stringify(value)},update:{value:JSON.stringify(value)}});return true;});
   if(!allowed)return NextResponse.json({error:"Too many checkout attempts. Please wait a few minutes."},{status:429});
-  return NextResponse.json(await startGiftCheckout(amount),{headers:{"Cache-Control":"no-store"}});
+  return NextResponse.json(await startGiftCheckout(amount,{purchaserName:String(body.purchaserName||""),recipientName:String(body.recipientName||"")}),{headers:{"Cache-Control":"no-store"}});
  }catch{return NextResponse.json({error:"Could not open checkout. Please retry or contact Car Dash."},{status:503});}
 }

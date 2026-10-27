@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       let amount: number;
       try { amount = parseGiftAmount(body.amount); } catch(e) { return reply({error:(e as Error).message},400); }
       if (amount > 0 && !note) return reply({error:'Record the payment reference or reason for issuing this value.'},400);
-      const card: GiftCard = {code,id:body.requestId,label:typeof body.label==='string'?body.label.trim().slice(0,120):'',balance:amount,paused:false,version:1,createdAt:now,events:[{id:body.requestId,kind:'issue',delta:amount,balance:amount,note:note || 'Blank card issued',actor:account.email,at:now}]};
+      const card: GiftCard = {code,id:body.requestId,purchaserName:String(body.purchaserName||'').trim().slice(0,120),recipientName:String(body.recipientName||'').trim().slice(0,120),paidValue:body.paymentReceived===true||body.paymentReceived==='on'?amount:0,paymentStatus:body.paymentReceived===true||body.paymentReceived==='on'?'paid':'unpaid',label:typeof body.label==='string'?body.label.trim().slice(0,120):'',balance:amount,paused:false,version:1,createdAt:now,events:[{id:body.requestId,kind:'issue',delta:amount,balance:amount,note:note || 'Blank card issued',actor:account.email,at:now}]};
       await prisma.siteContent.create({data:{key,value:JSON.stringify(card)}});
       return reply({card},201);
     }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const card = JSON.parse(row.value) as GiftCard;
     if (card.events.some(e=>e.id===body.requestId)) return reply({card});
     if (body.version!==card.version) return reply({error:'The balance changed in another session. Refresh before trying again.'},409);
-    if (!['load','spend','set','pause','resume','used','delete'].includes(body.action)) return reply({error:'Invalid action'},400);
+    if (!['payment','load','spend','set','pause','resume','used','delete'].includes(body.action)) return reply({error:'Invalid action'},400);
     let next: GiftCard;
     try { next = changeGiftCard(card,{id:body.requestId,kind:body.action,amount:body.amount,note,actor:account.email,at:now}); } catch(e) { return reply({error:(e as Error).message},400); }
     const result = await prisma.siteContent.updateMany({where:{key,value:row.value},data:{value:JSON.stringify(next)}});

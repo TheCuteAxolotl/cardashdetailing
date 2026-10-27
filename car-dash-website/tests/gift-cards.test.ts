@@ -25,7 +25,7 @@ async function main() {
   const requestId=randomUUID();
   const issue={action:'create',requestId,amount:'100.00',label:'Private customer',note:'Private receipt'};
   let r=await post(issue);assert.equal(r.status,201);let card=(await r.json()).card as GiftCard;
-  assert.equal(card.code.length,20);assert.equal(card.code,giftCodeFromId(requestId));assert.equal(card.balance,10000);
+  assert.equal(card.code.length,16);assert.equal(card.code,giftCodeFromId(requestId));assert.equal(card.balance,10000);
   assert.equal((await post(issue)).status,200);assert.equal(rows.size,1);
   let spend={action:'spend',requestId:randomUUID(),code:card.code,version:card.version,amount:'25.50',note:'Service invoice test'};
   r=await post(spend);assert.equal(r.status,200);card=(await r.json()).card;assert.equal(card.balance,7450);
