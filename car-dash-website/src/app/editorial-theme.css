@@ -297,3 +297,35 @@
 .editorial-theme .mobile-menu-nav { background: #202020 !important; color: #f4efe5 !important; border-color: #ffffff22 !important; }
 .editorial-theme .mobile-menu-nav > :is(a,button) { background: transparent !important; color: #f4efe5 !important; border-color: #ffffff18 !important; }
 .editorial-theme .mobile-menu-nav > :is(a,button):hover { background: #ffffff0d !important; }
+
+/* Owner dashboard: keep all clickable surfaces visibly interactive. */
+@media screen {
+  .editorial-theme .console-home :is(a[href],button:not(:disabled)) { cursor: pointer; }
+  .editorial-theme .console-home :is(a[href],button:not(:disabled)):focus-visible {
+    outline: 2px solid #d6b779;
+    outline-offset: -3px;
+    box-shadow: inset 0 0 0 1px #101010;
+  }
+  .editorial-theme .console-home :is(.dashboard-tile,.dashboard-row):active {
+    background-color: #d6b77920 !important;
+  }
+}
+@media screen and (hover: hover) and (pointer: fine) {
+  .editorial-theme .console-home :is(.dashboard-tile,.dashboard-row):hover {
+    background-color: #d6b77912 !important;
+    box-shadow: inset 0 0 0 1px #d6b77955;
+  }
+  .editorial-theme .console-home :is(.dashboard-tile,.dashboard-row):hover > div > span,
+  .editorial-theme .console-home .dashboard-row:hover > span {
+    border-color: #d6b77988 !important;
+    color: #d6b779 !important;
+  }
+  .editorial-theme .console-home .dashboard-action:hover {
+    background-color: #e5c995 !important;
+    box-shadow: 0 4px 16px #d6b77925;
+    transform: translateY(-2px);
+  }
+}
+@media screen and (prefers-reduced-motion: reduce) {
+  .editorial-theme .console-home :is(a,button) { transition: none; transform: none !important; }
+}

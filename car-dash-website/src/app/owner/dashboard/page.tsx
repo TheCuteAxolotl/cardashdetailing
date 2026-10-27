@@ -185,7 +185,7 @@ export default function OwnerDashboard() {
             </div>
             <a
               href="/owner/detail-builder"
-              className="inline-flex w-fit items-center gap-2 rounded-full bg-[#171411] px-4 py-2.5 text-sm font-semibold text-white"
+              className="dashboard-action inline-flex w-fit items-center gap-2 rounded-full bg-[#171411] px-4 py-2.5 text-sm font-semibold text-white"
             >
               <span className="text-lg leading-none">+</span> New
             </a>
@@ -201,7 +201,7 @@ export default function OwnerDashboard() {
                   <a
                     key={`${item.title}-${index}`}
                     href={item.href}
-                    className="group grid gap-3 px-4 py-4 transition hover:bg-white/70 sm:grid-cols-[42px_1fr_auto] sm:items-center sm:px-5"
+                    className="dashboard-row group grid gap-3 px-4 py-4 transition hover:bg-white/70 sm:grid-cols-[42px_1fr_auto] sm:items-center sm:px-5"
                   >
                     <span className="grid h-9 w-9 place-items-center rounded-xl border border-black/[.07] bg-white text-black/60">
                       <ToolGlyph kind={item.kind} />
@@ -252,7 +252,7 @@ export default function OwnerDashboard() {
               <a
                 key={label}
                 href={href}
-                className={`group min-h-[126px] border-black/[.065] p-5 transition hover:bg-white/72 ${index >= 3 ? "border-t" : ""} ${index % 3 !== 0 ? "lg:border-l" : ""} ${index === 1 ? "sm:border-l lg:border-l" : ""} ${index === 2 ? "sm:border-t lg:border-t-0" : ""}`}
+                className={`dashboard-tile group min-h-[126px] border-black/[.065] p-5 transition hover:bg-white/72 ${index >= 3 ? "border-t" : ""} ${index % 3 !== 0 ? "lg:border-l" : ""} ${index === 1 ? "sm:border-l lg:border-l" : ""} ${index === 2 ? "sm:border-t lg:border-t-0" : ""}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <span className="grid h-9 w-9 place-items-center rounded-xl border border-black/[.07] bg-white text-black/58">
