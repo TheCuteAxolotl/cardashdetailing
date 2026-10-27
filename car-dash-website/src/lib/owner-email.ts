@@ -1,3 +1,4 @@
+import { connectionFailure } from "@/lib/gmail-connection-error";
 import { ImapFlow } from "imapflow";
 import nodemailer from "nodemailer";
 import { simpleParser } from "mailparser";
@@ -36,18 +37,27 @@ export async function withMailbox<T>(folder: string, action: (client: ImapFlow) 
   } finally { await client.logout().catch(() => client.close()); }
 }
 export async function connectGmail(pass: string) {
-  const cursor = await withMailbox("inbox",async client => {
-    const box = client.mailbox;
-    if (!box) throw new Error("Inbox unavailable.");
-    return { validity: String(box.uidValidity), next: box.uidNext };
-  },pass);
+  let encrypted: string;
+  try { encrypted=encryptEmailSecret(pass); } catch(error) { throw connectionFailure("encryption",error); }
+  let cursor: {validity:string;next:number};
+  try {
+    cursor = await withMailbox("inbox",async client => {
+      const box = client.mailbox;
+      if (!box) throw new Error("Inbox unavailable.");
+      return { validity: String(box.uidValidity), next: box.uidNext };
+    },pass);
+  } catch(error) { throw connectionFailure("inbox",error); }
   const smtp = smtpClient(pass);
-  try { await smtp.verify(); } finally { smtp.close(); }
-  await prisma.$transaction([
-    prisma.siteContent.upsert({where:{key:CONNECTION},create:{key:CONNECTION,value:JSON.stringify({encrypted:encryptEmailSecret(pass),connectedAt:new Date().toISOString()})},update:{value:JSON.stringify({encrypted:encryptEmailSecret(pass),connectedAt:new Date().toISOString()})}}),
-    prisma.siteContent.upsert({where:{key:"owner_gmail_cursor"},create:{key:"owner_gmail_cursor",value:JSON.stringify(cursor)},update:{value:JSON.stringify(cursor)}}),
-  ]);
+  try { await smtp.verify(); } catch(error) { throw connectionFailure("sending",error); } finally { smtp.close(); }
+  const value=JSON.stringify({encrypted,connectedAt:new Date().toISOString()});
+  try {
+    await prisma.$transaction([
+      prisma.siteContent.upsert({where:{key:CONNECTION},create:{key:CONNECTION,value},update:{value}}),
+      prisma.siteContent.upsert({where:{key:"owner_gmail_cursor"},create:{key:"owner_gmail_cursor",value:JSON.stringify(cursor)},update:{value:JSON.stringify(cursor)}}),
+    ]);
+  } catch(error) { throw connectionFailure("saving",error); }
 }
+
 export async function listGmail(folder: string) {
   return withMailbox(folder,async client => {
     if (!client.mailbox || !client.mailbox.exists) return [];
