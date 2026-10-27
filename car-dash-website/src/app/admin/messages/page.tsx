@@ -1,6 +1,5 @@
-import StaffQuoteInbox from "@/components/StaffQuoteInbox";
-import StaffSmsInbox from "@/components/StaffSmsInbox";
+import UnifiedMessages from "@/components/UnifiedMessages";
 
-export default function AdminMessagesPage() {
-  return <><StaffSmsInbox role="admin" /><StaffQuoteInbox category="messages" backHref="/admin/dashboard" /></>;
+export default function MessagesPage() {
+  return <UnifiedMessages role="admin" />;
 }

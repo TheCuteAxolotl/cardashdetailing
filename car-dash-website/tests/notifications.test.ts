@@ -12,7 +12,7 @@ db.siteContent.upsert=async({where}:any)=>{savedKey=where.key;};
 db.booking.count=async({where}:any)=>{assert.equal(where.status,"pending");calls++;return 2;};
 db.$queryRaw=async()=>[{count:BigInt(3)}];
 db.unmatchedSmsMessage.count=async({where}:any)=>{assert.equal(where.direction,"inbound");return 4;};
-db.quoteMessage.count=async({where}:any)=>{assert.equal(where.sender,"customer");assert.ok(where.thread.status==="open"||Array.isArray(where.thread.status.notIn));return 5;};
+db.quoteMessage.count=async({where}:any)=>{assert.equal(where.sender,"customer");assert.equal(where.thread.status.not,"closed");return 5;};
 db.supportMessage.count=async()=>6;
 db.callLog.count=async()=>1;
 const token=createToken({id:"owner-test",role:"owner",email:"owner@example.com"});

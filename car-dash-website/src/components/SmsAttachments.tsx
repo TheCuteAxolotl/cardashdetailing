@@ -1,5 +1,6 @@
 "use client";
 
+import { DELETED_MESSAGE } from "@/lib/deleted-message";
 import { useEffect, useRef, useState } from "react";
 
 type Attachment = { sid: string; contentType: string; url: string };
@@ -18,7 +19,7 @@ export default function SmsAttachments({ sid, body = "" }: { sid?: string | null
     return () => observer.disconnect();
   }, []);
   useEffect(() => {
-    if (!visible || !sid) return;
+    if (!visible || !sid || body === DELETED_MESSAGE) return;
     const controller = new AbortController();
     setStatus("loading");
     fetch(`/api/sms/media/${encodeURIComponent(sid)}`, { signal: controller.signal, cache: "no-store" })
@@ -28,8 +29,8 @@ export default function SmsAttachments({ sid, body = "" }: { sid?: string | null
         setMedia(data.media || []); setStatus("ready");
       }).catch(() => { if (!controller.signal.aborted) setStatus("error"); });
     return () => controller.abort();
-  }, [sid, visible, attempt]);
-  if (!sid) return null;
+  }, [sid, visible, attempt, body]);
+  if (!sid || body === DELETED_MESSAGE) return null;
   const expected = /\{image\}|MMS attachment|\[image\]/i.test(body);
   return <div ref={container}>
     {status === "loading" && expected && <p className="mt-2 text-xs opacity-70">Loading attachments…</p>}

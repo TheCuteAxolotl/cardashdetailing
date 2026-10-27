@@ -1,3 +1,4 @@
+import { DELETED_MESSAGE } from "@/lib/deleted-message";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
@@ -10,12 +11,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ sid
   if (!/^(SM|MM)[a-f0-9]{32}$/i.test(sid)) return NextResponse.json({ error: "Invalid message" }, { status: 400 });
   // Only allow media belonging to a locally stored message in an authorized inbox.
   let permitted: unknown =
-    (hasStaffPermission(auth, "smsInbox") && await prisma.unmatchedSmsMessage.findUnique({ where: { externalSid: sid }, select: { id: true } })) ||
-    (hasStaffPermission(auth, "bookings") && await prisma.bookingMessage.findUnique({ where: { externalSid: sid }, select: { id: true } })) ||
-    (hasStaffPermission(auth, "quoteChats") && await prisma.quoteMessage.findUnique({ where: { externalSid: sid }, select: { id: true } }));
+    (hasStaffPermission(auth, "smsInbox") && await prisma.unmatchedSmsMessage.findFirst({ where: { externalSid: sid, body: { not: DELETED_MESSAGE } }, select: { id: true } })) ||
+    (hasStaffPermission(auth, "bookings") && await prisma.bookingMessage.findFirst({ where: { externalSid: sid, body: { not: DELETED_MESSAGE } }, select: { id: true } })) ||
+    (hasStaffPermission(auth, "quoteChats") && await prisma.quoteMessage.findFirst({ where: { externalSid: sid, body: { not: DELETED_MESSAGE } }, select: { id: true } }));
   if(!permitted){
-    const quote=await prisma.quoteMessage.findUnique({where:{externalSid:sid},select:{thread:{select:{userId:true}}}});
-    const booking=await prisma.bookingMessage.findUnique({where:{externalSid:sid},select:{conversation:{select:{booking:{select:{userId:true}}}}}});
+    const quote=await prisma.quoteMessage.findFirst({where:{externalSid:sid,body:{not:DELETED_MESSAGE}},select:{thread:{select:{userId:true}}}});
+    const booking=await prisma.bookingMessage.findFirst({where:{externalSid:sid,body:{not:DELETED_MESSAGE}},select:{conversation:{select:{booking:{select:{userId:true}}}}}});
     permitted=quote?.thread.userId===auth.id||booking?.conversation.booking.userId===auth.id;
   }
   if (!permitted) return NextResponse.json({ error: "No access to this message" }, { status: 403 });

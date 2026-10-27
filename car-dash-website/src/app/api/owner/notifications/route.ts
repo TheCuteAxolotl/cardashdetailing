@@ -17,10 +17,10 @@ export async function GET(request:NextRequest){
  if(hasStaffPermission(auth,"smsInbox"))jobs["/owner/messages"]=(async()=>{
   const rows=await prisma.$queryRaw<{count:bigint}[]>`SELECT COUNT(*) AS count FROM "BookingMessage" m JOIN "BookingConversation" c ON c.id=m."conversationId" WHERE m.sender='customer' AND (c."lastStaffSeenAt" IS NULL OR m."createdAt">c."lastStaffSeenAt")`;
   const direct=await prisma.unmatchedSmsMessage.count({where:{direction:"inbound",createdAt:{gt:seen("sms")}}});
-  const quoteMessages=hasStaffPermission(auth,"quoteChats")?await prisma.quoteMessage.count({where:{sender:"customer",createdAt:{gt:seen("sms")},thread:{status:{notIn:["open","closed"]}}}}):0;
+  const quoteMessages=hasStaffPermission(auth,"quoteChats")?await prisma.quoteMessage.count({where:{sender:"customer",createdAt:{gt:seen("sms")},thread:{status:{not:"closed"}}}}):0;
   return Number(rows[0]?.count||0)+direct+quoteMessages;
  })();
- if(hasStaffPermission(auth,"quoteChats"))jobs["/owner/quotes"]=prisma.quoteMessage.count({where:{sender:"customer",createdAt:{gt:seen("quotes")},thread:{status:"open"}}});
+ if(hasStaffPermission(auth,"quoteChats"))jobs["/owner/quotes"]=prisma.quoteMessage.count({where:{sender:"customer",createdAt:{gt:seen("quotes")},thread:{status:{not:"closed"}}}});
  if(hasStaffPermission(auth,"support"))jobs["/owner/support"]=prisma.supportMessage.count({where:{sender:"visitor",createdAt:{gt:seen("support")},ticket:{status:{not:"closed"}}}});
  if(hasStaffPermission(auth,"businessPhone"))jobs["/owner/calls"]=prisma.callLog.count({where:{blocked:false,OR:[{voicemailAt:{gt:seen("calls")}},{startedAt:{gt:seen("calls")},status:{in:["missed","no-answer","busy","failed"]}}]}});
  if(isOwnerAccount(auth))jobs["/owner/email"]=(async()=>{

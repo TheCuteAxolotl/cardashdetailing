@@ -1,4 +1,6 @@
 "use client";
+import DeleteMessageButton from "@/components/DeleteMessageButton";
+import { DELETED_MESSAGE } from "@/lib/deleted-message";
 import SendPhotos from "@/components/SendPhotos";
 
 import SmsAttachments from "@/components/SmsAttachments";
@@ -48,9 +50,12 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
     if (!response.ok) return;
 
     const raw = await response.json();
-    const data=raw.filter((thread:Thread)=>category==="messages"?thread.status!=="open":thread.status==="open");
+    const data = raw;
     setThreads(data);
-    if (!selectedId && data[0]) setSelectedId(data[0].id);
+    if (!selectedId && data[0]) {
+      const requested = new URLSearchParams(window.location.search).get("thread");
+      setSelectedId(data.some((thread: Thread) => thread.id === requested) ? requested! : data[0].id);
+    }
     if (selectedId && !data.some((thread: Thread) => thread.id === selectedId)) {
       setSelectedId(data[0]?.id || "");
     }
@@ -164,7 +169,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
         <div className="flex justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[.28em] text-[#6EAEC6]">Sales inbox</p>
-            <h1 className="mt-2 text-4xl font-semibold">{category==="messages"?"Quote conversations · Messages":"Quote requests"}</h1>
+            <h1 className="mt-2 text-4xl font-semibold">{category==="messages"?"Quote conversations · Messages":"Quote chats"}</h1>
             <p className="mt-2 text-white/40">Reply, send exact quotes, close conversations, and follow accepted quotes into bookings.</p>
           </div>
           <a href={backHref} className="h-fit rounded-full border border-white/15 px-5 py-3 text-sm">Back</a>
@@ -240,6 +245,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
                       return (
                         <div key={message.id} className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.sender === "team" ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8"}`}>
                           <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
+                          {canDelete && message.body !== DELETED_MESSAGE && <DeleteMessageButton kind="quote" id={message.id} onDeleted={() => void load()} />}
                           {message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                           {message.attachmentsJson && (
                             <div className="mt-3 grid grid-cols-2 gap-2">
