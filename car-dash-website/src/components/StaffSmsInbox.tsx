@@ -1,4 +1,5 @@
 "use client";
+import MessageBookingForm from "@/components/MessageBookingForm";
 
 import SmsAttachments from "@/components/SmsAttachments";
 
@@ -488,6 +489,7 @@ export default function StaffSmsInbox({
                     <time className="text-xs text-white/30">{new Date(thread.latestAt).toLocaleString()}</time>
                   </div>
 
+                  <div className="px-5 py-3"><MessageBookingForm key={[...thread.messages].reverse().find(message=>message.direction!=="outbound")?.id||thread.messages[0]?.id} source={{type:"sms",id:[...thread.messages].reverse().find(message=>message.direction!=="outbound")?.id||thread.messages[0]?.id}} /></div>
                   <div className="max-h-[360px] space-y-3 overflow-y-auto px-5 py-5">
                     {thread.messages.map((message) => {
                       const outbound = message.direction === "outbound";

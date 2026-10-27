@@ -63,7 +63,7 @@ async function slotIsPubliclyConfigured(tx:Prisma.TransactionClient,date:string,
 
 export async function createBookingWithSlotProtection(
   data: Prisma.BookingUncheckedCreateInput,
-  options: { enforcePublicAvailability?: boolean; quoteThreadId?: string } = {}
+  options: { enforcePublicAvailability?: boolean; quoteThreadId?: string; messageSourceKey?: string } = {}
 ) {
   const date = String(data.preferredDate || "").trim();
   const normalizedTime = normalizeBookingTime(String(data.preferredTime || ""));
@@ -72,6 +72,14 @@ export async function createBookingWithSlotProtection(
   }
 
   return prisma.$transaction(async (tx) => {
+    if (options.messageSourceKey) {
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"message-booking:"+options.messageSourceKey}))::text`;
+      const link = await tx.siteContent.findUnique({where:{key:options.messageSourceKey}});
+      if (link) {
+        const existing=await tx.booking.findUnique({where:{id:link.value}});
+        if (existing) return existing;
+      }
+    }
     if(options.quoteThreadId){
       await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"quote-booking:"+options.quoteThreadId}))::text`;
       const quote=await tx.quoteThread.findUnique({where:{id:options.quoteThreadId}});
@@ -95,6 +103,7 @@ export async function createBookingWithSlotProtection(
         preferredTime: formatBookingTime(normalizedTime),
       },
     });
+    if (options.messageSourceKey) await tx.siteContent.upsert({where:{key:options.messageSourceKey},create:{key:options.messageSourceKey,value:booking.id},update:{value:booking.id}});
     if(options.quoteThreadId) await tx.quoteThread.update({where:{id:options.quoteThreadId},data:{status:"booked"}});
     return booking;
   });

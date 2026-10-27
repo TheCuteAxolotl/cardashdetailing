@@ -1,4 +1,5 @@
 "use client";
+import MessageBookingForm from "@/components/MessageBookingForm";
 
 import SmsAttachments from "@/components/SmsAttachments";
 
@@ -222,6 +223,7 @@ export default function BookingChatPage() {
                     >
                       <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
                       {staff && message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
+                      {staff && message.sender === "customer" && <MessageBookingForm source={{type:"booking-message",id:message.id}} />}
                       <div className="mt-2 flex items-center gap-2 text-[10px] opacity-45">
                         <span>{new Date(message.createdAt).toLocaleString()}</span>
                         {message.channel === "sms" && (
