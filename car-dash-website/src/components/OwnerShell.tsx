@@ -208,7 +208,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
 
   return (
     <div className="console-shell min-h-screen bg-[#f3f0e8] text-[#171411]">
-      <aside className="console-rail fixed inset-y-0 left-0 z-50 hidden w-[76px] border-r border-black/[.08] bg-[#f8f6f0]/95 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
+      <aside onMouseEnter={() => setPanel(null)} className="console-rail console-rail-reveal fixed inset-y-0 left-0 z-50 hidden w-[76px] border-r border-black/[.08] bg-[#f8f6f0]/95 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
         <div className="flex w-full flex-col items-center gap-2 px-2 pt-4">
           <button title="Quick create" onClick={() => go(quickHref)} className="grid h-12 w-12 place-items-center rounded-full bg-[#0d0d0d] text-white shadow-[0_12px_28px_rgba(23,20,17,.15)] transition hover:scale-[1.04]">
             <Icon name="plus" className="h-6 w-6" />
@@ -218,7 +218,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
           </button>
         </div>
 
-        <nav className="mt-4 flex w-full flex-1 flex-col items-center gap-1 overflow-y-auto px-2 pb-3">
+        <nav className="console-rail-collapsed mt-4 flex w-full flex-1 flex-col items-center gap-1 overflow-y-auto px-2 pb-3">
           {visibleGroups.map((group) => {
             const isHome = group.label === "Home";
             const active = activeGroup === group.label;
@@ -235,6 +235,10 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               </button>
             );
           })}
+        </nav>
+
+        <nav aria-label="All workspace tabs" className="console-rail-expanded mt-4 w-full min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+          {textualNav}
         </nav>
 
         <div className="flex w-full flex-col items-center gap-2 border-t border-black/[.07] px-2 py-3">

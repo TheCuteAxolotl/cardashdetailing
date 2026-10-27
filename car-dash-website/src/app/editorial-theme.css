@@ -329,3 +329,28 @@
 @media screen and (prefers-reduced-motion: reduce) {
   .editorial-theme .console-home :is(a,button) { transition: none; transform: none !important; }
 }
+
+/* Reveal full tab names when the desktop navigation rail is hovered. */
+.console-rail-expanded { display: none; }
+@media screen and (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .console-rail-reveal {
+    transition: width 180ms ease, box-shadow 180ms ease;
+  }
+  .console-rail-reveal:hover,
+  .console-rail-reveal:has(.console-rail-expanded:focus-within) {
+    width: 286px;
+    box-shadow: 16px 0 48px #00000050;
+  }
+  .console-rail-reveal:hover .console-rail-collapsed,
+  .console-rail-reveal:has(.console-rail-expanded:focus-within) .console-rail-collapsed { display: none; }
+  .console-rail-reveal:hover .console-rail-expanded,
+  .console-rail-reveal:has(.console-rail-expanded:focus-within) .console-rail-expanded { display: block; }
+  .editorial-theme .console-rail-expanded a:hover {
+    background-color: #d6b77918 !important;
+    box-shadow: inset 0 0 0 1px #d6b77945;
+  }
+  .console-rail-expanded a:focus-visible { outline: 2px solid #d6b779; outline-offset: -2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-rail-reveal { transition: none; }
+}
