@@ -67,6 +67,7 @@ export function ensureBookingChatSchema() {
         ON "BookingMessage"("conversationId", "createdAt")
       `);
 
+      await prisma.$executeRawUnsafe(`ALTER TABLE "BookingMessage" ADD COLUMN IF NOT EXISTS "attachmentsJson" TEXT`);
       await prisma.$executeRawUnsafe(`
         CREATE UNIQUE INDEX IF NOT EXISTS "BookingMessage_externalSid_key"
         ON "BookingMessage"("externalSid")
@@ -100,6 +101,7 @@ export function ensureBookingChatSchema() {
         CREATE INDEX IF NOT EXISTS "UnmatchedSmsMessage_createdAt_idx"
         ON "UnmatchedSmsMessage"("createdAt")
       `);
+      await prisma.$executeRawUnsafe(`ALTER TABLE "UnmatchedSmsMessage" ADD COLUMN IF NOT EXISTS "attachmentsJson" TEXT`);
     })().catch((error) => {
       schemaReady = null;
       throw error;

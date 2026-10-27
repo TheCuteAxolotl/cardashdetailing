@@ -11,7 +11,11 @@ export async function getQuoteSmsContact(threadId: string) {
     select: { body: true },
   });
 
-  if (!systemMessage) return { phone: null, consent: false };
+  if (!systemMessage) {
+    const thread=await prisma.quoteThread.findUnique({where:{id:threadId},select:{guestPhone:true,userId:true}});
+    if(thread?.guestPhone&&thread.userId){const owner=await prisma.siteContent.findUnique({where:{key:`verified_phone_${thread.guestPhone}`}});if(owner?.value===thread.userId)return {phone:thread.guestPhone,consent:true};}
+    return { phone: null, consent: false };
+  }
 
   const match = systemMessage.body.match(/^SMS contact:\s*(.*?)\s*·\s*consent:\s*(Yes|No)$/i);
   if (!match) return { phone: null, consent: false };

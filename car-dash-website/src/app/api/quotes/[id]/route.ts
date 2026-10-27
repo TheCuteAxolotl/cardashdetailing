@@ -1,3 +1,4 @@
+import {mmsPhotoUrls} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -73,13 +74,11 @@ export async function POST(
   const allowed = await access(request, id);
   if (!allowed) return NextResponse.json({ error: "Not authorized" }, { status: 403 });
 
-  if (["closed", "booked"].includes(allowed.thread.status)) {
+  if (allowed.thread.status === "closed") {
     return NextResponse.json(
       {
         error:
-          allowed.thread.status === "booked"
-            ? "This quote has already been booked and the conversation is read-only."
-            : "This conversation is closed and is now read-only.",
+          "This conversation is closed and is now read-only.",
       },
       { status: 409 }
     );
@@ -154,6 +153,7 @@ export async function POST(
       const guestThread = !allowed.thread.userId;
       await sendTransactionalSms({
         to: sms.phone,
+        mediaUrls:await mmsPhotoUrls(attachments as string[]),
         body: guestThread
           ? `Car Dash Detailing: ${message || "We replied to your exact-quote request."} Reply to this text if you have a question.`.slice(0, 1450)
           : `Car Dash Detailing: We replied to your quote chat. View your private conversation: ${getPublicSiteUrl()}/quote?thread=${encodeURIComponent(id)}`,

@@ -1,3 +1,4 @@
+import {messagePhotos,mmsPhotoUrls} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureBookingChatSchema } from "@/lib/booking-chat";
@@ -20,10 +21,11 @@ export async function POST(request: NextRequest) {
     const phone = normalizePhoneNumber(String(payload.phone || ""));
     const message = String(payload.message || "").trim().slice(0, 3000);
 
+    const attachments=messagePhotos(payload.attachments);
     if (!phone) {
       return NextResponse.json({ error: "A valid phone number is required." }, { status: 400 });
     }
-    if (!message) {
+    if (!message && !attachments.length) {
       return NextResponse.json({ error: "Message required." }, { status: 400 });
     }
 
@@ -37,6 +39,7 @@ export async function POST(request: NextRequest) {
       to: phone,
       body: `Car Dash Detailing: ${message}`,
       includeOptOutLine: false,
+      mediaUrls: await mmsPhotoUrls(attachments),
     });
 
     if (!sms.sent || !sms.sid) {
@@ -46,11 +49,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const linked=await prisma.quoteThread.findFirst({where:{guestPhone:phone,status:{not:"closed"}},orderBy:{updatedAt:"desc"}});
+    if(linked){
+      const stored=await prisma.quoteMessage.create({data:{threadId:linked.id,sender:"team",body:message||"Photo attachment",attachmentsJson:attachments.length?JSON.stringify(attachments):null,externalSid:sms.sid}});
+      await prisma.quoteThread.update({where:{id:linked.id},data:{updatedAt:new Date()}});
+      return NextResponse.json({success:true,delivery:"sms",message:stored});
+    }
     const stored = await prisma.unmatchedSmsMessage.create({
       data: {
         fromPhone: latestInbound?.toPhone || "Car Dash Detailing",
         toPhone: phone,
-        body: message,
+        body: message||"Photo attachment",
+        attachmentsJson:attachments.length?JSON.stringify(attachments):null,
         direction: "outbound",
         externalSid: sms.sid,
       },

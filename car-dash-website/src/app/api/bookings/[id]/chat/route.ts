@@ -1,3 +1,4 @@
+import {messagePhotos,mmsPhotoUrls} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
@@ -121,7 +122,8 @@ export async function POST(
 
     const body = await request.json();
     const message = String(body.message || "").trim().slice(0, 3000);
-    if (!message) {
+    const attachments=messagePhotos(body.attachments);
+    if (!message && !attachments.length) {
       return NextResponse.json({ error: "Message required." }, { status: 400 });
     }
 
@@ -131,7 +133,8 @@ export async function POST(
       data: {
         conversationId: conversation.id,
         sender: allowed.viewer === "staff" ? "team" : "customer",
-        body: message,
+        body: message||"Photo attachment",
+        attachmentsJson:attachments.length?JSON.stringify(attachments):null,
         channel: "web",
       },
     });
@@ -173,6 +176,7 @@ export async function POST(
         to: allowed.booking.customerPhone,
         body: `Car Dash Detailing: ${message}`,
         includeOptOutLine: false,
+        mediaUrls:await mmsPhotoUrls(attachments),
       });
 
       if (sms.sent) {

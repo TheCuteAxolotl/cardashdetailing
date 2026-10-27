@@ -1,4 +1,5 @@
 "use client";
+import SendPhotos from "@/components/SendPhotos";
 
 import SmsAttachments from "@/components/SmsAttachments";
 
@@ -27,7 +28,7 @@ type Thread = {
 
 const input = "w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 outline-none focus:border-[#6EAEC6]/55";
 
-export default function StaffQuoteInbox({ backHref, canDelete = false }: { backHref: string; canDelete?: boolean }) {
+export default function StaffQuoteInbox({ backHref, canDelete = false, category="requests" }: { backHref: string; canDelete?: boolean; category?:"requests"|"messages" }) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [reply, setReply] = useState("");
@@ -36,6 +37,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
   const [msg, setMsg] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [authorized, setAuthorized] = useState(false);
+  const [denied,setDenied]=useState(false);
 
   const load = async () => {
     const response = await fetch("/api/quotes", { cache: "no-store" });
@@ -45,7 +47,8 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
     }
     if (!response.ok) return;
 
-    const data = await response.json();
+    const raw = await response.json();
+    const data=raw.filter((thread:Thread)=>category==="messages"?thread.status!=="open":thread.status==="open");
     setThreads(data);
     if (!selectedId && data[0]) setSelectedId(data[0].id);
     if (selectedId && !data.some((thread: Thread) => thread.id === selectedId)) {
@@ -59,6 +62,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
       if (!response.ok) return window.location.assign("/login");
       const payload = await response.json();
       if (payload.user?.role !== "owner" && !payload.permissions?.includes("quoteChats")) {
+        if(category==="messages"){setDenied(true);return;}
         return window.location.assign(payload.staffAccess ? "/admin/dashboard" : "/dashboard");
       }
       setAuthorized(true);
@@ -73,7 +77,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
   }, [selectedId, authorized]);
 
   const active = useMemo(() => threads.find((thread) => thread.id === selectedId) || null, [threads, selectedId]);
-  const readOnly = Boolean(active && ["closed", "booked"].includes(active.status));
+  const readOnly = Boolean(active && active.status === "closed");
 
   useEffect(() => {
     if (active) {
@@ -149,6 +153,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
     }
   };
 
+  if(denied)return null;
   if (!authorized) {
     return <main className="min-h-screen bg-[#070707] p-10 text-white">Checking quote access…</main>;
   }
@@ -159,7 +164,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
         <div className="flex justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[.28em] text-[#6EAEC6]">Sales inbox</p>
-            <h1 className="mt-2 text-4xl font-semibold">Specialist quote chats</h1>
+            <h1 className="mt-2 text-4xl font-semibold">{category==="messages"?"Quote conversations · Messages":"Quote requests"}</h1>
             <p className="mt-2 text-white/40">Reply, send exact quotes, close conversations, and follow accepted quotes into bookings.</p>
           </div>
           <a href={backHref} className="h-fit rounded-full border border-white/15 px-5 py-3 text-sm">Back</a>
@@ -234,7 +239,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
                       }
                       return (
                         <div key={message.id} className={`max-w-[85%] rounded-2xl px-4 py-3 ${message.sender === "team" ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8"}`}>
-                          <p className="text-sm leading-6">{message.body}</p>
+                          <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
                           {message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                           {message.attachmentsJson && (
                             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -250,17 +255,18 @@ export default function StaffQuoteInbox({ backHref, canDelete = false }: { backH
 
                   {readOnly ? (
                     <div className="border-t border-white/10 pt-4 text-sm text-white/35">
-                      {active.status === "booked" ? "Booked conversations are locked." : "Reopen the conversation before sending another message."}
+                      {active.status === "booked" ? "This appointment is booked. You can continue messaging here." : "Reopen the conversation before sending another message."}
                     </div>
                   ) : (
                     <form onSubmit={send} className="flex gap-2 border-t border-white/10 pt-4">
-                      <input className={input} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Reply to customer…" />
+                      <textarea rows={3} aria-label="Message" className={input} value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Reply to customer…" />
                       <button className="rounded-full bg-[#6EAEC6] px-5 text-[#0B1822]">Send</button>
                     </form>
                   )}
                 </div>
 
                 <aside className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                  {!readOnly && <SendPhotos endpoint={`/api/quotes/${active.id}`} onSent={()=>void load()}/>}
                   {!readOnly && <QuoteBookingForm key={active.id} quote={active} onBooked={() => { void load(); setMsg("Quote converted to a confirmed booking. View it in your schedule."); }} />}
                   <p className="text-xs uppercase tracking-[.22em] text-[#6EAEC6]">Final quote</p>
                   <label className="mt-4 block text-xs text-white/45">

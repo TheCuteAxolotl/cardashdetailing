@@ -1,4 +1,5 @@
 "use client";
+import LinkPhoneMessages from "@/components/LinkPhoneMessages";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { STAFF_PERMISSIONS } from "@/lib/access-control";
@@ -245,7 +246,7 @@ export default function AccountPage() {
   if (!user) return null;
 
   return (
-    <main className="customer-app min-h-screen text-white">
+    <main className="customer-app min-h-screen text-white"><LinkPhoneMessages/>
       <section className="border-b border-white/8">
         <div className="mx-auto max-w-[1280px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">

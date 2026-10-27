@@ -1,4 +1,5 @@
 "use client";
+import SendPhotos from "@/components/SendPhotos";
 import MessageBookingForm from "@/components/MessageBookingForm";
 
 import SmsAttachments from "@/components/SmsAttachments";
@@ -9,6 +10,7 @@ type InboxMessage = {
   id: string;
   sender: string;
   body: string;
+  attachmentsJson?: string | null;
   channel?: string;
   externalSid?: string | null;
   createdAt: string;
@@ -40,6 +42,7 @@ type UnmatchedSms = {
   fromPhone: string;
   toPhone: string | null;
   body: string;
+  attachmentsJson?: string | null;
   direction?: "inbound" | "outbound";
   externalSid: string;
   createdAt: string;
@@ -496,7 +499,7 @@ export default function StaffSmsInbox({
                       return (
                         <div key={message.id} className={`flex ${outbound ? "justify-end" : "justify-start"}`}>
                           <div className={`max-w-[86%] rounded-2xl px-4 py-3 ${outbound ? "bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8 text-white"}`}>
-                            <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
+                            <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>{message.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(message.attachmentsJson) as string[]).map((src,index)=><a key={index} href={src} target="_blank" rel="noreferrer"><img src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/></a>)}</div>}
                       {!outbound && <SmsAttachments sid={message.externalSid} body={message.body} />}
                             <p className={`mt-2 text-[10px] ${outbound ? "text-[#0B1822]/50" : "text-white/30"}`}>
                               {outbound ? "Car Dash" : "Customer"} · {new Date(message.createdAt).toLocaleString()}
@@ -507,6 +510,7 @@ export default function StaffSmsInbox({
                     })}
                   </div>
 
+                  <div className="px-4 pb-3"><SendPhotos endpoint="/api/sms/unmatched/reply" payload={{phone:thread.phone}} onSent={()=>void load(true)}/></div>
                   <form
                     className="border-t border-white/8 bg-black/15 p-4"
                     onSubmit={(event) => {
@@ -611,7 +615,7 @@ export default function StaffSmsInbox({
               Use this for people who contacted Car Dash or agreed to receive a text. If a number has opted out with STOP, Twilio won’t deliver a new message until they opt back in.
             </div>
 
-            {newTextNote && (
+            <SendPhotos endpoint="/api/sms/unmatched/reply" payload={{phone:newPhone}} onSent={()=>void load(true)}/>{newTextNote && (
               <p className="mt-3 text-sm text-white/60">{newTextNote}</p>
             )}
 

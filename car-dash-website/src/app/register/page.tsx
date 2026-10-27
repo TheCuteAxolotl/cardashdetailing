@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { OWNER_EMAIL } from "@/lib/constants";
 
 export default function RegisterPage() {
+  const [phone,setPhone]=useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +41,7 @@ export default function RegisterPage() {
       });
       const data = await response.json();
       if (!response.ok) return setError(data.error || "Registration failed");
-      window.location.assign(claimQuoteId ? `/quote?thread=${encodeURIComponent(claimQuoteId)}` : "/dashboard");
+      window.location.assign(phone?`/account?linkPhone=${encodeURIComponent(phone)}`:claimQuoteId ? `/quote?thread=${encodeURIComponent(claimQuoteId)}` : "/dashboard");
     } catch (err) {
       setError("An error occurred. Please try again.");
       console.error(err);
@@ -63,7 +64,7 @@ export default function RegisterPage() {
           {error && <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100">{error}</div>}
 
           <form onSubmit={handleSubmit} className="mt-7 space-y-4">
-            <div><label className="mb-2 block text-sm font-medium text-white/72">Full Name</label><input type="text" value={name} onChange={(event) => setName(event.target.value)} className={inputClass} placeholder="John Doe" required /></div>
+            <div><label className="mb-2 block text-sm font-medium text-white/72">Mobile number (optional, to connect previous text messages)</label><input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} className={inputClass}/></div><div><label className="mb-2 block text-sm font-medium text-white/72">Full Name</label><input type="text" value={name} onChange={(event) => setName(event.target.value)} className={inputClass} placeholder="John Doe" required /></div>
             <div><label className="mb-2 block text-sm font-medium text-white/72">Email</label><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} placeholder="your@email.com" required /></div>
             <div><label className="mb-2 block text-sm font-medium text-white/72">Password</label><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} placeholder="••••••••" required /></div>
             <div><label className="mb-2 block text-sm font-medium text-white/72">Confirm Password</label><input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className={inputClass} placeholder="••••••••" required /></div>

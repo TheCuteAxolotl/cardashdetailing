@@ -1,4 +1,5 @@
 "use client";
+import SendPhotos from "@/components/SendPhotos";
 import MessageBookingForm from "@/components/MessageBookingForm";
 
 import SmsAttachments from "@/components/SmsAttachments";
@@ -28,6 +29,7 @@ type BookingMessage = {
   id: string;
   sender: string;
   body: string;
+  attachmentsJson?: string | null;
   channel?: string;
   externalSid?: string | null;
   createdAt: string;
@@ -204,6 +206,7 @@ export default function BookingChatPage() {
               </div>
             </div>
 
+            {endpoint&&<SendPhotos endpoint={endpoint} onSent={()=>void load(true)}/>}
             <div className="flex-1 space-y-3 overflow-y-auto py-5">
               {data.messages.length ? (
                 data.messages.map((message) => {
@@ -221,7 +224,7 @@ export default function BookingChatPage() {
                       key={message.id}
                       className={`max-w-[86%] rounded-2xl px-4 py-3 ${mine ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8"}`}
                     >
-                      <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
+                      <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>{message.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(message.attachmentsJson) as string[]).map((src,index)=><a key={index} href={src} target="_blank" rel="noreferrer"><img src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/></a>)}</div>}
                       {staff && message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                       {staff && message.sender === "customer" && <MessageBookingForm source={{type:"booking-message",id:message.id}} />}
                       <div className="mt-2 flex items-center gap-2 text-[10px] opacity-45">

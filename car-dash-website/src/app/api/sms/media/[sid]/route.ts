@@ -9,10 +9,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ sid
   const { sid } = await context.params;
   if (!/^(SM|MM)[a-f0-9]{32}$/i.test(sid)) return NextResponse.json({ error: "Invalid message" }, { status: 400 });
   // Only allow media belonging to a locally stored message in an authorized inbox.
-  const permitted =
+  let permitted: unknown =
     (hasStaffPermission(auth, "smsInbox") && await prisma.unmatchedSmsMessage.findUnique({ where: { externalSid: sid }, select: { id: true } })) ||
     (hasStaffPermission(auth, "bookings") && await prisma.bookingMessage.findUnique({ where: { externalSid: sid }, select: { id: true } })) ||
     (hasStaffPermission(auth, "quoteChats") && await prisma.quoteMessage.findUnique({ where: { externalSid: sid }, select: { id: true } }));
+  if(!permitted){
+    const quote=await prisma.quoteMessage.findUnique({where:{externalSid:sid},select:{thread:{select:{userId:true}}}});
+    const booking=await prisma.bookingMessage.findUnique({where:{externalSid:sid},select:{conversation:{select:{booking:{select:{userId:true}}}}}});
+    permitted=quote?.thread.userId===auth.id||booking?.conversation.booking.userId===auth.id;
+  }
   if (!permitted) return NextResponse.json({ error: "No access to this message" }, { status: 403 });
   try {
     const mediaSid = request.nextUrl.searchParams.get("media");

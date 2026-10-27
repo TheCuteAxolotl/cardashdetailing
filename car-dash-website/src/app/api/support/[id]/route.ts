@@ -1,3 +1,4 @@
+import {messagePhotos} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, isOwnerAccount, hasStaffPermission } from "@/lib/permissions";
@@ -70,6 +71,7 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  await prisma.$executeRawUnsafe(`ALTER TABLE "SupportMessage" ADD COLUMN IF NOT EXISTS "attachmentsJson" TEXT`);
   const { id } = await context.params;
   const access = await canAccess(request, id);
 
@@ -91,7 +93,7 @@ export async function GET(
       updatedAt: true,
       messages: {
         orderBy: { createdAt: "asc" },
-        select: { id: true, sender: true, body: true, createdAt: true },
+        select: { id: true, sender: true, body: true, attachmentsJson: true, createdAt: true },
       },
     },
   });
@@ -107,6 +109,7 @@ export async function POST(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  await prisma.$executeRawUnsafe(`ALTER TABLE "SupportMessage" ADD COLUMN IF NOT EXISTS "attachmentsJson" TEXT`);
   const { id } = await context.params;
   const access = await canAccess(request, id);
 
@@ -114,10 +117,12 @@ export async function POST(
     return NextResponse.json({ error: "Not authorized" }, { status: 403 });
   }
 
-  const { message } = await request.json();
+  const payload = await request.json();
+  const {message}=payload;
+  const attachments=messagePhotos(payload.attachments);
   const body = cleanText(message, 1500);
 
-  if (!body) {
+  if (!body && !attachments.length) {
     return NextResponse.json(
       { error: "Message is required" },
       { status: 400 }
@@ -145,7 +150,8 @@ export async function POST(
     data: {
       ticketId: id,
       sender: access.staff ? "team" : "visitor",
-      body,
+      body:body||"Photo attachment",
+      attachmentsJson:attachments.length?JSON.stringify(attachments):null,
     },
   });
 

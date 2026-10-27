@@ -1,4 +1,5 @@
 "use client";
+import SmsAttachments from "@/components/SmsAttachments";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import PageMediaBand from "@/components/PageMediaBand";
@@ -13,7 +14,7 @@ type Vehicle = {
   nickname: string | null;
 };
 type Service = { id: string; title: string };
-type Msg = { id: string; sender: string; body: string; attachmentsJson: string | null; createdAt: string };
+type Msg = { externalSid?:string|null; id: string; sender: string; body: string; attachmentsJson: string | null; createdAt: string };
 type Thread = {
   id: string;
   subject: string;
@@ -125,7 +126,7 @@ export default function QuotePage() {
   }, [user, selected]);
 
   const active = useMemo(() => threads.find((thread) => thread.id === selected) || null, [threads, selected]);
-  const readOnly = Boolean(active && ["closed", "booked"].includes(active.status));
+  const readOnly = Boolean(active && active.status === "closed");
 
   useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth" }); }, [active?.messages.length]);
 
@@ -251,7 +252,7 @@ export default function QuotePage() {
         <div className="mx-auto max-w-4xl">
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#6EAEC6]">No login required</p>
-            <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Get a Free Custom Quote</h1>
+            <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Messages & quote requests</h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. Add a few photos if you can. We’ll look it over and quote the actual work your car needs.</p>
           </div>
 
@@ -301,7 +302,7 @@ export default function QuotePage() {
       <div className="mx-auto max-w-7xl">
         <div>
           <p className="text-xs uppercase tracking-[.28em] text-[#6EAEC6]">Condition-based pricing</p>
-          <h1 className="mt-2 text-4xl font-semibold">Get a Free Custom Quote</h1>
+          <h1 className="mt-2 text-4xl font-semibold">Messages & quote requests</h1>
           <p className="mt-2 max-w-3xl text-white/40">You’re signed in, so you can reuse saved vehicles and keep the whole quote conversation here. Tell us what you want done and we’ll price it around your actual car and its condition.</p>
         </div>
 
@@ -319,8 +320,8 @@ export default function QuotePage() {
                   {active.quotedPrice && <div className="mt-4 rounded-2xl border border-[#6EAEC6]/20 bg-[#6EAEC6]/[.05] p-4"><p className="text-xs uppercase tracking-[.2em] text-[#6EAEC6]">Car Dash Exact Quote</p><p className="mt-1 text-3xl font-semibold">${active.quotedPrice.toFixed(2)}</p>{active.quoteNotes && <p className="mt-2 text-sm text-white/45">{active.quoteNotes}</p>}{active.status === "quoted" && <button onClick={accept} className="mt-3 rounded-full bg-[#6EAEC6] px-5 py-2 text-sm font-semibold text-[#0B1822]">Accept quote</button>}{active.status === "accepted" && <div className="mt-3 flex flex-wrap items-center gap-3"><span className="text-sm font-semibold text-emerald-300">Quote accepted.</span><a href={`/contact?quote=${encodeURIComponent(active.id)}`} className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">Book this quote</a></div>}{active.status === "booked" && <p className="mt-3 text-sm font-semibold text-emerald-300">Booking request submitted. This quote is now locked.</p>}</div>}
                   {active.status === "closed" && <div className="mt-4 rounded-2xl border border-white/10 bg-white/[.035] p-4 text-sm text-white/55">This conversation has been closed by Car Dash. You can still read the history, but new messages are disabled.</div>}
                 </div>
-                <div className="flex-1 space-y-3 overflow-y-auto py-5">{active.messages.map((message) => { if (message.sender === "system") return null; return <div key={message.id} className={`max-w-[82%] rounded-2xl px-4 py-3 ${message.sender === "customer" ? "ml-auto bg-white/10" : "bg-[#6EAEC6] text-[#0B1822]"}`}><p className="text-sm leading-6">{message.body}</p>{message.attachmentsJson && <div className="mt-3 grid grid-cols-2 gap-2">{JSON.parse(message.attachmentsJson).map((src:string,index:number)=><img key={index} src={src} alt="Customer upload" className="max-h-48 w-full rounded-xl object-cover" />)}</div>}</div>; })}<div ref={end} /></div>
-                {readOnly ? <div className="border-t border-white/10 pt-4 text-sm text-white/38">{active.status === "booked" ? "This quote has been booked. Manage the appointment from your dashboard." : "This chat is closed and read-only."}</div> : <form onSubmit={send} className="border-t border-white/10 pt-4"><div className="flex gap-2"><input className={input} value={reply} onChange={(e)=>setReply(e.target.value)} placeholder="Message Car Dash…" /><button className="rounded-full bg-[#6EAEC6] px-5 font-semibold text-[#0B1822]">Send</button></div><label className="mt-3 inline-block cursor-pointer text-xs text-white/45">Attach up to 3 photos<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>{photos.length>0&&<span className="ml-3 text-xs text-[#6EAEC6]">{photos.length} photo(s) ready</span>}</form>}
+                <div className="flex-1 space-y-3 overflow-y-auto py-5">{active.messages.map((message) => { if (message.sender === "system") return null; return <div key={message.id} className={`max-w-[82%] rounded-2xl px-4 py-3 ${message.sender === "customer" ? "ml-auto bg-white/10" : "bg-[#6EAEC6] text-[#0B1822]"}`}><p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p><SmsAttachments sid={message.externalSid} body={message.body}/>{message.attachmentsJson && <div className="mt-3 grid grid-cols-2 gap-2">{JSON.parse(message.attachmentsJson).map((src:string,index:number)=><img key={index} src={src} alt="Customer upload" className="max-h-48 w-full rounded-xl object-cover" />)}</div>}</div>; })}<div ref={end} /></div>
+                {readOnly ? <div className="border-t border-white/10 pt-4 text-sm text-white/38">{active.status === "booked" ? "This quote has been booked. Manage the appointment from your dashboard." : "This chat is closed and read-only."}</div> : <form onSubmit={send} className="border-t border-white/10 pt-4"><div className="flex gap-2"><textarea rows={3} aria-label="Message" className={input} value={reply} onChange={(e)=>setReply(e.target.value)} placeholder="Message Car Dash…" /><button className="rounded-full bg-[#6EAEC6] px-5 font-semibold text-[#0B1822]">Send</button></div><label className="mt-3 inline-block cursor-pointer text-xs text-white/45">Attach up to 3 photos<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>{photos.length>0&&<span className="ml-3 text-xs text-[#6EAEC6]">{photos.length} photo(s) ready</span>}</form>}
                 {error && <p className="mt-3 text-sm text-[#6EAEC6]">{error}</p>}
               </div>
             ) : (

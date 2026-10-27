@@ -1,11 +1,12 @@
 "use client";
+import SendPhotos from "@/components/SendPhotos";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Message = {
   id: string;
   sender: string;
-  body: string;
+  body: string; attachmentsJson?: string | null;
   createdAt: string;
 };
 
@@ -243,13 +244,13 @@ export default function OwnerSupportPage() {
                       key={supportMessage.id}
                       className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${supportMessage.sender === "team" ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/7 text-white/75"}`}
                     >
-                      {supportMessage.body}
+                      <span className="whitespace-pre-wrap">{supportMessage.body}</span>{supportMessage.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(supportMessage.attachmentsJson) as string[]).map((src,index)=><img key={index} src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/>)}</div>}
                     </div>
                   ))}
                 </div>
 
-                <form onSubmit={sendReply} className="mt-auto flex gap-2 border-t border-white/8 pt-5">
-                  <input value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Reply to customer…" className="support-input" />
+                <SendPhotos endpoint={`/api/support/${selected.id}`} onSent={()=>void load()}/><form onSubmit={sendReply} className="mt-auto flex gap-2 border-t border-white/8 pt-5">
+                  <textarea rows={3} aria-label="Message" value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Reply to customer…" className="support-input" />
                   <button className="rounded-full bg-white px-5 text-sm font-semibold text-black transition hover:bg-white/85">Send</button>
                 </form>
               </>

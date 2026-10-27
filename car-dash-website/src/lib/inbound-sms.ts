@@ -128,9 +128,8 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
   if (!booking) {
     const guestQuotes = await prisma.quoteThread.findMany({
       where: {
-        userId: null,
         guestPhone: { not: null },
-        status: { notIn: ["closed", "booked"] },
+        status: { not: "closed" },
       },
       select: {
         id: true,

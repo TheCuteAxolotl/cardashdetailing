@@ -1,4 +1,5 @@
 "use client";
+import SendPhotos from "@/components/SendPhotos";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -15,7 +16,7 @@ type User = {
 type Message = {
   id: string;
   sender: string;
-  body: string;
+  body: string; attachmentsJson?: string | null;
   createdAt: string;
 };
 
@@ -429,7 +430,7 @@ export default function SupportWidget() {
                               : "ml-auto bg-white/8 text-white/80"
                           }`}
                         >
-                          <p>{item.body}</p>
+                          <p><span className="whitespace-pre-wrap">{item.body}</span>{item.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(item.attachmentsJson) as string[]).map((src,index)=><img key={index} src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/>)}</div>}</p>
                           <p className="mt-1 text-[10px] opacity-45">
                             {item.sender === "team" ? "Car Dash" : "You"}
                           </p>
@@ -438,9 +439,9 @@ export default function SupportWidget() {
                       <div ref={endRef} />
                     </div>
 
-                    <form onSubmit={sendMessage} className="border-t border-white/10 p-4">
+                    <SendPhotos endpoint={`/api/support/${selected.id}`} onSent={()=>void loadTickets()}/><form onSubmit={sendMessage} className="border-t border-white/10 p-4">
                       <div className="flex gap-2">
-                        <input
+                        <textarea rows={3} aria-label="Message"
                           value={message}
                           onChange={(event) => setMessage(event.target.value)}
                           placeholder="Type a message…"

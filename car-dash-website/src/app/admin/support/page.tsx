@@ -1,8 +1,9 @@
 "use client";
+import SendPhotos from "@/components/SendPhotos";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-type Message = { id: string; sender: string; body: string; createdAt: string };
+type Message = { id: string; sender: string; body: string; attachmentsJson?: string | null; createdAt: string };
 type Ticket = { id: string; name: string; email?: string | null; phone?: string | null; contactPreference: string; subject: string; status: string; createdAt: string; updatedAt: string; messages: Message[] };
 
 export default function AdminSupportPage() {
@@ -103,8 +104,8 @@ export default function AdminSupportPage() {
                 <div><h2 className="text-2xl font-semibold">{selected.subject}</h2><p className="mt-2 text-sm text-white/42">{selected.name} · {selected.contactPreference}{selected.email ? ` · ${selected.email}` : ""}{selected.phone ? ` · ${selected.phone}` : ""}</p></div>
                 <div className="flex gap-2">{["open","waiting","closed"].map((status) => <button key={status} onClick={() => setStatus(status)} className={`rounded-full px-3 py-2 text-xs capitalize ${selected.status === status ? "bg-[#6EAEC6] text-[#0B1822]" : "border border-white/10 text-white/50"}`}>{status}</button>)}</div>
               </div>
-              <div className="space-y-3 py-6">{selected.messages.map((item) => <div key={item.id} className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${item.sender === "team" ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/7 text-white/75"}`}>{item.body}</div>)}</div>
-              <form onSubmit={sendReply} className="mt-auto flex gap-2 border-t border-white/8 pt-5"><input value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply to customer…" className="support-input"/><button className="rounded-full bg-white px-5 text-sm font-semibold text-black">Send</button></form>
+              <div className="space-y-3 py-6">{selected.messages.map((item) => <div key={item.id} className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-6 ${item.sender === "team" ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/7 text-white/75"}`}><span className="whitespace-pre-wrap">{item.body}</span>{item.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(item.attachmentsJson) as string[]).map((src,index)=><img key={index} src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/>)}</div>}</div>)}</div>
+              <SendPhotos endpoint={`/api/support/${selected.id}`} onSent={()=>void load()}/><form onSubmit={sendReply} className="mt-auto flex gap-2 border-t border-white/8 pt-5"><textarea rows={3} aria-label="Message" value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Reply to customer…" className="support-input"/><button className="rounded-full bg-white px-5 text-sm font-semibold text-black">Send</button></form>
             </> : <div className="grid h-full place-items-center text-white/30">Choose a conversation.</div>}
           </section>
         </div>

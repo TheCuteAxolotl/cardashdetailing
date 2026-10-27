@@ -109,6 +109,8 @@ model BookingMessage {
   createdAt      DateTime            @default(now())
 
   @@index([conversationId, createdAt])
+  attachmentsJson String?
+
 }
 
 model UnmatchedSmsMessage {
@@ -121,6 +123,8 @@ model UnmatchedSmsMessage {
   createdAt   DateTime @default(now())
 
   @@index([createdAt])
+  attachmentsJson String?
+
 }
 
 model QuoteThread {
@@ -238,6 +242,8 @@ model SupportMessage {
   createdAt DateTime      @default(now())
 
   @@index([ticketId, createdAt])
+  attachmentsJson String?
+
 }
 
 model BlockedVisitor {

@@ -237,6 +237,7 @@ export async function sendTransactionalSms(input: {
   to: string;
   body: string;
   includeOptOutLine?: boolean;
+  mediaUrls?: string[];
 }) {
   const normalized = normalizePhoneNumber(input.to);
   if (!normalized) {
@@ -257,6 +258,7 @@ export async function sendTransactionalSms(input: {
       to: normalized,
       messagingServiceSid,
       body,
+      ...(input.mediaUrls?.length?{mediaUrl:input.mediaUrls}:{}),
     });
 
     return { sent: true, sid: message.sid };

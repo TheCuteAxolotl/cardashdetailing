@@ -1,3 +1,4 @@
+import {messagePhotos} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
@@ -79,11 +80,12 @@ const ticketSelect = {
   updatedAt: true,
   messages: {
     orderBy: { createdAt: "asc" as const },
-    select: { id: true, sender: true, body: true, createdAt: true },
+    select: { id: true, sender: true, body: true, attachmentsJson: true, createdAt: true },
   },
 };
 
 export async function GET(request: NextRequest) {
+  await prisma.$executeRawUnsafe(`ALTER TABLE "SupportMessage" ADD COLUMN IF NOT EXISTS "attachmentsJson" TEXT`);
   try {
     const auth = await getCurrentAccountFromRequest(request);
 
@@ -124,6 +126,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  await prisma.$executeRawUnsafe(`ALTER TABLE "SupportMessage" ADD COLUMN IF NOT EXISTS "attachmentsJson" TEXT`);
   try {
     const auth = await getCurrentAccountFromRequest(request);
 
