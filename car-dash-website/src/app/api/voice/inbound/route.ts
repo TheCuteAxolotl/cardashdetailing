@@ -80,8 +80,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Challenge the caller before the owner's phone ever rings.
-    // Using 2-9 avoids the predictable legacy "press 1" behavior.
-    const expectedDigit = String(randomInt(2, 10));
+    // Using 3-9 avoids the predictable legacy "press 1" behavior.
+    const expectedDigit = String(randomInt(3, 10));
     const challengeUrl = `${getPublicSiteUrl()}/api/voice/caller-screen?${
       callSid ? `callSid=${encodeURIComponent(callSid)}&` : ""
     }expected=${expectedDigit}`;

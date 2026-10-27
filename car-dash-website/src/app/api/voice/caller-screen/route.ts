@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const callSid = request.nextUrl.searchParams.get("callSid") || "";
     const expectedDigit = request.nextUrl.searchParams.get("expected") || "";
     const enteredDigit = String(params.Digits || "").trim();
-    const passed = /^[2-9]$/.test(expectedDigit) && enteredDigit === expectedDigit;
+    const passed = /^[3-9]$/.test(expectedDigit) && enteredDigit === expectedDigit;
 
     if (callSid) {
       await prisma.callLog.updateMany({
