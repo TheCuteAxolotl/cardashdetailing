@@ -1,3 +1,4 @@
+import { fulfillGiftCheckout } from "@/lib/gift-card-checkout";
 import { NextResponse } from "next/server";
 import { getInvoice, saveInvoice } from "@/lib/invoices";
 import { verifyStripeWebhook } from "@/lib/stripe-invoice";
@@ -110,6 +111,10 @@ export async function POST(request: Request) {
       session &&
       (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded")
     ) {
+      if(session.metadata?.gift_purchase_token) {
+        await fulfillGiftCheckout(session);
+        return NextResponse.json({received:true});
+      }
       await recordCheckoutPayment(session);
       if (session.metadata?.maintenance_subscription_id) {
         await recordMaintenanceCheckout(session);
