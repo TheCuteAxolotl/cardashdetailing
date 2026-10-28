@@ -6,7 +6,7 @@ import PromotionBanner from "@/components/PromotionBanner";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SupportWidget from "@/components/SupportWidget";
-import styles from "./HomeExperience.module.css";
+import BrandIntro from "@/components/BrandIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const STAFF_INTERNAL_PREFIXES = [
@@ -96,7 +96,7 @@ export default function SiteChrome({ children, footerBlurb }: { children: ReactN
 
   return (
     <>
-      <div className={styles.brandIntro} aria-hidden="true"><span>CAR DASH</span><small>MOBILE DETAILING · SOUTH ELGIN</small></div>
+      <BrandIntro />
       <PromotionBanner />
       <SiteHeader />
       <ScrollReveal />

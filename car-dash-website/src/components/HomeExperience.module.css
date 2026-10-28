@@ -59,7 +59,7 @@
 }
 
 /* Editorial presentation inspired by the supplied motion reference. */
-.brandIntro { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background: #101010; color: #f4efe5; pointer-events: none; animation: introExit 1.8s ease both; }
+.brandIntro { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background: #101010; color: #f4efe5; pointer-events: none; transition: opacity 700ms ease !important; }
 .brandIntro > span { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px,4vw,48px); letter-spacing: .28em; padding-left: .28em; }
 .brandIntro small { font-size: 9px; letter-spacing: .3em; color: #d6b779; }
 @keyframes introExit { 0%,45% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
@@ -107,7 +107,7 @@
   .railControls > p { max-width: 110px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .brandIntro { display: none; }
+  .brandIntro { transition: opacity 350ms ease !important; }
   .hero :global(.home-hero-copy), .transformPhoto { animation: none; }
   .filmRail { scroll-snap-type: none; }
 }

@@ -49,16 +49,14 @@
   }
 }
 
+/* Keep a gentle opacity fade when reduced motion is requested, without travel or blur. */
 @media (prefers-reduced-motion: reduce) {
-  .scroll-reveal,
-  .scroll-reveal:not(.is-revealed),
-  .scroll-reveal.is-revealed,
-  .scroll-reveal:not(.is-revealed).is-below,
-  .scroll-reveal:not(.is-revealed).is-above {
-    opacity: 1 !important;
+  .scroll-reveal {
     transform: none !important;
     filter: none !important;
-    transition: none !important;
-    will-change: auto !important;
+    transition: opacity 350ms ease !important;
+    will-change: opacity;
   }
+  .scroll-reveal:not(.is-revealed) { opacity: 0 !important; }
+  .scroll-reveal.is-revealed { opacity: 1 !important; }
 }
