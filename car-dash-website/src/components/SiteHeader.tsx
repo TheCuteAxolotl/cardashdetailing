@@ -33,6 +33,7 @@ const moreLinks = [
   ["/faq", "FAQ", "Answers before you book."],
   ["/contact", "Contact", "Call, text or send a message."],
   ["/quote", "Exact quote", "Get a price for your specific vehicle."],
+  ["/gift-cards", "Gift cards", "Check a gift card balance or purchase one."],
 ] as const;
 
 export default function SiteHeader() {
