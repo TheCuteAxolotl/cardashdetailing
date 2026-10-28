@@ -23,7 +23,7 @@ export default function SiteFooter({ blurb }: { blurb: string }) {
           <div className="site-footer-links grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[.16em] text-white/28">Explore</p>
-              <div className="space-y-3 text-white/52"><a href="/#prices" className="block hover:text-white">Pricing</a><a href="/gallery" className="block hover:text-white">Gallery</a><a href="/reviews" className="block hover:text-white">Reviews</a><a href="/about" className="block hover:text-white">About</a></div>
+              <div className="space-y-3 text-white/52"><a href="/#prices" className="block hover:text-white">Pricing</a><a href="/gallery" className="block hover:text-white">Gallery</a><a href="/reviews" className="block hover:text-white">Reviews</a><a href="/about" className="block hover:text-white">About</a><a href="/gift-cards" className="block hover:text-white">Gift card balance</a></div>
             </div>
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[.16em] text-white/28">Services</p>
