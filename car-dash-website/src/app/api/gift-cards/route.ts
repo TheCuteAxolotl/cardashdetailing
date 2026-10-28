@@ -13,6 +13,12 @@ export async function POST(request: NextRequest) {
     if (!row) return NextResponse.json({error:'Gift card not found. Check the code or contact Car Dash.'},{status:404,headers});
     const card = JSON.parse(row.value) as GiftCard;
     if (card.deletedAt) return NextResponse.json({error:'This gift card is no longer available.'},{status:404,headers});
-    return NextResponse.json({balance:card.balance,paused:card.paused,lastFour:card.code.slice(-4)},{headers});
+    // Public cardholder summary only: no purchaser, recipient, events, private notes, or full code.
+    const status = card.paused ? 'paused' : card.used ? 'used' : card.balance > 0 ? 'active' : 'empty';
+    return NextResponse.json({
+      balance: Math.max(0, Math.floor(Number(card.balance) || 0)),
+      status,
+      lastFour: card.code.slice(-4),
+    }, { headers });
   } catch { return NextResponse.json({error:'Unable to check the balance right now. Please retry.'},{status:503,headers}); }
 }
