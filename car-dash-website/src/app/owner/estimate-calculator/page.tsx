@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { DEFAULT_PRICING_PAGES, VEHICLE_LABELS, type VehicleClass, parsePricingConfig } from "@/lib/pricing-config";
 import { DEFAULT_BOOKING_PRICING, parseBookingPricingConfig, STANDALONE_HEADLIGHT_SERVICE_ID, type BookingPricingConfig } from "@/lib/booking-pricing";
 import { recommendedServiceMinutes, recommendedAddOnMinutes } from "@/lib/booking-duration";
-import { findTrainingGuide } from "@/lib/service-training-guide";
 
 type ServiceOption = { id: string; title: string; description?: string; category?: string; price: number; startingPrice?: number | null; pricingType: string; active: boolean };
 type EstimateChoice = { key: string; durationKey: string; name: string; price: number; duration: number; quoteRequired?: boolean; group: string };
