@@ -166,7 +166,7 @@ export default function EstimateCalculatorPage() {
             </div>
             {quoteRequired&&<p className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-xs text-amber-100">One or more selections require a custom quote. This price is only a starting estimate.</p>}
             <p className="mt-4 text-xs leading-5 text-white/40">Estimate only. Vehicle condition, drying/cure time, travel, severe contamination and service compatibility can change the final quote. Do not add overlapping package work twice.</p>
-            <button onClick={copy} disabled={pickedServices.length===0&&pickedAddOns.length===0} className="mt-5 w-full rounded-lg bg-[#d6b779] px-4 py-3 font-semibold text-black disabled:opacity-40">Copy customer estimate</button>
+            <button onClick={copy} disabled={pickedServices.length===0&&pickedAddOns.length===0} className="mt-5 w-full rounded-lg bg-[#d6b779] px-4 py-3 font-semibold text-[#101010] disabled:opacity-40">Copy customer estimate</button>
             <button onClick={()=>{setSelectedServices([]);setSelectedAddOns([]);setCustomPrice(0);setExtraMinutes(0);setNotes("");setStatus("");}} className="mt-2 w-full rounded-lg border border-white/15 px-4 py-3 text-sm text-white/75">Clear estimate</button>
           </div>
         </aside>
