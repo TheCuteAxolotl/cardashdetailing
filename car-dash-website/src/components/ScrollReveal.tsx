@@ -55,7 +55,7 @@ export default function ScrollReveal() {
 
     const register = (root: ParentNode = document) => {
       const elements = root.querySelectorAll<HTMLElement>(
-        "main section:not([data-no-scroll-reveal]), main [data-scroll-reveal]:not([data-no-scroll-reveal])"
+        ".public-clean section:not([data-no-scroll-reveal]):not(:has([data-reveal], [data-scroll-reveal])), .public-clean [data-reveal]:not([data-no-scroll-reveal]), .public-clean [data-scroll-reveal]:not([data-no-scroll-reveal])"
       );
 
       for (const element of elements) {
@@ -88,7 +88,7 @@ export default function ScrollReveal() {
       for (const mutation of mutations) {
         for (const node of mutation.addedNodes) {
           if (!(node instanceof HTMLElement)) continue;
-          if (node.matches("section:not([data-no-scroll-reveal]), [data-scroll-reveal]:not([data-no-scroll-reveal])")) {
+          if (node.matches("section:not([data-no-scroll-reveal]), [data-scroll-reveal]:not([data-no-scroll-reveal]), [data-reveal]:not([data-no-scroll-reveal])")) {
             register(node.parentElement || document);
           } else {
             register(node);
@@ -97,7 +97,7 @@ export default function ScrollReveal() {
       }
     });
 
-    const main = document.querySelector("main");
+    const main = document.querySelector(".public-clean");
     if (main) mutationObserver.observe(main, { childList: true, subtree: true });
 
     return () => {

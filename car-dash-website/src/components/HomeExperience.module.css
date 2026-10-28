@@ -59,10 +59,10 @@
 }
 
 /* Editorial presentation inspired by the supplied motion reference. */
-.brandIntro { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background: #101010; color: #f4efe5; pointer-events: none; animation: introExit 1.25s ease both; }
+.brandIntro { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background: #101010; color: #f4efe5; pointer-events: none; animation: introExit 1.8s ease both; }
 .brandIntro > span { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px,4vw,48px); letter-spacing: .28em; padding-left: .28em; }
 .brandIntro small { font-size: 9px; letter-spacing: .3em; color: #d6b779; }
-@keyframes introExit { 0%,35% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@keyframes introExit { 0%,45% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
 .experience .hero :global(.home-hero-shell), .experience .hero :global(.home-hero-content) { min-height: max(720px, calc(100svh - 80px)); }
 .experience .hero h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(64px,7.8vw,124px); font-weight: 400; line-height: 1; text-transform: none; letter-spacing: -.055em; max-width: 13ch; text-wrap: balance; }
 .hero :global(.home-hero-actions) a { border-radius: 999px; }
@@ -113,7 +113,7 @@
 }
 
 /* Cinematic homepage, using the existing real gallery media. */
-.experience .brandIntro { display:none; }
+
 .experience .hero h1 { font-family:Arial,Helvetica,sans-serif !important; font-weight:300 !important; text-transform:none !important; font-size:clamp(52px,7vw,106px) !important; line-height:1.02 !important; letter-spacing:-.065em !important; max-width:10ch !important; }
 .experience .hero :global(.home-hero-content) { justify-content:center; min-height: min(900px,90svh) !important; padding-top:85px; padding-bottom:85px; gap:38px; }
 .experience .hero :global(.home-hero-shell) { min-height: min(900px,90svh) !important; }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import styles from "./HomeExperience.module.css";
 import type { SiteContent } from "@/lib/site-defaults";
 import { SERVICE_AREAS } from "@/lib/seo";
@@ -32,25 +32,8 @@ export default function HomeExperience({
 }: Props) {
   const [heroInteracting, setHeroInteracting] = useState(false);
 
-  const rootRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!rootRef.current || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove(styles.waiting);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08 });
-    const sections = rootRef.current.querySelectorAll('[data-reveal]');
-    sections.forEach((section) => { section.classList.add(styles.waiting); observer.observe(section); });
-    return () => { observer.disconnect(); sections.forEach((section) => section.classList.remove(styles.waiting)); };
-  }, []);
-
   return (
-    <div ref={rootRef} className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
-      <div className={styles.brandIntro} aria-hidden="true"><span>CAR DASH</span><small>DETAILING · SOUTH ELGIN</small></div>
+    <div className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
       <section className={styles.hero}>
         <div className="home-hero-shell relative mx-auto min-h-[680px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
           <div className="absolute inset-0">

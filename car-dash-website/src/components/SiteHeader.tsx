@@ -8,7 +8,7 @@ type User = { id: string; name: string; email: string; role: string };
 
 const mainLinks = [
   ["/#prices", "Pricing"],
-  ["/gallery", "Work"],
+  ["/gallery", "Gallery"],
   ["/reviews", "Reviews"],
 ] as const;
 
@@ -175,7 +175,7 @@ export default function SiteHeader() {
             <div className="mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
               <nav className="mobile-menu-nav divide-y divide-black/[.07] border-y border-black/[.07]">
                 <a href="/#prices" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Pricing</a>
-                <a href="/gallery" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Work</a>
+                <a href="/gallery" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Gallery</a>
                 <a href="/reviews" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Reviews</a>
                 <button onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><span>{mobileServiceOpen ? "−" : "+"}</span></button>
                 {mobileServiceOpen && <div className="pb-4 pl-4">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}</div>}
