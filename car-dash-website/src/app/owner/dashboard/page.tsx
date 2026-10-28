@@ -24,6 +24,8 @@ const toolRows = [
   ["Bookings", "/owner/bookings", "Appointments and customer details", "booking"],
   ["Messages", "/owner/messages", "Customer SMS conversations", "message"],
   ["Build a Detail", "/owner/detail-builder", "Inspect a vehicle and build a custom price", "detail"],
+  ["Estimate Calculator", "/owner/estimate-calculator", "Live service prices, durations and add-on totals", "detail"],
+  ["Training Guides", "/owner/service-guides", "Step-by-step procedures for teaching every service", "detail"],
   ["Invoices", "/owner/invoices", "Create, send and record payments", "invoice"],
   ["Gift cards", "/owner/gift-cards", "Print cards and manage dollar balances", "pricing"],
   ["Loyalty cards", "/owner/loyalty", "Verify paid visits and free-detail rewards", "maintenance"],
