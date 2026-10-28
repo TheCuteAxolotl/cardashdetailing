@@ -1,3 +1,4 @@
+import { conversionPrice } from "@/lib/conversion-input";
 import {NextRequest,NextResponse} from "next/server";
 import {createHash} from "node:crypto";
 import {prisma} from "@/lib/prisma";
@@ -47,9 +48,9 @@ export async function POST(request:NextRequest){
  try{
   const body=await request.json();const source=await sourceDetails(request,body.source||{});const d=body.details||{};
   const clean=(key:string,max=240)=>String(d[key]??"").trim().slice(0,max);
-  const date=clean("preferredDate"),time=clean("preferredTime"),price=Number(d.quotedPrice);
-  if(!clean("customerName")||!clean("serviceName")||!isDateString(date)||!normalizeBookingTime(time)||d.quotedPrice==null||d.quotedPrice===""||!Number.isFinite(price)||price<0)return NextResponse.json({error:"Enter customer name, service, price, date and time."},{status:400});
-  const booking=await createBookingWithSlotProtection({userId:null,vehicleId:null,customerName:clean("customerName"),customerEmail:clean("customerEmail"),customerPhone:clean("customerPhone"),serviceName:clean("serviceName"),serviceMethod:"mobile",vehicleMake:clean("vehicleMake")||"Not specified",vehicleModel:clean("vehicleModel")||"Not specified",vehicleYear:clean("vehicleYear")||"Not specified",vehicleTrim:clean("vehicleTrim")||null,preferredDate:date,preferredTime:time,quotedPrice:Math.round(price*100)/100,status:"confirmed",notes:[`Booking source: ${source.label}`,`Original message: ${source.excerpt}`,"SMS consent: No consent recorded from website booking flow",clean("notes",2000)?`Address / owner notes: ${clean("notes",2000)}`:""].filter(Boolean).join("\n")},{messageSourceKey:source.key});
+  const date=clean("preferredDate"),time=clean("preferredTime"),price=conversionPrice(d.quotedPrice);
+  if(!clean("customerName")||!clean("serviceName")||!isDateString(date)||!normalizeBookingTime(time)||price===null)return NextResponse.json({error:"Enter customer name, service, price, date and time."},{status:400});
+  const booking=await createBookingWithSlotProtection({userId:null,vehicleId:null,customerName:clean("customerName"),customerEmail:clean("customerEmail"),customerPhone:clean("customerPhone"),serviceName:clean("serviceName"),serviceMethod:"mobile",vehicleMake:clean("vehicleMake")||"Not specified",vehicleModel:clean("vehicleModel")||"Not specified",vehicleYear:clean("vehicleYear")||"Not specified",vehicleTrim:clean("vehicleTrim")||null,preferredDate:date,preferredTime:time,quotedPrice:price,status:"confirmed",notes:[`Booking source: ${source.label}`,`Original message: ${source.excerpt}`,"SMS consent: No consent recorded from website booking flow",clean("notes",2000)?`Address / owner notes: ${clean("notes",2000)}`:""].filter(Boolean).join("\n")},{messageSourceKey:source.key});
   return NextResponse.json({booking},{status:201});
  }catch(error){
   if(error instanceof BookingSlotConflictError||error instanceof BookingSlotUnavailableError)return NextResponse.json({error:error.message},{status:409});
