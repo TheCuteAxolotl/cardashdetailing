@@ -31,6 +31,8 @@ const toolRows = [
   ["Loyalty cards", "/owner/loyalty", "Verify paid visits and free-detail rewards", "maintenance"],
   ["Maintenance", "/owner/maintenance", "Monthly subscriptions and client plans", "maintenance"],
   ["Pricing", "/owner/pricing-pages", "Packages and service pricing", "pricing"],
+  ["Promo Codes", "/owner/promo-codes", "Manage discount codes, limits and expiration dates", "pricing"],
+  ["Service Times", "/owner/service-durations", "Edit appointment durations for services and add-ons", "calendar"],
   ["Website", "/owner/website", "Homepage copy and public content", "website"],
   ["Photos & media", "/owner/gallery", "Website galleries and service images", "photo"],
 ] as const;
