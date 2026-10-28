@@ -13,12 +13,12 @@ export default async function AboutPage() {
   const storyPreview = storyIsLong && previewCut > 0
     ? storyText.slice(0, previewCut).trim() + "…"
     : storyText;
-  const explicitParagraphs = storyText.split(/\\n\\s*\\n/).map((item) => item.trim()).filter(Boolean);
+  const explicitParagraphs = storyText.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
   // Text entered as one enormous paragraph gets comfortable readable paragraphs,
   // without changing or dropping any words from the full story.
   const storyParagraphs = explicitParagraphs.flatMap((paragraph) => {
     if (paragraph.length <= 540) return [paragraph];
-    const sentences = paragraph.match(/[^.!?]+(?:[.!?]+(?=\\s|$)|$)/g) || [paragraph];
+    const sentences = paragraph.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g) || [paragraph];
     const result: string[] = [];
     let segment = "";
     for (const sentence of sentences) {
@@ -83,10 +83,6 @@ export default async function AboutPage() {
                 {storyPreview}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                {storyIsLong && <a href="#full-story" className="inline-flex items-center justify-center rounded-full bg-[#d6b779] px-6 py-3 text-sm font-semibold text-[#101010] hover:bg-[#e5c995]">
-                  Read the full story
-                  <span aria-hidden="true" className="ml-2">↓</span>
-                </a>}
                 <a href="/gallery" className="inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-[#f4efe5] hover:border-[#d6b779]">See the work</a>
               </div>
             </div>
