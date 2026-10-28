@@ -1,3 +1,4 @@
+import { discordIpLine } from "@/lib/discord-ip";
 import {messagePhotos} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -33,6 +34,7 @@ async function notifyDiscord(data: {
 
   const body = [
     "**New website support request**",
+    discordIpLine(data.ip, "Website request"),
     `Ticket: ${data.id}`,
     `Account: ${data.accountId}`,
     `Name: ${data.name}`,
@@ -42,7 +44,6 @@ async function notifyDiscord(data: {
     `Topic: ${data.subject}`,
     `Message: ${data.message}`,
     "",
-    `IP: ${data.ip}`,
     `Visitor hash: ${data.visitorHash}`,
     "Owner support: https://cardashdetailing.com/owner/support",
   ].join("\n");

@@ -102,6 +102,7 @@ export async function POST(request: NextRequest) {
   });
 
   await notifyQuoteDiscord({
+        clientIp: getClientIp(request),
     title: auth ? "New quote chat" : "New guest exact-quote request",
     customerName: auth?.name || guestName || "Guest",
     customerEmail: auth?.email || guestEmail || undefined,

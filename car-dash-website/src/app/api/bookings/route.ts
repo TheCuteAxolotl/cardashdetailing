@@ -1,3 +1,4 @@
+import { discordIpLine } from "@/lib/discord-ip";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
@@ -46,6 +47,7 @@ async function discordBooking(data: Record<string, string>) {
 
   const lines = [
     "**New detailing booking**",
+    discordIpLine(data.ip, "Website request"),
     `Customer: ${data.name}`,
     `Phone: ${data.phone}`,
     `Email: ${data.email}`,
@@ -57,7 +59,6 @@ async function discordBooking(data: Record<string, string>) {
     `Address: ${data.address || "Not specified"}`,
     `Notes: ${data.notes || "None"}`,
     "",
-    `IP: ${data.ip}`,
     `Visitor hash: ${data.visitorHash}`,
   ].join("\n");
 

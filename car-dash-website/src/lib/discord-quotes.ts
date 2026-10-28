@@ -1,4 +1,6 @@
+import { discordIpLine } from "@/lib/discord-ip";
 type QuoteDiscordPayload = {
+  clientIp?: string;
   title: string;
   customerName: string;
   customerEmail?: string;
@@ -21,6 +23,7 @@ export async function notifyQuoteDiscord(data: QuoteDiscordPayload) {
 
   const lines = [
     `**${data.title}**`,
+    discordIpLine(data.clientIp, data.clientIp === undefined ? "SMS provider" : "Website request"),
     `Customer: ${data.customerName || "Unknown"}`,
     `Email: ${data.customerEmail || "Not provided"}`,
     `Subject: ${data.subject || "Detailing quote"}`,

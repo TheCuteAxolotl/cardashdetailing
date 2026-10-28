@@ -1,3 +1,4 @@
+import { discordIpLine } from "@/lib/discord-ip";
 import { prisma } from "@/lib/prisma";
 import {
   ensureBookingConversation,
@@ -18,6 +19,7 @@ async function notifyDirectSmsDiscord(input: {
   const inboxUrl = `${getPublicSiteUrl()}/owner/messages`;
   const lines = [
     "**New direct SMS**",
+    discordIpLine(),
     `Phone: ${input.phone}`,
     `Message: ${input.body}`,
     `Open Messages: ${inboxUrl}`,

@@ -1,3 +1,4 @@
+import { discordIpLine } from "@/lib/discord-ip";
 import { connectionFailure } from "@/lib/gmail-connection-error";
 import { ImapFlow } from "imapflow";
 import nodemailer from "nodemailer";
@@ -112,7 +113,7 @@ export async function syncEmailDiscord() {
           next=uid+1;
         }
         if (lines.length) {
-          const response = await fetch(webhook,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"Car Dash Email",allowed_mentions:{parse:[]},content:`${lines.length} new email${lines.length===1?"":"s"}\n${lines.join("\n").slice(0,1700)}\nhttps://cardashdetailing.com/owner/email`}),signal:AbortSignal.timeout(8000)});
+          const response = await fetch(webhook,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:"Car Dash Email",allowed_mentions:{parse:[]},content:`${lines.length} new email${lines.length===1?"":"s"}\n${discordIpLine(undefined,"Gmail")}\n${lines.join("\n").slice(0,1700)}\nhttps://cardashdetailing.com/owner/email`}),signal:AbortSignal.timeout(8000)});
           if (!response.ok) throw new Error("Discord could not accept the notification. Try syncing again.");
           notified=lines.length;
         }

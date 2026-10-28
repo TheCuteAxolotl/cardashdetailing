@@ -1,3 +1,4 @@
+import { discordIpLine } from "@/lib/discord-ip";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { getPublicSiteUrl } from "@/lib/twilio-sms";
@@ -176,6 +177,7 @@ export async function addBookingSystemMessage(bookingId: string, body: string) {
 }
 
 export async function notifyBookingChatDiscord(input: {
+  clientIp?: string;
   bookingId: string;
   customerName: string;
   customerEmail: string;
@@ -189,6 +191,7 @@ export async function notifyBookingChatDiscord(input: {
   const ownerUrl = `${getPublicSiteUrl()}/booking-chat/${encodeURIComponent(input.bookingId)}`;
   const lines = [
     "**New booking chat message**",
+    discordIpLine(input.clientIp, input.clientIp === undefined ? "SMS provider" : "Website request"),
     `Customer: ${input.customerName}`,
     `Email: ${input.customerEmail}`,
     `Service: ${input.serviceName}`,

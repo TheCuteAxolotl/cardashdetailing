@@ -1,3 +1,4 @@
+import { getClientIp } from "@/lib/support-security";
 import {mmsPhotoUrls} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -129,6 +130,7 @@ export async function POST(
 
     if (details) {
       await notifyQuoteDiscord({
+        clientIp: getClientIp(request),
         title: attachments.length ? "New customer quote reply + photos" : "New customer quote reply",
         customerName: details.user?.name || details.guestName || "Guest",
         customerEmail: details.user?.email || details.guestEmail || undefined,
@@ -286,6 +288,7 @@ export async function PUT(
 
     if (details) {
       await notifyQuoteDiscord({
+        clientIp: getClientIp(request),
         title: "Quote accepted",
         customerName: details.user?.name || details.guestName || "Guest",
         customerEmail: details.user?.email || details.guestEmail || undefined,

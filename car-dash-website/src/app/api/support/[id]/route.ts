@@ -1,3 +1,5 @@
+import { getClientIp } from "@/lib/support-security";
+import { discordIpLine } from "@/lib/discord-ip";
 import {messagePhotos} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -27,6 +29,7 @@ async function canAccess(request: NextRequest, id: string) {
 }
 
 async function notifyDiscordReply(data: {
+  clientIp: string;
   ticketId: string;
   message: string;
   email: string;
@@ -46,6 +49,7 @@ async function notifyDiscordReply(data: {
         username: "Car Dash Support",
         content: [
           "**New customer support reply**",
+          discordIpLine(data.clientIp, "Website request"),
           `Ticket: ${data.ticketId}`,
           `Account email: ${data.email}`,
           `Message: ${data.message}`,
@@ -162,6 +166,7 @@ export async function POST(
 
   if (!access.staff) {
     await notifyDiscordReply({
+      clientIp: getClientIp(request),
       ticketId: id,
       message: body,
       email: access.auth.email,

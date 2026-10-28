@@ -1,3 +1,4 @@
+import { getClientIp } from "@/lib/support-security";
 import {messagePhotos,mmsPhotoUrls} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -150,6 +151,7 @@ export async function POST(
 
     if (allowed.viewer === "customer") {
       await notifyBookingChatDiscord({
+        clientIp: getClientIp(request),
         bookingId: allowed.booking.id,
         customerName: allowed.booking.customerName,
         customerEmail: allowed.booking.customerEmail,
