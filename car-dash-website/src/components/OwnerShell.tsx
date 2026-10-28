@@ -34,6 +34,8 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/bookings", adminHref: "/admin/bookings", label: "Bookings", icon: "calendar", permissions: ["bookings"] },
       { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
       { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", ownerOnly: true },
+      { href: "/owner/estimate-calculator", label: "Estimate Calculator", icon: "clock", ownerOnly: true },
+      { href: "/owner/service-guides", label: "Training Guides", icon: "book", ownerOnly: true },
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", ownerOnly: true },
       { href: "/owner/gift-cards", label: "Gift cards", icon: "price", ownerOnly: true },
       { href: "/owner/loyalty", label: "Loyalty cards", icon: "shield", ownerOnly: true },
