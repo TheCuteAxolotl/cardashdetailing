@@ -17,6 +17,8 @@ const SHARED_OWNER_ROUTES: Array<{ prefix: string; permissions: string[] }> = [
   { prefix: "/owner/website", permissions: ["website"] },
   { prefix: "/owner/pricing-pages", permissions: ["pricing"] },
   { prefix: "/owner/booking-settings", permissions: ["pricing", "bookings"] },
+  { prefix: "/owner/promo-codes", permissions: ["pricing"] },
+  { prefix: "/owner/service-durations", permissions: ["pricing"] },
 ];
 
 export default function OwnerLayout({ children }: { children: ReactNode }) {
