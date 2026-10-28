@@ -13,6 +13,7 @@ import {
   normalizeDiscountCode,
   parseBookingPricingConfig,
 } from "@/lib/booking-pricing";
+import { recommendedServiceMinutes, recommendedAddOnMinutes } from "@/lib/booking-duration";
 import { DEFAULT_PRICING_PAGES, parsePricingConfig } from "@/lib/pricing-config";
 import {
   BOOKING_DAY_KEYS,
@@ -43,6 +44,7 @@ function makeId(prefix: string) {
 
 export default function BookingSettingsPage() {
   const [pricing, setPricing] = useState<BookingPricingConfig>(DEFAULT_BOOKING_PRICING);
+  const [durationTargets, setDurationTargets] = useState<Array<{ key: string; label: string; name: string; group: string }>>([]);
   const [discounts, setDiscounts] = useState<ManagedDiscount[]>([]);
   const [discountTargets, setDiscountTargets] = useState<DiscountTargetOption[]>([]);
   const [availability, setAvailability] = useState<BookingAvailabilityConfig>(DEFAULT_BOOKING_AVAILABILITY);
@@ -101,6 +103,21 @@ export default function BookingSettingsPage() {
                 .filter((service) => service.active && service.pricingType === "fixed" && Number(service.price) > 0 && service.title.trim().toLowerCase() !== "headlight restoration")
                 .map((service) => ({ value: `service:${service.id}`, label: service.title, group: "Other Services" }))
             : [];
+          const durations = packageGroups.flatMap((group) =>
+            group.config.packages.flatMap((pkg) =>
+              (["coupe", "sedan", "truckSuv"] as const).map((vehicle, index) => ({
+                key: `package:${group.key}:${pkg.id}:${vehicle}`,
+                label: `${pkg.name} — ${["Sedan", "SUV / CRV", "Truck / 3-row SUV"][index]}`,
+                name: pkg.name,
+                group: group.label,
+              }))
+            )
+          );
+          setDurationTargets([
+            ...durations,
+            { key: `service:${STANDALONE_HEADLIGHT_SERVICE_ID}`, label: "Headlight Restoration", name: "Headlight Restoration", group: "Standalone" },
+            ...(Array.isArray(serviceData) ? serviceData.map((service) => ({ key: `service:${service.id}`, label: service.title, name: service.title, group: "Other Services" })) : []),
+          ]);
           setDiscountTargets([
             ...packageTargets,
             { value: `service:${STANDALONE_HEADLIGHT_SERVICE_ID}`, label: "Headlight Restoration", group: "Standalone" },
@@ -240,11 +257,14 @@ export default function BookingSettingsPage() {
       if (canManagePricing) {
         cleanedPricing = {
           headlightStandalonePrice: Math.max(0, Number(pricing.headlightStandalonePrice || 0)),
+          headlightStandaloneDuration: Math.max(15, Math.min(960, Math.ceil(Number(pricing.headlightStandaloneDuration || 90) / 15) * 15)),
+          serviceDurations: pricing.serviceDurations,
           addOns: pricing.addOns.map((item, index) => ({
             ...item,
             id: item.id || makeId(`addon-${index + 1}`),
             name: item.name.trim() || `Add-On ${index + 1}`,
             price: Math.max(0, Number(item.price || 0)),
+            durationMinutes: Math.max(15, Math.min(960, Math.ceil(Number(item.durationMinutes || recommendedAddOnMinutes(item.name, item.id)) / 15) * 15)),
           })),
         };
         const cleanedDiscounts = discounts.map((item) => ({
@@ -398,7 +418,7 @@ export default function BookingSettingsPage() {
           <>
             <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
               <div className="flex flex-wrap items-end justify-between gap-4">
-                <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Car Detailing Add-Ons</p><h2 className="mt-2 text-2xl font-semibold">Booking add-ons</h2><p className="mt-2 text-sm text-white/40">These prices appear in the booking form and are added to the exact total.</p></div>
+                <div><p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Car Detailing Add-Ons</p><h2 className="mt-2 text-2xl font-semibold">Booking add-ons</h2><p className="mt-2 text-sm text-white/40">These prices and estimated times appear in booking and are included in the calendar slot length. Severe odor restoration requires a separate quote.</p></div>
                 <label className="text-sm text-white/55">Headlight Restoration booked alone
                   <NumberInput type="number" min="0" step="1" className={`${input} mt-2 w-56`} value={pricing.headlightStandalonePrice} onChange={(e) => setPricing((current) => ({ ...current, headlightStandalonePrice: Number(e.target.value) }))} />
                 </label>
@@ -406,15 +426,42 @@ export default function BookingSettingsPage() {
 
               <div className="mt-6 grid gap-3">
                 {pricing.addOns.map((item, index) => (
-                  <div key={item.id} className="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-[1fr_150px_auto_auto] md:items-end">
+                  <div key={item.id} className="grid gap-3 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-[1fr_130px_145px_auto_auto] md:items-end">
                     <label className="text-sm text-white/55">Add-on name<input className={`${input} mt-2`} value={item.name} onChange={(e) => updateAddOn(index, { name: e.target.value })} /></label>
                     <label className="text-sm text-white/55">Price<NumberInput type="number" min="0" step="1" className={`${input} mt-2`} value={item.price} onChange={(e) => updateAddOn(index, { price: Number(e.target.value) })} /></label>
+                    <label className="text-sm text-white/55">Minutes<NumberInput type="number" min="15" max="960" step="15" className={`${input} mt-2`} value={item.durationMinutes ?? recommendedAddOnMinutes(item.name, item.id)} onChange={(e) => updateAddOn(index, { durationMinutes: Number(e.target.value) })} /></label>
                     <label className="flex h-12 items-center gap-2 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateAddOn(index, { active: e.target.checked })} /> Active</label>
                     <button type="button" onClick={() => deleteAddOn(index)} className="h-12 rounded-xl border border-red-500/25 px-4 text-sm text-red-300">Delete</button>
                   </div>
                 ))}
               </div>
               <button type="button" onClick={addAddOn} className="mt-5 rounded-full border border-[#6EAEC6]/30 bg-[#6EAEC6]/8 px-5 py-3 text-sm font-semibold text-[#6EAEC6]">+ Add add-on</button>
+            </section>
+
+            <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Time Management</p>
+                  <h2 className="mt-2 text-2xl font-semibold">Every service's duration</h2>
+                  <p className="mt-2 text-sm text-white/45">Edit the default appointment length of every package, standalone service and vehicle size. Add-on minutes are added automatically. Changes update customer availability and saved future bookings retain their original reserved time.</p>
+                </div>
+              </div>
+              <div className="mt-5 space-y-3">
+                {["Full Detailing", "Interior Only", "Exterior Only", "Standalone", "Other Services"].map((group) => {
+                  const targets = durationTargets.filter((item) => item.group === group);
+                  if (!targets.length) return null;
+                  return <details key={group} className="rounded-xl border border-white/10 bg-black/25 p-4" open={group === "Full Detailing" ? true : undefined}>
+                    <summary className="cursor-pointer font-semibold text-white">{group} · {targets.length} options</summary>
+                    <div className="mt-4 grid gap-3 md:grid-cols-2">
+                      {targets.map((item) => <label key={item.key} className="flex items-center justify-between gap-4 rounded-lg bg-white/[.035] p-3 text-sm text-white/65">
+                        <span className="flex-1">{item.label}</span>
+                        <span className="flex w-28 items-center gap-1"><NumberInput type="number" min="15" max="960" step="15" className={`${input} !py-2`} value={pricing.serviceDurations[item.key] ?? recommendedServiceMinutes(item.key, item.name)} onChange={(e) => setPricing((current) => ({ ...current, serviceDurations: { ...current.serviceDurations, [item.key]: Number(e.target.value) } }))} /><span className="text-xs">min</span></span>
+                      </label>)}
+                    </div>
+                  </details>;
+                })}
+              </div>
+              <p className="mt-3 text-xs text-white/35">These are estimates, not guarantees. Increase times for difficult conditions or complex restoration.</p>
             </section>
 
             <section className="mt-8 rounded-[30px] border border-white/10 bg-white/[.025] p-6">
