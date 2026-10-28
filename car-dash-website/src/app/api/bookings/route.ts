@@ -18,7 +18,7 @@ import {
   parseBookingPricingConfig,
   parseDiscountCodes,
 } from "@/lib/booking-pricing";
-import { durationForBooking } from "@/lib/booking-duration";
+import { totalBookingMinutes, recommendedServiceMinutes } from "@/lib/booking-duration";
 import { PROMOTIONS_KEY, matchingPromotion, parsePromotions, promotionalPrice } from "@/lib/promotions";
 import { checkDiscountAvailability } from "@/lib/discount-usage";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
@@ -153,6 +153,7 @@ export async function POST(request: NextRequest) {
     let verifiedVehicleId = String(form.get("vehicleId") || "").trim() || null;
     let allowAddOns = false;
     let bookingDiscountTarget: string | null = null;
+    let durationTarget: string | null = null;
 
     if (quoteThreadId) {
       await ensureGuestQuoteSupport();
@@ -171,6 +172,7 @@ export async function POST(request: NextRequest) {
       serviceName = quote.service?.title || quote.subject || "Accepted Quote";
       baseTotal = quote.quotedPrice;
       source = `Accepted specialist quote ${quote.id}`;
+      durationTarget = quote.service?.id ? `service:${quote.service.id}` : null;
       bookingName = quote.user.name;
       bookingEmail = quote.user.email;
       if (quote.vehicle) {
@@ -195,12 +197,14 @@ export async function POST(request: NextRequest) {
       baseTotal = selected.price;
       source = `Fixed pricing page: ${pricingPage}/${selected.pkg.id}/${selected.key}`;
       bookingDiscountTarget = `package:${pricingPage}:${selected.pkg.id}`;
+      durationTarget = `package:${pricingPage}:${selected.pkg.id}:${selected.key}`;
       allowAddOns = true;
     } else if (serviceId === STANDALONE_HEADLIGHT_SERVICE_ID) {
       serviceName = "Headlight Restoration";
       baseTotal = bookingPricing.headlightStandalonePrice;
       source = "Standalone Headlight Restoration";
       bookingDiscountTarget = `service:${STANDALONE_HEADLIGHT_SERVICE_ID}`;
+      durationTarget = bookingDiscountTarget;
       allowAddOns = false;
     } else {
       if (!serviceId) return NextResponse.json({ success: false, message: "Choose a service or pricing package before booking." }, { status: 400 });
@@ -209,6 +213,7 @@ export async function POST(request: NextRequest) {
       if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Get an Exact Quote." }, { status: 409 });
 
       bookingDiscountTarget = `service:${service.id}`;
+      durationTarget = bookingDiscountTarget;
       if (service.title.trim().toLowerCase() === "headlight restoration") {
         serviceName = "Headlight Restoration";
         baseTotal = bookingPricing.headlightStandalonePrice;
@@ -227,6 +232,12 @@ export async function POST(request: NextRequest) {
     const activeAddOns = bookingPricing.addOns.filter((item) => item.active);
     const selectedAddOns = allowAddOns ? requestedAddOnIds.map((id) => activeAddOns.find((item) => item.id === id)).filter(Boolean) : [];
     if (allowAddOns && selectedAddOns.length !== requestedAddOnIds.length) return NextResponse.json({ success: false, message: "One of the selected add-ons changed or is no longer available. Refresh the booking page and choose the add-ons again." }, { status: 409 });
+    if (selectedAddOns.some((item) => item?.quoteRequired)) {
+      return NextResponse.json({ success: false, message: "Severe odor restoration needs a custom inspection and quote before booking." }, { status: 409 });
+    }
+    if (selectedAddOns.filter((item) => ["odor-treatment", "odor-smoke", "odor-severe"].includes(item?.id || "")).length > 1) {
+      return NextResponse.json({ success: false, message: "Select one odor treatment per booking." }, { status: 400 });
+    }
 
     const addOnTotal = selectedAddOns.reduce((sum, item) => sum + Number(item?.price || 0), 0);
     const promotionRow=await prisma.siteContent.findUnique({where:{key:PROMOTIONS_KEY}});
@@ -273,7 +284,9 @@ export async function POST(request: NextRequest) {
     }
 
     const addOnSummary = selectedAddOns.length ? selectedAddOns.map((item) => `${item?.name} (+$${Number(item?.price || 0).toFixed(2)})`).join(", ") : "None";
-    const estimatedDuration=durationForBooking(serviceName,selectedAddOns.map(item=>String(item?.name||"")));
+    const configuredBase = durationTarget ? bookingPricing.serviceDurations[durationTarget] : undefined;
+    const baseMinutes = configuredBase ?? recommendedServiceMinutes(durationTarget, serviceName);
+    const estimatedDuration = totalBookingMinutes(serviceName, selectedAddOns.filter((item): item is NonNullable<typeof item> => Boolean(item)), baseMinutes);
     const detailsText = [
       `Estimated duration minutes: ${estimatedDuration}`,
       `Base service: $${baseTotal.toFixed(2)}`,
