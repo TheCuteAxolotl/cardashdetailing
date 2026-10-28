@@ -66,7 +66,8 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     items: [
       { href: "/owner/website", label: "Content", icon: "web", permissions: ["website"] },
       { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
-      { href: "/owner/promotions", label: "Promotions", icon: "price", ownerOnly: true },
+      { href: "/owner/promotions", label: "Automatic Promotions", icon: "price", ownerOnly: true },
+      { href: "/owner/promo-codes", label: "Promo Codes", icon: "price", permissions: ["pricing"] },
       { href: "/owner/services", label: "Services", icon: "service", permissions: ["services"] },
       { href: "/owner/gallery", label: "Photos & media", icon: "photo", permissions: ["gallery"] },
     ],
@@ -76,6 +77,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     icon: "grid",
     items: [
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
+      { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
       { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },
       { href: "/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
     ],
