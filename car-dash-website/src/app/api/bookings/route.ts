@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     if (!policyAgreed) return NextResponse.json({ success: false, message: "Please confirm the booking acknowledgement before submitting." }, { status: 400 });
 
     const vehicleTrim = String(form.get("vehicleTrim") || "").trim();
-    const serviceMethod = String(form.get("serviceMethod") || "Not specified").trim();
+    const serviceMethod = "mobile";
     const preferredDate = String(form.get("preferredDate") || "").trim();
     const preferredTime = String(form.get("preferredTime") || "").trim();
     if (!isDateString(preferredDate) || !normalizeBookingTime(preferredTime)) {
@@ -154,6 +154,7 @@ export async function POST(request: NextRequest) {
     let allowAddOns = false;
     let bookingDiscountTarget: string | null = null;
     let durationTarget: string | null = null;
+    let quoteUpdatedAt: Date | undefined;
 
     if (quoteThreadId) {
       await ensureGuestQuoteSupport();
@@ -171,6 +172,7 @@ export async function POST(request: NextRequest) {
 
       serviceName = quote.service?.title || quote.subject || "Accepted Quote";
       baseTotal = quote.quotedPrice;
+      quoteUpdatedAt = quote.updatedAt;
       source = `Accepted specialist quote ${quote.id}`;
       durationTarget = quote.service?.id ? `service:${quote.service.id}` : null;
       bookingName = quote.user.name;
@@ -326,7 +328,7 @@ export async function POST(request: NextRequest) {
         quotedPrice: bookingTotal,
         notes: details,
       },
-      { enforcePublicAvailability: true, quoteThreadId: quoteThreadId || undefined }
+      { enforcePublicAvailability: true, quoteThreadId: quoteThreadId || undefined, expectedQuoteStatus: "accepted", expectedQuoteUpdatedAt: quoteUpdatedAt }
     );
 
     const bookingChatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(auth?.id));
@@ -337,7 +339,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (quoteThreadId && auth?.id) {
-      await prisma.quoteThread.update({ where: { id: quoteThreadId }, data: { status: "booked", lastCustomerSeenAt: new Date() } });
+      await prisma.quoteThread.update({ where: { id: quoteThreadId }, data: { lastCustomerSeenAt: new Date() } });
       await prisma.quoteMessage.create({ data: { threadId: quoteThreadId, sender: "team", body: `Booking request submitted for $${bookingTotal.toFixed(2)}. Appointment confirmation will appear in your account once Car Dash confirms it.` } });
     }
 

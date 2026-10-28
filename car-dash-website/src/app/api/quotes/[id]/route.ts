@@ -1,3 +1,4 @@
+import { updateQuoteState } from "@/lib/quote-state";
 import { getClientIp } from "@/lib/support-security";
 import {mmsPhotoUrls} from "@/lib/message-photos";
 import { NextRequest, NextResponse } from "next/server";
@@ -23,6 +24,7 @@ async function access(request: NextRequest, id: string) {
       id: true,
       userId: true,
       status: true,
+      updatedAt: true,
       quotedPrice: true,
       lastCustomerSeenAt: true,
       guestName: true,
@@ -186,10 +188,8 @@ export async function PUT(
           { status: 409 }
         );
       }
-      const updated = await prisma.quoteThread.update({
-        where: { id },
-        data: { status: "closed" },
-      });
+      const updated = await updateQuoteState(id, allowed.thread.updatedAt, { status: "closed" });
+      if (!updated) return NextResponse.json({ error: "This quote changed. Refresh before trying again." }, { status: 409 });
       return NextResponse.json(updated);
     }
 
@@ -200,10 +200,8 @@ export async function PUT(
           { status: 409 }
         );
       }
-      const updated = await prisma.quoteThread.update({
-        where: { id },
-        data: { status: allowed.thread.quotedPrice ? "quoted" : "open" },
-      });
+      const updated = await updateQuoteState(id, allowed.thread.updatedAt, { status: allowed.thread.quotedPrice ? "quoted" : "open" });
+      if (!updated) return NextResponse.json({ error: "This quote changed. Refresh before trying again." }, { status: 409 });
       return NextResponse.json(updated);
     }
 
@@ -224,15 +222,13 @@ export async function PUT(
       );
     }
 
-    const updated = await prisma.quoteThread.update({
-      where: { id },
-      data: {
+    const updated = await updateQuoteState(id, allowed.thread.updatedAt, {
         status: "quoted",
         quotedPrice,
         quoteNotes: String(body.quoteNotes || "").trim() || null,
         acceptedAt: null,
-      },
-    });
+      });
+    if (!updated) return NextResponse.json({ error: "This quote changed. Refresh before trying again." }, { status: 409 });
 
     if (!isRecentlyActive(allowed.thread.lastCustomerSeenAt)) {
       const sms = await getQuoteSmsContact(id);
@@ -262,14 +258,12 @@ export async function PUT(
       return NextResponse.json({ error: "This quote does not have a valid final price." }, { status: 409 });
     }
 
-    const updated = await prisma.quoteThread.update({
-      where: { id },
-      data: {
+    const updated = await updateQuoteState(id, allowed.thread.updatedAt, {
         status: "accepted",
         acceptedAt: new Date(),
         lastCustomerSeenAt: new Date(),
-      },
-    });
+      });
+    if (!updated) return NextResponse.json({ error: "This quote changed. Refresh before trying again." }, { status: 409 });
 
     const details = await prisma.quoteThread.findUnique({
       where: { id },

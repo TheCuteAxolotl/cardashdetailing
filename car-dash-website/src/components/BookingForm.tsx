@@ -104,7 +104,7 @@ const initialState: FormState = {
   preferredDate: "",
   preferredTime: "",
   selectedPackage: "",
-  serviceMethod: "shop",
+  serviceMethod: "mobile",
   vehicleType: "Sedan",
   serviceAddress: "",
   interiorCondition: "Light",
