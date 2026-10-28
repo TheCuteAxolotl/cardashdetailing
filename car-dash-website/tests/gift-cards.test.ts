@@ -38,7 +38,7 @@ async function main() {
   assert.equal(card.balance,4900);
   r=await post({action:'set',requestId:randomUUID(),code:card.code,version:card.version,amount:'200.25',note:'Balance correction test'});assert.equal(r.status,200);card=(await r.json()).card;assert.equal(card.balance,20025);
   const view=await checkBalance(new NextRequest('https://cardashdetailing.com/api/gift-cards',{method:'POST',body:JSON.stringify({code:card.code})}));
-  const exposed=await view.json();assert.deepEqual(Object.keys(exposed).sort(),['balance','lastFour','paused']);assert.equal(exposed.balance,20025);
+  const exposed=await view.json();assert.deepEqual(Object.keys(exposed).sort(),['balance','lastFour','status']);assert.equal(exposed.balance,20025);assert.equal(exposed.status,'active');
   card=changeGiftCard(card,{id:randomUUID(),kind:'pause',amount:'0',note:'Lost card',actor:'test',at:new Date().toISOString()});
   assert.throws(()=>changeGiftCard(card,{id:randomUUID(),kind:'spend',amount:'1',note:'Test',actor:'test',at:new Date().toISOString()}),/Resume/);
   const svg=await (await qr()).text();assert.match(svg,/<svg/);assert.equal(svg,await(await qr()).text());
