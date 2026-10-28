@@ -67,7 +67,7 @@ export function parseBookingPricingConfig(value: string | null | undefined): Boo
   try {
     const parsed = JSON.parse(value || "") as Partial<BookingPricingConfig>;
     if (!parsed || !Array.isArray(parsed.addOns)) return DEFAULT_BOOKING_PRICING;
-    const addOns = parsed.addOns
+    const addOns: BookingAddOn[] = parsed.addOns
       .map((item, index) => ({
         id: String(item?.id || `addon-${index + 1}`).trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-") || `addon-${index + 1}`,
         name: String(item?.name || "Add-On").trim().slice(0, 80),
