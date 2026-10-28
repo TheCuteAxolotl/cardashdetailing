@@ -19,7 +19,7 @@ import {
 import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import type { SiteContent } from "@/lib/site-defaults";
 import BookingDatePicker from "@/components/BookingDatePicker";
-import { durationForBooking } from "@/lib/booking-duration";
+import { recommendedServiceMinutes, totalBookingMinutes } from "@/lib/booking-duration";
 
 
  type PricingKind = "packages" | "exterior" | "interior";
@@ -222,7 +222,13 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   const discountedAddOns=selectedAddOns.map(item=>({...item, salePrice:promotionalPrice(item.price,matchingPromotion(promotions,"addon",item.id,"addon"))}));
   const saleAddOnTotal=discountedAddOns.reduce((sum,item)=>sum+item.salePrice,0);
   const subtotal = baseTotal == null ? null : Math.max(0, (saleBase ?? baseTotal) + saleAddOnTotal);
-  const estimatedDuration = durationForBooking(packageSelection?.packageName || quote?.subject || selectedService?.title || (isStandaloneHeadlight ? "Headlight Restoration" : "Detail"), selectedAddOns.map(a=>a.name));
+  const durationTarget = packageSelection
+    ? `package:${packageSelection.pricingPage}:${packageSelection.packageId}:${packageSelection.vehicleClass}`
+    : isStandaloneHeadlight ? `service:${STANDALONE_HEADLIGHT_SERVICE_ID}` : selectedService ? `service:${selectedService.id}` : null;
+  const durationServiceName = packageSelection?.packageName || quote?.subject || selectedService?.title || (isStandaloneHeadlight ? "Headlight Restoration" : "Detail");
+  const baseMinutes = durationTarget ? bookingPricing.serviceDurations[durationTarget] ?? recommendedServiceMinutes(durationTarget, durationServiceName) : recommendedServiceMinutes(null, durationServiceName);
+  const estimatedDuration = totalBookingMinutes(durationServiceName, selectedAddOns, baseMinutes);
+  const needsOdorQuote = selectedAddOns.some((item) => item.quoteRequired);
   const hasAutomaticSale = (saleBase != null && baseTotal != null && saleBase < baseTotal) || saleAddOnTotal < addOnTotal;
   const discountAmount = subtotal == null || hasAutomaticSale ? 0 : calculateDiscount(subtotal, appliedDiscount, baseTotal ?? subtotal);
   const bookingTotal = subtotal == null ? null : Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
@@ -443,7 +449,10 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
   };
 
   const toggleAddOn = (id: string) => {
-    set("addOns", form.addOns.includes(id) ? form.addOns.filter((value) => value !== id) : [...form.addOns, id]);
+    const current = form.addOns;
+    if (current.includes(id)) { set("addOns", current.filter((value) => value !== id)); return; }
+    const odorIds = ["odor-treatment", "odor-smoke", "odor-severe"];
+    set("addOns", odorIds.includes(id) ? [...current.filter((value) => !odorIds.includes(value)), id] : [...current, id]);
   };
 
   const chooseBookingPhotos = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -498,6 +507,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
     event.preventDefault();
     setStatus("submitting");
     setMessage("");
+    if (needsOdorQuote) { setStatus("error"); setMessage("Severe odor restoration needs a custom inspection and quote before booking."); return; }
     if (!form.preferredDate || !form.preferredTime) {
       setStatus("error");
       setMessage("Choose an available date and time before submitting.");
@@ -611,7 +621,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
             {allowCarAddOns && (
               <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
-                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} />{item.name}</span><strong className="text-white">+${item.price.toFixed(0)}</strong></label>)}</div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} /><span>{item.name}{item.quoteRequired ? <span className="mt-1 block text-[10px] text-amber-200">Inspection and custom quote required</span> : null}{item.durationMinutes ? <span className="mt-0.5 block text-[10px] text-white/30">Approx. {item.durationMinutes} min</span> : null}</span></span><strong className="text-white">+${item.price.toFixed(0)}{item.quoteRequired ? "+" : ""}</strong></label>)}</div>
               </details>
             )}
 
@@ -656,13 +666,14 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
       <section className="space-y-3 border-t border-white/8 pt-6">
         <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request at the total shown, and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a>.</span></label>
 
+        {needsOdorQuote && <div className="rounded-xl border border-amber-300/25 bg-amber-400/10 p-4 text-sm text-amber-100">Severe odor restoration starts at $199 and requires an inspection and custom price before scheduling. <a href="/quote" className="font-semibold underline">Request a quote</a>.</div>}
         <div className="booking-option-panel border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
       </section>
 
       {status !== "idle" && <div className={`rounded-2xl border p-4 text-sm ${status === "success" ? "border-green-800 bg-green-950/30 text-green-200" : "border-red-800 bg-red-950/30 text-red-200"}`}><p>{message}</p>{status === "success" && chatUrl && <a href={chatUrl} className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black">Open booking chat</a>}</div>}
 
       <div className="flex flex-wrap gap-3">
-        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage)} className="min-w-[180px] rounded-full bg-[#6EAEC6] px-6 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Book for $${bookingTotal.toFixed(2)}` : "Choose a service"}</button>
+        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage) || needsOdorQuote} className="min-w-[180px] rounded-full bg-[#6EAEC6] px-6 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Book for $${bookingTotal.toFixed(2)}` : "Choose a service"}</button>
         {onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-6 py-3.5">Close</button>}
       </div>
     </form>
