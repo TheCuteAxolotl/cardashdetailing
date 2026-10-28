@@ -40,7 +40,7 @@ export default function GiftCardsPage() {
   useEffect(() => {
     // Returning Stripe customers should land on their purchase confirmation.
     if (new URLSearchParams(window.location.search).has("purchase")) {
-      document.getElementById("buy-gift-card")?.scrollIntoView({ behavior: "instant", block: "start" });
+      document.getElementById("buy-gift-card")?.scrollIntoView({ behavior: "auto", block: "start" });
     }
   }, []);
 
