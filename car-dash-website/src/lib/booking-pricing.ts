@@ -3,10 +3,14 @@ export type BookingAddOn = {
   name: string;
   price: number;
   active: boolean;
+  durationMinutes?: number;
+  quoteRequired?: boolean;
 };
 
 export type BookingPricingConfig = {
   headlightStandalonePrice: number;
+  headlightStandaloneDuration: number;
+  serviceDurations: Record<string, number>;
   addOns: BookingAddOn[];
 };
 
@@ -30,13 +34,17 @@ export const DISCOUNT_CODES_KEY = "discountCodesConfig";
 
 export const DEFAULT_BOOKING_PRICING: BookingPricingConfig = {
   headlightStandalonePrice: 99,
+  headlightStandaloneDuration: 90,
+  serviceDurations: {},
   addOns: [
     { id: "pet-hair", name: "Pet Hair Removal", price: 39, active: true },
     { id: "seat-shampoo", name: "Seat Shampoo", price: 49, active: true },
     { id: "carpet-extraction", name: "Carpet Extraction", price: 59, active: true },
     { id: "heavy-stains", name: "Heavy Stain Removal", price: 69, active: true },
     { id: "leather-protection", name: "Leather Protection", price: 39, active: true },
-    { id: "odor-treatment", name: "Odor Treatment", price: 49, active: true },
+    { id: "odor-treatment", name: "General Odor Treatment", price: 89, durationMinutes: 90, active: true },
+    { id: "odor-smoke", name: "Smoke Odor Treatment", price: 149, durationMinutes: 150, active: true },
+    { id: "odor-severe", name: "Severe Odor Restoration (from $199)", price: 199, durationMinutes: 240, quoteRequired: true, active: true },
     { id: "engine-bay", name: "Engine Bay Cleaning", price: 49, active: true },
     { id: "iron-decon", name: "Iron Decontamination", price: 45, active: true },
     { id: "clay-bar", name: "Clay Bar Treatment", price: 59, active: true },
@@ -65,11 +73,35 @@ export function parseBookingPricingConfig(value: string | null | undefined): Boo
         name: String(item?.name || "Add-On").trim().slice(0, 80),
         price: safeNumber(item?.price, 0),
         active: item?.active !== false,
+        durationMinutes: Number.isFinite(Number(item?.durationMinutes)) && Number(item?.durationMinutes) >= 15 && Number(item?.durationMinutes) <= 960
+          ? Math.ceil(Number(item.durationMinutes) / 15) * 15 : undefined,
+        quoteRequired: item?.quoteRequired === true,
       }))
       .filter((item) => item.name && item.price >= 0);
-
+    // Upgrade the legacy $49 odor entry without removing other owner edits.
+    const legacy = addOns.find((item) => item.id === "odor-treatment");
+    if (legacy && legacy.name === "Odor Treatment" && legacy.price === 49) {
+      legacy.name = "General Odor Treatment";
+      legacy.price = 89;
+    }
+    const defaults = DEFAULT_BOOKING_PRICING.addOns.filter((item) => ["odor-treatment", "odor-smoke", "odor-severe"].includes(item.id));
+    for (const item of defaults) {
+      if (!addOns.some((existing) => existing.id === item.id)) addOns.push({ ...item });
+    }
+    // Severe restorations are assessed and quoted individually, not fixed-price booked.
+    const severe = addOns.find((item) => item.id === "odor-severe");
+    if (severe) severe.quoteRequired = true;
+    const rawDurations = parsed.serviceDurations && typeof parsed.serviceDurations === "object" ? parsed.serviceDurations : {};
+    const serviceDurations = Object.fromEntries(
+      Object.entries(rawDurations).filter(([key, value]) => key.length <= 180 && Number.isFinite(Number(value)) && Number(value) >= 15 && Number(value) <= 960)
+        .map(([key, value]) => [key, Math.ceil(Number(value) / 15) * 15])
+    );
     return {
       headlightStandalonePrice: safeNumber(parsed.headlightStandalonePrice, DEFAULT_BOOKING_PRICING.headlightStandalonePrice),
+      headlightStandaloneDuration: Number.isFinite(Number(parsed.headlightStandaloneDuration)) && Number(parsed.headlightStandaloneDuration) >= 15
+        ? Math.min(960, Math.ceil(Number(parsed.headlightStandaloneDuration) / 15) * 15)
+        : DEFAULT_BOOKING_PRICING.headlightStandaloneDuration,
+      serviceDurations,
       addOns,
     };
   } catch {
