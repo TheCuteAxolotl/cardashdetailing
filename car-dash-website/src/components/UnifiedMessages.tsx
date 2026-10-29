@@ -2,6 +2,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SendPhotos from "@/components/SendPhotos";
 import SmsAttachments from "@/components/SmsAttachments";
+import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 import DeleteMessageButton from "@/components/DeleteMessageButton";
 import MessageBookingForm from "@/components/MessageBookingForm";
 import { DELETED_MESSAGE } from "@/lib/deleted-message";
@@ -84,10 +85,10 @@ function ConversationView({ conversation, owner, canBook, role, onChanged, onBac
         if (message.sender === "system") return <p key={message.id} className="text-center text-xs text-white/50">{message.body}</p>;
         const deleted = message.body === DELETED_MESSAGE;
         let photos: string[] = [];
-        try { photos = JSON.parse(message.attachmentsJson || "[]"); } catch { /* Old malformed attachments should not hide the chat. */ }
+        try { const stored = JSON.parse(message.attachmentsJson || "[]"); photos = Array.isArray(stored) ? stored.filter((value): value is string => typeof value === "string") : []; } catch { /* Old malformed attachments should not hide the chat. */ }
         return <article key={message.id} className={`max-w-[95%] break-words rounded-2xl p-4 sm:max-w-[85%] ${message.sender === "team" ? "ml-auto border border-[#d6b779]/50 bg-[#29251d]" : "border border-white/10 bg-[#242424]"}`}>
           <p className={`whitespace-pre-wrap text-sm leading-6 ${deleted ? "italic text-white/50" : ""}`}>{message.body}</p>
-          {!deleted && <><SmsAttachments sid={message.externalSid} body={message.body} /><div className="flex flex-wrap gap-2">{photos.map((src, index) => <a key={index} href={src} target="_blank" rel="noreferrer"><img src={src} alt="Message photo" loading="lazy" className="mt-2 max-h-72 max-w-full rounded-lg" /></a>)}</div></>}
+          {!deleted && <><SmsAttachments sid={message.externalSid} body={message.body} /><MessagePhotoGallery photos={photos} className="mt-3 flex flex-wrap gap-2" thumbnailClassName="max-h-72 max-w-full rounded-lg object-contain" altPrefix="Customer vehicle photo" /></>}
           <p className="mt-2 text-xs text-white/50">{message.sender === "team" ? "Car Dash" : conversation.name} · {new Date(message.createdAt).toLocaleString()}{message.context && kind === "sms" ? ` · ${message.context}` : ""}</p>
           {owner && !deleted && <DeleteMessageButton kind={message.source || kind} id={message.originalId || message.id} onDeleted={refresh} />}
         </article>;
