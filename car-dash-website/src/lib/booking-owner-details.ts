@@ -3,10 +3,10 @@ import { stripBookingPhotos, extractBookingPhotos, embedBookingPhotos } from "@/
 const START = "[[CAR_DASH_OWNER_NOTES]]";
 const END = "[[/CAR_DASH_OWNER_NOTES]]";
 const ADDRESS_LINE = /^Service address:[ \t]*([^\r\n]*)/gim;
-const LEGACY_OWNER_LINE = /^Owner (?:scheduling )?notes:\s*([^\r\n]*)\r?\n?/gim;
+const LEGACY_OWNER_LINE = /^Owner (?:scheduling )?notes:[ \t]*([^\r\n]*)\r?\n?/gim;
 
 export function bookingServiceAddress(notes: string | null | undefined): string {
-  const source = stripBookingPhotos(notes);
+  const source = stripBookingPhotos(notes).replace(/\[\[CAR_DASH_OWNER_NOTES\]\][\s\S]*?\[\[\/CAR_DASH_OWNER_NOTES\]\]/g, "");
   const matches = [...source.matchAll(ADDRESS_LINE)];
   const current = matches.length ? matches[matches.length - 1][1].trim() : "";
   return /^(not specified|none|n\/a)$/i.test(current) ? "" : current;
