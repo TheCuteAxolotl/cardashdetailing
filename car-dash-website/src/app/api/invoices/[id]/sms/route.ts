@@ -1,6 +1,7 @@
+import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { NextResponse } from "next/server";
 import { calculateInvoiceTotals, getInvoice, requireOwner, saveInvoice } from "@/lib/invoices";
-import { getPublicSiteUrl, sendTransactionalSms } from "@/lib/twilio-sms";
+import { getPublicSiteUrl } from "@/lib/twilio-sms";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,7 +29,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const defaultMessage = `Hi ${invoice.customerName}, here is your Car Dash Detailing invoice ${invoice.invoiceNumber}. Balance due: ${formatCurrency(totals.balance)}. View it here: ${link}`;
     const message = String(body?.message || defaultMessage).trim().slice(0, 1200);
 
-    const result = await sendTransactionalSms({ to: invoice.customerPhone, body: message });
+    const result = await sendCustomerSmsWithHistory({ to: invoice.customerPhone, body: message });
     if (!result.sent) {
       return NextResponse.json({ error: `SMS could not be sent (${result.reason})` }, { status: 502 });
     }
