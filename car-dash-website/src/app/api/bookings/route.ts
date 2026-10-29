@@ -25,6 +25,7 @@ import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 import { createBookingWithSlotProtection, BookingSlotConflictError, BookingSlotUnavailableError } from "@/lib/booking-slot";
 import { isDateString, normalizeBookingTime } from "@/lib/booking-availability";
 import { embedBookingPhotos } from "@/lib/booking-photos";
+import { customerVisibleBookingNotes } from "@/lib/booking-owner-details";
 
 function required(form: FormData, key: string) {
   const value = String(form.get(key) ?? "").trim();
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       include: { user: { select: { name: true, email: true } } },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(bookings);
+    return NextResponse.json(staff ? bookings : bookings.map(booking => ({ ...booking, notes: customerVisibleBookingNotes(booking.notes) })));
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
