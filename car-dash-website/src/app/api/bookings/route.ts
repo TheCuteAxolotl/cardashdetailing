@@ -1,7 +1,8 @@
+import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { discordIpLine } from "@/lib/discord-ip";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
+import { normalizePhoneNumber } from "@/lib/twilio-sms";
 import { getAuthFromRequest } from "@/lib/auth";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { getClientIp, hashVisitor } from "@/lib/support-security";
@@ -361,7 +362,7 @@ export async function POST(request: NextRequest) {
 
     if (smsConsent) {
       const requested = [preferredDate, preferredTime].filter(Boolean).join(" at ");
-      await sendTransactionalSms({
+      await sendCustomerSmsWithHistory({
         to: phone,
         body: `Car Dash Detailing: We received your booking request for ${serviceName} ($${bookingTotal.toFixed(2)})${requested ? `, requested for ${requested}` : ""}. We will notify you when it is confirmed. Reply to this text with questions or use your booking chat: ${bookingChatUrl}`,
       });
