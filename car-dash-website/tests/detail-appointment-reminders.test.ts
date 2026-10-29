@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   appointmentReminderBody,
+  appointmentReminderKey,
   isDueForReminder,
   localBookingDateTime,
   reminderDateCandidates,
@@ -40,6 +41,16 @@ assert.match(reminder, /Time: 11:00 AM \(CT\)/);
 assert.match(reminder, /Location: 120 Main St, South Elgin, IL/);
 assert.doesNotMatch(reminder, /Private owner note|CAR_DASH_OWNER_NOTES/);
 assert.doesNotMatch(appointmentReminderBody({ ...booking, notes: "SMS consent: Yes" }), /Location:/);
+
+const onDemandText = appointmentReminderBody(booking, "America/Chicago", "manual");
+assert.match(onDemandText, /reminder of your upcoming Car Dash Detailing appointment/);
+assert.doesNotMatch(onDemandText, /2 hours/);
+assert.match(onDemandText, /Location: 120 Main St, South Elgin, IL/);
+assert.doesNotMatch(onDemandText, /Private owner note|CAR_DASH_OWNER_NOTES/);
+assert.equal(appointmentReminderKey(booking), "detail-reminder:2h:booking-1:2026-10-29:11:00");
+assert.equal(appointmentReminderKey({ ...booking, preferredTime: "11:00 AM" }), appointmentReminderKey(booking));
+assert.equal(appointmentReminderKey({ ...booking, preferredTime: null }), null);
+assert.notEqual(appointmentReminderKey({ ...booking, preferredTime: "11:30" }), appointmentReminderKey(booking));
 
 // Cron candidates must include both dates when the reminder window crosses midnight.
 const closeToMidnight = new Date("2026-10-30T03:05:00Z"); // 10:05 PM CDT
