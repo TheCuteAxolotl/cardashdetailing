@@ -15,7 +15,7 @@ export type EditableBooking = {
   vehicleModel: string;
   vehicleTrim: string | null;
   preferredDate: string | null;
-  preferredTime: string | null;
+  preferredTime?: string | null;
   quotedPrice: number | null;
   notes: string | null;
   updatedAt?: string | Date;
