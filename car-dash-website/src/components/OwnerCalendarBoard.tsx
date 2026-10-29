@@ -98,7 +98,7 @@ export default function OwnerCalendarBoard({
   return (
     <>
       <div className="calendar-board-scroll overflow-x-auto overscroll-x-contain rounded-b-[20px]" aria-label={view === "month" ? "Month calendar. Scroll sideways on small screens to see all seven days." : "Weekly calendar"}>
-        <div className={view === "month" ? "min-w-[850px] xl:min-w-0" : "min-w-0"}>
+        <div className={"min-w-[850px] xl:min-w-0"}>
           <div className="grid grid-cols-7 border-b border-white/10 bg-[#202020]">
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
               <div key={day} className={"py-3.5 text-center text-[11px] font-semibold uppercase tracking-[.13em] " + (i >= 5 ? "text-[#99958d]" : "text-[#d2cbc0]")}>
