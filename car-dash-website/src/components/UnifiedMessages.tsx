@@ -135,7 +135,7 @@ export default function UnifiedMessages({ role }: { role: "owner" | "admin" }) {
     const params = new URLSearchParams(window.location.search);
     const requestedPhone = params.get("phone");
     if (!requestedPhone) return;
-    const digits = requestedPhone.replace(/\\D/g, "");
+    const digits = requestedPhone.replace(/\D/g, "");
     const normalized = digits.length === 10 ? `+1${digits}`
       : digits.length === 11 && digits.startsWith("1") ? `+${digits}`
       : requestedPhone.startsWith("+") && digits.length >= 8 && digits.length <= 15 ? `+${digits}` : "";
@@ -195,7 +195,7 @@ export default function UnifiedMessages({ role }: { role: "owner" | "admin" }) {
       <header className={`shrink-0 flex-wrap items-center justify-between gap-3 ${selected ? "hidden lg:flex" : "flex"}`}><div><h1 className="text-2xl font-semibold">Messages</h1><p className="mt-1 hidden text-sm text-white/60 sm:block">One saved conversation per phone, including booking chats, quote chats and direct texts.</p></div>{inbox?.canSms && <div className="flex gap-2"><button className={button} onClick={() => setNewText(!newText)}>New text</button><button className={button} disabled={syncing} onClick={() => void sync()}>{syncing ? "Syncing…" : "Sync replies"}</button></div>}</header>
       {notice && <p role="status" className="mt-3 text-sm">{notice}</p>}
       {error && <p role="alert" className="mt-3 text-red-200">{error}</p>}
-      {newText && <form className="mt-5 flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); const digits = phone.replace(/\D/g, ""); const normalized = digits.length === 10 ? `+1${digits}` : `+${digits}`; if (digits.length < 10 || digits.length > 15) { setError("Enter a valid phone number."); return; } setSelected({ kind: "sms", id: normalized, phone: normalized, name: normalized, subject: "Direct text", status: "", body: "", updatedAt: new Date().toISOString() }); setNewText(false); }}><label className="flex-1">Phone number<input type="tel" required className={`${field} mt-2`} value={phone} onChange={event => setPhone(event.target.value)} /></label><button className={`${button} self-end`}>Open conversation</button></form>}
+      {newText && <form className="mt-5 flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); const digits = phone.replace(/\D/g, ""); const normalized = digits.length === 10 ? `+1${digits}` : `+${digits}`; if (digits.length < 10 || digits.length > 15) { setError("Enter a valid phone number."); return; } setSelected(inbox?.conversations.find(row => row.kind === "sms" && row.phone === normalized) || { kind: "sms", id: normalized, phone: normalized, name: normalized, subject: "Customer conversation", status: "", body: "", updatedAt: new Date().toISOString() }); setNewText(false); }}><label className="flex-1">Phone number<input type="tel" required className={`${field} mt-2`} value={phone} onChange={event => setPhone(event.target.value)} /></label><button className={`${button} self-end`}>Open conversation</button></form>}
       <div className="mt-3 grid min-h-0 flex-1 gap-4 lg:grid-cols-[300px_1fr]">
         <aside className={`min-h-0 min-w-0 flex-col ${selected ? "hidden lg:flex" : "flex"}`}><label className="block shrink-0 pb-3 text-sm">Search conversations<input type="search" className={`${field} mt-2`} value={query} onChange={event => { setQuery(event.target.value); setLimit(50); }} placeholder="Name, phone, quote, or message" /></label>
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pr-1" aria-label="Conversations">
