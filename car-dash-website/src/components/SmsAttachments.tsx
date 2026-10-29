@@ -1,6 +1,7 @@
 "use client";
 
 import { DELETED_MESSAGE } from "@/lib/deleted-message";
+import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 import { useEffect, useRef, useState } from "react";
 
 type Attachment = { sid: string; contentType: string; url: string };
@@ -32,17 +33,13 @@ export default function SmsAttachments({ sid, body = "" }: { sid?: string | null
   }, [sid, visible, attempt, body]);
   if (!sid || body === DELETED_MESSAGE) return null;
   const expected = /\{image\}|MMS attachment|\[image\]/i.test(body);
+  const photoUrls = media.filter(item => /^image\/(jpeg|png|gif|webp|avif)$/i.test(item.contentType)).map(item => item.url);
+  const otherMedia = media.filter(item => !/^image\/(jpeg|png|gif|webp|avif)$/i.test(item.contentType));
   return <div ref={container}>
     {status === "loading" && expected && <p className="mt-2 text-xs opacity-70">Loading attachments…</p>}
     {status === "error" && <button type="button" onClick={() => setAttempt(value => value + 1)} className="mt-2 text-xs underline">Could not check attachments. Retry</button>}
     {status === "ready" && expected && !media.length && <p className="mt-2 text-xs opacity-70">Photo unavailable. Ask the customer to resend it.</p>}
-    {media.length > 0 && <div className="mt-3 grid gap-3">
-      {media.map(item => <div key={item.sid}>
-        {/^image\/(jpeg|png|gif|webp|avif)$/i.test(item.contentType) && <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label="Open full-size customer photo">
-          <img src={item.url} alt="Photo sent by text message" loading="lazy" className="max-h-72 max-w-full rounded-xl object-contain" onError={event => { event.currentTarget.hidden = true; }} />
-        </a>}
-        <a href={item.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs underline">{item.contentType.startsWith("image/") ? "Open full-size photo" : "Open attachment"}</a>
-      </div>)}
-    </div>}
+    <MessagePhotoGallery photos={photoUrls} className="mt-3 flex flex-wrap gap-2" thumbnailClassName="max-h-56 max-w-full rounded-xl object-contain" altPrefix="Customer MMS photo" />
+    {otherMedia.map(item => <a key={item.sid} href={item.url} target="_blank" rel="noopener noreferrer" className="mt-2 block text-sm underline">Open {item.contentType || "SMS attachment"}</a>)}
   </div>;
 }
