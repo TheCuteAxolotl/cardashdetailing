@@ -25,6 +25,10 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
       invoice: {
         ...current,
         shareToken: undefined,
+        // Internal owner-only details must never appear in the public receipt response.
+        internalInspectionNotes: undefined,
+        internalBreakdown: undefined,
+        source: undefined,
         totals: calculateInvoiceTotals(current),
       },
     });
