@@ -2,19 +2,10 @@
 
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
+import type { EditableBooking } from "@/components/BookingDetailsEditor";
+import { bookingServiceAddress } from "@/lib/booking-owner-details";
 
-type CalendarBooking = {
-  id: string;
-  serviceName?: string;
-  customerName?: string;
-  vehicleMake?: string;
-  vehicleModel?: string;
-  vehicleYear?: string;
-  preferredDate?: string | null;
-  preferredTime?: string | null;
-  quotedPrice?: number | null;
-  status?: string;
-};
+type CalendarBooking = EditableBooking;
 
 type CalendarItem =
   | { kind: "booking"; id: string; time: string; booking: CalendarBooking }
@@ -29,6 +20,7 @@ type Props = {
   bookings: CalendarBooking[];
   tasks: OwnerScheduleTask[];
   onSelectDay: (date: string) => void;
+  onEditBooking: (booking: CalendarBooking) => void;
   onAddTask: (date: string) => void;
   onEditTask: (task: OwnerScheduleTask) => void;
   onToggleTask: (task: OwnerScheduleTask) => void;
@@ -76,7 +68,7 @@ const taskColor = (task: OwnerScheduleTask) =>
 
 export default function OwnerCalendarBoard({
   view, cursor, days, today, selectedDay, bookings, tasks,
-  onSelectDay, onAddTask, onEditTask, onToggleTask,
+  onSelectDay, onAddTask, onEditTask, onToggleTask, onEditBooking,
 }: Props) {
   const index = new Map<string, CalendarItem[]>();
   for (const booking of bookings) {
@@ -151,15 +143,16 @@ export default function OwnerCalendarBoard({
                   </div>
                   <div className="space-y-1.5">
                     {visible.map(item => item.kind === "booking" ? (
-                      <a
+                      <button
+                        type="button"
                         key={"booking-" + item.id}
-                        href="/owner/bookings"
+                        onClick={() => onEditBooking(item.booking)}
                         title={prettyTime(item.booking.preferredTime) + " · " + (item.booking.customerName || "Customer") + " · " + (item.booking.serviceName || "Detailing")}
-                        className={"block rounded-md border-l-[3px] px-2 py-2 text-left transition hover:brightness-125 " + bookingColor(item.booking.status)}
+                        className={"block w-full rounded-md border-l-[3px] px-2 py-2 text-left transition hover:brightness-125 " + bookingColor(item.booking.status)}
                       >
                         <span className="block truncate text-[10px] font-bold leading-4">{compactTime(item.booking.preferredTime)}{item.booking.preferredTime ? " · " : ""}{item.booking.customerName || "Customer"}</span>
                         <span className="mt-0.5 block truncate text-[10px] leading-4 opacity-85">{item.booking.serviceName || "Detailing"}</span>
-                      </a>
+                      </button>
                     ) : (
                       <button
                         key={"task-" + item.id}
@@ -205,15 +198,22 @@ export default function OwnerCalendarBoard({
         {chosenItems.length ? (
           <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {chosenItems.map(item => item.kind === "booking" ? (
-              <a key={"day-booking-" + item.id} href="/owner/bookings" className={"min-w-0 rounded-xl border p-3.5 hover:brightness-125 " + bookingColor(item.booking.status)}>
+              <div key={"day-booking-" + item.id} className={"min-w-0 rounded-xl border p-3.5 " + bookingColor(item.booking.status)}>
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold">
                   <span>{prettyTime(item.booking.preferredTime)}</span>
                   <span className="capitalize opacity-75">{item.booking.status || "Booking"}</span>
                 </div>
                 <p className="mt-2 truncate text-sm font-bold">{item.booking.customerName || "Customer"}</p>
                 <p className="mt-1 line-clamp-2 text-xs opacity-80">{item.booking.serviceName || "Detailing"}{item.booking.vehicleMake ? " · " + [item.booking.vehicleYear, item.booking.vehicleMake, item.booking.vehicleModel].filter(Boolean).join(" ") : ""}</p>
-                {Number(item.booking.quotedPrice || 0) > 0 ? <p className="mt-3 text-sm font-semibold">{money(Number(item.booking.quotedPrice))}</p> : null}
-              </a>
+                {bookingServiceAddress(item.booking.notes)
+                  ? <p className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
+                      <span className="min-w-0 flex-1 break-words">📍 {bookingServiceAddress(item.booking.notes)}</span>
+                      <a href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(bookingServiceAddress(item.booking.notes))} target="_blank" rel="noopener noreferrer" className="shrink-0 underline">Maps</a>
+                    </p>
+                  : <p className="mt-3 text-xs font-bold text-amber-200">⚠ Service address missing</p>}
+                {Number(item.booking.quotedPrice || 0) > 0 ? <p className="mt-2 text-sm font-semibold">{money(Number(item.booking.quotedPrice))}</p> : null}
+                <button type="button" onClick={() => onEditBooking(item.booking)} className="mt-3 w-full rounded-lg border border-current/30 px-3 py-2 text-xs font-bold hover:brightness-125">Edit booking / address</button>
+              </div>
             ) : (
               <div key={"day-task-" + item.id} className={"min-w-0 rounded-xl border p-3.5 " + taskColor(item.task)}>
                 <div className="flex items-center justify-between gap-3">
