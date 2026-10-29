@@ -234,7 +234,7 @@ export default function OwnerInvoicesPage() {
       const response = await fetch(`/api/invoices/${current.id}/sms`, { method: "POST" });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Could not send SMS");
-      setMessage(`Invoice sent to ${current.customerPhone}.`);
+      setMessage(data.receipt ? `PAID receipt sent to ${current.customerPhone}.` : `Invoice sent to ${current.customerPhone}.`);
       await loadInvoices();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not send SMS");
@@ -369,7 +369,7 @@ export default function OwnerInvoicesPage() {
 
             <div className="mt-7 flex flex-wrap gap-3">
               <button disabled={saving} onClick={() => saveInvoice()} className="rounded-xl bg-[#6EAEC6] px-5 py-3 text-sm font-bold text-[#07131B] disabled:opacity-50">{saving ? "Saving…" : form.id ? "Save changes" : "Create invoice"}</button>
-              <button disabled={saving || !form.id} onClick={() => sendSms()} className="rounded-xl border border-[#6EAEC6]/30 px-5 py-3 text-sm font-semibold text-[#B9E0EC] disabled:opacity-35">Send via SMS</button>
+              <button disabled={saving || !form.id} onClick={() => sendSms()} className="rounded-xl border border-[#6EAEC6]/30 px-5 py-3 text-sm font-semibold text-[#B9E0EC] disabled:opacity-35">{form.status === "paid" && totals.total > 0 && totals.balance <= 0 ? "Text PAID receipt" : "Send invoice via SMS"}</button>
               <button disabled={!form.id} onClick={() => copyLink()} className="rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/75 disabled:opacity-35">Copy link</button>
               {form.shareToken && <a href={`/invoice/${form.shareToken}`} target="_blank" rel="noreferrer" className="rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-white/75">Preview</a>}
             </div>
