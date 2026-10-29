@@ -1,3 +1,4 @@
+import { syncCustomerOutboundHistory } from "@/lib/customer-sms-history";
 import { NextRequest, NextResponse } from "next/server";
 import { syncRecentInboundSmsFromTwilio } from "@/lib/inbound-sms";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
@@ -19,7 +20,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true, ...result, syncedAt: new Date().toISOString() });
+    // Recover previously sent automated/manual texts as well as inbound replies.
+    // A failure to backfill outgoing history must not prevent inbound syncing.
+    let outgoing;
+    let outgoingWarning: string | undefined;
+    try {
+      outgoing = await syncCustomerOutboundHistory();
+    } catch (error) {
+      outgoingWarning = error instanceof Error ? error.message : "Outbound history sync unavailable.";
+    }
+    return NextResponse.json({ success: true, ...result, outgoing, outgoingWarning, syncedAt: new Date().toISOString() });
   } catch (error) {
     console.error("SMS history sync failed:", error);
     return NextResponse.json({ error: "Could not sync Twilio replies." }, { status: 500 });
