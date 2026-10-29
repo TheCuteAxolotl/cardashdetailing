@@ -6,6 +6,7 @@ import {
 } from "@/lib/booking-slot";
 import { formatBookingTime, isDateString, normalizeBookingTime } from "@/lib/booking-availability";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import { replaceBookingOwnerDetails } from "@/lib/booking-owner-details";
 
 function clean(value: unknown, max = 300) {
   return String(value || "").trim().slice(0, max);
@@ -37,12 +38,12 @@ export async function POST(request: NextRequest) {
       ? Math.max(0, Math.round(quotedPriceRaw * 100) / 100)
       : null;
     const ownerNotes = clean(body.notes, 2000);
-    const notes = [
+    const baseNotes = [
       "Booking source: Added manually from the Car Dash dashboard",
       `Scheduled: ${preferredDate} at ${formatBookingTime(normalizedTime)}`,
       "SMS consent: No consent recorded from website booking flow",
-      ownerNotes ? `Owner notes: ${ownerNotes}` : null,
     ].filter(Boolean).join("\n");
+    const notes = replaceBookingOwnerDetails(baseNotes, clean(body.serviceAddress, 500), ownerNotes);
 
     const booking = await createBookingWithSlotProtection({
       userId: null,
