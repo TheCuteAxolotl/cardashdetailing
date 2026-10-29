@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
   // records stay intact and new bookings cannot fragment the customer timeline.
   const [bookingContacts, quoteContacts, direct] = await Promise.all([
     canBook ? prisma.booking.findMany({
-      select: { id: true, customerPhone: true, serviceName: true, status: true },
+      select: { id: true, userId: true, customerEmail: true, customerPhone: true, serviceName: true, status: true },
     }) : [],
     canQuote ? prisma.quoteThread.findMany({
-      select: { id: true, guestPhone: true, subject: true, status: true },
+      select: { id: true, userId: true, guestEmail: true, guestPhone: true, subject: true, status: true },
     }) : [],
     prisma.unmatchedSmsMessage.findMany({
       where: { OR: [
@@ -36,7 +36,13 @@ export async function GET(request: NextRequest) {
   ]);
 
   const matches = bookingContacts.filter(row => normalizePhoneNumber(row.customerPhone) === phone);
-  const quotes = quoteContacts.filter(row => normalizePhoneNumber(row.guestPhone) === phone);
+  const accountIds = new Set(matches.map(row => row.userId).filter(Boolean));
+  const emails = new Set(matches.map(row => row.customerEmail?.trim().toLowerCase()).filter(Boolean));
+  const quotes = quoteContacts.filter(row =>
+    normalizePhoneNumber(row.guestPhone) === phone ||
+    (row.userId && accountIds.has(row.userId)) ||
+    (row.guestEmail && emails.has(row.guestEmail.trim().toLowerCase()))
+  );
   const [bookingConversations, quoteMessages] = await Promise.all([
     matches.length
       ? prisma.bookingConversation.findMany({
