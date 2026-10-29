@@ -7,6 +7,7 @@ assert.match(text,/DURATION:PT240M/);
 assert.equal((text.match(/\r\nBEGIN:VEVENT/g)||[]).length,1);
 assert.match(text,/Daniel\\, Test\\nBEGIN:VEVENT/);
 assert.match(bookingCalendar([{...row,status:'cancelled'}]),/STATUS:CANCELLED/);
+assert.match(bookingCalendar([{...row,notes:"Service address: 123 Main St, South Elgin, IL"}]),/LOCATION:123 Main St\\, South Elgin\\, IL/);
 assert.equal(bookingCalendar([{...row,preferredTime:null}]).includes('BEGIN:VEVENT'),false);
 assert.ok(foldIcs('é'.repeat(150)).split('\r\n').every(s=>Buffer.byteLength(s)<=75));
 console.log('Calendar: timezone, duration, escaping, cancellation, missing times and UTF-8 folding passed.');
