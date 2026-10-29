@@ -16,7 +16,7 @@ import {
   updateBookingDetailsWithSlotProtection,
 } from "@/lib/booking-slot";
 import { formatBookingTime, isDateString, normalizeBookingTime } from "@/lib/booking-availability";
-import { replaceBookingOwnerDetails } from "@/lib/booking-owner-details";
+import { replaceBookingOwnerDetails, bookingServiceAddress, bookingOwnerNotes } from "@/lib/booking-owner-details";
 
 
 function statusSms(booking: {
@@ -85,7 +85,7 @@ export async function PUT(
       if (!customerName || !serviceName) {
         return NextResponse.json({ error: "Customer name and service are required." }, { status: 400 });
       }
-      if (customerEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(customerEmail)) {
+      if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
         return NextResponse.json({ error: "Enter a valid email address or leave it blank." }, { status: 400 });
       }
       const price = body.quotedPrice === undefined ? existing.quotedPrice :
@@ -143,7 +143,12 @@ export async function PUT(
       // Preserve original consent, evidence and duration metadata.
       const notes=existing.notes||"";
       const extra=String(body.notes||"").trim().slice(0,2000);
-      const booking=await confirmBookingWithDetails(existing.id,{...details,quotedPrice:price,notes:extra&&extra!==notes?notes+"\nOwner scheduling notes: "+extra:notes},date,time);
+      const updatedNotes = replaceBookingOwnerDetails(
+        extra && extra !== notes ? notes + "\\nOwner scheduling notes: " + extra : notes,
+        body.serviceAddress !== undefined ? String(body.serviceAddress || "").trim().slice(0, 500) : bookingServiceAddress(notes),
+        body.notes !== undefined ? extra : bookingOwnerNotes(notes)
+      );
+      const booking=await confirmBookingWithDetails(existing.id,{...details,quotedPrice:price,notes:updatedNotes},date,time);
       return NextResponse.json(booking);
     }
 
