@@ -77,6 +77,7 @@ type TwilioHistoryMessage = {
   date_sent?: string | null;
   date_created?: string | null;
   num_media?: string | null;
+  status?: string | null;
 };
 
 export async function listRecentInboundSms(input: { since: Date; limit?: number }) {
@@ -142,7 +143,7 @@ export async function listRecentOutboundSms(input: { since: Date; limit?: number
     }
     const rows: TwilioHistoryMessage[] = Array.isArray(payload?.messages) ? payload.messages : [];
     const messages = rows.filter(row =>
-      String(row.direction || "").startsWith("outbound") && row.sid && row.to
+      String(row.direction || "").startsWith("outbound") && row.sid && row.to && ["sent", "delivered", "read"].includes(String(row.status || "").toLowerCase())
     ).map(row => ({
       sid: String(row.sid), to: String(row.to), from: String(row.from || ""),
       body: String(row.body || ""),
