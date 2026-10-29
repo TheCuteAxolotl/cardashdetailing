@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { BOOKING_AVAILABILITY_KEY, parseBookingAvailabilityConfig } from "@/lib/booking-availability";
+import { BOOKING_AVAILABILITY_KEY, normalizeBookingTime, parseBookingAvailabilityConfig } from "@/lib/booking-availability";
 import { bookingHasSmsConsent, ensureBookingConversation } from "@/lib/booking-chat";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
       // Lock each appointment date/time before contacting Twilio. The unique
       // SiteContent key prevents parallel cron runs from texting twice.
-      const key = `detail-reminder:2h:${candidate.id}:${candidate.preferredDate}:${candidate.preferredTime}`;
+      const key = `detail-reminder:2h:${candidate.id}:${candidate.preferredDate}:${normalizeBookingTime(candidate.preferredTime)}`;
       try {
         await prisma.siteContent.create({ data: { key, value: "claimed" } });
       } catch (error) {
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
           !bookingHasSmsConsent(booking.notes) ||
           !normalizePhoneNumber(booking.customerPhone) ||
           booking.preferredDate !== candidate.preferredDate ||
-          booking.preferredTime !== candidate.preferredTime
+          normalizeBookingTime(booking.preferredTime) !== normalizeBookingTime(candidate.preferredTime)
         ) {
           totals.skipped++;
           await prisma.siteContent.delete({ where: { key } });
