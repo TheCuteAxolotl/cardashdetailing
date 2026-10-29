@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { bookingOwnerNotes, bookingServiceAddress, replaceBookingOwnerDetails } from "../src/lib/booking-owner-details";
+import { bookingOwnerNotes, bookingServiceAddress, replaceBookingOwnerDetails, customerVisibleBookingNotes } from "../src/lib/booking-owner-details";
 import { embedBookingPhotos, extractBookingPhotos, stripBookingPhotos } from "../src/lib/booking-photos";
 
 const photo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB";
@@ -25,6 +25,11 @@ assert.equal(bookingOwnerNotes(second), "Call on arrival");
 assert.equal((second.match(/Service address:/g) || []).length, 1);
 assert.equal((second.match(/\[\[CAR_DASH_OWNER_NOTES\]\]/g) || []).length, 1);
 assert.deepEqual(extractBookingPhotos(second), [photo]);
+const publicNotes = customerVisibleBookingNotes(second) || "";
+assert.ok(!publicNotes.includes("Call on arrival"));
+assert.ok(!publicNotes.includes("CAR_DASH_OWNER_NOTES"));
+assert.ok(publicNotes.includes("Customer notes: Focus on the back seats"));
+assert.ok(publicNotes.includes("Service address: 400 New Street, Geneva, IL"));
 assert.equal(bookingServiceAddress("Service address: Not specified"), "");
 assert.equal(bookingServiceAddress("Booking source: call"), "");
 assert.equal(bookingOwnerNotes("Owner notes: Follow up with customer"), "Follow up with customer");
