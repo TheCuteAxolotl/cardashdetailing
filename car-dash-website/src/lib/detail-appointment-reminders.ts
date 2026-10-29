@@ -69,7 +69,18 @@ function inline(value: string) {
   return value.replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export function appointmentReminderBody(booking: ReminderBooking, timezone = DEFAULT_REMINDER_TIMEZONE) {
+/** One shared key for manual and scheduled reminders so they cannot both text the same appointment. */
+export function appointmentReminderKey(booking: Pick<ReminderBooking, "id" | "preferredDate" | "preferredTime">) {
+  const time = normalizeBookingTime(booking.preferredTime);
+  if (!booking.preferredDate || !time) return null;
+  return `detail-reminder:2h:${booking.id}:${booking.preferredDate}:${time}`;
+}
+
+export function appointmentReminderBody(
+  booking: ReminderBooking,
+  timezone = DEFAULT_REMINDER_TIMEZONE,
+  mode: "automatic" | "manual" = "automatic",
+) {
   const firstName = inline(booking.customerName).split(" ")[0] || "there";
   const date = booking.preferredDate || "";
   const displayDate = new Intl.DateTimeFormat("en-US", {
@@ -85,7 +96,9 @@ export function appointmentReminderBody(booking: ReminderBooking, timezone = DEF
   const timezoneLabel = timezone === "America/Chicago" ? "CT" : timezone;
 
   return [
-    `Hi ${firstName}! Your Car Dash Detailing appointment is coming up in about 2 hours.`,
+    mode === "manual"
+      ? `Hi ${firstName}! This is a reminder of your upcoming Car Dash Detailing appointment.`
+      : `Hi ${firstName}! Your Car Dash Detailing appointment is coming up in about 2 hours.`,
     "",
     `Service: ${service}`,
     ...(vehicle ? [`Vehicle: ${vehicle}`] : []),
