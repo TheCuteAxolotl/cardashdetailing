@@ -101,7 +101,7 @@ export async function PUT(
       const nextNotes = replaceBookingOwnerDetails(existing.notes, address, ownerNotes);
       const before = normalizeBookingTime(existing.preferredTime);
       const after = normalizeBookingTime(time);
-      const scheduleChanged = existing.preferredDate !== date || before !== after;
+      const scheduleChanged = (existing.preferredDate || "") !== date || before !== after;
       const booking = await updateBookingDetailsWithSlotProtection(existing.id, {
         customerName, customerEmail, customerPhone,
         serviceName,
