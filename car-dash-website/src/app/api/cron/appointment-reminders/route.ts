@@ -6,6 +6,7 @@ import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
 import {
   appointmentReminderBody,
+  appointmentReminderKey,
   DEFAULT_REMINDER_TIMEZONE,
   isDueForReminder,
   reminderDateCandidates,
@@ -64,7 +65,8 @@ export async function GET(request: NextRequest) {
 
       // Lock each appointment date/time before contacting Twilio. The unique
       // SiteContent key prevents parallel cron runs from texting twice.
-      const key = `detail-reminder:2h:${candidate.id}:${candidate.preferredDate}:${normalizeBookingTime(candidate.preferredTime)}`;
+      const key = appointmentReminderKey(candidate);
+      if (!key) { totals.skipped++; continue; }
       try {
         await prisma.siteContent.create({ data: { key, value: "claimed" } });
       } catch (error) {
