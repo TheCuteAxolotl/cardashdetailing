@@ -295,7 +295,7 @@ export default function StaffAccountsPage() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <a href={`mailto:${selected.email}`} className="rounded-full border border-white/12 px-4 py-2 text-xs font-semibold text-white/65 hover:text-white">Email</a>
-                        {selected.latestBooking && <a href={`/booking-chat/${selected.latestBooking.id}`} className="rounded-full border border-white/12 px-4 py-2 text-xs font-semibold text-white/65 hover:text-white">Message via Car Dash</a>}
+                        {selected.latestBooking && <a href={selected.phone ? `/owner/messages?phone=${encodeURIComponent(selected.phone)}&name=${encodeURIComponent(selected.name || "Customer")}` : `/booking-chat/${selected.latestBooking.id}`} className="rounded-full border border-white/12 px-4 py-2 text-xs font-semibold text-white/65 hover:text-white">Message via Car Dash</a>}
                         {selected.phone && <a href="/owner/calls" className="rounded-full border border-white/12 px-4 py-2 text-xs font-semibold text-white/65 hover:text-white">Business Phone</a>}
                       </div>
                     </div>
