@@ -2,7 +2,7 @@ import { stripBookingPhotos, extractBookingPhotos, embedBookingPhotos } from "@/
 
 const START = "[[CAR_DASH_OWNER_NOTES]]";
 const END = "[[/CAR_DASH_OWNER_NOTES]]";
-const ADDRESS_LINE = /^Service address:\s*([^\r\n]*)/gim;
+const ADDRESS_LINE = /^Service address:[ \t]*([^\r\n]*)/gim;
 const LEGACY_OWNER_LINE = /^Owner (?:scheduling )?notes:\s*([^\r\n]*)\r?\n?/gim;
 
 export function bookingServiceAddress(notes: string | null | undefined): string {
