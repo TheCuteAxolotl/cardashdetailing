@@ -148,7 +148,10 @@ export async function updateBookingDetailsWithSlotProtection(
 ) {
   const cleanDate = String(date || "").trim();
   const normalized = normalizeBookingTime(time);
-  if (!cleanDate || !normalized) throw new BookingSlotUnavailableError("Enter a valid appointment date and time.");
+  if (!cleanDate && !String(time || "").trim()) {
+    return prisma.booking.update({ where: { id: bookingId }, data });
+  }
+  if (!cleanDate || !normalized) throw new BookingSlotUnavailableError("Enter both a valid date and time.");
 
   return prisma.$transaction(async tx => {
     await lockSlot(tx, cleanDate, normalized);
