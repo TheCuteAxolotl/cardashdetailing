@@ -5,6 +5,8 @@ import NumberInput from "@/components/NumberInput";
 import { useEffect, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
+import BookingDetailsEditor from "@/components/BookingDetailsEditor";
+import { bookingServiceAddress } from "@/lib/booking-owner-details";
 
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#6EAEC6]/60";
 
@@ -25,6 +27,7 @@ type Booking = {
   notes: string | null;
   status: string;
   createdAt: string;
+  updatedAt?: string;
 };
 
 type ManualBookingForm = {
@@ -40,6 +43,7 @@ type ManualBookingForm = {
   preferredDate: string;
   preferredTime: string;
   quotedPrice: string;
+  serviceAddress: string;
   notes: string;
 };
 
@@ -56,6 +60,7 @@ const EMPTY_MANUAL: ManualBookingForm = {
   preferredDate: "",
   preferredTime: "",
   quotedPrice: "",
+  serviceAddress: "",
   notes: "",
 };
 
@@ -70,6 +75,7 @@ export default function OwnerBookings() {
   const [showManual, setShowManual] = useState(false);
   const [manual, setManual] = useState<ManualBookingForm>(EMPTY_MANUAL);
   const [manualSaving, setManualSaving] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [scheduleEditingId, setScheduleEditingId] = useState<string | null>(null);
   const [scheduleDraft, setScheduleDraft] = useState({ date: "", time: "" });
   const [scheduleSaving, setScheduleSaving] = useState(false);
@@ -258,6 +264,7 @@ export default function OwnerBookings() {
               <label className="text-sm text-white/55">Vehicle make<input className={`${input} mt-2`} value={manual.vehicleMake} onChange={(e) => setManual((current) => ({ ...current, vehicleMake: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Vehicle model<input className={`${input} mt-2`} value={manual.vehicleModel} onChange={(e) => setManual((current) => ({ ...current, vehicleModel: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Vehicle trim<input className={`${input} mt-2`} value={manual.vehicleTrim} onChange={(e) => setManual((current) => ({ ...current, vehicleTrim: e.target.value }))} /></label>
+              <label className="text-sm font-semibold text-[#d6b779] md:col-span-2">Service address (mobile job location)<input autoComplete="street-address" maxLength={500} placeholder="Street address, city, state, ZIP" className={`${input} mt-2`} value={manual.serviceAddress} onChange={(e) => setManual((current) => ({ ...current, serviceAddress: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Date<input type="date" className={`${input} mt-2`} value={manual.preferredDate} onChange={(e) => setManual((current) => ({ ...current, preferredDate: e.target.value }))} required /></label>
               <label className="text-sm text-white/55">Time<input type="time" className={`${input} mt-2`} value={manual.preferredTime} onChange={(e) => setManual((current) => ({ ...current, preferredTime: e.target.value }))} required /></label>
             </div>
@@ -299,6 +306,7 @@ export default function OwnerBookings() {
                       <p><strong className="text-white">Vehicle:</strong> {booking.vehicleYear} {booking.vehicleMake} {booking.vehicleModel} {booking.vehicleTrim || ""}</p>
                       <p><strong className="text-white">Method:</strong> {booking.serviceMethod}</p>
                       <p><strong className="text-white">Scheduled:</strong> {booking.preferredDate || "Not specified"}{booking.preferredTime ? ` · ${booking.preferredTime}` : ""}</p>
+                      <p className="sm:col-span-2 rounded-xl border border-[#d6b779]/25 bg-[#d6b779]/[.06] p-3"><strong className="text-[#d6b779]">Service address:</strong> {bookingServiceAddress(booking.notes) ? <><span className="ml-2 text-white">{bookingServiceAddress(booking.notes)}</span> <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(bookingServiceAddress(booking.notes))}`} rel="noopener noreferrer" target="_blank" className="ml-2 font-semibold text-[#e5c995] underline">Maps</a></> : <span className="ml-2 text-amber-200">Missing — add before your appointment</span>}</p>
                       <p><strong className="text-white">Booking total:</strong> <span className="font-semibold text-emerald-300">{booking.quotedPrice != null ? `$${booking.quotedPrice.toFixed(2)}` : "Not entered"}</span></p>
                     </div>
 
@@ -320,7 +328,8 @@ export default function OwnerBookings() {
                   </div>
 
                   <div className="flex min-w-48 flex-col gap-2">
-                    <button type="button" onClick={() => startScheduleEdit(booking)} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80">Edit date / time</button>
+                    <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg bg-[#d6b779] px-4 py-3 text-sm font-bold text-[#101010]">Edit booking / address</button>
+                    <button type="button" onClick={() => startScheduleEdit(booking)} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80">Quick edit date / time</button>
                     <a href={`/booking-chat/${booking.id}`} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-center text-sm font-semibold text-[#6EAEC6]">Text / chat customer</a>
 
                     {!canDelete && (
@@ -347,6 +356,7 @@ export default function OwnerBookings() {
           {!visible.length && <p className="rounded-3xl border border-[#27404F] bg-[#0B1822] p-8 text-white/52">No bookings in this view.</p>}
         </div>
       </main>
+      {editingBooking && <BookingDetailsEditor key={editingBooking.id} booking={editingBooking} onClose={() => setEditingBooking(null)} onSaved={async () => { await load(); setMessage("Booking details and address saved."); }} />}
     </div>
   );
 }
