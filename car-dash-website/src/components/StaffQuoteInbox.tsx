@@ -4,6 +4,7 @@ import { DELETED_MESSAGE } from "@/lib/deleted-message";
 import SendPhotos from "@/components/SendPhotos";
 
 import SmsAttachments from "@/components/SmsAttachments";
+import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 
 import NumberInput from "@/components/NumberInput";
 
@@ -248,11 +249,8 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
                           {canDelete && message.body !== DELETED_MESSAGE && <DeleteMessageButton kind="quote" id={message.id} onDeleted={() => void load()} />}
                           {message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                           {message.attachmentsJson && (
-                            <div className="mt-3 grid grid-cols-2 gap-2">
-                              {JSON.parse(message.attachmentsJson).map((src: string, index: number) => (
-                                <img key={index} src={src} alt="Customer upload" className="max-h-56 w-full rounded-xl object-cover" />
-                              ))}
-                            </div>
+                            <MessagePhotoGallery photos={JSON.parse(message.attachmentsJson) as string[]}
+                              className="mt-3 grid grid-cols-2 gap-2" thumbnailClassName="max-h-56 w-full rounded-xl object-cover" altPrefix="Customer quote photo" />
                           )}
                         </div>
                       );
