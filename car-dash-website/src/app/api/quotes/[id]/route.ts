@@ -1,3 +1,4 @@
+import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { updateQuoteState } from "@/lib/quote-state";
 import { getClientIp } from "@/lib/support-security";
 import {mmsPhotoUrls} from "@/lib/message-photos";
@@ -10,7 +11,7 @@ import {
 } from "@/lib/permissions";
 import { notifyQuoteDiscord } from "@/lib/discord-quotes";
 import { getQuoteSmsContact } from "@/lib/quote-sms";
-import { getPublicSiteUrl, isRecentlyActive, sendTransactionalSms } from "@/lib/twilio-sms";
+import { getPublicSiteUrl, isRecentlyActive } from "@/lib/twilio-sms";
 import { ensureGuestQuoteSupport } from "@/lib/quote-guest";
 
 async function access(request: NextRequest, id: string) {
@@ -155,7 +156,7 @@ export async function POST(
     const sms = await getQuoteSmsContact(id);
     if (sms.consent && sms.phone) {
       const guestThread = !allowed.thread.userId;
-      await sendTransactionalSms({
+      await sendCustomerSmsWithHistory({
         to: sms.phone,
         mediaUrls:await mmsPhotoUrls(attachments as string[]),
         body: guestThread
@@ -235,7 +236,7 @@ export async function PUT(
       if (sms.consent && sms.phone) {
         const guestThread = !allowed.thread.userId;
         const guestEmail = allowed.thread.guestEmail || "";
-        await sendTransactionalSms({
+        await sendCustomerSmsWithHistory({
           to: sms.phone,
           body: guestThread
             ? `Car Dash Detailing: Your exact quote is $${quotedPrice.toFixed(2)}${String(body.quoteNotes || "").trim() ? ` — ${String(body.quoteNotes).trim()}` : ""}. Reply to this text to book or ask a question. Want to track it online? ${getPublicSiteUrl()}/register?claimQuoteId=${encodeURIComponent(id)}&email=${encodeURIComponent(guestEmail)}`.slice(0, 1450)
