@@ -117,12 +117,12 @@ export default function AdminBookings() {
                   <BookingPhotoEvidence notes={b.notes} />
                 </div>
                 <div className="flex min-w-48 flex-col gap-2">
-                  <a
-                    href={b.customerPhone ? `/admin/messages?phone=${encodeURIComponent(b.customerPhone)}&name=${encodeURIComponent(b.customerName || "Customer")}` : `/booking-chat/${b.id}`}
+                  {b.customerPhone ? <a
+                    href={`/admin/messages?phone=${encodeURIComponent(b.customerPhone)}&name=${encodeURIComponent(b.customerName || "Customer")}`}
                     className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-center text-sm font-semibold text-[#6EAEC6] transition hover:bg-[#6EAEC6]/18"
                   >
                     Text customer · Full history
-                  </a>
+                  </a> : <span className="rounded-lg border border-amber-400/25 px-4 py-3 text-center text-sm text-amber-200">Add a customer phone number before texting</span>}
                   {!['completed', 'cancelled'].includes(b.status) && (
                     <>
                       <button
