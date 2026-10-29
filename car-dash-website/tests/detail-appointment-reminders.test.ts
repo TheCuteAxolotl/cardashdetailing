@@ -42,8 +42,8 @@ assert.doesNotMatch(reminder, /Private owner note|CAR_DASH_OWNER_NOTES/);
 assert.doesNotMatch(appointmentReminderBody({ ...booking, notes: "SMS consent: Yes" }), /Location:/);
 
 // Cron candidates must include both dates when the reminder window crosses midnight.
-const closeToMidnight = new Date("2026-10-30T02:05:00Z"); // 9:05 PM CDT
-assert.deepEqual(reminderDateCandidates(closeToMidnight), ["2026-10-30"]);
+const closeToMidnight = new Date("2026-10-30T03:05:00Z"); // 10:05 PM CDT
+assert.deepEqual(reminderDateCandidates(closeToMidnight), ["2026-10-29", "2026-10-30"]);
 assert.equal(localBookingDateTime(new Date("2026-11-01T14:00:00Z")), "2026-11-01T08:00");
 assert.equal(isDueForReminder({ ...booking, preferredDate: "2026-11-01", preferredTime: "08:00" }, new Date("2026-11-01T12:00:00Z")), true);
 
