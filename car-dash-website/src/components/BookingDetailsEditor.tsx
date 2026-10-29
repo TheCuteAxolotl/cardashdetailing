@@ -129,10 +129,10 @@ export default function BookingDetailsEditor({
             <p className="text-xs leading-5 text-[#aaa49b]">These owner notes are separate from the customer’s original notes, photos, consent, and booking metadata.</p>
           </section>
           <section className="border-t border-white/10 pt-5">
-            <h3 className="mb-4 text-base font-semibold text-[#f4efe5]">Appointment & price</h3>
+            <h3 className="mb-1 text-base font-semibold text-[#f4efe5]">Appointment & price</h3><p className="mb-4 text-xs text-[#aaa49b]">For an unscheduled request, leave both date and time blank. To schedule it, enter both.</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className={label}>Date<input required type="date" value={draft.preferredDate} onChange={event => update("preferredDate", event.target.value)} className={field}/></label>
-              <label className={label}>Time<input required type="time" value={draft.preferredTime} onChange={event => update("preferredTime", event.target.value)} className={field}/></label>
+              <label className={label}>Date<input type="date" value={draft.preferredDate} onChange={event => update("preferredDate", event.target.value)} className={field}/></label>
+              <label className={label}>Time<input type="time" value={draft.preferredTime} onChange={event => update("preferredTime", event.target.value)} className={field}/></label>
               <label className={label + " sm:col-span-2"}>Service<input required maxLength={240} value={draft.serviceName} onChange={event => update("serviceName", event.target.value)} className={field}/></label>
               <label className={label}>Total price ($)<input type="number" min="0" max="100000" step="0.01" value={draft.quotedPrice} onChange={event => update("quotedPrice", event.target.value)} placeholder="No price set" className={field}/></label>
             </div>
