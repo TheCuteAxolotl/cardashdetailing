@@ -144,7 +144,7 @@ export async function PUT(
       const notes=existing.notes||"";
       const extra=String(body.notes||"").trim().slice(0,2000);
       const updatedNotes = replaceBookingOwnerDetails(
-        extra && extra !== notes ? notes + "\\nOwner scheduling notes: " + extra : notes,
+        extra && extra !== notes ? notes + "\nOwner scheduling notes: " + extra : notes,
         body.serviceAddress !== undefined ? String(body.serviceAddress || "").trim().slice(0, 500) : bookingServiceAddress(notes),
         body.notes !== undefined ? extra : bookingOwnerNotes(notes)
       );
