@@ -195,17 +195,19 @@ export default function OwnerSchedulePage() {
     [tasks, currentRangeDates]
   );
 
-  const weekStats = useMemo(() => {
-    const dates = new Set(weekDays.map(isoDate));
-    const weekBookings = activeBookings.filter((booking) => booking.preferredDate && dates.has(booking.preferredDate));
-    const weekTasks = tasks.filter((task) => dates.has(task.date));
+  const periodStats = useMemo(() => {
+    const visible = view === "week"
+      ? new Set(weekDays.map(isoDate))
+      : new Set(monthDays.filter(day => day.getMonth() === cursor.getMonth()).map(isoDate));
+    const periodBookings = activeBookings.filter(booking => booking.preferredDate && visible.has(booking.preferredDate));
+    const periodTasks = tasks.filter(task => visible.has(task.date));
     return {
-      bookings: weekBookings.length,
-      todos: weekTasks.filter((task) => task.type === "todo" && !task.completed).length,
-      plans: weekTasks.filter((task) => task.type === "plan").length,
-      revenue: weekBookings.reduce((sum, booking) => sum + Number(booking.quotedPrice || 0), 0),
+      bookings: periodBookings.length,
+      todos: periodTasks.filter(task => task.type === "todo" && !task.completed).length,
+      plans: periodTasks.filter(task => task.type === "plan").length,
+      revenue: periodBookings.reduce((total, booking) => total + Number(booking.quotedPrice || 0), 0),
     };
-  }, [activeBookings, tasks, weekDays]);
+  }, [view, weekDays, monthDays, cursor, activeBookings, tasks]);
 
   function moveRange(direction: number) {
     const next = view === "week"
@@ -344,10 +346,10 @@ export default function OwnerSchedulePage() {
 
         <section className="mt-5 grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4" aria-label="This week's calendar summary">
           {[
-            ["Bookings", String(weekStats.bookings), "This week"],
-            ["To-dos", String(weekStats.todos), "Still open"],
-            ["Plans", String(weekStats.plans), "This week"],
-            ["Booked value", weekStats.revenue ? money.format(weekStats.revenue) : "—", "Quoted totals"],
+            ["Bookings", String(periodStats.bookings), view === "month" ? "This month" : "This week"],
+            ["To-dos", String(periodStats.todos), "Still open"],
+            ["Plans", String(periodStats.plans), view === "month" ? "This month" : "This week"],
+            ["Booked value", periodStats.revenue ? money.format(periodStats.revenue) : "—", "Quoted totals"],
           ].map(([label, value, caption]) => (
             <div key={label} className="rounded-xl border border-white/10 bg-[#1c1c1c] px-4 py-4 sm:px-5">
               <p className="text-[11px] font-medium text-[#b9b5ad]">{label}</p>
