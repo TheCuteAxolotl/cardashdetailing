@@ -17,9 +17,15 @@ async function main() {
   assert.equal((await GET(new NextRequest("https://cardashdetailing.com/api/messages/inbox"))).status, 403);
   const response = await GET(request()), data = await response.json();
   assert.equal(response.status, 200); assert.equal(data.owner, true);
-  assert.equal(data.conversations.length, 7); assert.equal(data.conversations[0].body, "Latest"); assert.equal(data.conversations[1].kind, "booking");
-  assert.deepEqual(data.conversations.filter((row: any) => row.kind === "quote").map((row: any) => row.status).sort(), ["accepted", "booked", "closed", "open", "quoted"]);
+  // One phone gets exactly one customer thread even across five quotes and a booking.
+  assert.equal(data.conversations.length, 2);
+  assert.equal(data.conversations[0].body, "Latest");
+  assert.equal(data.conversations[0].kind, "sms");
+  assert.equal(data.conversations[0].phone, "+12245550000");
+  assert.equal(data.conversations[1].kind, "sms");
+  assert.equal(data.conversations[1].phone, "+12245551234");
+  assert.equal(data.conversations[1].name, "Booked customer");
   role = "user"; assert.equal((await GET(request())).status, 403); assert.equal(quoteReads, 1);
-  console.log("Unified inbox retains every quote status, groups direct replies, sorts newest first, avoids photo payloads, and enforces staff access.");
+  console.log("Unified inbox groups quotes, bookings and SMS by phone without duplicating a customer, and enforces staff access.");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
