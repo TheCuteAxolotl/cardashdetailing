@@ -3,6 +3,7 @@ import SendPhotos from "@/components/SendPhotos";
 import MessageBookingForm from "@/components/MessageBookingForm";
 
 import SmsAttachments from "@/components/SmsAttachments";
+import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -499,7 +500,7 @@ export default function StaffSmsInbox({
                       return (
                         <div key={message.id} className={`flex ${outbound ? "justify-end" : "justify-start"}`}>
                           <div className={`max-w-[86%] rounded-2xl px-4 py-3 ${outbound ? "bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8 text-white"}`}>
-                            <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>{message.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(message.attachmentsJson) as string[]).map((src,index)=><a key={index} href={src} target="_blank" rel="noreferrer"><img src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/></a>)}</div>}
+                            <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>{message.attachmentsJson&&<MessagePhotoGallery photos={JSON.parse(message.attachmentsJson) as string[]} className="mt-2 flex flex-wrap gap-2" thumbnailClassName="max-h-56 max-w-full rounded-lg object-contain" altPrefix="SMS photo" />}
                       {!outbound && <SmsAttachments sid={message.externalSid} body={message.body} />}
                             <p className={`mt-2 text-[10px] ${outbound ? "text-[#0B1822]/50" : "text-white/30"}`}>
                               {outbound ? "Car Dash" : "Customer"} · {new Date(message.createdAt).toLocaleString()}
