@@ -72,7 +72,7 @@ export async function POST(request: Request, context: Context) {
       const method = String(body?.method || "").trim();
       const allowedMethods = ["Cash", "Check", "Card (outside website)", "Zelle", "Venmo", "ACH / Bank", "Other"];
       const reference = String(body?.reference || "").trim().slice(0, 120);
-      if (!Number.isFinite(amount) || amount <= 0 || amount > 100000 || Math.round(amount * 100) !== amount * 100) {
+      if (!Number.isFinite(amount) || amount <= 0 || amount > 100000 || Math.abs(Math.round(amount * 100) - amount * 100) > 0.000001) {
         return NextResponse.json({ error: "Enter the exact amount received in dollars and cents." }, { status: 400 });
       }
       if (!allowedMethods.includes(method)) {
@@ -95,6 +95,7 @@ export async function POST(request: Request, context: Context) {
         discountAmount: 0,
         taxRate: 0,
         notes: "Thank you for choosing Car Dash Detailing.",
+        internalInspectionNotes: `Owner confirmed offline payment received and customer SMS receipt permission on ${new Date().toISOString()}. This records an owner-reported payment, not an independently verified bank transaction.`,
         terms: "Payment received in full.",
         paymentOptions: { check: false, cash: false, online: false, other: false },
         payments: [{ id: `booking-payment-${id}`, amount, method, reference: reference || undefined, paidAt: new Date().toISOString() }],
