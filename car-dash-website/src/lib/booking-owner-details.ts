@@ -21,6 +21,16 @@ export function bookingOwnerNotes(notes: string | null | undefined): string {
   return old.join("\n");
 }
 
+/** Remove team-only notes from customer-facing booking payloads.
+ * Keep original customer notes, addresses and photo evidence intact. */
+export function customerVisibleBookingNotes(notes: string | null | undefined): string | null {
+  if (notes == null) return null;
+  return notes
+    .replace(/\[\[CAR_DASH_OWNER_NOTES\]\][\s\S]*?\[\[\/CAR_DASH_OWNER_NOTES\]\]/g, "")
+    .replace(LEGACY_OWNER_LINE, "")
+    .trim();
+}
+
 /** Update only owner-controlled address/notes. Retain consent, price/duration,
  * original customer notes, discount identifiers, and attached booking photos. */
 export function replaceBookingOwnerDetails(
