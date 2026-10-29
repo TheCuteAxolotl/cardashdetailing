@@ -1,3 +1,4 @@
+import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
 import {
@@ -10,7 +11,7 @@ import {
   setMaintenanceOfferActive,
   syncMaintenanceSubscription,
 } from "@/lib/maintenance";
-import { normalizePhoneNumber, getPublicSiteUrl, sendTransactionalSms } from "@/lib/twilio-sms";
+import { normalizePhoneNumber, getPublicSiteUrl } from "@/lib/twilio-sms";
 import {
   retrieveMaintenanceSubscription,
   setMaintenanceSubscriptionCancelAtPeriodEnd,
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
       let sendWarning = "";
 
       if (Boolean(body.sendNow) && customerPhone) {
-        const sms = await sendTransactionalSms({
+        const sms = await sendCustomerSmsWithHistory({
           to: customerPhone,
           body: `Car Dash Detailing: Your private monthly maintenance plan is ready: ${link}`,
         });
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
       }
 
       const link = `${getPublicSiteUrl()}/maintenance/${offer.shareToken}`;
-      const sms = await sendTransactionalSms({
+      const sms = await sendCustomerSmsWithHistory({
         to: offer.customerPhone,
         body: `Car Dash Detailing: Your private monthly maintenance plan is ready: ${link}`,
       });
