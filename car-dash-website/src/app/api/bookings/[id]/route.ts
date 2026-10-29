@@ -69,8 +69,8 @@ export async function PUT(
       // Keep website consent, source metadata, photo evidence and original customer notes.
       const date = String(body.preferredDate ?? existing.preferredDate ?? "").trim();
       const time = String(body.preferredTime ?? existing.preferredTime ?? "").trim();
-      if (!isDateString(date) || !normalizeBookingTime(time)) {
-        return NextResponse.json({ error: "Enter a valid appointment date and time." }, { status: 400 });
+      if (!((!date && !time) || (isDateString(date) && normalizeBookingTime(time)))) {
+        return NextResponse.json({ error: "Provide both an appointment date and time, or leave both blank for an unscheduled booking." }, { status: 400 });
       }
       if (typeof body.updatedAt === "string" && body.updatedAt &&
           new Date(body.updatedAt).getTime() !== existing.updatedAt.getTime()) {
