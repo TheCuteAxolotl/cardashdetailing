@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       originalId: message.id,
       source: "sms" as const,
       sourceId: phone,
-      context: message.fromPhone === "Car Dash automated" ? "Automated text" : "Direct text",
+      context: message.fromPhone === "Car Dash automated" ? "Automated text" : message.fromPhone === "Car Dash imported SMS" ? "Earlier sent text" : "Direct text",
       sender: message.direction === "outbound" ? "team" : "customer",
     })),
   ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
