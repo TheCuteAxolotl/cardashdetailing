@@ -124,6 +124,37 @@ export async function listRecentInboundSms(input: { since: Date; limit?: number 
   }
 }
 
+/** Read provider-confirmed outbound SMS for optional historical inbox backfill.
+ * Customer authentication/verification codes must be filtered before persistence. */
+export async function listRecentOutboundSms(input: { since: Date; limit?: number }) {
+  const auth = twilioBasicAuthHeader();
+  if (!auth || !accountSid) {
+    return { ok: false as const, error: "Twilio account credentials are not configured." };
+  }
+  try {
+    const url = new URL(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`);
+    url.searchParams.set("DateSent>", input.since.toISOString().slice(0, 10));
+    url.searchParams.set("PageSize", String(Math.min(Math.max(input.limit || 500, 1), 1000)));
+    const response = await fetch(url, { headers: { Authorization: auth }, cache: "no-store" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return { ok: false as const, error: typeof payload?.message === "string" ? payload.message : `Twilio returned ${response.status}.` };
+    }
+    const rows: TwilioHistoryMessage[] = Array.isArray(payload?.messages) ? payload.messages : [];
+    const messages = rows.filter(row =>
+      String(row.direction || "").startsWith("outbound") && row.sid && row.to
+    ).map(row => ({
+      sid: String(row.sid), to: String(row.to), from: String(row.from || ""),
+      body: String(row.body || ""),
+      dateSent: row.date_sent ? new Date(row.date_sent) : null,
+      dateCreated: row.date_created ? new Date(row.date_created) : null,
+    }));
+    return { ok: true as const, messages };
+  } catch (error) {
+    return { ok: false as const, error: error instanceof Error ? error.message : "Could not load sent SMS history." };
+  }
+}
+
 export async function getMessagingServiceInboundStatus() {
   const auth = twilioBasicAuthHeader();
   const expectedUrl = getInboundSmsWebhookUrl();
