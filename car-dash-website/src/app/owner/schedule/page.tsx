@@ -1,6 +1,7 @@
 "use client";
 
 import CalendarSubscription from "@/components/CalendarSubscription";
+import OwnerCalendarBoard from "@/components/OwnerCalendarBoard";
 import { useEffect, useMemo, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
@@ -128,7 +129,8 @@ function bookingVehicle(booking: Booking) {
 export default function OwnerSchedulePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tasks, setTasks] = useState<OwnerScheduleTask[]>([]);
-  const [view, setView] = useState<ViewMode>("week");
+  const [view, setView] = useState<ViewMode>("month");
+  const [selectedDay, setSelectedDay] = useState(() => isoDate(new Date()));
   const [cursor, setCursor] = useState(() => {
     const today = new Date();
     today.setHours(12, 0, 0, 0);
@@ -205,25 +207,19 @@ export default function OwnerSchedulePage() {
     };
   }, [activeBookings, tasks, weekDays]);
 
-  function itemsForDate(date: string) {
-    const dayBookings = currentBookings
-      .filter((booking) => booking.preferredDate === date)
-      .sort((a, b) => eventSortTime(a.preferredTime).localeCompare(eventSortTime(b.preferredTime)));
-    const dayTasks = currentTasks
-      .filter((task) => task.date === date)
-      .sort((a, b) => (a.time || "99:99").localeCompare(b.time || "99:99"));
-    return { dayBookings, dayTasks };
-  }
-
   function moveRange(direction: number) {
-    if (view === "week") setCursor((current) => addDays(current, direction * 7));
-    else setCursor((current) => new Date(current.getFullYear(), current.getMonth() + direction, 1, 12));
+    const next = view === "week"
+      ? addDays(cursor, direction * 7)
+      : new Date(cursor.getFullYear(), cursor.getMonth() + direction, 1, 12);
+    setCursor(next);
+    setSelectedDay(isoDate(next));
   }
 
   function goToday() {
     const value = new Date();
     value.setHours(12, 0, 0, 0);
     setCursor(value);
+    setSelectedDay(isoDate(value));
   }
 
   function openNewTask(date = isoDate(cursor), type: "todo" | "plan" = "todo") {
@@ -319,196 +315,136 @@ export default function OwnerSchedulePage() {
   }
 
   if (loading) {
-    return <div className="grid min-h-[70vh] place-items-center text-sm text-black/40">Loading calendar…</div>;
+    return (
+      <div className="grid min-h-[70vh] place-items-center bg-[#101010] text-sm text-[#c9c1b5]">
+        Opening your calendar…
+      </div>
+    );
   }
 
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <div className="mx-auto max-w-[1500px]">
-        <CalendarSubscription />
-        <div className="flex flex-col gap-5 border-b border-black/[.08] pb-6 xl:flex-row xl:items-end xl:justify-between">
+    <div className="min-h-screen bg-[#101010] px-3 py-5 text-[#f4efe5] sm:px-6 sm:py-7 xl:px-8">
+      <div className="mx-auto max-w-[1600px]">
+        <header className="flex flex-wrap items-start justify-between gap-5 border-b border-white/10 pb-5">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/36">Weekly planning + customer bookings</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-[-.045em] text-[#111] sm:text-4xl">Schedule</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-black/48">Your real bookings appear automatically. Add private to-dos and plans around them so you can see the whole week in one place.</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#d6b779]">Car Dash / Business calendar</p>
+            <h1 className="mt-2 font-serif text-3xl tracking-tight text-[#f4efe5] sm:text-4xl">Your schedule.</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#b9b5ad]">
+              All your detailing appointments, private plans, and to-dos in one place.
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <a href="/owner/bookings" className="rounded-md border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black/60 hover:border-black/20 hover:text-black">Manage bookings</a>
-            <a href="/owner/booking-settings" className="rounded-md border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-black/60 hover:border-black/20 hover:text-black">Availability</a>
-            <button onClick={() => openNewTask(isoDate(today), "todo")} className="rounded-md bg-[#111] px-4 py-2.5 text-sm font-semibold text-white">+ Add to schedule</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <a href="/owner/bookings" className="rounded-xl border border-white/15 bg-[#202020] px-4 py-2.5 text-sm font-medium text-[#f4efe5] hover:border-[#d6b779]/40">Bookings</a>
+            <a href="/owner/booking-settings" className="rounded-xl border border-white/15 bg-[#202020] px-4 py-2.5 text-sm font-medium text-[#f4efe5] hover:border-[#d6b779]/40">Availability</a>
+            <button type="button" onClick={() => openNewTask(selectedDay, "todo")} className="rounded-xl bg-[#d6b779] px-4 py-2.5 text-sm font-semibold text-[#101010] hover:bg-[#e5c995]">+ Add event</button>
           </div>
-        </div>
+        </header>
 
-        {message && <div className="mt-5 rounded-md border border-black/10 bg-white px-4 py-3 text-sm text-black/60">{message}</div>}
+        {message && <p role="status" className="mt-4 rounded-xl border border-[#d6b779]/30 bg-[#29251c] px-4 py-3 text-sm text-[#f4dfae]">{message}</p>}
 
-        <section className="mt-6 grid gap-px overflow-hidden rounded-lg border border-black/[.08] bg-black/[.08] sm:grid-cols-2 xl:grid-cols-4">
+        <section className="mt-5 grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4" aria-label="This week's calendar summary">
           {[
-            ["Bookings this week", String(weekStats.bookings), "Active appointments"],
-            ["Open to-dos", String(weekStats.todos), "Not completed yet"],
-            ["Plans this week", String(weekStats.plans), "Private schedule items"],
-            ["Booked value", weekStats.revenue ? money.format(weekStats.revenue) : "—", "Based on quoted booking totals"],
-          ].map(([label, value, note]) => (
-            <div key={label} className="bg-white px-5 py-5">
-              <p className="text-xs font-medium text-black/42">{label}</p>
-              <p className="mt-3 text-3xl font-semibold tracking-[-.04em] text-[#111]">{value}</p>
-              <p className="mt-1 text-xs text-black/34">{note}</p>
+            ["Bookings", String(weekStats.bookings), "This week"],
+            ["To-dos", String(weekStats.todos), "Still open"],
+            ["Plans", String(weekStats.plans), "This week"],
+            ["Booked value", weekStats.revenue ? money.format(weekStats.revenue) : "—", "Quoted totals"],
+          ].map(([label, value, caption]) => (
+            <div key={label} className="rounded-xl border border-white/10 bg-[#1c1c1c] px-4 py-4 sm:px-5">
+              <p className="text-[11px] font-medium text-[#b9b5ad]">{label}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-[#f4efe5] sm:text-3xl">{value}</p>
+              <p className="mt-1 text-[11px] text-[#928d84]">{caption}</p>
             </div>
           ))}
         </section>
 
-        <section className="mt-6 overflow-hidden rounded-lg border border-black/[.08] bg-white">
-          <div className="flex flex-col gap-4 border-b border-black/[.08] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-            <div className="flex items-center gap-2">
-              <button onClick={() => moveRange(-1)} aria-label="Previous period" className="grid h-9 w-9 place-items-center rounded-md border border-black/10 text-lg text-black/55 hover:border-black/20 hover:text-black">‹</button>
-              <button onClick={goToday} className="rounded-md border border-black/10 px-3 py-2 text-xs font-semibold text-black/55 hover:border-black/20 hover:text-black">Today</button>
-              <button onClick={() => moveRange(1)} aria-label="Next period" className="grid h-9 w-9 place-items-center rounded-md border border-black/10 text-lg text-black/55 hover:border-black/20 hover:text-black">›</button>
-              <h3 className="ml-2 text-base font-semibold tracking-[-.02em] text-[#111] sm:text-lg">{view === "week" ? weekTitle(weekStart) : monthTitle(cursor)}</h3>
+        <section className="mt-5 overflow-hidden rounded-[20px] border border-white/15 bg-[#1c1c1c] shadow-[0_22px_70px_rgba(0,0,0,.24)]" aria-label="Business calendar">
+          <div className="flex flex-col gap-4 border-b border-white/10 bg-[#202020] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => moveRange(-1)} aria-label="Previous week or month" className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 text-xl text-[#f4efe5] hover:border-[#d6b779]/50">‹</button>
+              <button type="button" onClick={goToday} className="rounded-xl border border-white/15 px-4 py-2.5 text-xs font-semibold text-[#d6b779] hover:border-[#d6b779]/50">Today</button>
+              <button type="button" onClick={() => moveRange(1)} aria-label="Next week or month" className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 text-xl text-[#f4efe5] hover:border-[#d6b779]/50">›</button>
+              <h2 className="ml-1 font-serif text-xl text-[#f4efe5] sm:ml-3 sm:text-2xl">{view === "week" ? weekTitle(weekStart) : monthTitle(cursor)}</h2>
             </div>
-            <div className="flex rounded-md border border-black/10 bg-[#f5f4f1] p-1">
-              <button onClick={() => setView("week")} className={`rounded px-3 py-1.5 text-xs font-semibold ${view === "week" ? "bg-white text-black shadow-sm" : "text-black/42"}`}>Week</button>
-              <button onClick={() => setView("month")} className={`rounded px-3 py-1.5 text-xs font-semibold ${view === "month" ? "bg-white text-black shadow-sm" : "text-black/42"}`}>Month</button>
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="flex rounded-xl border border-white/15 bg-[#161616] p-1" role="group" aria-label="Calendar view">
+                <button type="button" aria-pressed={view === "month"} onClick={() => { setView("month"); setSelectedDay(isoDate(cursor)); }} className={"rounded-lg px-4 py-2 text-xs font-semibold transition " + (view === "month" ? "bg-[#d6b779] text-[#101010]" : "text-[#c7c1b6] hover:bg-white/10")}>Month</button>
+                <button type="button" aria-pressed={view === "week"} onClick={() => { setView("week"); setSelectedDay(isoDate(cursor)); }} className={"rounded-lg px-4 py-2 text-xs font-semibold transition " + (view === "week" ? "bg-[#d6b779] text-[#101010]" : "text-[#c7c1b6] hover:bg-white/10")}>Week</button>
+              </div>
             </div>
           </div>
 
-          {view === "week" ? (
-            <div className="grid md:grid-cols-7">
-              {weekDays.map((day, index) => {
-                const date = isoDate(day);
-                const { dayBookings, dayTasks } = itemsForDate(date);
-                const isToday = sameDate(day, today);
-                return (
-                  <div key={date} className={`min-w-0 border-black/[.07] md:min-h-[530px] ${index ? "border-t md:border-l md:border-t-0" : ""}`}>
-                    <div className={`flex items-center justify-between border-b border-black/[.07] px-3 py-3 ${isToday ? "bg-[#111] text-white" : "bg-[#fafafa]"}`}>
-                      <div>
-                        <p className={`text-[10px] font-semibold uppercase tracking-[.13em] ${isToday ? "text-white/45" : "text-black/35"}`}>{day.toLocaleDateString("en-US", { weekday: "short" })}</p>
-                        <p className="mt-1 text-xl font-semibold">{day.getDate()}</p>
-                      </div>
-                      <button onClick={() => openNewTask(date)} className={`grid h-8 w-8 place-items-center rounded-md border text-lg ${isToday ? "border-white/15 text-white/65 hover:bg-white/10" : "border-black/10 text-black/40 hover:border-black/20 hover:text-black"}`} aria-label={`Add item on ${date}`}>+</button>
-                    </div>
-
-                    <div className="space-y-2 p-2.5">
-                      {dayBookings.map((booking) => (
-                        <a key={booking.id} href="/owner/bookings" className="block rounded-md bg-[#111] p-3 text-white hover:bg-black">
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="text-[11px] font-semibold text-white/62">{prettyTime(booking.preferredTime)}</p>
-                            <span className="text-[9px] font-semibold uppercase tracking-[.08em] text-white/30">{booking.status || "booking"}</span>
-                          </div>
-                          <p className="mt-2 truncate text-sm font-semibold">{booking.customerName || "Customer"}</p>
-                          <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-white/48">{booking.serviceName || "Detailing"}</p>
-                          {bookingVehicle(booking) && <p className="mt-2 truncate text-[10px] text-white/34">{bookingVehicle(booking)}</p>}
-                          {Number(booking.quotedPrice || 0) > 0 && <p className="mt-2 text-xs font-semibold text-white/72">{money.format(Number(booking.quotedPrice))}</p>}
-                        </a>
-                      ))}
-
-                      {dayTasks.map((task) => (
-                        <div key={task.id} className={`rounded-md border p-3 ${task.completed ? "border-black/[.06] bg-[#f7f7f5] opacity-55" : task.type === "plan" ? "border-black/15 bg-[#f2eee8]" : "border-black/[.08] bg-white"}`}>
-                          <div className="flex items-start gap-2">
-                            {task.type === "todo" ? (
-                              <input aria-label={`Mark ${task.title} complete`} type="checkbox" checked={task.completed} onChange={() => toggleTask(task)} className="mt-0.5 h-4 w-4 shrink-0" />
-                            ) : (
-                              <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-black/35" />
-                            )}
-                            <button onClick={() => openEditTask(task)} className="min-w-0 flex-1 text-left">
-                              <p className={`text-[10px] font-semibold uppercase tracking-[.08em] text-black/35 ${task.completed ? "line-through" : ""}`}>{task.time ? prettyTime(task.time) : task.type === "plan" ? "Plan" : "To-do"}{task.endTime ? ` – ${prettyTime(task.endTime)}` : ""}</p>
-                              <p className={`mt-1 break-words text-sm font-semibold text-[#111] ${task.completed ? "line-through" : ""}`}>{task.title}</p>
-                              {task.notes && <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-black/38">{task.notes}</p>}
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-
-                      {!dayBookings.length && !dayTasks.length && (
-                        <button onClick={() => openNewTask(date)} className="w-full rounded-md border border-dashed border-black/10 px-2 py-5 text-center text-[11px] text-black/25 hover:border-black/20 hover:text-black/45">Nothing planned</button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div>
-              <div className="hidden grid-cols-7 border-b border-black/[.07] bg-[#fafafa] md:grid">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label) => <div key={label} className="px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-[.12em] text-black/32">{label}</div>)}
-              </div>
-              <div className="grid md:grid-cols-7">
-                {monthDays.map((day, index) => {
-                  const date = isoDate(day);
-                  const { dayBookings, dayTasks } = itemsForDate(date);
-                  const currentMonth = day.getMonth() === cursor.getMonth();
-                  const isToday = sameDate(day, today);
-                  const visibleEvents = [
-                    ...dayBookings.map((booking) => ({ id: `b-${booking.id}`, label: `${prettyTime(booking.preferredTime)} · ${booking.customerName || "Booking"}`, booking: true })),
-                    ...dayTasks.map((task) => ({ id: `t-${task.id}`, label: `${task.time ? prettyTime(task.time) + " · " : ""}${task.title}`, booking: false })),
-                  ].slice(0, 3);
-
-                  return (
-                    <div key={date} className={`min-h-[150px] border-black/[.07] p-2.5 ${index % 7 ? "md:border-l" : ""} ${index >= 7 ? "border-t" : ""} ${currentMonth ? "bg-white" : "bg-[#fafafa] text-black/35"}`}>
-                      <div className="mb-2 flex items-center justify-between">
-                        <button onClick={() => openNewTask(date)} className={`grid h-7 w-7 place-items-center rounded-full text-xs font-semibold ${isToday ? "bg-[#111] text-white" : "text-black/45 hover:bg-black/[.05]"}`}>{day.getDate()}</button>
-                        {(dayBookings.length + dayTasks.length) > 0 && <span className="text-[9px] text-black/25">{dayBookings.length + dayTasks.length}</span>}
-                      </div>
-                      <div className="space-y-1.5">
-                        {visibleEvents.map((event) => (
-                          <div key={event.id} className={`truncate rounded px-2 py-1.5 text-[10px] font-medium ${event.booking ? "bg-[#111] text-white" : "border border-black/[.07] bg-[#f5f4f1] text-black/58"}`}>{event.label}</div>
-                        ))}
-                        {(dayBookings.length + dayTasks.length) > 3 && <button onClick={() => { setCursor(day); setView("week"); }} className="px-1 text-[9px] font-semibold text-black/35 hover:text-black">+ {dayBookings.length + dayTasks.length - 3} more</button>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          <OwnerCalendarBoard
+            view={view}
+            cursor={cursor}
+            days={view === "month" ? monthDays : weekDays}
+            today={today}
+            selectedDay={selectedDay}
+            bookings={currentBookings}
+            tasks={currentTasks}
+            onSelectDay={(date) => setSelectedDay(date)}
+            onAddTask={(date) => openNewTask(date)}
+            onEditTask={openEditTask}
+            onToggleTask={toggleTask}
+          />
         </section>
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-black/40">
-          <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm bg-[#111]" /> Customer booking</span>
-          <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm border border-black/15 bg-white" /> To-do</span>
-          <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-sm bg-[#f2eee8]" /> Personal/business plan</span>
-          <span>Private schedule items never appear to customers.</span>
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 px-1 text-xs text-[#b9b5ad]">
+          <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#214335] ring-1 ring-[#396958]" /> Confirmed</span>
+          <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#4c3924] ring-1 ring-[#86673b]" /> Pending</span>
+          <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#243c52] ring-1 ring-[#3b5d78]" /> Completed</span>
+          <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#36324c] ring-1 ring-[#555177]" /> Plans</span>
+          <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#253b46] ring-1 ring-[#526a75]" /> To-dos</span>
+          <p className="w-full text-[11px] text-[#8f8980]">Private tasks aren't visible to customers. Swipe the month grid sideways on smaller screens.</p>
         </div>
+
+        <details className="mt-6 rounded-xl border border-white/10 bg-[#1b1b1b]">
+          <summary className="cursor-pointer px-5 py-4 text-sm font-semibold text-[#f4efe5]">Connect to Apple Calendar <span className="ml-2 text-xs font-normal text-[#b9b5ad]">(optional)</span></summary>
+          <div className="border-t border-white/10 px-4 pb-4">
+            <CalendarSubscription />
+          </div>
+        </details>
       </div>
 
       {editorOpen && (
-        <div className="fixed inset-0 z-[70] grid place-items-center bg-black/45 p-4" role="dialog" aria-modal="true" aria-label={draft.id ? "Edit schedule item" : "Add schedule item"}>
+        <div className="fixed inset-0 z-[70] grid place-items-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-label={draft.id ? "Edit schedule item" : "Add schedule item"}>
           <button aria-label="Close schedule editor" onClick={() => setEditorOpen(false)} className="absolute inset-0 cursor-default" />
-          <form onSubmit={saveDraft} className="relative z-10 w-full max-w-xl rounded-lg border border-black/10 bg-white p-5 shadow-2xl sm:p-6">
-            <div className="flex items-start justify-between gap-4 border-b border-black/[.08] pb-4">
+          <form onSubmit={saveDraft} className="relative z-10 w-full max-w-xl rounded-2xl border border-white/15 bg-[#1c1c1c] p-5 text-[#f4efe5] shadow-2xl sm:p-6">
+            <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-black/35">{draft.id ? "Edit schedule item" : "Add to schedule"}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-[#b9b5ad]">{draft.id ? "Edit schedule item" : "Add to schedule"}</p>
                 <h3 className="mt-1 text-xl font-semibold tracking-[-.03em]">{draft.type === "todo" ? "To-do" : "Plan"}</h3>
               </div>
-              <button type="button" onClick={() => setEditorOpen(false)} className="grid h-9 w-9 place-items-center rounded-md border border-black/10 text-lg text-black/45">×</button>
+              <button type="button" onClick={() => setEditorOpen(false)} className="grid h-9 w-9 place-items-center rounded-xl border border-white/15 text-lg text-[#c2bbb0]">×</button>
             </div>
 
             <div className="mt-5 grid gap-4">
               <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setDraft((current) => ({ ...current, type: "todo" }))} className={`rounded-md border px-4 py-3 text-sm font-semibold ${draft.type === "todo" ? "border-[#111] bg-[#111] text-white" : "border-black/10 text-black/55"}`}>To-do</button>
-                <button type="button" onClick={() => setDraft((current) => ({ ...current, type: "plan" }))} className={`rounded-md border px-4 py-3 text-sm font-semibold ${draft.type === "plan" ? "border-[#111] bg-[#111] text-white" : "border-black/10 text-black/55"}`}>Plan / event</button>
+                <button type="button" onClick={() => setDraft((current) => ({ ...current, type: "todo" }))} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${draft.type === "todo" ? "border-[#111] bg-[#d6b779] text-[#101010]" : "border-white/15 text-[#c2bbb0]"}`}>To-do</button>
+                <button type="button" onClick={() => setDraft((current) => ({ ...current, type: "plan" }))} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${draft.type === "plan" ? "border-[#111] bg-[#d6b779] text-[#101010]" : "border-white/15 text-[#c2bbb0]"}`}>Plan / event</button>
               </div>
 
-              <label className="text-xs font-medium text-black/45">Title
-                <input autoFocus value={draft.title} onChange={(e) => setDraft((current) => ({ ...current, title: e.target.value }))} placeholder={draft.type === "todo" ? "Wash towels, order chemicals…" : "Class, supply run, personal plans…"} className="mt-2 w-full rounded-md border border-black/10 bg-[#fafafa] px-3.5 py-3 text-base text-black outline-none focus:border-black/30" required />
+              <label className="text-xs font-medium text-[#c2bbb0]">Title
+                <input autoFocus value={draft.title} onChange={(e) => setDraft((current) => ({ ...current, title: e.target.value }))} placeholder={draft.type === "todo" ? "Wash towels, order chemicals…" : "Class, supply run, personal plans…"} className="mt-2 w-full rounded-xl border border-white/15 bg-[#242424] px-3.5 py-3 text-base text-[#f4efe5] outline-none focus:border-black/30" required />
               </label>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <label className="text-xs font-medium text-black/45">Date
-                  <input type="date" value={draft.date} onChange={(e) => setDraft((current) => ({ ...current, date: e.target.value }))} className="mt-2 w-full rounded-md border border-black/10 bg-[#fafafa] px-3 py-3 text-base text-black outline-none focus:border-black/30" required />
+                <label className="text-xs font-medium text-[#c2bbb0]">Date
+                  <input type="date" value={draft.date} onChange={(e) => setDraft((current) => ({ ...current, date: e.target.value }))} className="mt-2 w-full rounded-xl border border-white/15 bg-[#242424] px-3 py-3 text-base text-[#f4efe5] outline-none focus:border-black/30" required />
                 </label>
-                <label className="text-xs font-medium text-black/45">Start time
-                  <input type="time" value={draft.time} onChange={(e) => setDraft((current) => ({ ...current, time: e.target.value }))} className="mt-2 w-full rounded-md border border-black/10 bg-[#fafafa] px-3 py-3 text-base text-black outline-none focus:border-black/30" />
+                <label className="text-xs font-medium text-[#c2bbb0]">Start time
+                  <input type="time" value={draft.time} onChange={(e) => setDraft((current) => ({ ...current, time: e.target.value }))} className="mt-2 w-full rounded-xl border border-white/15 bg-[#242424] px-3 py-3 text-base text-[#f4efe5] outline-none focus:border-black/30" />
                 </label>
-                <label className="text-xs font-medium text-black/45">End time
-                  <input type="time" value={draft.endTime} onChange={(e) => setDraft((current) => ({ ...current, endTime: e.target.value }))} className="mt-2 w-full rounded-md border border-black/10 bg-[#fafafa] px-3 py-3 text-base text-black outline-none focus:border-black/30" />
+                <label className="text-xs font-medium text-[#c2bbb0]">End time
+                  <input type="time" value={draft.endTime} onChange={(e) => setDraft((current) => ({ ...current, endTime: e.target.value }))} className="mt-2 w-full rounded-xl border border-white/15 bg-[#242424] px-3 py-3 text-base text-[#f4efe5] outline-none focus:border-black/30" />
                 </label>
               </div>
 
-              <label className="text-xs font-medium text-black/45">Notes
-                <textarea value={draft.notes} onChange={(e) => setDraft((current) => ({ ...current, notes: e.target.value }))} placeholder="Optional details…" className="mt-2 min-h-24 w-full rounded-md border border-black/10 bg-[#fafafa] px-3.5 py-3 text-base text-black outline-none focus:border-black/30" />
+              <label className="text-xs font-medium text-[#c2bbb0]">Notes
+                <textarea value={draft.notes} onChange={(e) => setDraft((current) => ({ ...current, notes: e.target.value }))} placeholder="Optional details…" className="mt-2 min-h-24 w-full rounded-xl border border-white/15 bg-[#242424] px-3.5 py-3 text-base text-[#f4efe5] outline-none focus:border-black/30" />
               </label>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-black/[.08] pt-4">
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
               <div>
                 {draft.id && (
                   <button type="button" disabled={savingTask} onClick={() => {
@@ -517,12 +453,12 @@ export default function OwnerSchedulePage() {
                       setEditorOpen(false);
                       deleteTask(task);
                     }
-                  }} className="rounded-md border border-black/10 px-4 py-2.5 text-sm font-medium text-black/45 hover:border-black/20 hover:text-black disabled:opacity-50">Delete</button>
+                  }} className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-[#c2bbb0] hover:border-[#d6b779]/50 hover:text-[#f4efe5] disabled:opacity-50">Delete</button>
                 )}
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setEditorOpen(false)} className="rounded-md border border-black/10 px-4 py-2.5 text-sm font-medium text-black/50">Cancel</button>
-                <button type="submit" disabled={savingTask} className="rounded-md bg-[#111] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{savingTask ? "Saving…" : draft.id ? "Save changes" : "Add to schedule"}</button>
+                <button type="button" onClick={() => setEditorOpen(false)} className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-[#c2bbb0]">Cancel</button>
+                <button type="submit" disabled={savingTask} className="rounded-xl bg-[#111] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{savingTask ? "Saving…" : draft.id ? "Save changes" : "Add to schedule"}</button>
               </div>
             </div>
           </form>
