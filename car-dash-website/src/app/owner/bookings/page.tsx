@@ -7,6 +7,7 @@ import { normalizeBookingTime } from "@/lib/booking-availability";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 import BookingDetailsEditor from "@/components/BookingDetailsEditor";
 import BookingPaidReceiptDialog from "@/components/BookingPaidReceiptDialog";
+import BookingReminderDialog from "@/components/BookingReminderDialog";
 import { bookingServiceAddress } from "@/lib/booking-owner-details";
 
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#6EAEC6]/60";
@@ -78,6 +79,7 @@ export default function OwnerBookings() {
   const [manualSaving, setManualSaving] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [receiptBooking, setReceiptBooking] = useState<Booking | null>(null);
+  const [reminderBooking, setReminderBooking] = useState<Booking | null>(null);
   const [scheduleEditingId, setScheduleEditingId] = useState<string | null>(null);
   const [scheduleDraft, setScheduleDraft] = useState({ date: "", time: "" });
   const [scheduleSaving, setScheduleSaving] = useState(false);
@@ -333,6 +335,15 @@ export default function OwnerBookings() {
                     <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg bg-[#d6b779] px-4 py-3 text-sm font-bold text-[#101010]">Edit booking / address</button>
                     <button type="button" onClick={() => startScheduleEdit(booking)} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80">Quick edit date / time</button>
                     {booking.customerPhone ? <a href={`/owner/messages?phone=${encodeURIComponent(booking.customerPhone)}&name=${encodeURIComponent(booking.customerName || "Customer")}`} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-center text-sm font-semibold text-[#6EAEC6]">Text customer · Full history</a> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add customer phone to text</button>}
+                    {booking.status === "confirmed" && (
+                      <button
+                        type="button"
+                        onClick={() => booking.customerPhone ? setReminderBooking(booking) : setEditingBooking(booking)}
+                        className="rounded-lg border border-[#6EAEC6]/35 bg-[#6EAEC6]/10 px-4 py-3 text-sm font-bold text-[#B9E0EC] hover:bg-[#6EAEC6]/20"
+                      >
+                        {booking.customerPhone ? "Send Reminder Now · SMS" : "Add phone to send reminder"}
+                      </button>
+                    )}
                     {["confirmed", "completed"].includes(booking.status) && (booking.customerPhone ? <button type="button" onClick={() => setReceiptBooking(booking)} className="rounded-lg border border-emerald-400/35 bg-emerald-400/12 px-4 py-3 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20">Create PAID receipt · SMS</button> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add phone to send receipt</button>)}
 
                     {!canDelete && (
@@ -359,6 +370,7 @@ export default function OwnerBookings() {
           {!visible.length && <p className="rounded-3xl border border-[#27404F] bg-[#0B1822] p-8 text-white/52">No bookings in this view.</p>}
         </div>
       </main>
+      {reminderBooking && <BookingReminderDialog key={reminderBooking.id} booking={reminderBooking} onClose={() => setReminderBooking(null)} />}
       {receiptBooking && <BookingPaidReceiptDialog key={receiptBooking.id} booking={receiptBooking} onClose={() => setReceiptBooking(null)} />}
       {editingBooking && <BookingDetailsEditor key={editingBooking.id} booking={editingBooking} onClose={() => setEditingBooking(null)} onSaved={async () => { await load(); setMessage("Booking details and address saved."); }} />}
     </div>
