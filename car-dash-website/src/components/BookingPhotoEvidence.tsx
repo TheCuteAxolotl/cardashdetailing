@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { extractBookingPhotos, stripBookingPhotos } from "@/lib/booking-photos";
+import { bookingOwnerNotes } from "@/lib/booking-owner-details";
 
 export default function BookingPhotoEvidence({ notes }: { notes: string | null | undefined }) {
   const photos = extractBookingPhotos(notes);
-  const cleanNotes = stripBookingPhotos(notes);
+  const cleanNotes = stripBookingPhotos(notes).replace(/\[\[CAR_DASH_OWNER_NOTES\]\][\s\S]*?\[\[\/CAR_DASH_OWNER_NOTES\]\]/g, "").trim();
+  const ownerNotes = bookingOwnerNotes(notes);
   const [open, setOpen] = useState<string | null>(null);
 
-  if (!cleanNotes && !photos.length) return null;
+  if (!cleanNotes && !ownerNotes && !photos.length) return null;
 
   return (
     <>
+      {ownerNotes && <div className="mt-4 rounded-2xl border border-[#d6b779]/25 bg-[#27241e] p-4"><p className="text-xs font-bold uppercase tracking-wider text-[#d6b779]">Private owner notes</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#f4efe5]">{ownerNotes}</p></div>}
       {cleanNotes && <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-[#13232F] p-4 text-xs leading-6 text-white/72">{cleanNotes}</pre>}
       {photos.length > 0 && (
         <div className="mt-4 rounded-2xl border border-white/10 bg-[#13232F]/70 p-4">
