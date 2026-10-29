@@ -412,7 +412,7 @@ export default function StaffSmsInbox({
               return (
                 <a
                   key={row.conversationId}
-                  href={`/booking-chat/${booking.id}`}
+                  href={booking.customerPhone ? `/${role}/messages?phone=${encodeURIComponent(booking.customerPhone)}&name=${encodeURIComponent(booking.customerName || "Customer")}` : `/booking-chat/${booking.id}`}
                   className={`block rounded-3xl border p-5 transition hover:border-[#6EAEC6]/45 ${
                     row.unreadCount > 0
                       ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/[.06]"
