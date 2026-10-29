@@ -2,23 +2,12 @@
 
 import CalendarSubscription from "@/components/CalendarSubscription";
 import OwnerCalendarBoard from "@/components/OwnerCalendarBoard";
+import BookingDetailsEditor, { type EditableBooking } from "@/components/BookingDetailsEditor";
 import { useEffect, useMemo, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 
-type Booking = {
-  id: string;
-  serviceName?: string;
-  customerName?: string;
-  customerPhone?: string;
-  vehicleMake?: string;
-  vehicleModel?: string;
-  vehicleYear?: string;
-  preferredDate?: string | null;
-  preferredTime?: string | null;
-  quotedPrice?: number | null;
-  status?: string;
-};
+type Booking = EditableBooking;
 
 type ViewMode = "week" | "month";
 
@@ -140,6 +129,7 @@ export default function OwnerSchedulePage() {
   const [savingTask, setSavingTask] = useState(false);
   const [message, setMessage] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [draft, setDraft] = useState<TaskDraft>(EMPTY_DRAFT);
 
   useEffect(() => {
@@ -384,6 +374,7 @@ export default function OwnerSchedulePage() {
             bookings={currentBookings}
             tasks={currentTasks}
             onSelectDay={(date) => setSelectedDay(date)}
+            onEditBooking={(booking) => setEditingBooking(booking)}
             onAddTask={(date) => openNewTask(date)}
             onEditTask={openEditTask}
             onToggleTask={toggleTask}
@@ -406,6 +397,21 @@ export default function OwnerSchedulePage() {
           </div>
         </details>
       </div>
+
+      {editingBooking && (
+        <BookingDetailsEditor
+          key={editingBooking.id}
+          booking={editingBooking}
+          onClose={() => setEditingBooking(null)}
+          onSaved={async () => {
+            const response = await fetch("/api/bookings", { cache: "no-store" });
+            if (!response.ok) throw new Error("Booking was saved, but the calendar could not refresh. Reload to see your changes.");
+            const refreshed = await response.json();
+            setBookings(Array.isArray(refreshed) ? refreshed : []);
+            setMessage("Booking and service address updated.");
+          }}
+        />
+      )}
 
       {editorOpen && (
         <div className="fixed inset-0 z-[70] grid place-items-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-label={draft.id ? "Edit schedule item" : "Add schedule item"}>
