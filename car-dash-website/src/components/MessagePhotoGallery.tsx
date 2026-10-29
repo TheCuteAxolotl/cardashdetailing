@@ -115,7 +115,7 @@ export default function MessagePhotoGallery({
           onDoubleClick={() => {setZoom(v=>v>1?1:2);setOffset({x:0,y:0});}}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={images[openIndex]} alt={altPrefix + " " + (openIndex + 1) + " enlarged"}
-            className="max-h-full max-w-full select-none object-contain" draggable={false}
+            className="h-full w-full select-none object-contain" draggable={false}
             style={{transform:"translate("+offset.x+"px,"+offset.y+"px) scale("+zoom+")"}} />
           {images.length > 1 && <>
             <button type="button" aria-label="Previous photo" onClick={() => move(-1)} className="absolute left-2 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/70 text-2xl sm:left-5">‹</button>
