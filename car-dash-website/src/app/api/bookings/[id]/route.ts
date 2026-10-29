@@ -1,3 +1,4 @@
+import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -121,7 +122,7 @@ export async function PUT(
         if (bookingHasSmsConsent(existing.notes) && customerPhone) {
           const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
           try {
-            await sendTransactionalSms({
+            await sendCustomerSmsWithHistory({
               to: customerPhone,
               body: `Car Dash Detailing: Your ${booking.serviceName} appointment was updated to ${when}. Reply with questions. Booking chat: ${chatUrl}`,
             });
@@ -175,7 +176,7 @@ export async function PUT(
 
       if (bookingHasSmsConsent(booking.notes)) {
         const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
-        await sendTransactionalSms({
+        await sendCustomerSmsWithHistory({
           to: booking.customerPhone,
           body: `Car Dash Detailing: Your ${booking.serviceName} appointment time was updated to ${when}. Reply to this text if you have any questions. Booking chat: ${chatUrl}`,
         });
@@ -211,7 +212,7 @@ export async function PUT(
         const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
         const smsBody = statusSms(booking, chatUrl);
         if (smsBody) {
-          await sendTransactionalSms({
+          await sendCustomerSmsWithHistory({
             to: booking.customerPhone,
             body: smsBody,
           });
