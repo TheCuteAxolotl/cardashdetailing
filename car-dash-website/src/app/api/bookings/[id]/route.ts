@@ -13,8 +13,11 @@ import {
   BookingSlotConflictError,
   BookingSlotUnavailableError,
   updateBookingScheduleWithSlotProtection,
+  updateBookingDetailsWithSlotProtection,
 } from "@/lib/booking-slot";
 import { formatBookingTime, isDateString, normalizeBookingTime } from "@/lib/booking-availability";
+import { replaceBookingOwnerDetails } from "@/lib/booking-owner-details";
+
 
 function statusSms(booking: {
   status: string;
@@ -59,6 +62,75 @@ export async function PUT(
 
     if (!existing) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    if (body.action === "editDetails") {
+      // An edit is not a new booking, a status change, or a quote conversion.
+      // Keep website consent, source metadata, photo evidence and original customer notes.
+      const date = String(body.preferredDate ?? existing.preferredDate ?? "").trim();
+      const time = String(body.preferredTime ?? existing.preferredTime ?? "").trim();
+      if (!isDateString(date) || !normalizeBookingTime(time)) {
+        return NextResponse.json({ error: "Enter a valid appointment date and time." }, { status: 400 });
+      }
+      if (typeof body.updatedAt === "string" && body.updatedAt &&
+          new Date(body.updatedAt).getTime() !== existing.updatedAt.getTime()) {
+        return NextResponse.json({ error: "This booking was updated elsewhere. Refresh before saving your changes." }, { status: 409 });
+      }
+      const clean = (key: string, max: number, fallback: string) =>
+        body[key] === undefined ? fallback : String(body[key] ?? "").trim().slice(0, max);
+      const customerName = clean("customerName", 150, existing.customerName);
+      const serviceName = clean("serviceName", 240, existing.serviceName);
+      const customerEmail = clean("customerEmail", 240, existing.customerEmail);
+      const customerPhone = clean("customerPhone", 60, existing.customerPhone);
+      if (!customerName || !serviceName) {
+        return NextResponse.json({ error: "Customer name and service are required." }, { status: 400 });
+      }
+      if (customerEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(customerEmail)) {
+        return NextResponse.json({ error: "Enter a valid email address or leave it blank." }, { status: 400 });
+      }
+      const price = body.quotedPrice === undefined ? existing.quotedPrice :
+        body.quotedPrice === "" || body.quotedPrice === null ? null : Number(body.quotedPrice);
+      if (price !== null && (typeof price !== "number" || !Number.isFinite(price) || price < 0 || price > 100000)) {
+        return NextResponse.json({ error: "Enter a valid booking price." }, { status: 400 });
+      }
+      const address = String(body.serviceAddress ?? "").trim();
+      const ownerNotes = String(body.ownerNotes ?? "").trim();
+      if (address.length > 500 || ownerNotes.length > 4000) {
+        return NextResponse.json({ error: "Address or notes are too long." }, { status: 400 });
+      }
+      const nextNotes = replaceBookingOwnerDetails(existing.notes, address, ownerNotes);
+      const before = normalizeBookingTime(existing.preferredTime);
+      const after = normalizeBookingTime(time);
+      const scheduleChanged = existing.preferredDate !== date || before !== after;
+      const booking = await updateBookingDetailsWithSlotProtection(existing.id, {
+        customerName, customerEmail, customerPhone,
+        serviceName,
+        vehicleYear: clean("vehicleYear", 20, existing.vehicleYear),
+        vehicleMake: clean("vehicleMake", 100, existing.vehicleMake),
+        vehicleModel: clean("vehicleModel", 100, existing.vehicleModel),
+        vehicleTrim: clean("vehicleTrim", 100, existing.vehicleTrim || "") || null,
+        quotedPrice: price, notes: nextNotes,
+      }, date, time);
+      if (scheduleChanged) {
+        const when = `${date} at ${formatBookingTime(time)}`;
+        try {
+          await addBookingSystemMessage(booking.id, `Appointment time updated to ${when}.`);
+        } catch (error) {
+          console.error("Booking chat schedule update failed:", error);
+        }
+        if (bookingHasSmsConsent(existing.notes) && customerPhone) {
+          const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
+          try {
+            await sendTransactionalSms({
+              to: customerPhone,
+              body: `Car Dash Detailing: Your ${booking.serviceName} appointment was updated to ${when}. Reply with questions. Booking chat: ${chatUrl}`,
+            });
+          } catch (error) {
+            console.error("Booking schedule update SMS failed:", error);
+          }
+        }
+      }
+      return NextResponse.json(booking, { status: 200 });
     }
 
     if (body.action === "confirmWithDetails") {
