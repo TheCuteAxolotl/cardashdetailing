@@ -138,6 +138,35 @@ export async function updateBookingScheduleWithSlotProtection(
   });
 }
 
+/** Edit a booking and its schedule as one transaction. The day lock and duration
+ * check protect customer slots when owners change service or appointment times. */
+export async function updateBookingDetailsWithSlotProtection(
+  bookingId: string,
+  data: Prisma.BookingUncheckedUpdateInput,
+  date: string,
+  time: string
+) {
+  const cleanDate = String(date || "").trim();
+  const normalized = normalizeBookingTime(time);
+  if (!cleanDate || !normalized) throw new BookingSlotUnavailableError("Enter a valid appointment date and time.");
+
+  return prisma.$transaction(async tx => {
+    await lockSlot(tx, cleanDate, normalized);
+    const existing = await tx.booking.findUnique({ where: { id: bookingId } });
+    if (!existing) throw new Error("Booking not found");
+    const serviceName = typeof data.serviceName === "string" ? data.serviceName : existing.serviceName;
+    const notes = typeof data.notes === "string" ? data.notes : existing.notes;
+    if (ACTIVE_STATUSES.includes(existing.status) &&
+      await slotIsTaken(tx, cleanDate, normalized, savedDuration(notes, serviceName), bookingId)) {
+      throw new BookingSlotConflictError("The updated appointment would overlap another active booking. Choose another time.");
+    }
+    return tx.booking.update({
+      where: { id: bookingId },
+      data: { ...data, preferredDate: cleanDate, preferredTime: formatBookingTime(normalized) },
+    });
+  });
+}
+
 export async function activateBookingStatusWithSlotProtection(
   bookingId: string,
   status: "pending" | "confirmed"
