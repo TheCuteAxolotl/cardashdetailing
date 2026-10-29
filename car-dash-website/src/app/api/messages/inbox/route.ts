@@ -29,15 +29,15 @@ export async function GET(request: NextRequest) {
     bookings ? prisma.bookingConversation.findMany({
       where: { messages: { some: { sender: { in: ["customer", "team"] } } } },
       select: {
-        booking: { select: { id: true, customerName: true, customerPhone: true, serviceName: true, status: true } },
+        booking: { select: { id: true, userId: true, customerEmail: true, customerName: true, customerPhone: true, serviceName: true, status: true } },
         updatedAt: true,
         messages: latest,
       },
     }) : [],
     quotes ? prisma.quoteThread.findMany({
       select: {
-        id: true, subject: true, status: true, guestName: true, guestPhone: true, updatedAt: true,
-        user: { select: { name: true } }, messages: latest,
+        id: true, userId: true, subject: true, status: true, guestName: true, guestEmail: true, guestPhone: true, updatedAt: true,
+        user: { select: { name: true, email: true } }, messages: latest,
       },
     }) : [],
     sms ? prisma.unmatchedSmsMessage.findMany({
@@ -51,6 +51,23 @@ export async function GET(request: NextRequest) {
     if (phone && !direct.has(phone)) direct.set(phone, message);
   }
 
+  const byAccount = new Map<string, string>();
+  const byEmail = new Map<string, string>();
+  for (const row of bookingRows) {
+    const phone = normalizePhoneNumber(row.booking.customerPhone);
+    if (!phone) continue;
+    if (row.booking.userId && !byAccount.has(row.booking.userId)) byAccount.set(row.booking.userId, phone);
+    if (row.booking.customerEmail && !byEmail.has(row.booking.customerEmail.trim().toLowerCase())) {
+      byEmail.set(row.booking.customerEmail.trim().toLowerCase(), phone);
+    }
+  }
+  const linkedQuotePhone = (row: typeof quoteRows[number]) =>
+    normalizePhoneNumber(row.guestPhone) ||
+    (row.userId ? byAccount.get(row.userId) : undefined) ||
+    (row.guestEmail ? byEmail.get(row.guestEmail.trim().toLowerCase()) : undefined) ||
+    (row.user?.email ? byEmail.get(row.user.email.trim().toLowerCase()) : undefined) ||
+    "";
+
   const rows: Row[] = [
     ...bookingRows.map(row => ({
       kind: "booking" as const, id: row.booking.id, name: row.booking.customerName,
@@ -59,7 +76,7 @@ export async function GET(request: NextRequest) {
     })),
     ...quoteRows.map(row => ({
       kind: "quote" as const, id: row.id, name: row.user?.name || row.guestName || "Customer",
-      phone: row.guestPhone || "", subject: row.subject, status: row.status,
+      phone: linkedQuotePhone(row), subject: row.subject, status: row.status,
       body: row.messages[0]?.body || "", updatedAt: row.messages[0]?.createdAt || row.updatedAt,
     })),
     ...Array.from(direct, ([phone, message]) => ({
