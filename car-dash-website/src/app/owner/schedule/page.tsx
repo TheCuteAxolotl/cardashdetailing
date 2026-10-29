@@ -458,7 +458,7 @@ export default function OwnerSchedulePage() {
               </div>
               <div className="flex gap-2">
                 <button type="button" onClick={() => setEditorOpen(false)} className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-[#c2bbb0]">Cancel</button>
-                <button type="submit" disabled={savingTask} className="rounded-xl bg-[#111] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{savingTask ? "Saving…" : draft.id ? "Save changes" : "Add to schedule"}</button>
+                <button type="submit" disabled={savingTask} className="rounded-xl bg-[#d6b779] px-5 py-2.5 text-sm font-semibold text-[#101010] disabled:opacity-50">{savingTask ? "Saving…" : draft.id ? "Save changes" : "Add to schedule"}</button>
               </div>
             </div>
           </form>
