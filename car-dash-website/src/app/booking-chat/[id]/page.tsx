@@ -5,6 +5,7 @@ import SendPhotos from "@/components/SendPhotos";
 import MessageBookingForm from "@/components/MessageBookingForm";
 
 import SmsAttachments from "@/components/SmsAttachments";
+import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
@@ -227,7 +228,7 @@ export default function BookingChatPage() {
                       className={`max-w-[86%] rounded-2xl px-4 py-3 ${mine ? "ml-auto bg-[#6EAEC6] text-[#0B1822]" : "bg-white/8"}`}
                     >
                       <p className="whitespace-pre-wrap text-sm leading-6">{message.body}</p>
-                      {authRole === "owner" && message.body !== DELETED_MESSAGE && <DeleteMessageButton kind="booking" id={message.id} onDeleted={() => void load(true)} />}{message.attachmentsJson&&<div className="mt-2 flex flex-wrap gap-2">{(JSON.parse(message.attachmentsJson) as string[]).map((src,index)=><a key={index} href={src} target="_blank" rel="noreferrer"><img src={src} alt="Message photo" className="max-h-56 max-w-full rounded-lg"/></a>)}</div>}
+                      {authRole === "owner" && message.body !== DELETED_MESSAGE && <DeleteMessageButton kind="booking" id={message.id} onDeleted={() => void load(true)} />}{message.attachmentsJson&&<MessagePhotoGallery photos={JSON.parse(message.attachmentsJson) as string[]} className="mt-2 flex flex-wrap gap-2" thumbnailClassName="max-h-56 max-w-full rounded-lg object-contain" altPrefix="Booking chat photo" />}
                       {staff && message.sender === "customer" && <SmsAttachments sid={message.externalSid} body={message.body} />}
                       {staff && message.sender === "customer" && <MessageBookingForm source={{type:"booking-message",id:message.id}} />}
                       <div className="mt-2 flex items-center gap-2 text-[10px] opacity-45">
