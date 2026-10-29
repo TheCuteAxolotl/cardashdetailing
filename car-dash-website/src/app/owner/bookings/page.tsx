@@ -330,7 +330,7 @@ export default function OwnerBookings() {
                   <div className="flex min-w-48 flex-col gap-2">
                     <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg bg-[#d6b779] px-4 py-3 text-sm font-bold text-[#101010]">Edit booking / address</button>
                     <button type="button" onClick={() => startScheduleEdit(booking)} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80">Quick edit date / time</button>
-                    <a href={`/booking-chat/${booking.id}`} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-center text-sm font-semibold text-[#6EAEC6]">Text / chat customer</a>
+                    <a href={booking.customerPhone ? `/owner/messages?phone=${encodeURIComponent(booking.customerPhone)}&name=${encodeURIComponent(booking.customerName || "Customer")}` : `/booking-chat/${booking.id}`} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-center text-sm font-semibold text-[#6EAEC6]">Text customer · Full history</a>
 
                     {!canDelete && (
                       <>
