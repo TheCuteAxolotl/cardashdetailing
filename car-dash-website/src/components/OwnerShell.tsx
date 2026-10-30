@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
+import OwnerActivityBell from "@/components/OwnerActivityBell";
 
 type OwnerUser = { name?: string | null; email?: string | null; role?: string | null };
 
@@ -239,7 +240,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   );
 
   return (
-    <div className="console-shell min-h-screen bg-[#f3f0e8] text-[#171411]">
+    <div className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
       <aside onMouseEnter={() => setPanel(null)} className="console-rail console-rail-reveal fixed inset-y-0 left-0 z-50 hidden w-[76px] border-r border-black/[.08] bg-[#f8f6f0]/95 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
         <div className="flex w-full flex-col items-center gap-2 px-2 pt-4">
           <button title="Quick create" onClick={() => go(quickHref)} className="grid h-12 w-12 place-items-center rounded-full bg-[#0d0d0d] text-white shadow-[0_12px_28px_rgba(23,20,17,.15)] transition hover:scale-[1.04]">
@@ -370,6 +371,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <OwnerActivityBell />
             <button onClick={() => { setSearchOpen(true); setQuery(""); }} className="hidden rounded-full border border-black/[.08] bg-white px-3.5 py-2 text-xs font-medium text-black/45 hover:text-black sm:inline-flex">⌘ Search</button>
             <a href="/" target="_blank" rel="noreferrer" className="rounded-full border border-black/[.08] bg-white px-3.5 py-2 text-xs font-medium text-black/48 hover:text-black">View site</a>
           </div>
