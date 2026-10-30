@@ -105,9 +105,34 @@
     .editorial-theme .owner-app aside[class*="max-w-[88vw]"] a {
       color: #e3d9ce !important;
     }
-    .editorial-theme .owner-app aside[class*="max-w-[88vw]"] a[class*="bg-[#171411]"] {
+    .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-search {
+      background: #2b2926 !important;
+      color: #eee5d7 !important;
+      border-color: #ffffff38 !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-search:hover {
+      border-color: #e58b4b90 !important;
+      background: #35302b !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-search svg {
+      color: #e6aa77 !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-close {
+      background: #2b2926 !important;
+      color: #f4efe5 !important;
+      border-color: #ffffff30 !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link {
+      color: #ddd4c9 !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active,
+    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active :is(span,svg) {
       background: #e58b4b !important;
-      color: #101010 !important;
+      color: #171310 !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link:not(.owner-nav-link-active):hover {
+      background: #ffffff13 !important;
+      color: #fff !important;
     }
   }
 }
