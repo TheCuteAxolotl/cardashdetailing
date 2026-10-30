@@ -207,10 +207,10 @@ export default function OwnerCalendarBoard({
                 <p className="mt-1 line-clamp-2 text-xs opacity-80">{item.booking.serviceName || "Detailing"}{item.booking.vehicleMake ? " · " + [item.booking.vehicleYear, item.booking.vehicleMake, item.booking.vehicleModel].filter(Boolean).join(" ") : ""}</p>
                 {bookingServiceAddress(item.booking.notes)
                   ? <p className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
-                      <span className="min-w-0 flex-1 break-words">📍 {bookingServiceAddress(item.booking.notes)}</span>
+                      <span className="min-w-0 flex-1 break-words">Service address: {bookingServiceAddress(item.booking.notes)}</span>
                       <a href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(bookingServiceAddress(item.booking.notes))} target="_blank" rel="noopener noreferrer" className="shrink-0 underline">Maps</a>
                     </p>
-                  : <p className="mt-3 text-xs font-bold text-amber-200">⚠ Service address missing</p>}
+                  : <p className="mt-3 text-xs font-bold text-amber-200">Service address missing</p>}
                 {Number(item.booking.quotedPrice || 0) > 0 ? <p className="mt-2 text-sm font-semibold">{money(Number(item.booking.quotedPrice))}</p> : null}
                 <button type="button" onClick={() => onEditBooking(item.booking)} className="mt-3 w-full rounded-lg border border-current/30 px-3 py-2 text-xs font-bold hover:brightness-125">Edit booking / address</button>
               </div>
