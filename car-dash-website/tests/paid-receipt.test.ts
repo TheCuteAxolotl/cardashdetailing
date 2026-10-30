@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { invoiceSmsText, isInvoiceFullyPaid, paidReceiptInvoiceId } from "../src/lib/paid-receipt";
+import { invoiceSmsText, isInvoiceFullyPaid, paidReceiptInvoiceId, paymentReceiptSmsText } from "../src/lib/paid-receipt";
 import type { InvoiceRecord } from "../src/lib/invoices";
 
 const invoice: InvoiceRecord = {
@@ -55,3 +55,32 @@ const voidInvoice = { ...invoice, status: "void" as const };
 assert.equal(isInvoiceFullyPaid(voidInvoice), false);
 
 console.log("Invoice SMS: paid versus outstanding and partial balances produce correct wording.");
+
+
+const partialReceipt = paymentReceiptSmsText(
+  { ...invoice, status: "partial", dueDate: "2026-11-06", payments: [{ ...invoice.payments[0], amount: 124.50 }] },
+  url,
+  { ...invoice.payments[0], amount: 124.50 }
+);
+assert.match(partialReceipt, /received your payment of \$124\.50/);
+assert.match(partialReceipt, /Invoice total: \$249\.00/);
+assert.match(partialReceipt, /Total paid: \$124\.50/);
+assert.match(partialReceipt, /Remaining balance: \$124\.50/);
+assert.match(partialReceipt, /Due date: 2026-11-06/);
+assert.match(partialReceipt, /payment receipt/);
+assert.doesNotMatch(partialReceipt, /PAID receipt|balance is \$0\.00/);
+
+const finalPayment = { id: "paid-2", amount: 124.50, method: "Zelle", paidAt: "2026-11-06T16:00:00.000Z" };
+const settled = {
+  ...invoice,
+  payments: [{ ...invoice.payments[0], amount: 124.50 }, finalPayment],
+  status: "paid" as const,
+};
+const finalReceipt = paymentReceiptSmsText(settled, url, finalPayment);
+assert.match(finalReceipt, /received your payment of \$124\.50/);
+assert.match(finalReceipt, /Total paid: \$249\.00/);
+assert.match(finalReceipt, /balance is \$0\.00/);
+assert.match(finalReceipt, /PAID receipt/);
+assert.doesNotMatch(finalReceipt, /Remaining balance: \$124\.50/);
+
+console.log("Partial and final payment receipts show the right amounts and payment status.");
