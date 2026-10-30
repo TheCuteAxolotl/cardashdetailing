@@ -73,7 +73,7 @@ export async function POST(request: Request, context: Context) {
     if (!/^[a-zA-Z0-9-]{8,48}$/.test(requestId)) {
       return NextResponse.json({ error: "Invalid payment request. Refresh and try again." }, { status: 400 });
     }
-    const paymentId = \`receipt-payment-\${requestId}\`;
+    const paymentId = `receipt-payment-${requestId}`;
     const identifier = paidReceiptInvoiceId(id);
     const amount = Number(body?.paidAmount);
     const totalAmount = Number(body?.totalAmount);
@@ -90,12 +90,12 @@ export async function POST(request: Request, context: Context) {
     if (!allowedMethods.includes(method)) {
       return NextResponse.json({ error: "Choose a payment method." }, { status: 400 });
     }
-    if (dueDate && (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate) || Number.isNaN(new Date(\`\${dueDate}T12:00:00\`).getTime()))) {
+    if (dueDate && (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate) || Number.isNaN(new Date(`${dueDate}T12:00:00`).getTime()))) {
       return NextResponse.json({ error: "Enter a valid balance due date." }, { status: 400 });
     }
 
     let invoice: InvoiceRecord | null = null;
-    const key = \`invoice:\${identifier}\`;
+    const key = `invoice:${identifier}`;
 
     // Compare-and-swap avoids lost updates or double charges in owner records
     // when two browser tabs record a payment at nearly the same time.
@@ -123,12 +123,12 @@ export async function POST(request: Request, context: Context) {
           discountAmount: 0,
           taxRate: 0,
           notes: "Thank you for choosing Car Dash Detailing.",
-          internalInspectionNotes: \`Owner reported offline payment received and SMS permission on \${new Date().toISOString()}. Not an independently verified bank transaction.\`,
+          internalInspectionNotes: `Owner reported offline payment received and SMS permission on ${new Date().toISOString()}. Not an independently verified bank transaction.`,
           terms: "Payments are recorded as received. Any remaining balance is still owed.",
           paymentOptions: { check: false, cash: false, online: false, other: false },
           payments: [{ id: paymentId, amount, method, reference: reference || undefined, paidAt: new Date().toISOString() }],
           status: "partial",
-          source: \`booking-paid:\${id}\`,
+          source: `booking-paid:${id}`,
         });
         try {
           await prisma.siteContent.create({ data: { key, value: JSON.stringify(newInvoice) } });
@@ -160,7 +160,7 @@ export async function POST(request: Request, context: Context) {
         return NextResponse.json({ error: "This invoice is already fully paid. No additional payment was recorded." }, { status: 409 });
       }
       if (Math.round(amount * 100) > Math.round(outstanding * 100)) {
-        return NextResponse.json({ error: \`Payment exceeds the remaining balance of $\${outstanding.toFixed(2)}.\` }, { status: 400 });
+        return NextResponse.json({ error: `Payment exceeds the remaining balance of $${outstanding.toFixed(2)}.` }, { status: 400 });
       }
 
       const payments: InvoicePayment[] = [
@@ -192,7 +192,7 @@ export async function POST(request: Request, context: Context) {
 
     // A distinct claim per payment prevents duplicate texts while allowing the
     // next week's payment to be acknowledged with its own receipt.
-    const smsKey = \`payment-receipt-sms:\${identifier}:\${paymentId}\`;
+    const smsKey = `payment-receipt-sms:${identifier}:${paymentId}`;
     try {
       await prisma.siteContent.create({ data: { key: smsKey, value: "claimed" } });
     } catch (error) {
@@ -213,7 +213,7 @@ export async function POST(request: Request, context: Context) {
         await prisma.siteContent.delete({ where: { key: smsKey } }).catch(() => null);
         return NextResponse.json({ error: "Invoice changed. Refresh before texting." }, { status: 409 });
       }
-      const link = \`\${getPublicSiteUrl()}/invoice/\${latest.shareToken}\`;
+      const link = `${getPublicSiteUrl()}/invoice/${latest.shareToken}`;
       const message = paymentReceiptSmsText(latest, link, payment);
       const delivery = await sendCustomerSmsWithHistory({ to: latest.customerPhone, body: message });
       if (!delivery.sent || !delivery.sid) {
@@ -247,7 +247,7 @@ export async function POST(request: Request, context: Context) {
           update: {},
           create: {
             conversationId: conversation.id, sender: "team",
-            body: \`\${message}\nReply STOP to opt out or HELP for help.\`,
+            body: `${message}\nReply STOP to opt out or HELP for help.`,
             channel: "sms", externalSid: delivery.sid,
           },
         });
