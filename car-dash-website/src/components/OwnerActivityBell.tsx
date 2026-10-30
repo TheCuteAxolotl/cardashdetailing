@@ -48,7 +48,7 @@ export default function OwnerActivityBell() {
   useEffect(()=>{
     setEnabled(localStorage.getItem("cardash_live_alerts")==="yes");
     void load();
-    const timer=window.setInterval(()=>{if(!document.hidden)void load();},20000);
+    const timer=window.setInterval(()=>void load(),30000);
     const onFocus=()=>void load();
     window.addEventListener("focus",onFocus);
     return()=>{clearInterval(timer);window.removeEventListener("focus",onFocus)};
