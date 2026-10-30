@@ -86,7 +86,7 @@
   .editorial-theme .owner-app .owner-activity-panel :is(button,a):not([class*="bg-[#e58b4b]"]):hover {
     background-color: #ffffff0a;
   }
-  .editorial-theme .owner-app .console-shell [class~="console-notification-badge"] {
+  .editorial-theme .owner-app .console-notification-badge {
     background-color: #ef7f36 !important;
     color: #101010 !important;
   }
