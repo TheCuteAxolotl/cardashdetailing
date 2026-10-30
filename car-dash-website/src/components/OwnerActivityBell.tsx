@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
 
 type Alert = {id:string;kind:"booking"|"quote"|"message"|"call"|"support";title:string;detail:string;href:string;time:string};
 type Payload = {alerts:Alert[];unread:number;seenAt:string|null};
@@ -7,7 +8,7 @@ const age = (value:string) => {
   const minutes=Math.max(0,Math.floor((Date.now()-Date.parse(value))/60000));
   return minutes<1?"Just now":minutes<60?minutes+"m ago":minutes<1440?Math.floor(minutes/60)+"h ago":new Date(value).toLocaleDateString("en-US",{month:"short",day:"numeric"});
 };
-const icon:{[K in Alert["kind"]]:string}={booking:"▦",quote:"✦",message:"✉",call:"☎",support:"?"};
+const icon:Record<Alert["kind"],OwnerIconName>={booking:"calendar",quote:"quote",message:"message",call:"phone",support:"support"};
 
 export default function OwnerActivityBell() {
   const [payload,setPayload]=useState<Payload|null>(null);
@@ -96,19 +97,19 @@ export default function OwnerActivityBell() {
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
       {Boolean(payload?.unread) && <span className="absolute -right-1.5 -top-1.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#ec742f] px-1 text-[10px] font-bold text-[#101010]">{Math.min(99,payload?.unread||0)}{(payload?.unread||0)>99?"+":""}</span>}
     </button>
-    {open && <div className="owner-activity-panel absolute right-0 top-[calc(100%+12px)] z-[110] w-[min(370px,calc(100vw-24px))] overflow-hidden rounded-2xl border border-white/20 bg-[#1a1a19] text-[#f4efe5] shadow-[0_28px_100px_#0009]">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+    {open && <div className="owner-activity-panel fixed left-3 right-3 top-[80px] z-[110] flex max-h-[calc(100dvh-92px)] flex-col overflow-hidden rounded-2xl border border-white/20 bg-[#1a1a19] text-[#f4efe5] shadow-[0_28px_100px_#0009] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+12px)] sm:w-[min(370px,calc(100vw-32px))]">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-4">
         <div><p className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#d6b779]">Live activity</p><h2 className="mt-1 text-lg font-semibold">Notifications</h2></div>
         <button type="button" onClick={()=>void markRead()} disabled={!payload?.unread} className="text-xs font-semibold text-[#e5c995] disabled:opacity-40">Mark read</button>
       </div>
-      <div className="max-h-[min(57vh,480px)] overflow-y-auto divide-y divide-white/10">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain divide-y divide-white/10 sm:max-h-[min(56vh,460px)]">
         {payload?.alerts.length ? payload.alerts.map(alert=><a key={alert.id} href={alert.href} className="flex items-start gap-3 px-4 py-3.5 hover:bg-white/[.055]">
-          <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#e58b4b]/15 text-lg text-[#e8a36a]">{icon[alert.kind]}</span>
+          <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#e58b4b]/15 text-[#e8a36a]"><OwnerAppIcon name={icon[alert.kind]} className="h-[18px] w-[18px]"/></span>
           <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{alert.title}</span><span className="mt-1 block line-clamp-2 break-words text-xs leading-5 text-[#bdb8b0]">{alert.detail}</span></span>
           <time className="shrink-0 text-[10px] text-[#969089]">{age(alert.time)}</time>
         </a>) : <p className="px-5 py-10 text-center text-sm text-[#bdb8b0]">No recent activity yet.</p>}
       </div>
-      <div className="border-t border-white/10 bg-[#20201f] px-4 py-3">
+      <div className="shrink-0 border-t border-white/10 bg-[#20201f] px-4 py-3">
         <button type="button" onClick={()=>void setLive()} className="flex w-full items-center justify-between gap-3 text-left text-xs font-medium text-[#e2dcd2]">
           <span>{enabled?"Live alerts enabled on this device":"Enable live alerts on this device"}</span>
           <span className={"relative inline-flex h-6 w-11 shrink-0 rounded-full transition "+(enabled?"bg-[#e58b4b]":"bg-[#55514b]")}><span className={"absolute top-1 h-4 w-4 rounded-full bg-[#171411] transition "+(enabled?"left-6":"left-1")}/></span>
