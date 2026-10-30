@@ -144,9 +144,9 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
                 <p className="mt-6 text-sm leading-6 text-white/45 print:text-black/55">South Elgin, Illinois<br />cardashdetailing.com</p>
               </div>
               <div className="sm:text-right">
-                <p className="text-xs font-semibold uppercase tracking-[.22em] text-[#6EAEC6] print:text-black/50">Invoice</p>
+                <p className="text-xs font-semibold uppercase tracking-[.22em] text-[#6EAEC6] print:text-black/50">{invoice.totals.paid > 0 ? "Payment receipt" : "Invoice"}</p>
                 <h1 className="mt-2 text-3xl font-semibold">{invoice.invoiceNumber}</h1>
-                <div className="mt-3 flex sm:justify-end"><span className={`rounded-full border px-3 py-1 text-xs font-bold ${paid ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200 print:text-black" : "border-[#6EAEC6]/25 bg-[#6EAEC6]/10 text-[#B9E0EC] print:text-black"}`}>{paid ? "PAID" : `${currency.format(invoice.totals.balance)} DUE`}</span></div>
+                <div className="mt-3 flex sm:justify-end"><span className={`rounded-full border px-3 py-1 text-xs font-bold ${paid ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-200 print:text-black" : "border-[#6EAEC6]/25 bg-[#6EAEC6]/10 text-[#B9E0EC] print:text-black"}`}>{paid ? "PAID" : invoice.totals.paid > 0 ? `PARTIALLY PAID · ${currency.format(invoice.totals.balance)} DUE` : `${currency.format(invoice.totals.balance)} DUE`}</span></div>
               </div>
             </div>
           </header>
