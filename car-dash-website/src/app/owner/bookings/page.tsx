@@ -94,6 +94,14 @@ export default function OwnerBookings() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("create") === "1") {
+      setConvertingId(null);
+      setShowManual(true);
+      window.requestAnimationFrame(() => document.getElementById("owner-manual-booking")?.scrollIntoView({block:"start",behavior:"smooth"}));
+    }
+  }, []);
+
   const load = async () => {
     const response = await fetch("/api/bookings", { cache: "no-store" });
     if (!response.ok) throw new Error("Failed to load bookings");
@@ -251,7 +259,7 @@ export default function OwnerBookings() {
 
       <main className="mx-auto max-w-7xl px-6 py-10">
         {showManual && (
-          <form onSubmit={submitManualBooking} className="mb-8 rounded-3xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.04] p-6">
+          <form id="owner-manual-booking" onSubmit={submitManualBooking} className="mb-8 scroll-mt-24 rounded-3xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.04] p-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Manual Booking</p>
               <h2 className="mt-2 text-2xl font-semibold">{convertingId ? "Confirm request and add to schedule" : "Add a booking from somewhere else"}</h2>
