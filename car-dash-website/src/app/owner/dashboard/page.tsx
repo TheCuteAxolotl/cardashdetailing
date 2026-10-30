@@ -3,274 +3,142 @@
 import { useEffect, useMemo, useState } from "react";
 
 type Booking = {
-  id: string;
-  serviceName?: string;
-  customerName?: string;
-  vehicleMake?: string;
-  vehicleModel?: string;
-  preferredDate?: string | null;
-  preferredTime?: string | null;
-  status?: string;
-  quotedPrice?: number | null;
+  id: string; serviceName?: string; customerName?: string;
+  vehicleMake?:string;vehicleModel?:string; preferredDate?:string|null;preferredTime?:string|null;
+  status?:string;quotedPrice?:number|null;createdAt?:string;
+};
+type Activity={id:string;kind:string;title:string;detail:string;href:string;time:string};
+type Metrics={bookings:Booking[];unread:number;activity:Activity[]};
+
+const tools = [
+  {title:"Calendar",href:"/owner/schedule",description:"Jobs and availability",symbol:"▦"},
+  {title:"Clients & bookings",href:"/owner/bookings",description:"Appointments and addresses",symbol:"◉"},
+  {title:"Messages",href:"/owner/messages",description:"Your complete SMS history",symbol:"✉"},
+  {title:"Quotes",href:"/owner/quotes",description:"Review and convert leads",symbol:"✦"},
+  {title:"Invoices",href:"/owner/invoices",description:"Create and collect payment",symbol:"▤"},
+  {title:"Detail calculator",href:"/owner/estimate-calculator",description:"Price and time estimates",symbol:"⌗"},
+  {title:"Training guides",href:"/owner/service-guides",description:"Step-by-step procedures",symbol:"☷"},
+  {title:"Analytics",href:"/owner/analytics",description:"Performance and results",symbol:"↗"},
+  {title:"Gift cards",href:"/owner/gift-cards",description:"Balances and redemption",symbol:"◇"},
+  {title:"Website",href:"/owner/website",description:"Content and photos",symbol:"◫"},
+];
+const money=(value:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(value);
+const dayId=(d:Date)=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);
+const niceDate=(value:string)=>new Date(value+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+const timeLabel=(value?:string|null)=>{
+ if(!value)return "Time TBD";
+ const match=value.match(/^(\d{1,2}):(\d{2})/);
+ if(!match)return value;
+ const hours=Number(match[1]);return (hours%12||12)+":"+match[2]+(hours>=12?" PM":" AM");
 };
 
-type Metrics = {
-  bookings: Booking[];
-  unread: number;
-};
+export default function OwnerDashboard(){
+ const [data,setData]=useState<Metrics>({bookings:[],unread:0,activity:[]});
+ const [loaded,setLoaded]=useState(false);
+ const [tab,setTab]=useState<"today"|"upcoming">("today");
+ const today=useMemo(()=>dayId(new Date()),[]);
+ const greeting=useMemo(()=>new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",weekday:"long",month:"long",day:"numeric"}).format(new Date()),[]);
+ useEffect(()=>{
+  let cancelled=false;
+  const run=async()=>{
+   const [bookings,sms,activity]=await Promise.allSettled([
+    fetch("/api/bookings",{cache:"no-store"}).then(async r=>r.ok?r.json():[]),
+    fetch("/api/sms/inbox",{cache:"no-store"}).then(async r=>r.ok?r.json():null),
+    fetch("/api/owner/activity",{cache:"no-store"}).then(async r=>r.ok?r.json():null),
+   ]);
+   if(cancelled)return;
+   setData({
+    bookings:bookings.status==="fulfilled"&&Array.isArray(bookings.value)?bookings.value:[],
+    unread:sms.status==="fulfilled"?Number(sms.value?.totalUnread||0):0,
+    activity:activity.status==="fulfilled"&&Array.isArray(activity.value?.alerts)?activity.value.alerts:[],
+   });
+   setLoaded(true);
+  };
+  void run();
+  const interval=setInterval(()=>{if(!document.hidden)void run()},45000);
+  return()=>{cancelled=true;clearInterval(interval)};
+ },[]);
+ const upcoming=useMemo(()=>data.bookings.filter(b=>b.preferredDate&&b.preferredDate>=today&&!["cancelled","completed"].includes((b.status||"").toLowerCase()))
+   .sort((a,b)=>(a.preferredDate||"").localeCompare(b.preferredDate||"")||(a.preferredTime||"").localeCompare(b.preferredTime||"")),[data.bookings,today]);
+ const todayBookings=upcoming.filter(b=>b.preferredDate===today);
+ const visibleBookings=tab==="today"?todayBookings:upcoming.slice(0,5);
+ const active=data.bookings.filter(b=>!["cancelled","completed"].includes((b.status||"").toLowerCase()));
+ const pending=active.filter(b=>(b.status||"").toLowerCase()==="pending");
+ const completed=data.bookings.filter(b=>(b.status||"").toLowerCase()==="completed");
+ const bookedValue=active.reduce((sum,b)=>sum+Number(b.quotedPrice||0),0);
+ const completedValue=completed.reduce((sum,b)=>sum+Number(b.quotedPrice||0),0);
+ const spotlight=data.activity.slice(0,4);
 
-const toolRows = [
-  ["Schedule", "/owner/schedule", "Calendar, bookings and private to-dos", "calendar"],
-  ["Bookings", "/owner/bookings", "Appointments and customer details", "booking"],
-  ["Messages", "/owner/messages", "Customer SMS conversations", "message"],
-  ["Build a Detail", "/owner/detail-builder", "Inspect a vehicle and build a custom price", "detail"],
-  ["Estimate Calculator", "/owner/estimate-calculator", "Live service prices, durations and add-on totals", "detail"],
-  ["Training Guides", "/owner/service-guides", "Step-by-step procedures for teaching every service", "detail"],
-  ["Invoices", "/owner/invoices", "Create, send and record payments", "invoice"],
-  ["Gift cards", "/owner/gift-cards", "Print cards and manage dollar balances", "pricing"],
-  ["Loyalty cards", "/owner/loyalty", "Verify paid visits and free-detail rewards", "maintenance"],
-  ["Maintenance", "/owner/maintenance", "Monthly subscriptions and client plans", "maintenance"],
-  ["Pricing", "/owner/pricing-pages", "Packages and service pricing", "pricing"],
-  ["Promo Codes", "/owner/promo-codes", "Manage discount codes, limits and expiration dates", "pricing"],
-  ["Service Times", "/owner/service-durations", "Edit appointment durations for services and add-ons", "calendar"],
-  ["Website", "/owner/website", "Homepage copy and public content", "website"],
-  ["Photos & media", "/owner/gallery", "Website galleries and service images", "photo"],
-] as const;
-
-function money(value: number | null | undefined) {
-  if (!value) return "—";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function bookingDate(value?: string | null) {
-  if (!value) return "No date";
-  const d = new Date(`${value}T12:00:00`);
-  if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-function ToolGlyph({ kind }: { kind: string }) {
-  const common = "h-[19px] w-[19px]";
-  if (kind === "calendar") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>;
-  if (kind === "message") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><path d="M4 5h16v12H8l-4 3V5Z"/><path d="M8 9h8M8 12h5"/></svg>;
-  if (kind === "invoice") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>;
-  if (kind === "website") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>;
-  if (kind === "photo") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m5 18 4-4 3 3 3-3 4 4"/></svg>;
-  if (kind === "pricing") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><path d="M12 3v18"/><path d="M17 7c-1-1-2.6-1.6-4.8-1.6-2.8 0-4.7 1.2-4.7 3.2 0 4.8 9.5 2.1 9.5 7 0 2-1.8 3.4-5 3.4-2.4 0-4.3-.8-5.5-2.2"/></svg>;
-  if (kind === "maintenance") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg>;
-  if (kind === "booking") return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><path d="M5 5h14v15H5z"/><path d="M8 3v4M16 3v4M8 11h8M8 15h5"/></svg>;
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={common}><path d="M4 7h10M4 17h16M14 7h6M4 12h4M12 12h8"/><circle cx="11" cy="12" r="2"/><circle cx="17" cy="7" r="2"/></svg>;
-}
-
-export default function OwnerDashboard() {
-  const [metrics, setMetrics] = useState<Metrics>({ bookings: [], unread: 0 });
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const [bookingsResult, smsResult] = await Promise.allSettled([
-        fetch("/api/bookings", { cache: "no-store" }).then((r) => (r.ok ? r.json() : [])),
-        fetch("/api/sms/inbox", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)),
-      ]);
-      if (cancelled) return;
-      const bookings =
-        bookingsResult.status === "fulfilled" && Array.isArray(bookingsResult.value)
-          ? bookingsResult.value
-          : [];
-      const unread =
-        smsResult.status === "fulfilled"
-          ? Number(smsResult.value?.totalUnread || 0)
-          : 0;
-      setMetrics({ bookings, unread });
-      setLoaded(true);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const summary = useMemo(() => {
-    const active = metrics.bookings.filter(
-      (b) => !["cancelled", "completed"].includes(String(b.status || "").toLowerCase())
-    );
-    const pending = metrics.bookings.filter(
-      (b) => String(b.status || "").toLowerCase() === "pending"
-    );
-    const completed = metrics.bookings.filter(
-      (b) => String(b.status || "").toLowerCase() === "completed"
-    );
-    const completedValue = completed.reduce(
-      (sum, b) => sum + Number(b.quotedPrice || 0),
-      0
-    );
-    return {
-      active: active.length,
-      pending: pending.length,
-      completed: completed.length,
-      completedValue,
-    };
-  }, [metrics.bookings]);
-
-  const upcoming = useMemo(
-    () =>
-      metrics.bookings
-        .filter(
-          (b) => !["cancelled", "completed"].includes(String(b.status || "").toLowerCase())
-        )
-        .sort((a, b) =>
-          String(a.preferredDate || "9999").localeCompare(
-            String(b.preferredDate || "9999")
-          )
-        )
-        .slice(0, 4),
-    [metrics.bookings]
-  );
-
-  const recentRows = useMemo(() => {
-    const rows: Array<{
-      href: string;
-      eyebrow: string;
-      title: string;
-      meta: string;
-      kind: string;
-    }> = [];
-
-    if (metrics.unread > 0) {
-      rows.push({
-        href: "/owner/messages",
-        eyebrow: "Messages",
-        title: `${metrics.unread} unread customer message${metrics.unread === 1 ? "" : "s"}`,
-        meta: "Open inbox",
-        kind: "message",
-      });
-    }
-
-    if (summary.pending > 0) {
-      rows.push({
-        href: "/owner/bookings",
-        eyebrow: "Bookings",
-        title: `${summary.pending} request${summary.pending === 1 ? "" : "s"} waiting for confirmation`,
-        meta: "Review requests",
-        kind: "booking",
-      });
-    }
-
-    for (const booking of upcoming.slice(0, 3)) {
-      rows.push({
-        href: "/owner/bookings",
-        eyebrow: `${bookingDate(booking.preferredDate)} · ${booking.preferredTime || "Time TBD"}`,
-        title: `${booking.customerName || "Customer"} · ${booking.serviceName || "Detailing"}`,
-        meta:
-          [booking.vehicleMake, booking.vehicleModel].filter(Boolean).join(" ") ||
-          "Upcoming appointment",
-        kind: "calendar",
-      });
-    }
-
-    return rows.slice(0, 5);
-  }, [metrics.unread, summary.pending, upcoming]);
-
-  return (
-    <div className="console-home px-4 py-6 sm:px-7 lg:px-10 lg:py-9">
-      <div className="mx-auto max-w-[1180px]">
-        <section className="pb-7 pt-2 sm:pb-9">
-          <p className="text-[11px] font-medium text-black/32">Home</p>
-          <div className="mt-2 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-4xl font-semibold tracking-[-.055em] sm:text-5xl">Car Dash, at a glance.</h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-black/42">
-                The things that need attention first, without digging through the whole console.
-              </p>
-            </div>
-            <a
-              href="/owner/detail-builder"
-              className="dashboard-action inline-flex w-fit items-center gap-2 rounded-full bg-[#171411] px-4 py-2.5 text-sm font-semibold text-white"
-            >
-              <span className="text-lg leading-none">+</span> New
-            </a>
-          </div>
-        </section>
-
-        <section className="console-home-section border-t border-black/[.08] pt-6">
-          <p className="mb-3 text-[13px] font-medium text-black/38">Last few minutes</p>
-          <div className="overflow-hidden rounded-[18px] border border-black/[.075] bg-[#f8f6f0]">
-            {loaded && recentRows.length ? (
-              <div className="divide-y divide-black/[.065]">
-                {recentRows.map((item, index) => (
-                  <a
-                    key={`${item.title}-${index}`}
-                    href={item.href}
-                    className="dashboard-row group grid gap-3 px-4 py-4 transition hover:bg-white/70 sm:grid-cols-[42px_1fr_auto] sm:items-center sm:px-5"
-                  >
-                    <span className="grid h-9 w-9 place-items-center rounded-xl border border-black/[.07] bg-white text-black/60">
-                      <ToolGlyph kind={item.kind} />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-[.13em] text-black/28">{item.eyebrow}</p>
-                      <p className="mt-1 truncate text-sm font-medium text-[#171411]">{item.title}</p>
-                    </div>
-                    <p className="text-xs text-black/30 group-hover:text-black/52">{item.meta} →</p>
-                  </a>
-                ))}
-              </div>
-            ) : loaded ? (
-              <div className="px-5 py-10 text-center">
-                <p className="text-sm font-medium text-black/48">Nothing urgent right now.</p>
-                <p className="mt-1 text-xs text-black/28">Your next booking will show up here.</p>
-              </div>
-            ) : (
-              <div className="px-5 py-10 text-center text-sm text-black/32">Loading activity…</div>
-            )}
-          </div>
-        </section>
-
-        <section className="mt-9">
-          <p className="mb-3 text-[13px] font-medium text-black/38">Business pulse</p>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["Active bookings", loaded ? summary.active : "—"],
-              ["Pending", loaded ? summary.pending : "—"],
-              ["Unread messages", loaded ? metrics.unread : "—"],
-              ["Completed value", loaded ? money(summary.completedValue) : "—"],
-            ].map(([label, value]) => (
-              <div key={String(label)} className="rounded-[16px] border border-black/[.07] bg-[#f8f6f0] px-5 py-5">
-                <p className="text-[11px] font-medium text-black/34">{label}</p>
-                <p className="mt-4 text-3xl font-semibold tracking-[-.045em]">{value}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-9 pb-10">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-[13px] font-medium text-black/38">Workspace</p>
-            <a href="/owner/settings" className="text-xs font-medium text-black/30 hover:text-black">Settings →</a>
-          </div>
-          <div className="grid overflow-hidden rounded-[18px] border border-black/[.075] bg-[#f8f6f0] sm:grid-cols-2 lg:grid-cols-3">
-            {toolRows.map(([label, href, description, kind], index) => (
-              <a
-                key={label}
-                href={href}
-                className={`dashboard-tile group min-h-[126px] border-black/[.065] p-5 transition hover:bg-white/72 ${index >= 3 ? "border-t" : ""} ${index % 3 !== 0 ? "lg:border-l" : ""} ${index === 1 ? "sm:border-l lg:border-l" : ""} ${index === 2 ? "sm:border-t lg:border-t-0" : ""}`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <span className="grid h-9 w-9 place-items-center rounded-xl border border-black/[.07] bg-white text-black/58">
-                    <ToolGlyph kind={kind} />
-                  </span>
-
-                </div>
-                <p className="mt-4 text-sm font-semibold">{label}</p>
-                <p className="mt-1 text-xs leading-5 text-black/36">{description}</p>
-              </a>
-            ))}
-          </div>
-        </section>
-      </div>
+ return <div className="owner-app-home min-h-screen px-4 pb-16 pt-6 sm:px-7 sm:pt-8 xl:px-10">
+  <div className="mx-auto max-w-[1360px]">
+   <div className="flex flex-wrap items-start justify-between gap-4">
+    <div>
+     <p className="text-[10px] font-bold uppercase tracking-[.26em] text-[#e9ab73]"><span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#e58b4b] shadow-[0_0_14px_#e58b4b]"/>Car Dash business command center</p>
+     <h2 className="mt-3 font-sans text-3xl font-semibold tracking-[-.055em] text-[#f5f0e8] sm:text-5xl">Today, at a glance.</h2>
+     <p className="mt-2 text-sm text-[#b8b2aa]">{greeting} <span className="mx-2 text-[#746f67]">/</span> Bookings, conversations, and what needs your attention.</p>
     </div>
-  );
+    <div className="flex flex-wrap gap-2">
+      <a href="/owner/bookings" className="rounded-xl border border-[#e58b4b]/60 bg-[#e58b4b] px-4 py-3 text-sm font-semibold text-[#131210] shadow-[0_8px_25px_#e58b4b20]">+ New appointment</a>
+      <a href="/owner/schedule" className="rounded-xl border border-white/20 bg-[#25231f] px-4 py-3 text-sm font-semibold text-[#f4eee6]">View calendar →</a>
+    </div>
+   </div>
+
+   <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Current business metrics">
+    {[
+      {label:"Active bookings",value:active.length,detail:"Appointments in progress",symbol:"▦"},
+      {label:"Awaiting confirmation",value:pending.length,detail:"Requests needing review",symbol:"✦"},
+      {label:"Unread messages",value:data.unread,detail:"Customer conversations",symbol:"✉"},
+      {label:"Booked value",value:money(bookedValue),detail:"Scheduled and pending · not paid",symbol:"↗"},
+    ].map((item,i)=><div key={item.label} className={"owner-metric-card group rounded-2xl border p-5 "+(i===1&&pending.length?"border-[#e58b4b]/45 bg-[#2b241e]":"border-white/10 bg-[#20201f]")}>
+      <div className="flex items-center justify-between gap-3"><span className="text-xs font-medium text-[#bbb5ab]">{item.label}</span><span className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-lg text-[#e6a56e]">{item.symbol}</span></div>
+      <p className="mt-5 text-[clamp(27px,3vw,40px)] font-semibold tracking-[-.055em] tabular-nums text-[#f5f0e8]">{loaded?item.value:"—"}</p>
+      <p className="mt-1 text-[11px] text-[#999389]">{item.detail}</p>
+    </div>)}
+   </section>
+
+   <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(330px,.75fr)]">
+    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e1d]">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 px-5 py-5 sm:px-6">
+        <div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#e9ab73]">Schedule</p><h3 className="mt-1 text-xl font-semibold text-[#f4efe5]">Appointments</h3></div>
+        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-[#151514] p-1">
+          <button onClick={()=>setTab("today")} className={"rounded-lg px-3 py-2 text-xs font-semibold "+(tab==="today"?"bg-[#e58b4b] text-[#18120e]":"text-[#bcb6ac]")}>Today</button>
+          <button onClick={()=>setTab("upcoming")} className={"rounded-lg px-3 py-2 text-xs font-semibold "+(tab==="upcoming"?"bg-[#e58b4b] text-[#18120e]":"text-[#bcb6ac]")}>Upcoming</button>
+        </div>
+      </div>
+      <div className="min-h-[230px] divide-y divide-white/[.075]">
+       {visibleBookings.length?visibleBookings.map(b=><a href="/owner/bookings" key={b.id} className="group flex items-center gap-4 px-5 py-4 transition hover:bg-white/[.045] sm:px-6">
+         <div className="w-[67px] shrink-0 border-r border-white/10 pr-3 text-center"><p className="text-sm font-bold text-[#e9ab73]">{timeLabel(b.preferredTime)}</p><p className="mt-1 text-[10px] text-[#aaa49c]">{niceDate(b.preferredDate!)}</p></div>
+         <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-[#f4eee6]">{b.customerName||"Customer"}</p><p className="mt-1 truncate text-xs text-[#b5afa5]">{b.serviceName||"Detailing"}{b.vehicleMake?" · "+[b.vehicleMake,b.vehicleModel].filter(Boolean).join(" "):""}</p></div>
+         <div className="flex items-center gap-2"><span className={"hidden rounded-full border px-2.5 py-1 text-[10px] font-medium sm:block "+(b.status==="pending"?"border-[#e58b4b]/40 text-[#f2bd8d]":"border-[#719988]/40 text-[#add4bf]")}>{b.status||"Booked"}</span><span className="text-[#e9ab73]">›</span></div>
+       </a>):<div className="flex h-[230px] flex-col items-center justify-center p-7 text-center"><span className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10 text-2xl text-[#e58b4b]">▦</span><p className="mt-4 text-sm font-semibold">{loaded?"No appointments "+(tab==="today"?"today":"coming up"):"Checking schedule…"}</p><p className="mt-1 text-xs text-[#999389]">{loaded?"Use the calendar to add your next booking.":"Your bookings will appear here."}</p></div>}
+      </div>
+      <a href="/owner/schedule" className="block border-t border-white/10 px-5 py-3.5 text-center text-xs font-semibold text-[#e9ab73] hover:bg-white/[.04]">Open full calendar →</a>
+    </section>
+
+    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e1d]">
+      <div className="flex items-center justify-between border-b border-white/10 px-5 py-5 sm:px-6"><div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#e9ab73]">While you were away</p><h3 className="mt-1 text-xl font-semibold">Latest activity</h3></div><span className="relative flex h-2 w-2 rounded-full bg-[#e58b4b]"/></div>
+      <div className="min-h-[230px] divide-y divide-white/[.075]">
+       {spotlight.length?spotlight.map(item=><a key={item.id} href={item.href} className="block px-5 py-4 transition hover:bg-white/[.05] sm:px-6"><div className="flex justify-between gap-3"><p className="line-clamp-1 text-sm font-semibold text-[#f3ece1]">{item.title}</p><span className="shrink-0 text-xs text-[#e6a56e]">↗</span></div><p className="mt-1 line-clamp-2 text-xs leading-5 text-[#aaa49a]">{item.detail}</p></a>):<p className="px-6 py-12 text-center text-sm text-[#aaa49a]">{loaded?"No recent customer activity.":"Loading activity…"}</p>}
+      </div>
+      <a href="/owner/messages" className="block border-t border-white/10 px-5 py-3.5 text-center text-xs font-semibold text-[#e9ab73] hover:bg-white/[.04]">Open customer messages →</a>
+    </section>
+   </div>
+
+   <section className="mt-6 rounded-2xl border border-white/10 bg-[#1d1d1b] p-5 sm:p-6">
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#e9ab73]">Quick launch</p><h3 className="mt-1 text-xl font-semibold">Your tools, one tap away.</h3></div>
+      <a href="/owner/analytics" className="text-xs font-semibold text-[#e9ab73]">Detailed performance →</a>
+    </div>
+    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      {tools.map(t=><a key={t.href} href={t.href} className="owner-tool-card group rounded-xl border border-white/10 bg-[#262522] p-4 transition hover:border-[#e58b4b]/50 hover:bg-[#2b2925]">
+        <span className="grid h-10 w-10 place-items-center rounded-xl border border-[#e58b4b]/15 bg-[#e58b4b]/10 text-xl text-[#edae79]">{t.symbol}</span>
+        <p className="mt-4 text-sm font-semibold text-[#f4efe5]">{t.title}</p>
+        <p className="mt-1 text-[11px] leading-5 text-[#aaa49a]">{t.description}</p>
+      </a>)}
+    </div>
+   </section>
+
+   <footer className="mt-6 flex flex-wrap justify-between gap-3 px-1 text-xs text-[#969087]"><p>Car Dash Detailing · Owner workspace</p><p>Completed booking value: {loaded?money(completedValue):"—"} · Based on booked prices, not payment records</p></footer>
+  </div>
+ </div>;
 }
