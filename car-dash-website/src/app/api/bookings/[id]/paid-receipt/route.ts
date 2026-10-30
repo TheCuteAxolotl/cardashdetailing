@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureBookingConversation } from "@/lib/booking-chat";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
-import { calculateInvoiceTotals, getInvoice, nextInvoiceNumber, requireOwner, sanitizeInvoiceInput, saveInvoice } from "@/lib/invoices";
+import { calculateInvoiceTotals, getInvoice, nextInvoiceNumber, requireOwner, sanitizeInvoiceInput } from "@/lib/invoices";
 import type { InvoicePayment, InvoiceRecord } from "@/lib/invoices";
 import { getPublicSiteUrl, normalizePhoneNumber } from "@/lib/twilio-sms";
 import { paidReceiptInvoiceId, paymentReceiptSmsText } from "@/lib/paid-receipt";
@@ -70,7 +70,7 @@ export async function POST(request: Request, context: Context) {
 
     // The client keeps this ID unchanged if saving succeeds but sending fails.
     const requestId = String(body?.paymentId || "").trim();
-    if (!/^[a-zA-Z0-9-]{8,80}$/.test(requestId)) {
+    if (!/^[a-zA-Z0-9-]{8,48}$/.test(requestId)) {
       return NextResponse.json({ error: "Invalid payment request. Refresh and try again." }, { status: 400 });
     }
     const paymentId = \`receipt-payment-\${requestId}\`;
@@ -227,7 +227,20 @@ export async function POST(request: Request, context: Context) {
       try {
         await prisma.siteContent.update({ where: { key: smsKey }, data: { value: delivery.sid } });
         // sentAt is the FIRST text sent, not proof the invoice is fully paid.
-        await saveInvoice({ ...latest, sentAt: latest.sentAt || new Date().toISOString() });
+        // Update the sent timestamp using a conditional write so a payment
+        // recorded in a second tab cannot be lost during an SMS request.
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const currentRow = await prisma.siteContent.findUnique({ where: { key } });
+          if (!currentRow) break;
+          const currentInvoice = JSON.parse(currentRow.value) as InvoiceRecord;
+          if (currentInvoice.sentAt) break;
+          const updated = { ...currentInvoice, sentAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+          const changed = await prisma.siteContent.updateMany({
+            where: { key, value: currentRow.value },
+            data: { value: JSON.stringify(updated) },
+          });
+          if (changed.count === 1) break;
+        }
         const conversation = await ensureBookingConversation(id);
         await prisma.bookingMessage.upsert({
           where: { externalSid: delivery.sid },
