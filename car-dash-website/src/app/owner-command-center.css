@@ -80,8 +80,14 @@
     background: #1b1b1a !important;
     color: #f4efe5 !important;
   }
-  .editorial-theme .owner-app .owner-activity-panel :is(h2,p,span) {
-    color: inherit;
+  .editorial-theme .owner-app .owner-activity-panel h2 {
+    font-family: var(--font-geist-sans),Arial,sans-serif !important;
+    font-weight: 650 !important;
+    color: #f4efe5 !important;
+  }
+  .editorial-theme .owner-app .owner-activity-panel [class*="text-[#bdb8b0]"],
+  .editorial-theme .owner-app .owner-activity-panel [class*="text-[#969089]"] {
+    color: #bdb7ad !important;
   }
   .editorial-theme .owner-app .owner-activity-panel :is(button,a):not([class*="bg-[#e58b4b]"]):hover {
     background-color: #ffffff0a;
@@ -125,9 +131,11 @@
     .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link {
       color: #ddd4c9 !important;
     }
-    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active,
-    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active :is(span,svg) {
+    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active {
       background: #e58b4b !important;
+      color: #171310 !important;
+    }
+    .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active :is(span,svg) {
       color: #171310 !important;
     }
     .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link:not(.owner-nav-link-active):hover {
