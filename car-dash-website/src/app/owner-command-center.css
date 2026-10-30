@@ -1,0 +1,116 @@
+/* Owner-only visual layer inspired by compact mobile operations dashboards.
+   Preserves the public Car Dash site and functional admin controls. */
+@media screen {
+  .editorial-theme .owner-app,
+  .editorial-theme .owner-app .owner-shell-content,
+  .editorial-theme .owner-app .owner-app-home {
+    background: #131312 !important;
+    color: #f4efe5 !important;
+  }
+  .editorial-theme .owner-app .console-topbar,
+  .editorial-theme .owner-app .console-rail,
+  .editorial-theme .owner-app .console-flyout {
+    background: #191918 !important;
+    border-color: #ffffff20 !important;
+    color: #f4efe5 !important;
+  }
+  .editorial-theme .owner-app .console-topbar {
+    box-shadow: 0 1px 0 #ffffff08;
+  }
+  .editorial-theme .owner-app .console-rail-button,
+  .editorial-theme .owner-app .console-topbar [class*="text-black/"],
+  .editorial-theme .owner-app .console-rail [class*="text-black/"],
+  .editorial-theme .owner-app .console-flyout [class*="text-black/"] {
+    color: #bfb8ac !important;
+  }
+  .editorial-theme .owner-app .console-rail-button-active {
+    background: #e58b4b !important;
+    color: #141210 !important;
+    box-shadow: 0 0 0 1px #e58b4b4d, 0 6px 18px #e58b4b1c;
+  }
+  .editorial-theme .owner-app .console-flyout a,
+  .editorial-theme .owner-app .console-rail-expanded a {
+    color: #d9d3c8 !important;
+  }
+  .editorial-theme .owner-app .console-flyout a:hover,
+  .editorial-theme .owner-app .console-rail-expanded a:hover {
+    background: #e58b4b1c !important;
+    color: #f4efe5 !important;
+  }
+  .editorial-theme .owner-app .console-rail-expanded a[class*="bg-[#171411]"],
+  .editorial-theme .owner-app .console-flyout a[class*="bg-[#171411]"] {
+    background: #e58b4b !important;
+    color: #101010 !important;
+  }
+  .editorial-theme .owner-app .console-rail-expanded [class~="text-black/32"],
+  .editorial-theme .owner-app .console-flyout [class~="text-black/30"] {
+    color: #e5aa7a !important;
+  }
+  .editorial-theme .owner-app .console-topbar h1 {
+    color: #f4efe5 !important;
+    font-family: var(--font-geist-sans),Arial,sans-serif;
+    font-weight: 600;
+  }
+  .editorial-theme .owner-app .console-topbar a[class~="bg-white"],
+  .editorial-theme .owner-app .console-topbar button[class~="bg-white"] {
+    background: #292723 !important;
+    border-color: #ffffff28 !important;
+    color: #e8e0d5 !important;
+  }
+  .editorial-theme .owner-app .console-topbar a[class~="bg-white"]:hover,
+  .editorial-theme .owner-app .console-topbar button[class~="bg-white"]:hover {
+    background: #373128 !important;
+    color: #f5e6d2 !important;
+  }
+  .editorial-theme .owner-app .owner-app-home :is(h2,h3) {
+    font-family: var(--font-geist-sans),Arial,sans-serif !important;
+    font-weight: 650 !important;
+    letter-spacing: -.035em;
+  }
+  .editorial-theme .owner-app .owner-app-home .owner-tool-card,
+  .editorial-theme .owner-app .owner-app-home .owner-metric-card {
+    box-shadow: inset 0 1px 0 #ffffff08, 0 10px 25px #00000016;
+  }
+  .editorial-theme .owner-app .owner-notification-trigger {
+    background: #282522 !important;
+    color: #efe6dc !important;
+    border-color: #ffffff2e !important;
+  }
+  .editorial-theme .owner-app .owner-activity-panel {
+    background: #1b1b1a !important;
+    color: #f4efe5 !important;
+  }
+  .editorial-theme .owner-app .owner-activity-panel :is(h2,p,span) {
+    color: inherit;
+  }
+  .editorial-theme .owner-app .owner-activity-panel :is(button,a):not([class*="bg-[#e58b4b]"]):hover {
+    background-color: #ffffff0a;
+  }
+  .editorial-theme .owner-app .console-shell [class~="console-notification-badge"] {
+    background-color: #ef7f36 !important;
+    color: #101010 !important;
+  }
+  .editorial-theme .owner-app .console-rail-expanded,
+  .editorial-theme .owner-app .console-rail-collapsed {
+    scrollbar-color: #51453a transparent;
+  }
+  @media (max-width: 1023px) {
+    .editorial-theme .owner-app aside[class*="max-w-[88vw]"] {
+      background: #1c1c1b !important;
+      color: #f4efe5 !important;
+    }
+    .editorial-theme .owner-app aside[class*="max-w-[88vw]"] [class*="text-black/"] {
+      color: #c7bfb3 !important;
+    }
+    .editorial-theme .owner-app aside[class*="max-w-[88vw]"] a {
+      color: #e3d9ce !important;
+    }
+    .editorial-theme .owner-app aside[class*="max-w-[88vw]"] a[class*="bg-[#171411]"] {
+      background: #e58b4b !important;
+      color: #101010 !important;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .owner-app .owner-tool-card,.owner-app .owner-metric-card {transition:none !important}
+}
