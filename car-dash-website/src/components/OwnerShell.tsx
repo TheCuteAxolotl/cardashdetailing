@@ -217,16 +217,16 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   const panelGroup = visibleGroups.find((group) => group.label === panel);
 
   const textualNav = (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {visibleGroups.map((group) => (
         <div key={group.label}>
-          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-black/32">{group.label}</p>
+          <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-[#bdb4a7]">{group.label}</p>
           <div className="space-y-1">
             {group.items.map((item) => {
               const href = owner ? item.href : (item.adminHref || item.href);
               const active = pathname === href || pathname.startsWith(`${href}/`);
               return (
-                <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "bg-[#171411] text-white" : "text-black/56 hover:bg-black/[.045] hover:text-black"}`}>
+                <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`owner-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "owner-nav-link-active bg-[#e58b4b] text-[#151310]" : "text-[#d1c8bc] hover:bg-white/[.07] hover:text-white"}`}>
                   <Icon name={item.icon} className="h-[18px] w-[18px]" />
                   <span className="min-w-0 flex-1">{item.label}</span>
                   <NotificationBadge count={notificationCounts[item.href]} />
@@ -317,38 +317,38 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       )}
 
       {searchOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/20 p-4 backdrop-blur-[2px]" onMouseDown={(event) => { if (event.currentTarget === event.target) setSearchOpen(false); }}>
-          <div className="mx-auto mt-[10vh] w-full max-w-xl overflow-hidden rounded-[24px] border border-black/[.1] bg-[#fbfaf6] shadow-[0_38px_120px_rgba(23,20,17,.22)]">
-            <div className="flex items-center gap-3 border-b border-black/[.08] px-5">
-              <Icon name="search" className="h-5 w-5 text-black/35" />
-              <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Car Dash tools…" className="h-16 min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-black/28" />
-              <button onClick={() => setSearchOpen(false)} className="text-xs font-semibold text-black/35">ESC</button>
+        <div className="fixed inset-0 z-[100] bg-black/70 p-4 backdrop-blur-[4px]" onMouseDown={(event) => { if (event.currentTarget === event.target) setSearchOpen(false); }}>
+          <div className="mx-auto mt-[10vh] w-full max-w-xl overflow-hidden rounded-[24px] border border-white/20 bg-[#1d1c1a] text-[#f4efe5] shadow-[0_38px_120px_rgba(0,0,0,.5)]">
+            <div className="flex items-center gap-3 border-b border-white/10 px-5">
+              <Icon name="search" className="h-5 w-5 text-[#bdb4a7]" />
+              <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Car Dash tools…" className="h-16 min-w-0 flex-1 bg-transparent text-base text-[#f4efe5] outline-none placeholder:text-[#999084]" />
+              <button onClick={() => setSearchOpen(false)} className="text-xs font-semibold text-[#d6b779]">Close</button>
             </div>
             <div className="max-h-[56vh] overflow-y-auto p-2">
               {searchResults.map((item) => (
-                <button key={item.resolvedHref} onClick={() => go(item.resolvedHref)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-black/[.045]">
-                  <Icon name={item.icon} className="h-[18px] w-[18px] text-black/48" />
-                  <div><p className="text-sm font-medium">{item.label}</p><p className="mt-0.5 text-[10px] uppercase tracking-[.12em] text-black/28">{item.group}</p></div>
+                <button key={item.resolvedHref} onClick={() => go(item.resolvedHref)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[#f4efe5] hover:bg-white/[.06]">
+                  <Icon name={item.icon} className="h-[18px] w-[18px] text-[#d6b779]" />
+                  <div><p className="text-sm font-medium">{item.label}</p><p className="mt-0.5 text-[10px] uppercase tracking-[.12em] text-[#bdb4a7]">{item.group}</p></div>
                 </button>
               ))}
-              {!searchResults.length && <p className="px-4 py-10 text-center text-sm text-black/35">No tools found.</p>}
+              {!searchResults.length && <p className="px-4 py-10 text-center text-sm text-[#aaa49a]">No tools found.</p>}
             </div>
           </div>
         </div>
       )}
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-[90] lg:hidden">
+        <div className="owner-mobile-menu fixed inset-0 z-[90] lg:hidden">
           <button aria-label="Close navigation" className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="relative h-full w-[310px] max-w-[88vw] overflow-y-auto bg-[#f8f6f0] px-4 pb-8 pt-4 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
+          <aside className="owner-mobile-drawer relative h-full w-[310px] max-w-[88vw] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#1c1c1b] px-4 pb-10 pt-5 text-[#f4efe5] shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
               <a href={homeHref} className="flex items-center gap-3">
                 <img src="/favicon.png" alt="" className="h-9 w-9 rounded-full border border-black/[.08] bg-white p-1" />
                 <div><p className="text-sm font-semibold tracking-[-.02em]">Car Dash</p><p className="text-[9px] uppercase tracking-[.16em] text-black/32">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
               </a>
-              <button onClick={() => setMobileOpen(false)} className="grid h-9 w-9 place-items-center rounded-full border border-black/[.09] bg-white"><Icon name="close" className="h-5 w-5" /></button>
+              <button onClick={() => setMobileOpen(false)} className="owner-menu-close grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-[#292723] text-[#f4efe5]"><Icon name="close" className="h-5 w-5" /></button>
             </div>
-            <button onClick={() => { setMobileOpen(false); setSearchOpen(true); }} className="mb-5 flex w-full items-center gap-3 rounded-xl border border-black/[.08] bg-white px-4 py-3 text-sm text-black/42">
+            <button onClick={() => { setMobileOpen(false); setSearchOpen(true); }} className="owner-menu-search mb-5 flex w-full items-center gap-3 rounded-xl border border-white/15 bg-[#2c2a27] px-4 py-3 text-sm font-medium text-[#e1d8cc] hover:border-[#e58b4b]/50">
               <Icon name="search" className="h-4 w-4" /> Search tools
             </button>
             {textualNav}
@@ -364,7 +364,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       <div className="lg:pl-[76px]">
         <header className="console-topbar sticky top-0 z-40 flex h-[72px] items-center justify-between border-b border-black/[.07] bg-[#f8f6f0]/92 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="relative grid h-10 w-10 place-items-center rounded-full border border-black/[.09] bg-white lg:hidden" aria-label="Open navigation"><Icon name="menu" /><span className="absolute -right-1 -top-1"><NotificationBadge count={allVisibleItems.reduce((sum,item)=>sum+(notificationCounts[item.href]||0),0)} /></span></button>
+            <button onClick={() => setMobileOpen(true)} className="relative grid h-10 w-10 place-items-center rounded-full border border-black/[.09] bg-white lg:hidden" aria-label="Open navigation"><Icon name="menu" />{allVisibleItems.some(item=>(notificationCounts[item.href]||0)>0) && <span aria-label="Unread items" className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#191918] bg-[#e58b4b]" />}</button>
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[.17em] text-black/28">Car Dash / {owner ? "Owner" : "Staff"}</p>
               <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-.025em]">{pageTitle(pathname, owner)}</h1>
