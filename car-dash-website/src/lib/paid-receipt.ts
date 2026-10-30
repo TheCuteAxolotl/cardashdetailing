@@ -1,4 +1,4 @@
-import type { InvoiceRecord } from "@/lib/invoices";
+import type { InvoicePayment, InvoiceRecord } from "@/lib/invoices";
 import { calculateInvoiceTotals } from "@/lib/invoices";
 
 export function paidReceiptInvoiceId(bookingId: string) {
@@ -26,4 +26,22 @@ export function invoiceSmsText(invoice: InvoiceRecord, url: string) {
   }
 
   return `Hi ${firstName}, here is your Car Dash Detailing invoice ${smsText(invoice.invoiceNumber)}. Balance due: ${formattedMoney(totals.balance)}. View your invoice: ${url}`;
+}
+
+/** An acknowledgement for one payment, including the actual outstanding balance. */
+export function paymentReceiptSmsText(invoice: InvoiceRecord, url: string, payment: InvoicePayment) {
+  const totals = calculateInvoiceTotals(invoice);
+  const money = (amount: number) => new Intl.NumberFormat("en-US", {
+    style: "currency", currency: "USD",
+  }).format(amount);
+  const firstName = smsText(invoice.customerName).split(" ")[0] || "there";
+  const due = invoice.dueDate && totals.balance > 0
+    ? ` Due date: ${invoice.dueDate}.`
+    : "";
+
+  if (isInvoiceFullyPaid(invoice)) {
+    return `Hi ${firstName}! Car Dash Detailing received your payment of ${money(payment.amount)} for invoice ${smsText(invoice.invoiceNumber)}. Total paid: ${money(totals.paid)}. Your balance is $0.00. View or save your PAID receipt: ${url}`;
+  }
+
+  return `Hi ${firstName}! Car Dash Detailing received your payment of ${money(payment.amount)} toward invoice ${smsText(invoice.invoiceNumber)}. Invoice total: ${money(totals.total)}. Total paid: ${money(totals.paid)}. Remaining balance: ${money(totals.balance)}.${due} View your payment receipt: ${url}`;
 }

@@ -344,7 +344,7 @@ export default function OwnerBookings() {
                         {booking.customerPhone ? "Send Reminder Now · SMS" : "Add phone to send reminder"}
                       </button>
                     )}
-                    {["confirmed", "completed"].includes(booking.status) && (booking.customerPhone ? <button type="button" onClick={() => setReceiptBooking(booking)} className="rounded-lg border border-emerald-400/35 bg-emerald-400/12 px-4 py-3 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20">Create PAID receipt · SMS</button> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add phone to send receipt</button>)}
+                    {["confirmed", "completed"].includes(booking.status) && (booking.customerPhone ? <button type="button" onClick={() => setReceiptBooking(booking)} className="rounded-lg border border-emerald-400/35 bg-emerald-400/12 px-4 py-3 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20">Create receipt · SMS</button> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add phone to send receipt</button>)}
 
                     {!canDelete && (
                       <>
