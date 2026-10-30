@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./scroll-reveal.css";
 import "./editorial-theme.css";
+import "./owner-command-center.css";
 import SiteChrome from "@/components/SiteChrome";
 import StructuredData from "@/components/StructuredData";
 import { localBusinessSchema, SITE_URL } from "@/lib/seo";
