@@ -78,7 +78,7 @@ export default function OwnerDashboard(){
      <p className="mt-2 text-sm text-[#b8b2aa]">{greeting} <span className="mx-2 text-[#746f67]">/</span> Bookings, conversations, and what needs your attention.</p>
     </div>
     <div className="flex flex-wrap gap-2">
-      <a href="/owner/bookings" className="rounded-xl border border-[#e58b4b]/60 bg-[#e58b4b] px-4 py-3 text-sm font-semibold text-[#131210] shadow-[0_8px_25px_#e58b4b20]">+ New appointment</a>
+      <a href="/owner/bookings?create=1" className="rounded-xl border border-[#e58b4b]/60 bg-[#e58b4b] px-4 py-3 text-sm font-semibold text-[#131210] shadow-[0_8px_25px_#e58b4b20]">+ New appointment</a>
       <a href="/owner/schedule" className="rounded-xl border border-white/20 bg-[#25231f] px-4 py-3 text-sm font-semibold text-[#f4eee6]">View calendar →</a>
     </div>
    </div>
