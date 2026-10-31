@@ -159,7 +159,7 @@ async function compressBookingPhoto(file: File) {
   return result;
 }
 
-export default function BookingForm({ prefill, onClose, initialSiteContent }: { prefill?: { service?: string }; onClose?: () => void; initialSiteContent?: SiteContent }) {
+export default function BookingForm({ prefill, onClose, initialSiteContent, bookingSearch }: { prefill?: { service?: string }; onClose?: () => void; initialSiteContent?: SiteContent; bookingSearch?: string }) {
   const [form, setForm] = useState<FormState>({ ...initialState, selectedPackage: prefill?.service || "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -348,7 +348,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent }: { 
         }
       }
 
-      const params = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(bookingSearch ?? window.location.search);
       const quoteId = params.get("quote");
       const requestedService = params.get("service") || prefill?.service || "";
       const pricingPage = params.get("pricingPage") as PricingKind | null;
