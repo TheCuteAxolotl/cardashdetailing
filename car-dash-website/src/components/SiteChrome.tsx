@@ -8,6 +8,8 @@ import SiteFooter from "@/components/SiteFooter";
 import SupportWidget from "@/components/SupportWidget";
 import BrandIntro from "@/components/BrandIntro";
 import ScrollReveal from "@/components/ScrollReveal";
+import PublicBookingModal from "@/components/PublicBookingModal";
+import type { SiteContent } from "@/lib/site-defaults";
 
 const STAFF_INTERNAL_PREFIXES = [
   "/owner",
@@ -28,7 +30,7 @@ const QUIET_CUSTOMER_PREFIXES = [
   "/invoice",
 ];
 
-export default function SiteChrome({ children, footerBlurb }: { children: ReactNode; footerBlurb: string }) {
+export default function SiteChrome({ children, footerBlurb, initialSiteContent }: { children: ReactNode; footerBlurb: string; initialSiteContent: SiteContent }) {
   const pathname = usePathname();
   const [dockSuppressed, setDockSuppressed] = useState(false);
   const staffInternal = STAFF_INTERNAL_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
@@ -85,6 +87,7 @@ export default function SiteChrome({ children, footerBlurb }: { children: ReactN
         </header>
         {children}
         <SupportWidget />
+        <PublicBookingModal initialSiteContent={initialSiteContent} />
       </div>
     );
   }
@@ -103,6 +106,7 @@ export default function SiteChrome({ children, footerBlurb }: { children: ReactN
       <div className="public-clean flex-1">{children}</div>
       <SiteFooter blurb={footerBlurb} />
       <SupportWidget />
+      <PublicBookingModal initialSiteContent={initialSiteContent} />
       {showMobileActions && (
         <div className={`mobile-booking-bar fixed z-[65] sm:hidden ${dockSuppressed ? "mobile-booking-bar-hidden" : ""}`}>
           <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-[1fr_.86fr] gap-2">
