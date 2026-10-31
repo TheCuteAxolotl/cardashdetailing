@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 import BookingDetailsEditor from "@/components/BookingDetailsEditor";
+import OwnerBookingModal from "@/components/OwnerBookingModal";
 import BookingPaidReceiptDialog from "@/components/BookingPaidReceiptDialog";
 import BookingReminderDialog from "@/components/BookingReminderDialog";
 import { bookingServiceAddress } from "@/lib/booking-owner-details";
@@ -98,7 +99,6 @@ export default function OwnerBookings() {
     if (new URLSearchParams(window.location.search).get("create") === "1") {
       setConvertingId(null);
       setShowManual(true);
-      window.requestAnimationFrame(() => document.getElementById("owner-manual-booking")?.scrollIntoView({block:"start",behavior:"smooth"}));
     }
   }, []);
 
@@ -258,8 +258,12 @@ export default function OwnerBookings() {
       </header>
 
       <main className="mx-auto max-w-7xl px-6 py-10">
-        {showManual && (
-          <form id="owner-manual-booking" onSubmit={submitManualBooking} className="mb-8 scroll-mt-24 rounded-3xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.04] p-6">
+        <OwnerBookingModal
+          open={showManual}
+          title={convertingId ? "Confirm booking request" : "New manual booking"}
+          onClose={() => { if (manualSaving) return; setShowManual(false); setConvertingId(null); setManual(EMPTY_MANUAL); }}
+        >
+          <form id="owner-manual-booking" onSubmit={submitManualBooking} className="rounded-2xl border border-white/10 bg-[#1e1e1e] p-4 sm:p-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Manual Booking</p>
               <h2 className="mt-2 text-2xl font-semibold">{convertingId ? "Confirm request and add to schedule" : "Add a booking from somewhere else"}</h2>
@@ -286,7 +290,7 @@ export default function OwnerBookings() {
               <button type="button" onClick={() => { setShowManual(false); setManual(EMPTY_MANUAL); }} className="rounded-full border border-white/10 px-6 py-3 text-sm text-white/60">Cancel</button>
             </div>
           </form>
-        )}
+        </OwnerBookingModal>
 
         <div className="mb-8 flex flex-wrap gap-2">
           {["all", "pending", "confirmed", "completed", "cancelled"].map((status) => (
@@ -360,7 +364,7 @@ export default function OwnerBookings() {
                         <button onClick={() => sendArrivalUpdate(booking, "eta")} disabled={arrivalSendingId === booking.id} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 disabled:opacity-50">Send arrival time</button>
                       </>
                     )}
-                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); window.scrollTo({top:0,behavior:"smooth"}); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
+                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
                     <button onClick={() => updateStatus(booking.id, "completed")} className="rounded-lg bg-green-700 px-4 py-2 text-sm">Complete</button>
                     <button onClick={() => updateStatus(booking.id, "cancelled")} className="rounded-lg bg-red-800 px-4 py-2 text-sm">Cancel</button>
 
