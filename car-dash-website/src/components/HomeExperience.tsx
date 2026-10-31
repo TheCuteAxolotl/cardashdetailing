@@ -8,7 +8,6 @@ import type { PromotionSettings } from "@/lib/promotions";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import DynamicGallery from "@/components/DynamicGallery";
 import ReviewCards from "@/components/ReviewCards";
-import BookingForm from "@/components/BookingForm";
 import HomePackagePricing from "@/components/HomePackagePricing";
 import type { MediaItem } from "@/lib/media";
 import PageMediaBand from "@/components/PageMediaBand";
@@ -188,27 +187,17 @@ export default function HomeExperience({
         </div>
       </section>
 
-      <section id="book" className="scroll-mt-24 bg-[#111] px-5 py-16 text-white sm:px-8 sm:py-24 lg:py-28">
-        <div className="mx-auto grid max-w-[1320px] gap-10 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
-          <div className="lg:sticky lg:top-28">
-            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-white/35">Booking</p>
-            <h2 className="mt-3 max-w-lg text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Pick the service. Pick a time. We’ll take it from there.</h2>
-            <p className="mt-5 max-w-lg text-sm leading-7 text-white/48">Tell us what you drive, what you want done, and when works for you. We’ll review it and reach out if we need to confirm anything.</p>
-            <div className="mt-8 border-y border-white/10">
-              {[
-                "Dates that are already booked won’t show up.",
-                "You’ll see your total before you submit.",
-                "We can text you appointment updates.",
-              ].map((item) => (
-                <p key={item} className="border-b border-white/10 py-4 text-sm text-white/55 last:border-b-0">{item}</p>
-              ))}
-            </div>
-            <PageMediaBand categories={["home-cta-bg"]} theme="dark" compact className="mt-8" />
+      <section id="booking-info" className="border-y border-white/10 bg-[#151515] px-5 py-14 text-white sm:px-8 sm:py-20">
+        <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-7 md:flex-row md:items-center">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Book Car Dash</p>
+            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-[-.04em] sm:text-4xl">Your detail, on your schedule.</h2>
+            <p className="mt-3 max-w-xl text-sm leading-7 text-white/60">Choose your service and available appointment time in our secure booking window. You’ll see your estimated total before submitting.</p>
           </div>
-
-          <div className="booking-shell border border-white/12 bg-[#181818] p-4 shadow-[0_28px_80px_rgba(0,0,0,.18)] sm:p-6 lg:p-7">
-            <BookingForm initialSiteContent={content} />
-          </div>
+          <a href="/#book" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#d6b779] px-7 py-4 text-sm font-bold text-[#101010] transition hover:bg-[#e5c995]">
+            Book an appointment
+            <span aria-hidden="true" className="ml-3">→</span>
+          </a>
         </div>
       </section>
 
