@@ -58,7 +58,7 @@ export default async function RootLayout({
     >
       <body className="editorial-theme flex min-h-screen flex-col bg-[#171411] text-[#F7F5F2]">
         <StructuredData data={localBusinessSchema} />
-        <SiteChrome footerBlurb={siteContent.footerBlurb}>{children}</SiteChrome>
+        <SiteChrome footerBlurb={siteContent.footerBlurb} initialSiteContent={siteContent}>{children}</SiteChrome>
       </body>
     </html>
   );
