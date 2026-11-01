@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
       if (!serviceId) return NextResponse.json({ success: false, message: "Choose a service or pricing package before booking." }, { status: 400 });
       const service = await prisma.service.findUnique({ where: { id: serviceId } });
       if (!service || !service.active) return NextResponse.json({ success: false, message: "That service is not available." }, { status: 404 });
-      if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Get an Exact Quote." }, { status: 409 });
+      if (service.pricingType !== "fixed" || !service.price || service.price <= 0) return NextResponse.json({ success: false, message: "This service needs an exact quote before booking. Please use Get a Quote." }, { status: 409 });
 
       bookingDiscountTarget = `service:${service.id}`;
       durationTarget = bookingDiscountTarget;
