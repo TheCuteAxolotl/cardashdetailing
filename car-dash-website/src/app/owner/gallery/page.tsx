@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { DEFAULT_PRICING_PAGES, PricingPageConfig, parsePricingConfig } from "@/lib/pricing-config";
-import { MediaVisual } from "@/components/MediaLightbox";
+import GalleryPlacementChecklist from "@/components/GalleryPlacementChecklist";
+import GalleryMediaCard from "@/components/GalleryMediaCard";
 import type { MediaItem } from "@/lib/media";
 import { getMediaKind } from "@/lib/media";
 import { STATIC_MEDIA_PLACEMENTS, getMediaPlacementPath, type MediaPlacement } from "@/lib/media-placements";
@@ -78,6 +79,7 @@ export default function OwnerGallery() {
     interior: DEFAULT_PRICING_PAGES.interior,
   });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [mode, setMode] = useState<MediaMode>("photo");
@@ -106,7 +108,7 @@ export default function OwnerGallery() {
         exterior: parsePricingConfig(content?.pricingExteriorConfig, DEFAULT_PRICING_PAGES.exterior),
         interior: parsePricingConfig(content?.pricingInteriorConfig, DEFAULT_PRICING_PAGES.interior),
       })),
-    ]).catch(() => setMessage("Could not load media or placements.")).finally(() => setLoading(false));
+    ]).catch(() => { setLoadError(true); setMessage("Could not load media or placements. Refresh to try again."); }).finally(() => setLoading(false));
   }, []);
 
   const addMedia = async (e: React.FormEvent) => {
@@ -194,83 +196,151 @@ export default function OwnerGallery() {
       ? attentionMedia
       : media.filter((item) => (placementByValue.get(item.category)?.group || "Other") === filter);
 
-  const PlacementSelect = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
-    <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm">
-      {groups.map((group) => <optgroup key={group} label={group}>{placements.filter((item) => item.group === group).map((item) => <option key={item.value} value={item.value}>{item.label}{item.photoOnly ? " (photo only)" : ""}</option>)}</optgroup>)}
-      {!placementByValue.has(value) && <option value={value}>Legacy / custom placement: {value}</option>}
-    </select>
-  );
+  const assignUploadDestination = (value: string) => {
+    if (!placementByValue.has(value)) return;
+    setCategory(value);
+    setMode("photo");
+    setVideoUrl("");
+    setFile(null);
+    const input = document.getElementById("gallery-file") as HTMLInputElement | null;
+    if (input) input.value = "";
+    window.requestAnimationFrame(() =>
+      document.getElementById("gallery-upload-form")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    );
+  };
+  const selectedPlacement = placementByValue.get(category);
+  const selectedPhotos = media.filter(item => item.category === category && getMediaKind(item.url) === "image");
+  const selectedVideos = media.filter(item => item.category === category && getMediaKind(item.url) !== "image");
 
   return (
-    <div className="min-h-screen bg-[#07131B] text-white">
-      <header className="border-b border-[#27404F] bg-[#0B1822]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-6">
-          <div><h1 className="text-2xl font-bold">Photos & Videos</h1><p className="mt-1 text-sm text-white/52">Add proof right where customers are deciding what to book.</p></div>
-          <div className="flex gap-2"><a href="/owner/pricing-pages" className="rounded-lg border border-white/10 px-4 py-2 text-sm">Pricing Pages</a><a href="/owner/dashboard" className="rounded-lg bg-[#6EAEC6] px-4 py-2 text-sm font-medium text-[#0B1822]">Back</a></div>
+    <div className="min-h-screen bg-[#121211] text-[#f4efe5]">
+      <header className="border-b border-white/10 bg-[#191918]">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-7">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-[#d6b779]">Car Dash · Owner workspace</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Photos & media</h1>
+            <p className="mt-2 text-sm text-[#b5aea3]">Organize your website photos by page, package, and service feature.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a href="/owner/pricing-pages" className="rounded-xl border border-white/20 px-4 py-2.5 text-xs font-semibold hover:border-[#d6b779]/60">Pricing pages</a>
+            <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-[#d6b779]/45 bg-[#2b261f] px-4 py-2.5 text-xs font-semibold text-[#ebd5a7]">View website</a>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-6 rounded-2xl border border-[#6EAEC6]/15 bg-[#6EAEC6]/[.045] p-4 text-sm leading-6 text-white/60">
-          <strong className="text-white">Every placement below is connected to a real public page now.</strong> The Homepage Hero Slideshow is photo-only and crossfades to the next uploaded slide automatically every few seconds. Slides play in upload order, and customers can also use the arrow controls. If you have not added any hero slides yet, that hero media area stays intentionally blank. Other page media can use photos or videos, package items like “Foam + hand wash” can still have their own tap-to-enlarge proof, and every package now has a “When should I get this?” dirty-before example placement.
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-7 sm:py-8">
+        {loadError && <div role="alert" className="rounded-xl border border-red-400/30 bg-red-900/20 p-4 text-sm text-red-100">
+          Photo coverage could not be verified. Refresh this page before trusting missing-photo totals.
+        </div>}
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,.85fr)] xl:items-start">
+          {loading ? (
+            <div className="rounded-2xl border border-white/15 bg-[#20201f] p-6 text-sm text-[#bdb5aa]">Loading photo placements and existing uploads…</div>
+          ) : !loadError ? (
+            <GalleryPlacementChecklist placements={placements} media={media} selected={category} onSelect={assignUploadDestination} />
+          ) : <div className="rounded-2xl border border-white/15 bg-[#20201f] p-6 text-sm">Unable to check photo coverage right now.</div>}
+
+          <section id="gallery-upload-form" className="scroll-mt-24 rounded-2xl border border-[#d6b779]/30 bg-[#211f1b] p-4 sm:p-6 xl:sticky xl:top-5" aria-labelledby="gallery-upload-title">
+            <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#d6b779]">Add new media</p>
+            <h2 id="gallery-upload-title" className="mt-1 text-xl font-semibold">Upload to a specific location</h2>
+            <p className="mt-2 text-xs leading-6 text-[#b9b1a5]">Choose a placement from the checklist first. This upload will be assigned only to the location shown below.</p>
+
+            <div className="mt-5 rounded-xl border border-[#d6b779]/30 bg-[#2d2922] p-4" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#e7c88f]">Selected photo location</p>
+                <span className={"rounded-full px-2.5 py-1 text-[10px] font-semibold " +
+                  (selectedPhotos.length ? "bg-[#304235] text-[#c2e2cc]" : "bg-[#4a3625] text-[#f4d5a7]")}>
+                  {selectedPhotos.length ? selectedPhotos.length + " photo(s) added" : "Missing photo"}
+                </span>
+              </div>
+              <p className="mt-2 text-sm font-semibold leading-6">{selectedPlacement?.label || "Public Gallery → Main Gallery"}</p>
+              {selectedVideos.length > 0 && selectedPhotos.length === 0 && <p className="mt-2 text-xs text-[#d8bb95]">This location has video, but no photo assigned.</p>}
+              {getMediaPlacementPath(category) && <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer"
+                className="mt-2 inline-block text-xs font-semibold text-[#d6b779] underline">View this page</a>}
+              <button type="button" onClick={() => document.getElementById("search-gallery-placements")?.focus()}
+                className="mt-3 block text-xs font-semibold text-[#e5cfaa] underline">Choose a different location</button>
+            </div>
+
+            <form onSubmit={addMedia} className="mt-5 space-y-4">
+              <label className="block text-xs font-semibold text-[#d9d1c6]">
+                Media type
+                <select value={mode} onChange={event => { setMode(event.target.value as MediaMode); setFile(null); setVideoUrl(""); }}
+                  disabled={selectedPlacement?.photoOnly} className="mt-2 w-full rounded-xl border border-white/20 bg-[#2c2b28] px-4 py-3 text-base text-[#f4efe5] disabled:opacity-60">
+                  <option value="photo">Photo upload</option>
+                  {!selectedPlacement?.photoOnly && <option value="video-file">Video upload</option>}
+                  {!selectedPlacement?.photoOnly && <option value="video-url">Video / social link</option>}
+                </select>
+              </label>
+              {selectedPlacement?.photoOnly && <p className="text-xs leading-5 text-[#c6b8a0]">This spot displays photos only.</p>}
+
+              {mode === "video-url" ? (
+                <label className="block text-xs font-semibold text-[#d9d1c6]">
+                  Video link
+                  <input value={videoUrl} onChange={event => setVideoUrl(event.target.value)}
+                    placeholder="YouTube, Vimeo, Instagram or direct video URL"
+                    className="mt-2 w-full rounded-xl border border-white/20 bg-[#2c2b28] px-4 py-3 text-base text-[#f4efe5] outline-none placeholder:text-[#9c9387] focus:border-[#d6b779]" required />
+                </label>
+              ) : (
+                <label className="block text-xs font-semibold text-[#d9d1c6]">
+                  {mode === "photo" ? "Choose photo" : "Choose video"}
+                  <input id="gallery-file" type="file" accept={mode === "photo" ? "image/*" : "video/mp4,video/webm,video/quicktime,video/*"}
+                    onChange={event => setFile(event.target.files?.[0] || null)} required
+                    className="mt-2 block w-full rounded-xl border border-white/20 bg-[#2c2b28] p-3 text-sm text-[#f4efe5] file:mr-3 file:rounded-lg file:border-0 file:bg-[#d6b779] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-[#171717]" />
+                  <span className="mt-2 block text-[11px] font-normal leading-5 text-[#b6aea2]">
+                    {category === "home-360" ? "Upload slideshow frames in order. The website rotates through your uploaded photos."
+                      : mode === "photo" ? "Photos are compressed automatically before uploading."
+                      : "Videos up to 500 MB can be sent directly to media storage."}
+                  </span>
+                </label>
+              )}
+              <label className="block text-xs font-semibold text-[#d9d1c6]">
+                Title (optional)
+                <input value={title} onChange={event => setTitle(event.target.value)}
+                  placeholder="Before, After, Hand wash…" className="mt-2 w-full rounded-xl border border-white/20 bg-[#2c2b28] px-4 py-3 text-base text-[#f4efe5] outline-none placeholder:text-[#9c9387] focus:border-[#d6b779]" />
+              </label>
+              <button type="submit" disabled={saving || loading || loadError || !selectedPlacement}
+                className="w-full rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e7cb97] disabled:opacity-40">
+                {saving ? (mode === "video-file" && uploadProgress > 0 ? "Uploading " + uploadProgress + "%" : "Processing…") : "Add to selected location"}
+              </button>
+              {message && <p role="status" className="rounded-xl border border-white/10 bg-[#292824] p-3 text-xs leading-5 text-[#e2d5bd]">{message}</p>}
+            </form>
+          </section>
         </div>
 
-        <form onSubmit={addMedia} className="grid gap-4 rounded-3xl border border-[#27404F] bg-[#0B1822] p-6 md:grid-cols-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium">Media type</label>
-            <select value={mode} onChange={(e) => { setMode(e.target.value as MediaMode); setFile(null); setVideoUrl(""); }} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" disabled={placementByValue.get(category)?.photoOnly}>
-              <option value="photo">Photo upload</option>
-              {!placementByValue.get(category)?.photoOnly && <option value="video-file">Video upload</option>}
-              {!placementByValue.get(category)?.photoOnly && <option value="video-url">Video / social link</option>}
-            </select>
-            {placementByValue.get(category)?.photoOnly && <p className="mt-2 text-xs text-white/38">Hero spots use photos only so the page always has a clean background image.</p>}
+        <section className="rounded-2xl border border-white/15 bg-[#1d1d1c] p-4 sm:p-6" aria-labelledby="gallery-library-title">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#d6b779]">Already uploaded</p>
+              <h2 id="gallery-library-title" className="mt-1 text-xl font-semibold">Your media library</h2>
+              <p className="mt-1 text-xs leading-6 text-[#aba397]">Manage titles and placements without scrolling through hundreds of dropdown options.</p>
+            </div>
+            <p className="text-sm text-[#c2b6a3]">{visibleMedia.length} shown of {media.length} uploads</p>
           </div>
-
-          <div className="md:col-span-2">
-            {mode === "video-url" ? (
-              <>
-                <label className="mb-2 block text-sm font-medium">Video link</label>
-                <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="YouTube Short, Vimeo, Instagram Reel, or .mp4 link" className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" required />
-                <p className="mt-2 text-xs text-white/38">YouTube Shorts, Vimeo, Instagram Reels/posts, and direct video links are supported. YouTube can be unlisted.</p>
-              </>
-            ) : (
-              <>
-                <label className="mb-2 block text-sm font-medium">{mode === "photo" ? "Photo" : "Video clip"}</label>
-                <input id="gallery-file" type="file" accept={mode === "photo" ? "image/*" : "video/mp4,video/webm,video/quicktime,video/*"} onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" required />
-                <p className="mt-2 text-xs text-white/38">{category === "home-360" ? "Upload the 360 frames in order as you move around the car/interior. About 8 photos works; 12–24 looks smoother (up to 36 frames). Customers can drag or swipe through them in a loop." : mode === "photo" ? "Photos are resized/compressed automatically." : "Upload videos directly up to 500 MB. Large files upload straight to media storage instead of through the normal website request."}</p>
-              </>
-            )}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <label className="text-xs font-semibold text-[#d4cbbf]">Show media from
+              <select value={filter} onChange={event=>setFilter(event.target.value)}
+                className="ml-2 rounded-xl border border-white/20 bg-[#2c2b28] px-3 py-2.5 text-sm text-[#f4efe5]">
+                <option value="all">All pages</option>
+                {attentionMedia.length>0 && <option value="attention">Needs attention ({attentionMedia.length})</option>}
+                {groups.map(group=><option key={group} value={group}>{group}</option>)}
+                {media.some(item=>!placementByValue.has(item.category)) && <option value="Other">Legacy / custom</option>}
+              </select>
+            </label>
+            {attentionMedia.length>0 && <p className="text-xs text-[#e5c995]">
+              {attentionMedia.length} upload(s) need a new placement or correct media type.
+            </p>}
           </div>
-
-          <div><label className="mb-2 block text-sm font-medium">Title (optional)</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={category === "home-360" ? "Frame 01 (optional)" : "Before, After, Hand wash…"} className="w-full rounded-xl border border-[#27404F] bg-[#13232F] p-3 text-sm" /></div>
-          <div className="md:col-span-3"><label className="mb-2 block text-sm font-medium">Where should it appear?</label><PlacementSelect value={category} onChange={(value) => { setCategory(value); if (placementByValue.get(value)?.photoOnly) { setMode("photo"); setVideoUrl(""); setFile(null); const input = document.getElementById("gallery-file") as HTMLInputElement | null; if (input) input.value = ""; } }} /><p className="mt-2 text-[11px] leading-4 text-white/38">Current destination: {placementByValue.get(category)?.label || category}{getMediaPlacementPath(category) && <> · <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer" className="text-[#6EAEC6] hover:underline">Open page</a></>}</p></div>
-          <div className="flex items-end"><button disabled={saving} className="w-full rounded-xl bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{saving ? (mode === "video-file" && uploadProgress > 0 ? `Uploading ${uploadProgress}%` : "Processing…") : "Add Media"}</button></div>
-          {message && <div className="md:col-span-4 text-sm text-white/72">{message}</div>}
-        </form>
-
-        <div className="mt-8 flex flex-wrap items-center gap-2">
-          <button onClick={() => setFilter("all")} className={`rounded-full px-4 py-2 text-xs ${filter === "all" ? "bg-[#6EAEC6] text-[#0B1822]" : "border border-white/10 text-white/55"}`}>All Media</button>
-          {attentionMedia.length > 0 && <button onClick={() => setFilter("attention")} className={`rounded-full px-4 py-2 text-xs ${filter === "attention" ? "bg-amber-300 text-black" : "border border-amber-400/25 text-amber-200"}`}>Needs attention ({attentionMedia.length})</button>}
-          {groups.map((group) => <button key={group} onClick={() => setFilter(group)} className={`rounded-full px-4 py-2 text-xs ${filter === group ? "bg-[#6EAEC6] text-[#0B1822]" : "border border-white/10 text-white/55"}`}>{group}</button>)}
-        </div>
-        {attentionMedia.length > 0 && <p className="mt-3 text-xs leading-5 text-amber-200/70">“Needs attention” means an older/custom placement is not connected to a current page, or a video is sitting in a photo-only hero spot. Move it with the placement dropdown on the media card.</p>}
-
-        {loading ? <p className="py-12 text-white/52">Loading…</p> : (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {visibleMedia.map((item) => {
-              const placement = placementByValue.get(item.category);
-              return <article key={item.id} className="overflow-hidden rounded-3xl border border-[#27404F] bg-[#0B1822]">
-                <div className="relative h-56 bg-black"><MediaVisual item={item} thumbnail className="h-full w-full object-cover" /></div>
-                <div className="space-y-3 p-4">
-                  <div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Current Placement</p><p className="mt-1 text-sm font-medium text-white">{placement?.label || item.category}</p>{getMediaPlacementPath(item.category) && <a href={getMediaPlacementPath(item.category) || "#"} target="_blank" rel="noreferrer" className="mt-1 inline-flex text-[11px] font-semibold text-[#6EAEC6] hover:underline">Open public page</a>}{!placement && <p className="mt-1 text-[11px] text-amber-300">This is a legacy/custom placement. Move it to a current page so customers can see it.</p>}{placement?.photoOnly && getMediaKind(item.url) !== "image" && <p className="mt-1 text-[11px] text-amber-300">This hero spot only displays photos. Move this video to a page-media spot.</p>}</div>
-                  <input defaultValue={item.title} onBlur={(e) => { if (e.target.value !== item.title) updateMedia(item, { title: e.target.value }).catch(() => setMessage("Rename failed.")); }} className="w-full rounded-lg border border-[#27404F] bg-[#13232F] px-3 py-2 text-sm" />
-                  <PlacementSelect value={item.category} onChange={(value) => updateMedia(item, { category: value }).catch((error) => setMessage(error instanceof Error ? error.message : "Update failed."))} />
-                  <button onClick={() => deleteMedia(item.id)} className="w-full rounded-lg bg-red-900/70 px-3 py-2 text-sm font-medium text-red-100 hover:bg-red-900">Delete Media</button>
-                </div>
-              </article>;
-            })}
+          {!loading && !visibleMedia.length && <p className="mt-6 rounded-xl border border-white/10 bg-[#262522] px-5 py-10 text-center text-sm text-[#b9b0a4]">
+            No media in this category yet. Choose a slot above and upload a photo.
+          </p>}
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleMedia.map(item => <GalleryMediaCard key={item.id} item={item} placements={placements}
+              onUpdate={async (original, nextCategory, nextTitle) => {
+                try { await updateMedia(original, {category:nextCategory, title:nextTitle ?? original.title}); }
+                catch (error) { setMessage(error instanceof Error ? error.message : "Could not update media."); }
+              }}
+              onDelete={deleteMedia} />)}
           </div>
-        )}
+        </section>
       </main>
     </div>
   );
