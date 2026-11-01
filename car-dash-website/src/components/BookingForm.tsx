@@ -587,7 +587,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
 
   return (
-    <form onSubmit={submit} className="car-dash-booking-app space-y-5 text-[#f4efe5]">
+    <form onSubmit={submit} className="luxury-booking-form car-dash-booking-app space-y-5 text-[#f4efe5]">
       {status === "success" ? (
         <section role="status" aria-live="polite" className="mx-auto max-w-xl py-6 text-center sm:py-10">
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-[#d6b779]/40 bg-[#d6b779]/10 text-[#e5c995]">
