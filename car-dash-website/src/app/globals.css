@@ -1465,3 +1465,17 @@ img { display: block; }
     line-height: .96 !important;
   }
 }
+
+/* Keep iOS focus from zooming and horizontally panning message composers. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+    font-size: 16px !important;
+  }
+  textarea {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  form:has(textarea) { min-width: 0; max-width: 100%; }
+  form:has(textarea) > button { flex-shrink: 0; }
+}
