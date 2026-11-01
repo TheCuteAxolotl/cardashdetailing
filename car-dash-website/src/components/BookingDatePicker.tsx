@@ -144,7 +144,7 @@ export default function BookingDatePicker({ value, onChange, duration = 180 }: {
               if (!cell) return <div key={`blank-${index}`} className="aspect-square" />;
               const state = availability?.days?.[cell.date];
               const unavailable = loading || !state?.available;
-              const selected = value === cell.date;
+              const selected = value === cell.date && !unavailable;
               const today = availability?.today === cell.date;
               return (
                 <button
@@ -159,8 +159,8 @@ export default function BookingDatePicker({ value, onChange, duration = 180 }: {
                     selected
                       ? "bg-[#6EAEC6] text-black"
                       : unavailable
-                        ? "cursor-not-allowed bg-white/[.025] text-white/20"
-                        : "bg-white/[.04] text-white hover:bg-white/[.09]"
+                        ? "cursor-not-allowed bg-[#0a0a0a] text-[#686868] opacity-100"
+                        : "bg-[#353535] text-white hover:bg-[#454545]"
                   } ${today && !selected ? "ring-1 ring-[#6EAEC6]/50" : ""}`}
                   aria-label={`${dateLabel(cell.date)}${unavailable ? ", unavailable" : `, ${state?.remaining || 0} time slots available`}`}
                   title={unavailable ? "Unavailable" : `${state?.remaining || 0} time slot${state?.remaining === 1 ? "" : "s"} available`}
@@ -173,8 +173,8 @@ export default function BookingDatePicker({ value, onChange, duration = 180 }: {
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-xs text-white/40">
             <div className="flex flex-wrap items-center gap-4">
-              <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-white/[.08]" />Available</span>
-              <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-white/[.025] ring-1 ring-white/10" />Unavailable / booked</span>
+              <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#353535]" />Available</span>
+              <span className="flex items-center gap-2"><span className="h-3 w-3 rounded bg-[#0a0a0a] ring-1 ring-white/10" />Unavailable / booked</span>
             </div>
             {loading && <span>Checking availability…</span>}
             {!loading && error && <span className="text-[#FF5A5A]">{error}</span>}
