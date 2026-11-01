@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import PromotionBanner from "@/components/PromotionBanner";
 import SiteHeader from "@/components/SiteHeader";
@@ -32,30 +32,9 @@ const QUIET_CUSTOMER_PREFIXES = [
 
 export default function SiteChrome({ children, footerBlurb, initialSiteContent }: { children: ReactNode; footerBlurb: string; initialSiteContent: SiteContent }) {
   const pathname = usePathname();
-  const [dockSuppressed, setDockSuppressed] = useState(false);
   const staffInternal = STAFF_INTERNAL_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
   const customerPortal = CUSTOMER_PORTAL_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
   const quietCustomer = QUIET_CUSTOMER_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
-
-  useEffect(() => {
-    const targets = [document.querySelector("#book"), document.querySelector("footer")].filter(Boolean) as Element[];
-    if (!targets.length) return;
-
-    const visible = new Set<Element>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) visible.add(entry.target);
-          else visible.delete(entry.target);
-        }
-        setDockSuppressed(visible.size > 0);
-      },
-      { threshold: 0.05, rootMargin: "0px 0px -8% 0px" }
-    );
-
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
-  }, [pathname]);
 
   if (staffInternal) {
     return <div className="min-h-screen bg-[#0d0d0d] text-[#f5f3ef]">{children}</div>;
@@ -107,11 +86,12 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
       <SiteFooter blurb={footerBlurb} />
       <SupportWidget />
       <PublicBookingModal initialSiteContent={initialSiteContent} />
+      {showMobileActions && <a href="/quote" className="fixed bottom-6 left-6 z-[65] hidden rounded-full bg-[#d6b779] px-6 py-3.5 text-sm font-semibold text-[#101010] shadow-lg transition hover:bg-[#e5c995] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d6b779] sm:inline-flex">Get a Quote</a>}
       {showMobileActions && (
-        <div className={`mobile-booking-bar fixed z-[65] sm:hidden ${dockSuppressed ? "mobile-booking-bar-hidden" : ""}`}>
+        <div className="mobile-booking-bar fixed z-[65] sm:hidden">
           <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-[1fr_.86fr] gap-2">
             <a href="/#book" className="mobile-book-primary rounded-full px-4 py-3 text-center text-sm font-semibold">Book a detail</a>
-            <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Exact quote</a>
+            <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Get a Quote</a>
           </div>
         </div>
       )}
