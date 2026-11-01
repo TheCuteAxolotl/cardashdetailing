@@ -146,6 +146,8 @@ export default function QuotePage() {
   const create = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
+    if (!photos.length) return setError("Add at least one vehicle photo to request a quote.");
+    if (!smsConsent) return setError("Enable SMS consent so we can text you about your quote.");
     setSubmitting(true);
     try {
       const response = await fetch("/api/quotes", {
@@ -257,7 +259,7 @@ export default function QuotePage() {
           <div className="max-w-3xl">
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#6EAEC6]">No login required</p>
             <h1 className="mt-4 text-5xl font-semibold leading-[.92] tracking-[-.06em] sm:text-7xl">Messages & quote requests</h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. Add a few photos if you can. We’ll look it over and quote the actual work your car needs.</p>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52">Tell us what you drive, what you want done, and what shape it’s in. Add at least one photo and enable SMS updates. We’ll look it over and quote the actual work your car needs.</p>
           </div>
 
           <PageMediaBand categories={["quote-media"]} theme="dark" compact className="mt-8" />
@@ -285,11 +287,11 @@ export default function QuotePage() {
             <div className="mt-5 grid gap-4">
               <label className="text-sm text-white/65">How dirty is it right now?<select className={`${input} mt-2`} value={condition} onChange={(e)=>setCondition(e.target.value)}><option value="">Select condition</option><option value="Light / already fairly clean">Light / already fairly clean</option><option value="Average / normal buildup">Average / normal buildup</option><option value="Heavy / needs extra work">Heavy / needs extra work</option><option value="Not sure — please judge from photos">Not sure — judge from photos</option></select></label>
               <textarea className={`${input} min-h-36`} value={body} onChange={(e)=>setBody(e.target.value)} placeholder="What do you want done? Mention things like stains, pet hair, a third row, recent cleaning, paint scratches, oxidation, or anything else we should know." required />
-              <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/45 hover:border-[#6EAEC6]/35">Add up to 3 photos so we can price it right<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
+              <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-6 text-center text-sm text-white/45 hover:border-[#6EAEC6]/35">Add 1–3 vehicle photos (required)<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
               {photos.length > 0 && <p className="text-sm text-[#6EAEC6]">{photos.length} photo(s) ready</p>}
 
               <div className="rounded-2xl border border-white/10 bg-[#07131B]/20 p-4">
-                <label className="flex items-start gap-3 text-sm leading-6 text-white/58"><input type="checkbox" checked={smsConsent} onChange={(e)=>setSmsConsent(e.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label>
+                <label className="flex items-start gap-3 text-sm leading-6 text-white/58"><input type="checkbox" required checked={smsConsent} onChange={(e)=>setSmsConsent(e.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. SMS consent is required to submit this online quote request.</span></label>
                 <p className="mt-3 pl-6 text-xs text-white/30">See our <a href="/privacy-policy" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" className="text-[#6EAEC6]">Terms</a>.</p>
               </div>
 
@@ -342,11 +344,11 @@ export default function QuotePage() {
                   <label className="block text-sm text-white/65">Service address (optional)<input name="serviceAddress" autoComplete="street-address" maxLength={500} className={`${input} mt-2`} value={serviceAddress} onChange={(e)=>setServiceAddress(e.target.value)} placeholder="Street address, unit, city, state, ZIP code" /><span className="mt-2 block text-xs leading-5 text-white/45">Add it now to make booking easier, so you won’t have to send your address again after your quote.</span></label>
                   <input className={input} value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Topic" />
                   <textarea className={`${input} min-h-36`} value={body} onChange={(e)=>setBody(e.target.value)} placeholder="Tell us what you want done and anything important we should know (pet hair, stains, third row, recent cleaning, etc.)." required />
-                  <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">Add photos so we can price it right (optional, up to 3)<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
+                  <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">Add 1–3 vehicle photos (required)<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
                   {photos.length>0&&<p className="text-sm text-[#6EAEC6]">{photos.length} photo(s) selected</p>}
-                  <div className="rounded-2xl border border-white/10 bg-white/[.025] p-4"><label className="block text-sm text-white/60">Mobile number for quote and appointment texts (optional)<input type="tel" className={`${input} mt-2`} value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="(630) 555-0123" /></label><label className="mt-4 flex items-start gap-3 text-sm text-white/60"><input type="checkbox" checked={smsConsent} onChange={(e)=>setSmsConsent(e.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs text-white/35">See our <a href="/privacy-policy" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
+                  <div className="rounded-2xl border border-white/10 bg-white/[.025] p-4"><label className="block text-sm text-white/60">Mobile number for quote and appointment texts (required)<input type="tel" className={`${input} mt-2`} value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="(630) 555-0123" required /></label><label className="mt-4 flex items-start gap-3 text-sm text-white/60"><input type="checkbox" required checked={smsConsent} onChange={(e)=>setSmsConsent(e.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white">Yes, text me about my quote and appointment — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. SMS consent is required to submit this online quote request.</span></label><p className="mt-3 pl-6 text-xs text-white/35">See our <a href="/privacy-policy" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
                   {error&&<p className="text-sm text-[#6EAEC6]">{error}</p>}
-                  <button disabled={submitting} className="rounded-full bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{submitting ? "Sending…" : "Request my exact quote"}</button>
+                  <button disabled={submitting} className="rounded-full bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{submitting ? "Sending…" : "Get a Quote"}</button>
                 </div>
               </form>
             )}
