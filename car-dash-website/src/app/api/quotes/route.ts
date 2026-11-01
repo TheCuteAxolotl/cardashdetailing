@@ -35,6 +35,8 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const subject = String(body.subject || "Exact detailing quote").trim().slice(0, 120);
   const message = String(body.message || "").trim().slice(0, 3000);
+  const serviceAddress = String(body.serviceAddress || "").replace(/[\r\n]+/g, " ").trim().slice(0, 500);
+  const quoteMessage = serviceAddress ? `${message}\n\nService address: ${serviceAddress}` : message;
   const vehicleId = auth ? String(body.vehicleId || "").trim() || null : null;
   const serviceId = String(body.serviceId || "").trim() || null;
   const attachments: unknown[] = Array.isArray(body.attachments) ? body.attachments.slice(0, 3) : [];
@@ -93,8 +95,9 @@ export async function POST(request: NextRequest) {
       lastCustomerSeenAt: auth ? new Date() : null,
       messages: {
         create: [
-          { sender: "customer", body: message, attachmentsJson: attachments.length ? JSON.stringify(attachments) : null },
+          { sender: "customer", body: quoteMessage, attachmentsJson: attachments.length ? JSON.stringify(attachments) : null },
           { sender: "system", body: `SMS contact: ${(normalizePhoneNumber(phone) || phone) || "Not provided"} · consent: ${smsConsent ? "Yes" : "No"}` },
+          ...(serviceAddress ? [{ sender: "system", body: `Service address: ${serviceAddress}` }] : []),
           ...(!auth && guestVehicle ? [{ sender: "system", body: `Guest vehicle: ${guestVehicle}` }] : []),
         ],
       },
@@ -107,7 +110,7 @@ export async function POST(request: NextRequest) {
     customerName: auth?.name || guestName || "Guest",
     customerEmail: auth?.email || guestEmail || undefined,
     subject,
-    message,
+    message: quoteMessage,
     vehicle: thread.vehicle
       ? [thread.vehicle.year, thread.vehicle.make, thread.vehicle.model, thread.vehicle.trim].filter(Boolean).join(" ")
       : guestVehicle || undefined,
