@@ -176,6 +176,26 @@ export const DEFAULT_PRICING_PAGES: Record<"packages" | "exterior" | "interior",
   },
 };
 
+/** Applies one flat dollar reduction to every positive vehicle price in a saved
+ * page configuration. Never changes package content, IDs, add-ons or discounts. */
+export function reducePackagePrices(config: PricingPageConfig, amount: number): PricingPageConfig {
+  if (!Number.isFinite(amount) || amount <= 0) return config;
+  return {
+    ...config,
+    packages: config.packages.map(pkg => ({
+      ...pkg,
+      prices: Object.fromEntries(
+        (Object.keys(VEHICLE_LABELS) as VehicleClass[]).map(vehicle => {
+          const original = Number(pkg.prices?.[vehicle]);
+          return [vehicle, Number.isFinite(original) && original > 0
+            ? Math.max(0, Math.round((original - amount) * 100) / 100)
+            : original];
+        })
+      ) as Record<VehicleClass, number>,
+    })),
+  };
+}
+
 function shouldMigrateLegacyPackageMenu(parsed: PricingPageConfig, fallback: PricingPageConfig) {
   if (fallback !== DEFAULT_PRICING_PAGES.packages) return false;
   const ids = new Set(parsed.packages.map((item) => item.id));
