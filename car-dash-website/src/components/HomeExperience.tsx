@@ -201,16 +201,50 @@ export default function HomeExperience({
       </section>
 
       <section id="booking-info" className="border-y border-white/10 bg-[#151515] px-5 py-14 text-white sm:px-8 sm:py-20">
-        <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-7 md:flex-row md:items-center">
+        <div className="mx-auto grid max-w-[1200px] items-center gap-10 lg:grid-cols-[1fr_.9fr] lg:gap-20">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Book Car Dash</p>
-            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight tracking-[-.04em] sm:text-4xl">Your detail, on your schedule.</h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-white/60">Choose your service and available appointment time in our secure booking window. You’ll see your estimated total before submitting.</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[.19em] text-[#d6b779]">Car Dash · Online appointments</p>
+            <h2 className="mt-4 max-w-[15ch] text-4xl font-semibold leading-[1.04] tracking-[-.055em] sm:text-5xl">Detailing, without the back and forth.</h2>
+            <p className="mt-5 max-w-lg text-sm leading-8 text-white/65 sm:text-base">Choose a service, find a time that works, and send your booking request in one clean experience. We bring the detail to your driveway.</p>
+            <div className="mt-7 grid max-w-lg gap-3 sm:grid-cols-2">
+              {["Browse real services and prices","Choose an available time","Tell us where to arrive","Review before submitting"].map((label, index) => (
+                <div key={label} className="flex items-center gap-3 text-sm text-white/75">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[#d6b779]/45 text-xs font-semibold text-[#e5c995]">{index+1}</span>
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <a href="/#book" className="inline-flex items-center justify-center rounded-full bg-[#d6b779] px-7 py-4 text-sm font-bold text-[#161616] transition hover:bg-[#e5c995]">Book an appointment</a>
+              <a href="/quote" className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-4 text-sm font-semibold text-[#f4efe5] transition hover:border-[#d6b779]/60">Get a quote</a>
+            </div>
           </div>
-          <a href="/#book" className="inline-flex shrink-0 items-center justify-center rounded-full bg-[#d6b779] px-7 py-4 text-sm font-bold text-[#101010] transition hover:bg-[#e5c995]">
-            Book an appointment
-            <span aria-hidden="true" className="ml-3">→</span>
-          </a>
+          <div className="mx-auto w-full max-w-[480px] overflow-hidden rounded-[28px] border border-[#d6b779]/25 bg-[#232322] p-4 shadow-[0_36px_90px_rgba(0,0,0,.35)] sm:p-6">
+            <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-4">
+              <div><p className="text-[10px] font-semibold uppercase tracking-[.17em] text-[#d6b779]">Car Dash Detailing</p>
+                <p className="mt-1 text-xl font-semibold tracking-tight">Pick your detail</p></div>
+              <span className="rounded-full border border-[#d6b779]/25 bg-[#d6b779]/10 px-3 py-1.5 text-[10px] font-semibold text-[#e5c995]">Step 1 of 4</span>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-[#d6b779] px-3 py-2 text-[11px] font-semibold text-[#171717]">Full Detail</span>
+              <span className="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/60">Interior</span>
+              <span className="rounded-full border border-white/15 px-3 py-2 text-[11px] text-white/60">Exterior</span>
+            </div>
+            <div className="mt-4 space-y-2">
+              {pricingConfig.packages.slice(0,3).map(pkg => (
+                <a key={pkg.id} href={"/?pricingPage=packages&packageId=" + encodeURIComponent(pkg.id) + "&vehicleClass=coupe#book"}
+                  className="group flex items-center gap-3 rounded-xl border border-white/10 bg-[#1a1a1a] p-2.5 transition hover:border-[#d6b779]/45">
+                  <SitePhoto category={"pricing-car-packages-pkg-" + pkg.id} fallbackCategory="pricing-car-packages-hero"
+                    className="h-[62px] w-[86px] shrink-0 rounded-lg" alt={pkg.name} />
+                  <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{pkg.name}</span>
+                    <span className="mt-1 block text-xs text-white/45">Sedan · Starting at {"$" + Number(pkg.prices.coupe || 0).toFixed(0)}</span></span>
+                  <span className="rounded-full border border-[#d6b779]/35 px-3 py-1.5 text-[11px] font-semibold text-[#e5c995]">Book</span>
+                </a>
+              ))}
+            </div>
+            <a href="/#book" className="mt-4 block rounded-xl bg-[#d6b779] px-4 py-3.5 text-center text-sm font-bold text-[#171717] hover:bg-[#e5c995]">Browse all services</a>
+            <p className="mt-3 text-center text-[10px] text-white/35">Live pricing and appointment availability are shown in the booking window.</p>
+          </div>
         </div>
       </section>
 
