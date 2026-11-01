@@ -10,7 +10,7 @@ import { DELETED_MESSAGE } from "@/lib/deleted-message";
 type Conversation = { kind: "quote" | "booking" | "sms"; id: string; name: string; phone: string; subject: string; status: string; body: string; updatedAt: string };
 type Message = { id: string; originalId?: string; source?: "sms" | "booking" | "quote"; sourceId?: string; context?: string; sender: string; body: string; attachmentsJson?: string | null; externalSid?: string | null; createdAt: string };
 type Inbox = { conversations: Conversation[]; owner: boolean; canSms: boolean; canBook: boolean };
-const field = "w-full rounded-xl border border-white/20 bg-[#202020] px-4 py-3 text-[#f4efe5]";
+const field = "min-w-0 max-w-full text-base w-full rounded-xl border border-white/20 bg-[#202020] px-4 py-3 text-[#f4efe5]";
 const button = "rounded-xl border border-[#d6b779]/50 px-4 py-2 text-sm font-semibold disabled:opacity-50";
 const keyOf = (row: Conversation) => `${row.kind}:${row.id}`;
 
@@ -159,7 +159,7 @@ export default function UnifiedMessages({ role }: { role: "owner" | "admin" }) {
       const node = inboxRef.current;
       if (!node) return;
       const bottom = viewport ? viewport.height + viewport.offsetTop : window.innerHeight;
-      node.style.height = `${Math.max(240, bottom - node.getBoundingClientRect().top)}px`;
+      node.style.height = `${Math.max(240, bottom - Math.max(viewport?.offsetTop || 0, node.getBoundingClientRect().top))}px`;
     };
     resize();
     window.addEventListener("resize", resize);
