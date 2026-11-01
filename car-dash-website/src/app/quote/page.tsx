@@ -66,6 +66,7 @@ export default function QuotePage() {
   const [serviceId, setServiceId] = useState("");
   const [subject, setSubject] = useState("Exact detailing quote");
   const [condition, setCondition] = useState("");
+  const [serviceAddress, setServiceAddress] = useState("");
   const [body, setBody] = useState("");
   const [reply, setReply] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
@@ -155,6 +156,7 @@ export default function QuotePage() {
           serviceId,
           subject,
           message: `${condition ? `Vehicle condition: ${condition}.\n\n` : ""}${body}`.trim(),
+          serviceAddress,
           attachments: photos,
           smsConsent,
           phone,
@@ -178,6 +180,7 @@ export default function QuotePage() {
 
       setBody("");
       setCondition("");
+      setServiceAddress("");
       setPhotos([]);
       setSmsConsent(false);
       setPhone("");
@@ -267,6 +270,8 @@ export default function QuotePage() {
               <label className="text-sm text-white/65">Service<select className={`${input} mt-2`} value={serviceId} onChange={(e)=>setServiceId(e.target.value)}><option value="">Not sure yet</option>{services.map((service)=><option key={service.id} value={service.id}>{service.title}</option>)}</select></label>
             </div>
 
+            <div className="mt-5"><label className="block text-sm text-white/65">Service address (optional)<input name="serviceAddress" autoComplete="street-address" maxLength={500} className={`${input} mt-2`} value={serviceAddress} onChange={(e)=>setServiceAddress(e.target.value)} placeholder="Street address, unit, city, state, ZIP code" /><span className="mt-2 block text-xs leading-5 text-white/45">Add it now to make booking easier, so you won’t have to send your address again after your quote.</span></label></div>
+
             <div className="mt-7 border-t border-white/10 pt-7">
               <p className="text-xs font-bold uppercase tracking-[.22em] text-white/35">Vehicle</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -334,6 +339,7 @@ export default function QuotePage() {
                   {!vehicles.length && <a href="/vehicles" className="text-sm text-[#6EAEC6]">+ Save a vehicle first</a>}
                   <select className={input} value={serviceId} onChange={(e)=>setServiceId(e.target.value)}><option value="">Service (optional)</option>{services.map((service)=><option key={service.id} value={service.id}>{service.title}</option>)}</select>
                   <label className="block text-sm text-white/60">How dirty is it right now?<select className={`${input} mt-2`} value={condition} onChange={(e)=>setCondition(e.target.value)}><option value="">Select condition (optional)</option><option value="Light / already fairly clean">Light / already fairly clean</option><option value="Average / normal buildup">Average / normal buildup</option><option value="Heavy / needs extra work">Heavy / needs extra work</option><option value="Not sure — please judge from photos">Not sure — judge from photos</option></select></label>
+                  <label className="block text-sm text-white/65">Service address (optional)<input name="serviceAddress" autoComplete="street-address" maxLength={500} className={`${input} mt-2`} value={serviceAddress} onChange={(e)=>setServiceAddress(e.target.value)} placeholder="Street address, unit, city, state, ZIP code" /><span className="mt-2 block text-xs leading-5 text-white/45">Add it now to make booking easier, so you won’t have to send your address again after your quote.</span></label>
                   <input className={input} value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Topic" />
                   <textarea className={`${input} min-h-36`} value={body} onChange={(e)=>setBody(e.target.value)} placeholder="Tell us what you want done and anything important we should know (pet hair, stains, third row, recent cleaning, etc.)." required />
                   <label className="cursor-pointer rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">Add photos so we can price it right (optional, up to 3)<input type="file" accept="image/*" multiple onChange={files} className="hidden" /></label>
