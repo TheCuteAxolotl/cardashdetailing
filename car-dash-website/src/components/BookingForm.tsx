@@ -19,6 +19,7 @@ import {
 import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import type { SiteContent } from "@/lib/site-defaults";
 import BookingDatePicker from "@/components/BookingDatePicker";
+import SitePhoto from "@/components/SitePhoto";
 import { recommendedServiceMinutes, totalBookingMinutes } from "@/lib/booking-duration";
 
 
@@ -187,6 +188,9 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
   const [promotions, setPromotions] = useState<PromotionSettings>(DEFAULT_PROMOTIONS);
   const [bookingPhotos, setBookingPhotos] = useState<string[]>([]);
   const [photoMessage, setPhotoMessage] = useState("");
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+  const [category, setCategory] = useState<PricingKind | "other">("packages");
+  const [stepMessage, setStepMessage] = useState("");
 
   const set = (key: keyof FormState, value: unknown) => setForm((current) => ({ ...current, [key]: value }));
 
@@ -507,6 +511,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (step !== 3 || status === "submitting" || status === "success") return;
     setStatus("submitting");
     setMessage("");
     if (!form.serviceAddress.trim()) {
@@ -551,6 +556,35 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
   };
 
   const databaseServices = services.filter((service) => service.active && service.title.trim().toLowerCase() !== "headlight restoration");
+
+  const stageNames = ["Service", "Date & time", "Your details", "Review"] as const;
+  const selectedName = packageSelection?.packageName || (quoteLocked ? form.selectedPackage : selectedService?.title || (isStandaloneHeadlight ? "Headlight Restoration" : ""));
+  const selectedVehicleSize = packageSelection ? VEHICLE_LABELS[packageSelection.vehicleClass] : form.vehicleType;
+  const serviceReady = Boolean(baseTotal != null && baseTotal > 0 && selectedName && !setupMessage && !needsOdorQuote);
+  const scheduleReady = Boolean(form.preferredDate && form.preferredTime && slots.includes(form.preferredTime));
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
+  const detailsReady = Boolean(
+    form.name.trim() && form.phone.trim() && emailValid && form.serviceAddress.trim() &&
+    form.vehicleYear.trim() && form.vehicleMake.trim() && form.vehicleModel.trim()
+  );
+  const advance = () => {
+    setStepMessage("");
+    if (step === 0 && !serviceReady) { setStepMessage("Choose a fixed-price detail or an accepted quote first."); return; }
+    if (step === 1 && !scheduleReady) { setStepMessage("Choose an available date and start time."); return; }
+    if (step === 2 && !detailsReady) { setStepMessage("Fill in your name, phone, valid email, service address, and vehicle details."); return; }
+    setStep(current => Math.min(3, current + 1) as 0 | 1 | 2 | 3);
+    window.requestAnimationFrame(() => document.getElementById("car-dash-booking-scroll")?.scrollTo({top:0,behavior:"smooth"}));
+  };
+  const previous = () => {
+    setStep(current => Math.max(0, current - 1) as 0 | 1 | 2 | 3);
+    setStepMessage("");
+    window.requestAnimationFrame(() => document.getElementById("car-dash-booking-scroll")?.scrollTo({top:0,behavior:"smooth"}));
+  };
+  useEffect(() => {
+    if (packageSelection) setCategory(packageSelection.pricingPage);
+  }, [packageSelection?.pricingPage]);
+
+
 
   return (
     <form onSubmit={submit} className="luxury-booking-form space-y-6 text-white">
