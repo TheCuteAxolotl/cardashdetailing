@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { connection } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ensureTenDollarPackagePriceUpdate } from "@/lib/ten-dollar-pricing-update";
 import { normalizeLegacySiteContent, SITE_DEFAULTS } from "@/lib/site-defaults";
 import type { SiteContent } from "@/lib/site-defaults";
 
@@ -20,6 +21,7 @@ export const getSiteContent = cache(async (): Promise<SiteContent> => {
   await connection();
 
   try {
+    await ensureTenDollarPackagePriceUpdate();
     const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const stored = Object.fromEntries(
