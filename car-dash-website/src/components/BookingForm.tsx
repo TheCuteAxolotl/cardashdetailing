@@ -19,7 +19,7 @@ import {
 import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import type { SiteContent } from "@/lib/site-defaults";
 import BookingDatePicker from "@/components/BookingDatePicker";
-import SitePhoto from "@/components/SitePhoto";
+import BookingServiceCatalog from "@/components/BookingServiceCatalog";
 import { recommendedServiceMinutes, totalBookingMinutes } from "@/lib/booking-duration";
 
 
@@ -587,26 +587,73 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
 
   return (
-    <form onSubmit={submit} className="luxury-booking-form space-y-6 text-white">
-      <div className="border-b border-white/10 pb-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-white/38">Appointment</p>
-        <h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">Book your detail</h2>
-        <p className="mt-2 text-sm leading-6 text-white/42">Pick the service, tell us what you drive, choose an open time, and send it over. You can add photos too.</p>
-        <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#6EAEC6]">Get a free photo quote →</a></p>
-      </div>
-
-      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#6EAEC6]">Get a Quote →</a></div>}
-
+    <form onSubmit={submit} className="car-dash-booking-app space-y-5 text-[#f4efe5]">
+      {status === "success" ? (
+        <section role="status" aria-live="polite" className="mx-auto max-w-xl py-6 text-center sm:py-10">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-[#d6b779]/40 bg-[#d6b779]/10 text-[#e5c995]">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m5 12 5 5L20 7"/></svg>
+          </div>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-[#d6b779]">Booking request received</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight">Your detail is on its way.</h2>
+          <p className="mt-3 text-sm leading-6 text-[#c5beb4]">{message}</p>
+          <div className="mt-6 rounded-2xl border border-white/15 bg-[#232323] p-5 text-left">
+            <p className="font-semibold">{selectedName}</p>
+            <p className="mt-2 text-sm text-[#bcb5aa]">{form.preferredDate} · {form.preferredTime}</p>
+            <p className="mt-2 text-sm text-[#bcb5aa]">{form.serviceAddress}</p>
+            <p className="mt-4 text-2xl font-semibold text-[#e5c995]">{"$" + Number(bookingTotal || 0).toFixed(2)}</p>
+          </div>
+          <p className="mt-4 text-xs leading-5 text-[#a8a095]">Car Dash will review your request and confirm the appointment details.</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            {chatUrl && <a href={chatUrl} className="rounded-xl bg-[#d6b779] px-5 py-3 text-sm font-bold text-[#161616]">Open booking chat</a>}
+            {onClose && <button type="button" onClick={onClose} className="rounded-xl border border-white/20 px-5 py-3 text-sm">Close</button>}
+          </div>
+        </section>
+      ) : (
+        <>
+          <header className="border-b border-white/10 pb-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-[#d6b779]">Car Dash · Online booking</p>
+            <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{stageNames[step]}</h2>
+                <p className="mt-1.5 text-xs text-[#aaa399]">Step {step + 1} of 4 · Mobile detailing at your location</p>
+              </div>
+              <div className="rounded-xl border border-[#d6b779]/25 bg-[#d6b779]/10 px-3 py-2">
+                <p className="text-[10px] uppercase tracking-widest text-[#bdb3a0]">Est. total</p>
+                <p className="text-xl font-semibold tabular-nums text-[#ead5a8]">{bookingTotal != null ? "$" + bookingTotal.toFixed(2) : "—"}</p>
+              </div>
+            </div>
+            <ol className="mt-5 grid grid-cols-4 gap-2" aria-label="Booking progress">
+              {stageNames.map((title, index) => (
+                <li key={title} className="min-w-0"><div className={"h-1 rounded-full " + (index <= step ? "bg-[#d6b779]" : "bg-white/10")} />
+                  <span className={"mt-2 block truncate text-[10px] font-semibold " + (index === step ? "text-[#f4efe5]" : "text-[#928b80]")}>{title}</span></li>
+              ))}
+            </ol>
+          </header>
+          {setupMessage && <div role="alert" className="rounded-xl border border-amber-300/30 bg-amber-900/20 p-4 text-sm text-amber-100">{setupMessage} <a href="/quote" className="font-semibold text-[#e5c995] underline">Get a quote</a></div>}
+          {step === 0 && <div className="space-y-6">
+            {!quoteLocked && <BookingServiceCatalog
+              category={category}
+              onCategoryChange={setCategory}
+              configs={pricingConfigs}
+              vehicleClass={vehicleTypeToClass(form.vehicleType)}
+              selected={serviceChoiceValue}
+              onSelect={chooseBookingOption}
+              otherServices={databaseServices}
+              standaloneId={STANDALONE_HEADLIGHT_SERVICE_ID}
+              headlightPrice={bookingPricing.headlightStandalonePrice}
+            />}
       <section>
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Pick what you want done.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Choose a service, then choose your vehicle size.</p></div></div>
 
         {quoteLocked ? (
-          <div className="rounded-2xl border border-[#6EAEC6]/25 bg-[#6EAEC6]/[.055] p-4">
-            <p className="text-xs uppercase tracking-[.18em] text-[#6EAEC6]">Accepted quote</p>
+          <div className="rounded-2xl border border-[#d6b779]/25 bg-[#d6b779]/[.055] p-4">
+            <p className="text-xs uppercase tracking-[.18em] text-[#d6b779]">Accepted quote</p>
             <div className="mt-2 flex flex-wrap items-end justify-between gap-4"><div><p className="text-lg font-semibold">{form.selectedPackage}</p><p className="mt-1 text-xs text-white/35">Quote #{form.quoteThreadId.slice(-7)}</p></div><p className="text-2xl font-semibold">${Number(baseTotal || 0).toFixed(2)}</p></div>
           </div>
         ) : (
-          <label className="block text-sm text-white/55">
+          <details className="mt-4 rounded-xl border border-white/10 bg-[#232323] p-3">
+            <summary className="cursor-pointer text-xs font-semibold text-[#e5c995]">Or browse services in a list</summary>
+            <label className="mt-3 block text-sm text-white/55">
             Service or package
             <select className={input} value={serviceChoiceValue} onChange={(event) => chooseBookingOption(event.target.value)} required>
               <option value="">Choose a service</option>
@@ -616,59 +663,27 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
               <optgroup label="Standalone"><option value={`service:${STANDALONE_HEADLIGHT_SERVICE_ID}`}>Headlight Restoration — ${bookingPricing.headlightStandalonePrice.toFixed(0)}</option></optgroup>
               {databaseServices.length > 0 && <optgroup label="Other Services">{databaseServices.map((service) => <option key={service.id} value={`service:${service.id}`}>{service.title} — {formatPricingType(service)}</option>)}</optgroup>}
             </select>
-          </label>
+            </label>
+          </details>
         )}
 
         {packageSelection && !quoteLocked && (
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.025] p-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">{packageSelection.packageName}</p><p className="mt-1 text-xs text-white/35">Choose vehicle size</p></div><p className="text-2xl font-semibold">${packageSelection.price.toFixed(0)}</p></div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#6EAEC6]/55 bg-[#6EAEC6]/10 text-white" : "border-white/10 bg-[#07131B]/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#d6b779]/55 bg-[#d6b779]/10 text-white" : "border-white/10 bg-[#07131B]/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
           </div>
         )}
       </section>
 
-      <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">2</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Just enough info to know who and what we’re booking.</p></div></div>
-
-        {vehicles.length > 0 && !quoteLocked && <label className="mb-4 block text-sm text-white/55">Saved vehicle<select className={input} value={form.vehicleId} onChange={(event) => chooseVehicle(event.target.value)}><option value="">Enter vehicle manually</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select></label>}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm text-white/55">Name<input className={input} value={form.name} onChange={(event) => set("name", event.target.value)} required /></label>
-          <label className="text-sm text-white/55">Phone<input className={input} value={form.phone} onChange={(event) => set("phone", event.target.value)} required /></label>
-          <label className="text-sm text-white/55 sm:col-span-2">Email<input type="email" className={input} value={form.email} onChange={(event) => set("email", event.target.value)} required /></label>
-        </div>
-
-        <label className="mt-4 block text-sm text-white/55">
-          Service address (required)
-          <input name="serviceAddress" autoComplete="street-address" className={input} value={form.serviceAddress} onChange={(event) => set("serviceAddress", event.target.value)} placeholder="Street address, unit, city, state, ZIP code" aria-describedby="service-address-help" required />
-          <span id="service-address-help" className="mt-2 block text-xs text-white/45">We come to you. Enter the full address where your vehicle will be detailed.</span>
-        </label>
-
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <label className="text-sm text-white/55">Year<input className={input} value={form.vehicleYear} onChange={(event) => set("vehicleYear", event.target.value)} required /></label>
-          <label className="text-sm text-white/55">Make<input className={input} value={form.vehicleMake} onChange={(event) => set("vehicleMake", event.target.value)} required /></label>
-          <label className="text-sm text-white/55">Model<input className={input} value={form.vehicleModel} onChange={(event) => set("vehicleModel", event.target.value)} required /></label>
-        </div>
-      </section>
-
-      <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Grey dates aren’t available. Times that are already booked won’t show up.</p></div></div>
-        <p className="mb-3 text-sm text-white/60">Estimated appointment: {Math.floor(estimatedDuration/60)}h {estimatedDuration%60 ? `${estimatedDuration%60}m` : ""}. Available start times automatically account for this.</p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker duration={estimatedDuration} value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
-          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{[...slots.map(slot=>({slot,disabled:false})),...pastSlots.map(slot=>({slot,disabled:true}))].sort((a,b)=>a.slot.localeCompare(b.slot)).map(({slot,disabled}) => <option key={slot} disabled={disabled} value={slot}>{slot}{disabled ? " — past" : ""}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#6EAEC6]">No times left on this day. Choose another date.</span>}</label>
-        </div>
-      </section>
-
       {(allowCarAddOns || baseTotal != null) && (
         <section className="border-t border-white/8 pt-6">
-          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">4</span><div><h3 className="font-semibold">Optional</h3><p className="text-xs text-white/35">Only open these if you need them.</p></div></div>
+          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">4</span><div><h3 className="font-semibold">Optional</h3><p className="text-xs text-white/35">Personalize your detail with add-ons, photos or a discount code.</p></div></div>
 
           <div className="space-y-3">
             {allowCarAddOns && (
               <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
-                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#6EAEC6]/35 bg-[#6EAEC6]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} /><span>{item.name}{item.quoteRequired ? <span className="mt-1 block text-[10px] text-amber-200">Inspection and custom quote required</span> : null}{item.durationMinutes ? <span className="mt-0.5 block text-[10px] text-white/30">Approx. {item.durationMinutes} min</span> : null}</span></span><strong className="text-white">+${item.price.toFixed(0)}{item.quoteRequired ? "+" : ""}</strong></label>)}</div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#d6b779]/35 bg-[#d6b779]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} /><span>{item.name}{item.quoteRequired ? <span className="mt-1 block text-[10px] text-amber-200">Inspection and custom quote required</span> : null}{item.durationMinutes ? <span className="mt-0.5 block text-[10px] text-white/30">Approx. {item.durationMinutes} min</span> : null}</span></span><strong className="text-white">+${item.price.toFixed(0)}{item.quoteRequired ? "+" : ""}</strong></label>)}</div>
               </details>
             )}
 
@@ -698,6 +713,60 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         </section>
       )}
 
+
+          </div>}
+          {step === 1 && <div className="space-y-6">
+      <section className="border-t border-white/8 pt-6">
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Unavailable dates and times are disabled.</p></div></div>
+        <p className="mb-3 text-sm text-white/60">Estimated appointment: {Math.floor(estimatedDuration/60)}h {estimatedDuration%60 ? `${estimatedDuration%60}m` : ""}. Available start times automatically account for this.</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker duration={estimatedDuration} value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
+          <label className="text-sm text-white/55">Time<select className={input} value={form.preferredTime} onChange={(event) => set("preferredTime", event.target.value)} required><option value="">Choose a time</option>{[...slots.map(slot=>({slot,disabled:false})),...pastSlots.map(slot=>({slot,disabled:true}))].sort((a,b)=>a.slot.localeCompare(b.slot)).map(({slot,disabled}) => <option key={slot} disabled={disabled} value={slot}>{slot}{disabled ? " — past" : ""}</option>)}</select>{form.preferredDate && slots.length === 0 && <span className="mt-2 block text-xs text-[#d6b779]">No times left on this day. Choose another date.</span>}</label>
+        </div>
+      </section>
+
+
+          </div>}
+          {step === 2 && <div className="space-y-6">
+      <section className="border-t border-white/8 pt-6">
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">2</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Tell us about your car and where to meet you.</p></div></div>
+
+        {vehicles.length > 0 && !quoteLocked && <label className="mb-4 block text-sm text-white/55">Saved vehicle<select className={input} value={form.vehicleId} onChange={(event) => chooseVehicle(event.target.value)}><option value="">Enter vehicle manually</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select></label>}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm text-white/55">Name<input className={input} value={form.name} onChange={(event) => set("name", event.target.value)} required /></label>
+          <label className="text-sm text-white/55">Phone<input className={input} value={form.phone} onChange={(event) => set("phone", event.target.value)} required /></label>
+          <label className="text-sm text-white/55 sm:col-span-2">Email<input type="email" className={input} value={form.email} onChange={(event) => set("email", event.target.value)} required /></label>
+        </div>
+
+        <label className="mt-4 block text-sm text-white/55">
+          Service address (required)
+          <input name="serviceAddress" autoComplete="street-address" className={input} value={form.serviceAddress} onChange={(event) => set("serviceAddress", event.target.value)} placeholder="Street address, unit, city, state, ZIP code" aria-describedby="service-address-help" required />
+          <span id="service-address-help" className="mt-2 block text-xs text-white/45">We come to you. Enter the full address where your vehicle will be detailed.</span>
+        </label>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <label className="text-sm text-white/55">Year<input className={input} value={form.vehicleYear} onChange={(event) => set("vehicleYear", event.target.value)} required /></label>
+          <label className="text-sm text-white/55">Make<input className={input} value={form.vehicleMake} onChange={(event) => set("vehicleMake", event.target.value)} required /></label>
+          <label className="text-sm text-white/55">Model<input className={input} value={form.vehicleModel} onChange={(event) => set("vehicleModel", event.target.value)} required /></label>
+        </div>
+      </section>
+
+
+          </div>}
+          {step === 3 && <div className="space-y-6">
+            <section className="rounded-2xl border border-[#d6b779]/25 bg-[#28251f] p-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Please review your request</p>
+              <h3 className="mt-3 text-xl font-semibold">{selectedName}</h3>
+              <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+                <div><dt className="text-xs text-[#aaa399]">Vehicle</dt><dd className="mt-1">{[form.vehicleYear,form.vehicleMake,form.vehicleModel].filter(Boolean).join(" ")} · {selectedVehicleSize}</dd></div>
+                <div><dt className="text-xs text-[#aaa399]">Time</dt><dd className="mt-1">{form.preferredDate} at {form.preferredTime}</dd></div>
+                <div className="sm:col-span-2"><dt className="text-xs text-[#aaa399]">Service address</dt><dd className="mt-1">{form.serviceAddress}</dd></div>
+                <div><dt className="text-xs text-[#aaa399]">Customer</dt><dd className="mt-1">{form.name}</dd></div>
+                <div><dt className="text-xs text-[#aaa399]">Est. duration</dt><dd className="mt-1">{Math.floor(estimatedDuration / 60)} hr {estimatedDuration % 60 ? estimatedDuration % 60 + " min" : ""}</dd></div>
+              </dl>
+              <button type="button" onClick={() => setStep(2)} className="mt-4 text-xs font-semibold text-[#e5c995] underline">Edit your details</button>
+            </section>
       {baseTotal != null && (
         <section className="booking-total-panel border border-white/10 bg-black/20 p-5">
           <div className="space-y-2 text-sm">
@@ -711,19 +780,32 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
       )}
 
       <section className="space-y-3 border-t border-white/8 pt-6">
-        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request at the total shown, and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a>.</span></label>
+        <label className="flex items-start gap-3 text-sm leading-6 text-white/50"><input type="checkbox" checked={form.policyAgreed} onChange={(event) => set("policyAgreed", event.target.checked)} className="mt-1" /><span>I understand this is a booking request at the total shown, and Car Dash will confirm availability. I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#d6b779]">Terms and Conditions</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#d6b779]">Privacy Policy</a>.</span></label>
 
         {needsOdorQuote && <div className="rounded-xl border border-amber-300/25 bg-amber-400/10 p-4 text-sm text-amber-100">Severe odor restoration starts at $199 and requires an inspection and custom price before scheduling. <a href="/quote" className="font-semibold underline">Request a quote</a>.</div>}
-        <div className="booking-option-panel border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#6EAEC6]">Terms and Conditions</a>.</p></div>
+        <div className="booking-option-panel border border-white/10 bg-white/[.02] p-4"><label className="flex items-start gap-3 text-sm leading-6 text-white/52"><input type="checkbox" checked={form.smsConsent} onChange={(event) => set("smsConsent", event.target.checked)} className="mt-1" /><span><strong className="font-semibold text-white/80">Yes, text me my booking confirmation and appointment updates — no spam or promotional messages.</strong> Car Dash Detailing will only text you about your quote, scheduling, appointment updates, or other messages directly related to your service. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.</span></label><p className="mt-3 pl-6 text-xs leading-5 text-white/32">See our <a href="/privacy-policy" target="_blank" rel="noreferrer" className="text-[#d6b779]">Privacy Policy</a> and <a href="/terms-and-conditions" target="_blank" rel="noreferrer" className="text-[#d6b779]">Terms and Conditions</a>.</p></div>
       </section>
 
-      {status !== "idle" && <div className={`rounded-2xl border p-4 text-sm ${status === "success" ? "border-green-800 bg-green-950/30 text-green-200" : "border-red-800 bg-red-950/30 text-red-200"}`}><p>{message}</p>{status === "success" && chatUrl && <a href={chatUrl} className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-semibold text-black">Open booking chat</a>}</div>}
 
-      <div className="flex flex-wrap gap-3">
-        <button disabled={status === "submitting" || status === "success" || quote?.status === "booked" || !form.policyAgreed || !form.preferredDate || !form.preferredTime || bookingTotal == null || !baseTotal || Boolean(setupMessage) || needsOdorQuote} className="min-w-[180px] rounded-full bg-[#6EAEC6] px-6 py-3.5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{status === "submitting" ? "Sending…" : status === "success" ? "Booking submitted" : bookingTotal != null ? `Book for $${bookingTotal.toFixed(2)}` : "Choose a service"}</button>
-        {onClose && <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-6 py-3.5">Close</button>}
-      </div>
+          </div>}
+          {stepMessage && <p role="alert" className="rounded-xl border border-amber-300/30 bg-amber-900/20 p-3 text-sm text-amber-100">{stepMessage}</p>}
+          {status === "error" && <p role="alert" className="rounded-xl border border-red-400/30 bg-red-900/20 p-4 text-sm text-red-100">{message}</p>}
+          <nav aria-label="Booking step navigation" className="sticky bottom-0 z-20 -mx-4 mt-6 flex items-center gap-3 border-t border-white/15 bg-[#161616]/95 px-4 py-4 shadow-[0_-12px_35px_#101010cc] backdrop-blur-xl sm:-mx-8 sm:px-8">
+            {step > 0 && <button type="button" onClick={previous} disabled={status === "submitting"} className="rounded-xl border border-white/20 px-5 py-3.5 text-sm font-semibold">Back</button>}
+            {step < 3 ? (
+              <button type="button" onClick={advance} disabled={status === "submitting" || (step === 0 && !serviceReady) || (step === 1 && !scheduleReady) || (step === 2 && !detailsReady)}
+                className="ml-auto flex-1 rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e8cf9e] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-[245px]">
+                {step === 0 ? "Choose a time" : step === 1 ? "Enter your details" : "Review appointment"}
+              </button>
+            ) : (
+              <button type="submit" disabled={status === "submitting" || !form.policyAgreed || !serviceReady || !scheduleReady || !detailsReady}
+                className="ml-auto flex-1 rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e8cf9e] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-[245px]">
+                {status === "submitting" ? "Submitting…" : "Request detail · $" + Number(bookingTotal || 0).toFixed(2)}
+              </button>
+            )}
+          </nav>
+        </>
+      )}
     </form>
   );
-
 }
