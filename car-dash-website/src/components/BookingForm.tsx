@@ -305,7 +305,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
       const service = services.find((item) => item.id === id);
       setForm((current) => ({ ...current, serviceId: id, quoteThreadId: "", selectedPackage: service?.title || "", addOns: [] }));
       if (service && (service.pricingType !== "fixed" || service.price <= 0)) {
-        setSetupMessage(`${service.title} needs an exact quote before booking. Use Get an Exact Quote and then book after accepting the final price.`);
+        setSetupMessage(`${service.title} needs an exact quote before booking. Use Get a Quote and then book after accepting the final price.`);
       }
     }
   };
@@ -412,7 +412,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         if (!match) return;
         if (!cancelled) {
           setForm((current) => ({ ...current, serviceId: match.id, selectedPackage: match.title, addOns: [] }));
-          if (match.pricingType !== "fixed" || match.price <= 0) setSetupMessage(`${match.title} needs an exact quote before booking. Use Get an Exact Quote, then book after accepting the final price.`);
+          if (match.pricingType !== "fixed" || match.price <= 0) setSetupMessage(`${match.title} needs an exact quote before booking. Use Get a Quote, then book after accepting the final price.`);
         }
       }
     })();
@@ -561,7 +561,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         <p className="mt-3 text-xs text-white/34">Not sure which detail you need? <a href="/quote" className="font-semibold text-[#6EAEC6]">Get a free photo quote →</a></p>
       </div>
 
-      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#6EAEC6]">Get an Exact Quote →</a></div>}
+      {setupMessage && <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[.07] p-4 text-sm text-amber-100"><p>{setupMessage}</p><a href="/quote" className="mt-3 inline-block font-semibold text-[#6EAEC6]">Get a Quote →</a></div>}
 
       <section>
         <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Pick what you want done.</p></div></div>
