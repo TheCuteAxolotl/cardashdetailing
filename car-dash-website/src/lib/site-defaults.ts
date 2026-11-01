@@ -5,7 +5,7 @@ export const SITE_DEFAULTS = {
   heroEyebrow: "South Elgin, IL · Mobile car detailing",
   heroTitle: "Professional detailing, right in your driveway.",
   heroBody: "You don’t have to drop your car off or wait around at a shop. We come to your home or work for interior details, exterior details, paint correction, and ceramic coatings. Pick a package online, or send us a few photos and we’ll give you an exact quote.",
-  heroPrimaryCta: "Get an Exact Quote",
+  heroPrimaryCta: "Get a Quote",
   heroSecondaryCta: "See Services",
 
   introEyebrow: "How pricing works",
