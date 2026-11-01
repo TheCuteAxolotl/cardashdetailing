@@ -147,7 +147,7 @@ export default function PublicBookingModal({ initialSiteContent }: { initialSite
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M5 5 19 19M19 5 5 19"/></svg>
           </button>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-8 sm:py-8"
+        <div id="car-dash-booking-scroll" className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-8 sm:py-8"
           style={{ WebkitOverflowScrolling: "touch", paddingBottom: "max(32px, env(safe-area-inset-bottom))" }}>
           <BookingForm key={selection.id} bookingSearch={selection.search} initialSiteContent={initialSiteContent} onClose={close} />
         </div>
