@@ -70,6 +70,7 @@ type Vehicle = {
 };
 
 type Quote = {
+  messages?: { sender: string; body: string }[];
   id: string;
   subject: string;
   status: string;
@@ -386,6 +387,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           setForm((current) => ({
             ...current,
             quoteThreadId: quoteData.id,
+            serviceAddress: current.serviceAddress || quoteData.messages?.find((message) => message.sender === "system" && message.body.startsWith("Service address: "))?.body.slice("Service address: ".length) || "",
             serviceId: quoteData.service?.id || "",
             selectedPackage: quoteData.service?.title || quoteData.subject,
             vehicleId: quoteData.vehicle?.id || current.vehicleId,
