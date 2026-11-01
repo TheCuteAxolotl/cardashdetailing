@@ -68,7 +68,7 @@ export default function HomeExperience({
               <p className="mt-5 max-w-[650px] border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 tracking-[-.01em] text-white/90 sm:text-base">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>
               <div className="home-hero-actions mt-8 flex flex-wrap gap-3">
                 <a href="#book" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ece9e3]">Book a detail</a>
-                <a href="/quote" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">Get an exact quote</a>
+                <a href="/quote" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">Get a Quote</a>
                 <a href="#prices" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">View pricing</a>
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function HomeExperience({
       <section className={styles.services} aria-labelledby="craft-heading">
         <div className={styles.sectionHeading} data-reveal>
           <div><p className={styles.eyebrow}>The Car Dash approach</p><h2 id="craft-heading">Every surface.<br /><span>Every detail.</span></h2></div>
-          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Get an exact quote</a></div>
+          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Get a Quote</a></div>
         </div>
         <div className={styles.serviceGrid}>
           {[
