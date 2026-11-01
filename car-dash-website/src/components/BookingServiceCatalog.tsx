@@ -57,7 +57,7 @@ export default function BookingServiceCatalog({
             className={"group overflow-hidden rounded-2xl border text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d6b779] " +
               (checked ? "border-[#d6b779] bg-[#302b21] ring-1 ring-[#d6b779]/30" : "border-white/15 bg-[#212121] hover:border-[#d6b779]/60")}>
             <div className="relative aspect-[16/9] overflow-hidden bg-[#272624]">
-              <SitePhoto category={"pricing-car-" + category + "-pkg-" + pkg.id}
+              <SitePhoto category={(category === "packages" ? "pricing-car-packages-pkg-" : "pricing-" + category + "-pkg-") + pkg.id}
                 fallbackCategory={"pricing-" + (category === "packages" ? "car-packages" : category) + "-hero"}
                 className="h-full w-full" alt={pkg.name + " detailing photo"} />
               {pkg.badge && <span className="absolute left-2.5 top-2.5 rounded-full bg-[#d6b779] px-2.5 py-1 text-[10px] font-bold text-[#151515]">{pkg.badge}</span>}
