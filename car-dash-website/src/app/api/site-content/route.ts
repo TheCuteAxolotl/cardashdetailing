@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ensureTenDollarPackagePriceUpdate } from "@/lib/ten-dollar-pricing-update";
 import { SITE_DEFAULTS, normalizeLegacySiteContent } from "@/lib/site-defaults";
 import { getCurrentAccountFromRequest, hasStaffPermission, isOwnerAccount } from "@/lib/permissions";
 
@@ -18,6 +19,7 @@ function canEditKey(auth: Awaited<ReturnType<typeof getCurrentAccountFromRequest
 
 export async function GET() {
   try {
+    await ensureTenDollarPackagePriceUpdate();
     const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const stored = Object.fromEntries(rows.filter((row) => allowedKeys.has(row.key)).map((row) => [row.key, row.value]));
@@ -30,6 +32,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    await ensureTenDollarPackagePriceUpdate();
     const auth = await getCurrentAccountFromRequest(request);
     if (!auth) return NextResponse.json({ error: "Login required" }, { status: 401 });
 
