@@ -43,7 +43,9 @@ export async function POST(request: NextRequest) {
   if (attachments.some((item) => typeof item !== "string" || !/^data:image\/(?:jpeg|png|webp);base64,/i.test(item) || item.length > 650000)) {
     return NextResponse.json({ error: "Each quote photo must be a JPG, PNG, or WebP image under the upload limit." }, { status: 400 });
   }
+  if (!attachments.length) return NextResponse.json({ error: "Add at least one vehicle photo to request a quote." }, { status: 400 });
   const smsConsent = body.smsConsent === true;
+  if (!smsConsent) return NextResponse.json({ error: "Enable SMS consent so we can text you about your quote." }, { status: 400 });
   const phone = String(body.phone || body.guestPhone || "").trim().slice(0, 40);
 
   const guestName = auth ? null : String(body.guestName || "").trim().slice(0, 120);
