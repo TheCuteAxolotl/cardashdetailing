@@ -2,6 +2,7 @@ import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { discordIpLine } from "@/lib/discord-ip";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { ensureTenDollarPackagePriceUpdate } from "@/lib/ten-dollar-pricing-update";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
 import { getAuthFromRequest } from "@/lib/auth";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
@@ -96,6 +97,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureTenDollarPackagePriceUpdate();
     const ip = getClientIp(request);
     const visitorHash = hashVisitor(ip);
     const blocked = await prisma.blockedVisitor.findUnique({ where: { hash: visitorHash } });
