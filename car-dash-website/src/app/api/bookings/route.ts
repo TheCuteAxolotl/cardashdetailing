@@ -126,6 +126,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Choose an available booking date and time." }, { status: 400 });
     }
     const serviceAddress = String(form.get("serviceAddress") || "").trim();
+    if (!serviceAddress) {
+      return NextResponse.json({ success: false, message: "Enter the full address where we should detail your vehicle." }, { status: 400 });
+    }
     const customerNotes = String(form.get("serviceNotes") || "None").trim();
     const smsConsent = String(form.get("smsConsent") || "false") === "true";
     if (smsConsent && !normalizePhoneNumber(phone)) return NextResponse.json({ success: false, message: "Enter a valid mobile number to receive SMS updates." }, { status: 400 });
