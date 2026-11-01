@@ -81,6 +81,19 @@ export default function HomeExperience({
         </div>
       </section>
 
+      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
+        <div className="mx-auto max-w-[1320px]">
+          <div className="mb-9 flex items-end justify-between gap-5 border-b border-black/[.08] pb-6">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
+            </div>
+            <a href="/reviews" className="hidden text-sm font-semibold text-black/50 hover:text-black sm:block">All reviews →</a>
+          </div>
+          <ReviewCards />
+        </div>
+      </section>
+
       <section className={styles.manifesto} aria-labelledby="care-heading">
         <div data-reveal><p className={styles.eyebrow}>Care you can see. A difference you can feel.</p><h2 id="care-heading">Some details change<br />how your car looks.<br /><em>Ours change how it feels.</em></h2><p>A fresh interior. A finish that catches the light. Thoughtful care, brought to your driveway.</p></div>
         <div className={styles.locations} aria-label="Communities within about 20 miles of South Elgin">
@@ -201,18 +214,7 @@ export default function HomeExperience({
         </div>
       </section>
 
-      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
-        <div className="mx-auto max-w-[1320px]">
-          <div className="mb-9 flex items-end justify-between gap-5 border-b border-black/[.08] pb-6">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
-            </div>
-            <a href="/reviews" className="hidden text-sm font-semibold text-black/50 hover:text-black sm:block">All reviews →</a>
-          </div>
-          <ReviewCards />
-        </div>
-      </section>
+
     </div>
   );
 }
