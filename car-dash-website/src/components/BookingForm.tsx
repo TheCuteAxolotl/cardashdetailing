@@ -507,6 +507,11 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
     event.preventDefault();
     setStatus("submitting");
     setMessage("");
+    if (!form.serviceAddress.trim()) {
+      setStatus("error");
+      setMessage("Enter the full address where we should detail your vehicle.");
+      return;
+    }
     if (needsOdorQuote) { setStatus("error"); setMessage("Severe odor restoration needs a custom inspection and quote before booking."); return; }
     if (!form.preferredDate || !form.preferredTime) {
       setStatus("error");
@@ -596,6 +601,12 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           <label className="text-sm text-white/55">Phone<input className={input} value={form.phone} onChange={(event) => set("phone", event.target.value)} required /></label>
           <label className="text-sm text-white/55 sm:col-span-2">Email<input type="email" className={input} value={form.email} onChange={(event) => set("email", event.target.value)} required /></label>
         </div>
+
+        <label className="mt-4 block text-sm text-white/55">
+          Service address (required)
+          <input name="serviceAddress" autoComplete="street-address" className={input} value={form.serviceAddress} onChange={(event) => set("serviceAddress", event.target.value)} placeholder="Street address, unit, city, state, ZIP code" aria-describedby="service-address-help" required />
+          <span id="service-address-help" className="mt-2 block text-xs text-white/45">We come to you. Enter the full address where your vehicle will be detailed.</span>
+        </label>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <label className="text-sm text-white/55">Year<input className={input} value={form.vehicleYear} onChange={(event) => set("vehicleYear", event.target.value)} required /></label>
