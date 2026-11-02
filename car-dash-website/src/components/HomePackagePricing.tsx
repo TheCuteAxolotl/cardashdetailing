@@ -64,10 +64,7 @@ export default function HomePackagePricing({ config, mediaItems = [], promotions
 
             <PackageMediaEvidence
               packageMedia={mediaItems.filter((item) => item.category === `pricing-car-packages-pkg-${pkg.id}`)}
-              featureMedia={pkg.features.map((feature, featureIndex) => ({
-                feature,
-                items: mediaItems.filter((item) => item.category === `pricing-car-packages-pkg-${pkg.id}-feature-${featureIndex + 1}`),
-              }))}
+              features={pkg.features}
             />
           </article>
         ))}

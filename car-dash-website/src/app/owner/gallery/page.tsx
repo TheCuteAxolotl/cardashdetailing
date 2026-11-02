@@ -62,11 +62,6 @@ function dynamicPackagePlacements(configs: PricingConfigs): Placement[] {
         label: `${label} → ${pkg.name} → When Should I Get This? → Dirty Before Examples`,
         group: label,
       },
-      ...pkg.features.map((feature, index) => ({
-        value: `pricing-${slug}-pkg-${pkg.id}-feature-${index + 1}`,
-        label: `${label} → ${pkg.name} → Included Item → ${feature}`,
-        group: label,
-      })),
     ])
   );
 }
@@ -219,7 +214,7 @@ export default function OwnerGallery() {
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-[#d6b779]">Car Dash · Owner workspace</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">Photos & media</h1>
-            <p className="mt-2 text-sm text-[#b5aea3]">Organize your website photos by page, package, and service feature.</p>
+            <p className="mt-2 text-sm text-[#b5aea3]">Organize your website photos by page and package.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/owner/pricing-pages" className="rounded-xl border border-white/20 px-4 py-2.5 text-xs font-semibold hover:border-[#d6b779]/60">Pricing pages</a>

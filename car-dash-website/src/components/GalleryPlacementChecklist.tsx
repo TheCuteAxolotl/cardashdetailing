@@ -93,9 +93,9 @@ export default function GalleryPlacementChecklist({
     </header>
 
     <div className="px-4 py-4 sm:px-6">
-      <label htmlFor="search-gallery-placements" className="text-xs font-semibold text-[#dfd5c6]">Find a page, package, or feature</label>
+      <label htmlFor="search-gallery-placements" className="text-xs font-semibold text-[#dfd5c6]">Find a page or package</label>
       <input id="search-gallery-placements" type="search" value={query} onChange={event => setQuery(event.target.value)}
-        placeholder="Search: Full Detail, ceramic, foam wash..."
+        placeholder="Search: Full Detail, ceramic, homepage..."
         className="mt-2 w-full rounded-xl border border-white/20 bg-[#292825] px-4 py-3 text-base text-[#f4efe5] outline-none placeholder:text-[#a49a8c] focus:border-[#d6b779]"/>
       <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter photo slots">
         {([

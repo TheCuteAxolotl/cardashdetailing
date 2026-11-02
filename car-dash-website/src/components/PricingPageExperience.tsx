@@ -85,10 +85,7 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
 
               <PackageMediaEvidence
                 packageMedia={mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}`)}
-                featureMedia={pkg.features.map((feature, featureIndex) => ({
-                  feature,
-                  items: mediaItems.filter((item) => item.category === `pricing-${kind === "packages" ? "car-packages" : kind}-pkg-${pkg.id}-feature-${featureIndex + 1}`),
-                }))}
+                features={pkg.features}
               />
             </article>
           ))}
