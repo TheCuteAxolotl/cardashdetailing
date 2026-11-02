@@ -36,9 +36,18 @@ export async function PUT(request: NextRequest) {
     const auth = await getCurrentAccountFromRequest(request);
     if (!auth) return NextResponse.json({ error: "Login required" }, { status: 401 });
 
-    const body = await request.json();
+    const body: unknown = await request.json();
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Website content must be an object of text fields." }, { status: 400 });
+    }
     const allowedKeys = new Set(Object.keys(SITE_DEFAULTS));
     const entries = Object.entries(body).filter(([key]) => allowedKeys.has(key));
+    if (entries.some(([, value]) => typeof value !== "string")) {
+      return NextResponse.json({ error: "Website content fields must contain text." }, { status: 400 });
+    }
+    if (entries.some(([, value]) => (value as string).length > 20000)) {
+      return NextResponse.json({ error: "One or more website fields exceed the 20,000-character limit." }, { status: 400 });
+    }
 
     const writableEntries = entries.filter(([key]) => canEditKey(auth, key));
     if (!writableEntries.length) {
@@ -52,10 +61,11 @@ export async function PUT(request: NextRequest) {
       writableEntries.map(([key, value]) =>
         prisma.siteContent.upsert({
           where: { key },
-          update: { value: String(value ?? "").slice(0, 20000) },
-          create: { key, value: String(value ?? "").slice(0, 20000) },
+          update: { value: value as string },
+          create: { key, value: value as string },
         })
-      )
+      ),
+      { maxWait: 10000, timeout: 20000 }
     );
 
     const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
@@ -63,6 +73,14 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(normalizeLegacySiteContent({ ...SITE_DEFAULTS, ...stored }), { status: 200 });
   } catch (error) {
     console.error("Error updating site content:", error);
-    return NextResponse.json({ error: "Failed to update website content" }, { status: 500 });
+    const databaseError = error && typeof error === "object" && "code" in error ? String(error.code) : "";
+    const retryable = ["P2024", "P2034"].includes(databaseError);
+    return NextResponse.json(
+      { error: retryable
+          ? "The database was busy. Your edits were not saved; please try again."
+          : "Could not save website content. Your edits are still in the editor. Please retry or contact support.",
+        code: databaseError || undefined },
+      { status: retryable ? 503 : 500 }
+    );
   }
 }
