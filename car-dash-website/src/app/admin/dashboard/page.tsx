@@ -90,9 +90,6 @@ export default function AdminDashboard() {
           <h2 className="mt-2 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">
             Hey {user.name?.split(" ")[0] || "there"}.
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-black/42">
-            Your Car Dash workspace only shows the tools the Owner has given you access to.
-          </p>
         </section>
 
         <section className="border-t border-black/[.08] pt-6">
