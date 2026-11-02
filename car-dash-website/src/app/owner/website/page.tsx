@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SITE_DEFAULTS } from "@/lib/site-defaults";
 
 type Content = Record<keyof typeof SITE_DEFAULTS, string>;
@@ -66,26 +66,51 @@ export default function OwnerWebsiteEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const savedContent = useRef<Content>({ ...SITE_DEFAULTS });
 
   useEffect(() => {
     fetch("/api/site-content", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => setContent({ ...SITE_DEFAULTS, ...data }))
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load saved website content.");
+        const data = await response.json();
+        const loaded = { ...SITE_DEFAULTS, ...data } as Content;
+        savedContent.current = loaded;
+        setContent(loaded);
+      })
+      .catch((error) => setMessage(error instanceof Error ? error.message : "Unable to load website content."))
       .finally(() => setLoading(false));
   }, []);
 
   const save = async () => {
+    const changed = Object.fromEntries(
+      (Object.keys(SITE_DEFAULTS) as (keyof Content)[])
+        .filter((key) => content[key] !== savedContent.current[key])
+        .map((key) => [key, content[key]])
+    );
+    if (!Object.keys(changed).length) {
+      setMessage("No changes to save.");
+      return;
+    }
     setSaving(true);
     setMessage("");
     try {
       const response = await fetch("/api/site-content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(content),
+        body: JSON.stringify(changed),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Save failed");
-      setContent({ ...SITE_DEFAULTS, ...data });
+      const saved = { ...SITE_DEFAULTS, ...data } as Content;
+      savedContent.current = saved;
+      setContent((current) => {
+        const next = { ...saved };
+        for (const key of Object.keys(SITE_DEFAULTS) as (keyof Content)[]) {
+          // Never overwrite text typed while the save request was in flight.
+          if (current[key] !== content[key]) next[key] = current[key];
+        }
+        return next;
+      });
       setMessage("Website updated.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Save failed.");
