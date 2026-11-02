@@ -26,7 +26,7 @@ export async function ensureTenDollarPackagePriceUpdate() {
 
   await prisma.$transaction(async tx => {
     // Serialize simultaneous requests across serverless instances.
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(2026110101::bigint)`;
+    await tx.$queryRaw`SELECT 1::integer AS locked FROM (SELECT pg_advisory_xact_lock(2026110101::bigint)) AS advisory_lock`;
     const existingMarker = await tx.siteContent.findUnique({
       where: { key: CHANGE_KEY },
       select: { id: true },

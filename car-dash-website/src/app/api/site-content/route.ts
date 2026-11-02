@@ -64,8 +64,7 @@ export async function PUT(request: NextRequest) {
           update: { value: value as string },
           create: { key, value: value as string },
         })
-      ),
-      { maxWait: 10000, timeout: 20000 }
+      )
     );
 
     const rows = await prisma.siteContent.findMany({where:{key:{in:Object.keys(SITE_DEFAULTS)}}});
