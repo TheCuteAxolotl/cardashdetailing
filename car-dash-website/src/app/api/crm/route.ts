@@ -34,7 +34,7 @@ export async function POST(req:NextRequest){
  const b=await req.json();const id=String(b.id||"").slice(0,320);
  if(!id)return NextResponse.json({error:"Customer ID required"},{status:400});
  const data:Record<string,string>={};
- for(const key of ["name","email","phone","address","stage","tags","notes","followUp"])data[key]=String(b[key]||"").trim().slice(0,key==="notes"?10000:500);
+ for(const key of ["name","email","phone","address","stage","tags","notes","followUp","source","nextAction"])data[key]=String(b[key]||"").trim().slice(0,key==="notes"?10000:500);
  if(!data.name)return NextResponse.json({error:"Customer name required"},{status:400});
  if(!["Lead","Contacted","Quoted","Customer","Inactive"].includes(data.stage))return NextResponse.json({error:"Invalid stage"},{status:400});
  if(data.followUp && !/^\d{4}-\d{2}-\d{2}$/.test(data.followUp))return NextResponse.json({error:"Invalid follow-up date"},{status:400});
