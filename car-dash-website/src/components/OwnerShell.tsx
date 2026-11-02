@@ -78,6 +78,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Operations",
     icon: "grid",
     items: [
+      { href: "/owner/jobs", label: "Jobs & Quality", icon: "photo", permissions: ["assignedJobs"] },
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
       { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
       { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },

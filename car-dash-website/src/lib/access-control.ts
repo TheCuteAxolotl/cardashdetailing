@@ -1,4 +1,5 @@
 export const STAFF_PERMISSIONS = [
+  { key: "assignedJobs", label: "Assigned jobs", description: "View only assigned vehicles, upload private before/after photos, and submit work for owner review. No booking or pricing changes." },
   { key: "staffGuide", label: "Staff Guide", description: "Read Car Dash rules, scripts, professionalism standards, and communication playbooks." },
   { key: "bookings", label: "Bookings & Booking Chat", description: "View bookings, update booking status, use booking chat, and send arrival updates." },
   { key: "smsInbox", label: "SMS Inbox", description: "View incoming customer SMS replies and reply from booking conversations." },
@@ -35,6 +36,7 @@ export function sanitizePermissions(values: unknown): StaffPermission[] {
 }
 
 export const PERMISSION_ROUTES: Record<StaffPermission, string> = {
+  assignedJobs: "/owner/jobs",
   staffGuide: "/staff-guide",
   bookings: "/admin/bookings",
   smsInbox: "/admin/messages",

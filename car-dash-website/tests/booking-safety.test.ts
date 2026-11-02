@@ -11,7 +11,7 @@ import { savedDuration } from '../src/lib/booking-duration';
 
 const db = prisma as any;
 const version = new Date('2026-10-28T12:00:00Z');
-let quote = { id: 'quote', status: 'open', updatedAt: version, userId: null, vehicleId: null };
+let quote = { id: 'quote', status: 'open', updatedAt: version, userId: null, vehicleId: null, messages: [{body: 'Service address: 123 Test Street'}] };
 let creates = 0;
 let busy: any[] = [];
 const locks: string[] = [];
@@ -48,6 +48,7 @@ async function main() {
   let booking = (await response.json()).booking;
   assert.equal(booking.serviceMethod, 'mobile');
   assert.equal(booking.status, 'confirmed');
+  assert.match(booking.notes, /Service address: 123 Test Street/);
   assert.equal(booking.quotedPrice, 100.13);
   assert.equal(savedDuration(booking.notes, booking.serviceName), 300);
   assert.equal(quote.status, 'booked');

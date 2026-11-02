@@ -21,6 +21,7 @@ model User {
   warranties   Warranty[]
   customRoleAssignments CustomRoleAssignment[]
   permissionOverrides UserPermissionOverride[]
+  assignedDetailJobs DetailJob[]
 }
 
 model Vehicle {
@@ -84,6 +85,7 @@ model Booking {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   conversation   BookingConversation?
+  detailJob      DetailJob?
 }
 
 
@@ -318,4 +320,28 @@ model UserPermissionOverride {
 
   @@unique([userId, permission])
   @@index([userId])
+}
+
+model DetailJob {
+  id String @id
+  booking Booking @relation(fields: [id], references: [id], onDelete: Cascade)
+  assigneeId String
+  assignee User @relation(fields: [assigneeId], references: [id], onDelete: Restrict)
+  state String @default("assigned")
+  version Int @default(1)
+  data Json
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  photos DetailJobPhoto[]
+  @@index([assigneeId], map: "DetailJob_assignee")
+}
+model DetailJobPhoto {
+  id String @id
+  jobId String
+  job DetailJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  phase String
+  area String
+  bytes Bytes
+  uploadedBy String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@index([jobId], map: "DetailJobPhoto_job")
 }

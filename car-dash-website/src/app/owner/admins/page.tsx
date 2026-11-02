@@ -26,7 +26,7 @@ type Account = {
 const input = "w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none transition focus:border-[#6EAEC6]/60";
 
 const ROLE_TEMPLATES = [
-  { name: "Detailer", description: "Booking operations, customer arrival updates, and day-of-service messaging.", permissions: ["staffGuide", "bookings", "smsInbox"] },
+  { name: "Detailer", description: "Assigned vehicles, private before/after photos, and owner quality review. No booking or pricing changes.", permissions: ["staffGuide", "assignedJobs"] },
   { name: "Support Agent", description: "Customer support and text-message assistance without pricing or website access.", permissions: ["staffGuide", "support", "smsInbox"] },
   { name: "Quote Specialist", description: "Review quote requests, customer photos, and send exact quotes.", permissions: ["staffGuide", "quoteChats", "smsInbox"] },
   { name: "Manager", description: "Operational access across bookings, support, phone, warranties, quotes, and analytics.", permissions: ["staffGuide", "bookings", "smsInbox", "quoteChats", "support", "businessPhone", "warranties", "analytics"] },

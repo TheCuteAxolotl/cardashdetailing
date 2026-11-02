@@ -58,6 +58,7 @@ export default function AdminDashboard() {
   }, [user, permissions]);
 
   const tools = useMemo<Tool[]>(() => [
+    { permission: "assignedJobs", href: "/owner/jobs", title: "My assigned jobs", description: "Vehicle details, before / after photos and quality review", kind: "photo" },
     { permission: "bookings", href: "/admin/bookings", title: "Bookings", description: "Appointments, status changes and arrival updates", kind: "booking" },
     { permission: "smsInbox", href: "/admin/messages", title: "Messages", description: "Customer SMS conversations", kind: "message", badge: smsUnread },
     { permission: "quoteChats", href: "/admin/quotes", title: "Quote requests", description: "Photos, conversations and exact quotes", kind: "quote" },

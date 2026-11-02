@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from "next/server";
 import {prisma} from "@/lib/prisma";
 import {getCurrentAccountFromRequest,hasStaffPermission,isOwnerAccount} from "@/lib/permissions";
+import {ensureJobs} from "@/lib/jobs";
 import {emailConfig,withMailbox} from "@/lib/owner-email";
 
 type Section="sms"|"quotes"|"support"|"calls";
@@ -13,6 +14,13 @@ export async function GET(request:NextRequest){
  const seenRows=await prisma.siteContent.findMany({where:{key:{in:keys}}});
  const seen=(section:Section)=>{const raw=seenRows.find(row=>row.key===`notification_seen_${auth.id}_${section}`)?.value;const date=raw?new Date(raw):new Date(0);return Number.isNaN(date.getTime())?new Date(0):date;};
  const jobs:Record<string,Promise<number>>={};
+ if(hasStaffPermission(auth,"assignedJobs"))jobs["/owner/jobs"]=(async()=>{
+  await ensureJobs();
+  const rows=isOwnerAccount(auth)
+   ?await prisma.$queryRaw<{count:bigint}[]>`SELECT COUNT(*) AS count FROM "DetailJob" WHERE "state"='awaiting_review'`
+   :await prisma.$queryRaw<{count:bigint}[]>`SELECT COUNT(*) AS count FROM "DetailJob" WHERE "assigneeId"=${auth.id} AND "state" IN ('assigned','needs_touch_up')`;
+  return Number(rows[0]?.count||0);
+ })();
  if(hasStaffPermission(auth,"bookings"))jobs["/owner/bookings"]=prisma.booking.count({where:{status:"pending"}});
  if(hasStaffPermission(auth,"smsInbox"))jobs["/owner/messages"]=(async()=>{
   const rows=await prisma.$queryRaw<{count:bigint}[]>`SELECT COUNT(*) AS count FROM "BookingMessage" m JOIN "BookingConversation" c ON c.id=m."conversationId" WHERE m.sender='customer' AND (c."lastStaffSeenAt" IS NULL OR m."createdAt">c."lastStaffSeenAt")`;
