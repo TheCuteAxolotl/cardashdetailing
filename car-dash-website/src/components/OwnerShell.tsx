@@ -295,13 +295,13 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       )}
 
       {mobileOpen && (
-        <div className="owner-mobile-menu fixed inset-0 z-[90] lg:hidden">
+        <div className="owner-mobile-menu fixed inset-0 z-[90] xl:hidden">
           <button aria-label="Close navigation" className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <aside className="owner-mobile-drawer relative h-full w-[310px] max-w-[88vw] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#1c1c1b] px-4 pb-10 pt-5 text-[#f4efe5] shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <a href={homeHref} className="flex items-center gap-3">
                 <img src="/favicon.png" alt="" className="h-9 w-9 rounded-full border border-black/[.08] bg-white p-1" />
-                <div><p className="text-sm font-semibold tracking-[-.02em]">Car Dash</p><p className="text-[9px] uppercase tracking-[.16em] text-black/32">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
+                <div><p className="text-sm font-semibold tracking-[-.02em]">Car Dash</p><p className="text-[9px] uppercase tracking-[.16em] text-[#d6b779]">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
               </a>
               <button onClick={() => setMobileOpen(false)} className="owner-menu-close grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-[#292723] text-[#f4efe5]"><Icon name="close" className="h-5 w-5" /></button>
             </div>
@@ -311,29 +311,55 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             {textualNav}
             <div className="mt-7 border-t border-black/[.08] pt-4">
               <p className="px-2 text-xs font-semibold">{user.name || user.email}</p>
-              <p className="mt-1 truncate px-2 text-[10px] text-black/32">{user.email}</p>
-              <div className="mt-3 grid grid-cols-2 gap-2"><a href="/" className="rounded-xl border border-black/[.08] bg-white px-3 py-2.5 text-center text-xs font-semibold">Website</a><button onClick={logout} className="rounded-xl bg-[#171411] px-3 py-2.5 text-xs font-semibold text-white">Sign out</button></div>
+              <p className="mt-1 truncate px-2 text-[10px] text-[#aaa397]">{user.email}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2"><a href="/" className="rounded-xl border border-white/20 bg-[#2b2925] px-3 py-2.5 text-center text-xs font-semibold text-[#f4eee5]">Website</a><button onClick={logout} className="rounded-xl bg-[#171411] px-3 py-2.5 text-xs font-semibold text-white">Sign out</button></div>
             </div>
           </aside>
         </div>
       )}
 
-      <div className="lg:pl-[76px]">
-        <header className="console-topbar sticky top-0 z-40 flex h-[72px] items-center justify-between border-b border-black/[.07] bg-[#f8f6f0]/92 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="relative grid h-10 w-10 place-items-center rounded-full border border-black/[.09] bg-white lg:hidden" aria-label="Open navigation"><Icon name="menu" />{allVisibleItems.some(item=>(notificationCounts[item.href]||0)>0) && <span aria-label="Unread items" className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#191918] bg-[#e58b4b]" />}</button>
-            <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[.17em] text-black/28">Car Dash / {owner ? "Owner" : "Staff"}</p>
-              <h1 className="mt-0.5 text-[17px] font-semibold tracking-[-.025em]">{pageTitle(pathname, owner)}</h1>
+      <div className="xl:pl-[248px]">
+        <header className="console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6">
+          <div className="flex min-h-[68px] items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <button onClick={() => setMobileOpen(true)}
+                className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#292826] text-[#f4eee5] xl:hidden" aria-label="Open navigation">
+                <Icon name="menu"/>
+                {allVisibleItems.some(item=>(notificationCounts[item.href]||0)>0)&&<span aria-label="Unread items" className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#191918] bg-[#d6b779]"/>}
+              </button>
+              <div className="min-w-0"><p className="truncate text-[9px] font-semibold uppercase tracking-[.19em] text-[#c5af82]">Car Dash / {owner?"Owner":"Staff"}</p><h1 className="mt-1 truncate text-lg font-semibold tracking-[-.03em] text-[#f5eee3]">{pageTitle(pathname,owner)}</h1></div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button type="button" onClick={() => {setSearchOpen(true);setQuery("");}}
+                className="hidden items-center gap-2 rounded-xl border border-white/15 bg-[#282724] px-3.5 py-2.5 text-xs font-semibold text-[#d7ccc0] hover:border-[#d6b779]/60 sm:inline-flex">
+                <Icon name="search" className="h-4 w-4"/> Search
+              </button>
+              <OwnerActivityBell/>
+              <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 bg-[#272622] px-3.5 py-2.5 text-xs font-semibold text-[#ebe0ce] hover:border-[#d6b779]/60">View site</a>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <OwnerActivityBell />
-            <button onClick={() => { setSearchOpen(true); setQuery(""); }} className="hidden rounded-full border border-black/[.08] bg-white px-3.5 py-2 text-xs font-medium text-black/45 hover:text-black sm:inline-flex">⌘ Search</button>
-            <a href="/" target="_blank" rel="noreferrer" className="rounded-full border border-black/[.08] bg-white px-3.5 py-2 text-xs font-medium text-black/48 hover:text-black">View site</a>
-          </div>
+          <nav aria-label="Business workspace tabs" className="owner-topnav flex max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none]">
+            {(owner ? [
+              {label:"Calendar",href:"/owner/dashboard"},
+              {label:"Jobs",href:"/owner/jobs"},
+              {label:"Quotes",href:"/owner/quotes"},
+              {label:"Customers",href:"/owner/crm"},
+              {label:"Orders",href:"/owner/bookings"},
+              {label:"Payments",href:"/owner/invoices"},
+              {label:"Subscriptions",href:"/owner/maintenance"},
+            ] : [
+              {label:"Home",href:"/admin/dashboard"},
+              {label:"Bookings",href:"/admin/bookings"},
+              {label:"Quotes",href:"/admin/quotes"},
+              {label:"Messages",href:"/admin/messages"},
+            ].filter(item=>allVisibleItems.some(v=>v.resolvedHref===item.href))).map(tab=>{
+              const active=pathname===tab.href||(tab.href!=="/owner/dashboard"&&pathname.startsWith(tab.href+"/"));
+              return <a key={tab.href} href={tab.href} aria-current={active?"page":undefined}
+                className={"shrink-0 rounded-lg px-3 py-2 text-[11px] font-semibold transition sm:px-4 sm:text-xs "+(active?"border border-[#d6b779]/35 bg-[#d6b779]/15 text-[#f1dab0]":"border border-transparent text-[#b4aa9d] hover:bg-white/10 hover:text-[#f3e9db]")}>{tab.label}</a>;
+            })}
+          </nav>
         </header>
-        <main className="owner-shell-content min-h-[calc(100vh-72px)]">{children}</main>
+        <main className="owner-shell-content min-h-[calc(100vh-112px)]">{children}</main>
       </div>
     </div>
   );
