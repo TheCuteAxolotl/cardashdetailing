@@ -60,6 +60,7 @@ const statusDetails: Record<string, { label: string; description: string; classN
 
 export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [avatar,setAvatar] = useState<string|null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [maintenanceSubscriptions, setMaintenanceSubscriptions] = useState<MaintenanceSubscription[]>([]);
   const [staffAccess, setStaffAccess] = useState(false);
@@ -102,6 +103,9 @@ export default function AccountPage() {
 
         setUser(currentUser);
         setName(currentUser.name);
+        fetch("/api/account-profile",{cache:"no-store"}).then(r=>r.ok?r.json():null)
+          .then(value=>setAvatar(typeof value?.profile?.avatar==="string"?value.profile.avatar:null))
+          .catch(()=>{});
 
         if (!hasStaffAccess) {
           const [bookingResponse, maintenanceResponse] = await Promise.all([
@@ -292,7 +296,7 @@ export default function AccountPage() {
                 <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em]">Profile</h2>
               </div>
               <div className="grid h-11 w-11 place-items-center rounded-full border border-[#6EAEC6]/20 bg-[#6EAEC6]/10 text-sm font-semibold text-[#6EAEC6]">
-                {user.name?.slice(0, 1).toUpperCase() || "C"}
+{avatar?<img src={avatar} alt="Your profile photo" className="h-full w-full rounded-full object-cover"/>:user.name?.slice(0, 1).toUpperCase() || "C"}
               </div>
             </div>
 
