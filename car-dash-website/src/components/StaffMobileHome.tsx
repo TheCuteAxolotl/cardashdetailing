@@ -67,6 +67,7 @@ export default function StaffMobileHome({name,permissions,tools,smsUnread}:{
        <p className="text-xs text-[#b8afa2]">{niceDate(today)}</p>
        <h1 className="mt-2 text-[28px] font-semibold tracking-[-.045em]">Welcome{recording?" back":name?.trim()?", "+name.split(" ")[0]:""}.</h1>
        <p className="mt-2 text-sm text-[#aaa093]">Your Car Dash staff workspace.</p>
+       <a href="/admin/profile" className="mt-4 inline-flex rounded-lg border border-[#d6b779]/35 bg-[#d6b779]/10 px-3 py-2.5 text-xs font-semibold text-[#e7cfa0]">Edit profile photo, contact & saved cars</a>
        <div className="mt-5 flex flex-wrap gap-2">
          {canBook&&<Link href="/admin/bookings" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#d6b779] px-4 text-xs font-bold text-[#181714]"><OwnerAppIcon name="calendar" className="h-4 w-4"/> Open bookings</Link>}
          {permissions.includes("assignedJobs")&&<Link href="/owner/jobs" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-[#d6b779]/40 bg-[#2a271f] px-4 text-xs font-semibold text-[#e7d0a1]"><OwnerAppIcon name="check" className="h-4 w-4"/> My jobs</Link>}
