@@ -172,6 +172,31 @@
     }
   }
 }
+/* Phone dashboard only: compact native-app header and a readable fixed tab bar.
+   Tablet and laptop workspace styles are intentionally unchanged. */
+@media (max-width: 767px) {
+  .editorial-theme .owner-app .owner-mobile-dashboard-topbar {
+    min-height: 66px !important;
+    height: auto !important;
+    background: #191918 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-home {
+    background: #121211 !important;
+    color: #f2ece2 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-home :is(h1,h2,h3,h4) {
+    font-family: var(--font-geist-sans),Arial,sans-serif !important;
+    letter-spacing: -0.035em;
+  }
+  .editorial-theme .owner-app .owner-mobile-home a,
+  .editorial-theme .owner-app .owner-mobile-home button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .editorial-theme .owner-app .owner-mobile-home #today-route {
+    scroll-margin-top: 90px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .owner-app .owner-tool-card,.owner-app .owner-metric-card {transition:none !important}
 }
