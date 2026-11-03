@@ -86,7 +86,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/inventory", label: "Supply inventory", icon: "grid", ownerOnly: true },
       { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
       { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },
-      { href: "/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
+      { href: "/staff-guide", adminHref: "/admin/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
     ],
   },
   {
