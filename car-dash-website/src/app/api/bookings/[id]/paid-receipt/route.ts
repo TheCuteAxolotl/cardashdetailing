@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureBookingConversation } from "@/lib/booking-chat";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
+import { bookingPhoneWasReleased } from "@/lib/phone-release";
 import { calculateInvoiceTotals, getInvoice, nextInvoiceNumber, requireOwner, sanitizeInvoiceInput } from "@/lib/invoices";
 import type { InvoicePayment, InvoiceRecord } from "@/lib/invoices";
 import { getPublicSiteUrl, normalizePhoneNumber } from "@/lib/twilio-sms";
@@ -58,6 +59,12 @@ export async function POST(request: Request, context: Context) {
     }
     if (!normalizePhoneNumber(booking.customerPhone)) {
       return NextResponse.json({ error: "Add a valid customer phone number first." }, { status: 400 });
+    }
+
+    if (await bookingPhoneWasReleased(booking.customerPhone,booking.createdAt)) {
+      return NextResponse.json({
+        error:"This customer's previously connected phone number was removed. Update the booking contact before sending a payment receipt.",
+      },{status:409});
     }
 
     const body = await request.json().catch(() => ({}));
