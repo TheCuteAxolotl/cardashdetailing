@@ -23,7 +23,7 @@ const dayName = (d:Date) => d.toLocaleDateString("en-US",{weekday:"short",month:
 const monthTitle = (d:Date) => d.toLocaleDateString("en-US",{month:"long",year:"numeric"});
 const timeText = (value?:string|null) => {
  const match = String(value || "").match(/^(\d{1,2}):(\d{2})/);
- if(!match) return "Time TBD";
+ if(!match || Number(match[1])>23 || Number(match[2])>59) return "Time TBD";
  const h=Number(match[1]); return (h%12||12)+":"+match[2]+" "+(h>=12?"PM":"AM");
 };
 const money = (n:number) => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(n);
@@ -100,7 +100,7 @@ export default function OwnerScheduleOverview({
  const periodValue = periodBookings.reduce((sum,b)=>sum+(Number(b.quotedPrice)||0),0);
  const open = (event:Event)=>{ if(event.booking)onEditBooking(event.booking); else if(event.task)window.location.assign("/owner/schedule"); };
  const title = view==="month"?monthTitle(anchor):view==="week"
-  ? dayName(weekDays[0])+" – "+dayName(weekDays[6]):dayName(anchor);
+  ? dayName(weekDays[0])+" – "+dayName(weekDays[6]) : view==="agenda" ? "Upcoming appointments" : view==="locations" ? "Service locations" : dayName(anchor);
  const views:ScheduleView[]=["month","week","day","agenda","locations"];
 
  const eventBadge=(event:Event,compact:boolean)=>(
