@@ -208,6 +208,7 @@ export default function OwnerDashboard(){
      <p className="pb-4 text-[10px] text-[#8f877c]">Scheduled values are estimates from booking records, not verified payments. Manage invoices and actual collection in Payments.</p>
    </div>
  </div>
+ </div>
    {editor&&<BookingDetailsEditor key={editor.id} booking={editor} onClose={()=>setEditor(null)} onSaved={load}/>}
  </>;
 }
