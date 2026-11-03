@@ -32,7 +32,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Customers",
     icon: "people",
     items: [
-      { href: "/owner/crm", label: "Customer", icon: "people", ownerOnly: true },
+      { href: "/owner/crm", label: "Customers", icon: "people", ownerOnly: true },
       { href: "/owner/bookings", adminHref: "/admin/bookings", label: "Bookings", icon: "calendar", permissions: ["bookings"] },
       { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
       { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", ownerOnly: true },
@@ -41,7 +41,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", ownerOnly: true },
       { href: "/owner/gift-cards", label: "Gift cards", icon: "price", ownerOnly: true },
       { href: "/owner/loyalty", label: "Loyalty cards", icon: "shield", ownerOnly: true },
-      { href: "/owner/maintenance", label: "Maintenance", icon: "price", ownerOnly: true },
+      { href: "/owner/maintenance", label: "Subscriptions & maintenance", icon: "price", ownerOnly: true },
       { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },
     ],
   },
@@ -70,7 +70,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
       { href: "/owner/promotions", label: "Automatic Promotions", icon: "price", ownerOnly: true },
       { href: "/owner/promo-codes", label: "Promo Codes", icon: "price", permissions: ["pricing"] },
-      { href: "/owner/services", label: "Services", icon: "service", permissions: ["services"] },
+      { href: "/owner/services", label: "Products & services", icon: "service", permissions: ["services"] },
       { href: "/owner/gallery", label: "Photos & media", icon: "photo", permissions: ["gallery"] },
     ],
   },
@@ -80,6 +80,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     items: [
       { href: "/owner/jobs", label: "Jobs & Quality", icon: "photo", permissions: ["assignedJobs"] },
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
+      { href: "/owner/inventory", label: "Supply inventory", icon: "grid", ownerOnly: true },
       { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
       { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },
       { href: "/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
@@ -89,7 +90,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Admin",
     icon: "settings",
     items: [
-      { href: "/owner/admins", label: "Staff & accounts", icon: "people", ownerOnly: true },
+      { href: "/owner/admins", label: "Employees & resources", icon: "people", ownerOnly: true },
       { href: "/owner/settings", label: "Settings", icon: "settings", ownerOnly: true },
     ],
   },
@@ -147,8 +148,7 @@ function NotificationBadge({count=0}:{count?:number}) {
 export default function OwnerShell({ children, user, permissions = [] }: { children: ReactNode; user: OwnerUser; permissions?: string[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [panel, setPanel] = useState<string | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const owner = user.role === "owner";
   const [notificationCounts,setNotificationCounts]=useState<Record<string,number>>({});
@@ -210,13 +210,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   };
 
   const go = (href: string) => {
-    setPanel(null);
     setMobileOpen(false);
     setSearchOpen(false);
     window.location.assign(href);
   };
 
-  const panelGroup = visibleGroups.find((group) => group.label === panel);
 
   const textualNav = (
     <div className="space-y-4">
@@ -228,7 +226,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               const href = owner ? item.href : (item.adminHref || item.href);
               const active = pathname === href || pathname.startsWith(`${href}/`);
               return (
-                <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`owner-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "owner-nav-link-active bg-[#e58b4b] text-[#151310]" : "text-[#d1c8bc] hover:bg-white/[.07] hover:text-white"}`}>
+                <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`owner-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "owner-nav-link-active bg-[#d6b779] text-[#191714]" : "text-[#d1c8bc] hover:bg-white/[.07] hover:text-white"}`}>
                   <Icon name={item.icon} className="h-[18px] w-[18px]" />
                   <span className="min-w-0 flex-1">{item.label}</span>
                   <NotificationBadge count={notificationCounts[item.href]} />
@@ -243,80 +241,37 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
 
   return (
     <div className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
-      <aside onMouseEnter={() => setPanel(null)} className="console-rail console-rail-reveal fixed inset-y-0 left-0 z-50 hidden w-[76px] border-r border-black/[.08] bg-[#f8f6f0]/95 backdrop-blur-xl lg:flex lg:flex-col lg:items-center">
-        <div className="flex w-full flex-col items-center gap-2 px-2 pt-4">
-          <button title="Quick create" onClick={() => go(quickHref)} className="grid h-12 w-12 place-items-center rounded-full bg-[#0d0d0d] text-white shadow-[0_12px_28px_rgba(23,20,17,.15)] transition hover:scale-[1.04]">
-            <Icon name="plus" className="h-6 w-6" />
-          </button>
-          <button title="Search tools" onClick={() => { setSearchOpen(true); setQuery(""); }} className="console-rail-button mt-2">
-            <Icon name="search" />
-          </button>
+      <aside aria-label="Owner workspace sidebar" className="owner-workspace-sidebar fixed inset-y-0 left-0 z-50 hidden w-[248px] flex-col border-r border-white/10 bg-[#1b1b1a] text-[#f4eee5] xl:flex">
+        <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
+          <img src="/favicon.png" alt="Car Dash" className="h-10 w-10 rounded-xl border border-[#d6b779]/25 bg-[#25241f] p-1.5 object-contain" />
+          <div className="min-w-0"><p className="truncate text-base font-semibold tracking-tight text-[#f6efe2]">Car Dash</p><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-[.20em] text-[#d6b779]">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
         </div>
-
-        <nav className="console-rail-collapsed mt-4 flex w-full flex-1 flex-col items-center gap-1 overflow-y-auto px-2 pb-3">
-          {visibleGroups.map((group) => {
-            const isHome = group.label === "Home";
-            const active = activeGroup === group.label;
-            const target = owner ? group.items[0].href : (group.items[0].adminHref || group.items[0].href);
-            return (
-              <button
-                key={group.label}
-                title={group.label}
-                onClick={() => isHome ? go(target) : setPanel(panel === group.label ? null : group.label)}
-                className={`console-rail-button relative ${active ? "console-rail-button-active" : ""}`}
-              >
-                <Icon name={group.icon} />
-                <span className="absolute -right-1 -top-1"><NotificationBadge count={group.items.reduce((sum,item)=>sum+(notificationCounts[item.href]||0),0)} /></span>
-                {active && <span className="absolute -left-2 h-7 w-[3px] rounded-r-full bg-[#171411]" />}
-              </button>
-            );
-          })}
-        </nav>
-
-        <nav aria-label="All workspace tabs" className="console-rail-expanded mt-4 w-full min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+        <div className="px-4 pt-4">
+          <button type="button" onClick={()=>{setSearchOpen(true);setQuery("");}}
+            className="flex w-full items-center gap-2.5 rounded-xl border border-white/15 bg-[#272622] px-3.5 py-3 text-left text-xs font-medium text-[#bdb3a7] transition hover:border-[#d6b779]/60 hover:text-white">
+            <Icon name="search" className="h-4 w-4 text-[#d6b779]"/> Search workspace
+            <span className="ml-auto rounded-md border border-white/10 px-1.5 py-1 text-[10px] text-[#958d80]">Find</span>
+          </button>
+          <a href={owner?"/owner/bookings?create=1":allVisibleItems.find(item=>item.label==="Bookings")?.resolvedHref||homeHref}
+            className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-[#d6b779] px-3 py-3 text-xs font-bold text-[#181715] transition hover:bg-[#ead49f]">
+            <Icon name="plus" className="h-4 w-4"/> New booking
+          </a>
+        </div>
+        <nav aria-label="Workspace sections" className="owner-sidebar-nav min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-5">
           {textualNav}
         </nav>
-
-        <div className="flex w-full flex-col items-center gap-2 border-t border-black/[.07] px-2 py-3">
-          <a title="View website" href="/" target="_blank" rel="noreferrer" className="console-rail-button"><Icon name="external" /></a>
-          <button title={user.name || user.email || "Account"} onClick={() => setPanel(panel === "Account" ? null : "Account")} className="grid h-10 w-10 place-items-center rounded-full bg-[#171411] text-xs font-semibold text-white">
-            {(user.name || user.email || "C").slice(0, 1).toUpperCase()}
-          </button>
+        <div className="space-y-2 border-t border-white/10 px-4 py-4">
+          <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-[#c9bdad] hover:bg-white/10"><Icon name="external" className="h-4 w-4"/> Public website</a>
+          <div className="flex items-center gap-3 border-t border-white/10 pt-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#d6b779]/35 bg-[#302921] text-xs font-semibold text-[#ebd3a5]">{(user.name||user.email||"C").slice(0,1).toUpperCase()}</span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-semibold text-[#f4eee5]">{user.name || (owner?"Owner":"Staff")}</p>
+              <p className="truncate text-[10px] text-[#a79f94]">{user.email}</p>
+            </div>
+            <button type="button" onClick={logout} title="Sign out" className="rounded-lg border border-white/10 p-2 text-[10px] text-[#ceb78e] hover:bg-white/10">Exit</button>
+          </div>
         </div>
       </aside>
-
-      {panelGroup && (
-        <div className="console-flyout fixed left-[86px] top-4 z-[60] hidden w-[286px] overflow-hidden rounded-[22px] border border-black/[.09] bg-[#fbfaf6]/98 shadow-[0_30px_90px_rgba(23,20,17,.16)] backdrop-blur-2xl lg:block">
-          <div className="border-b border-black/[.07] px-5 py-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-black/30">Car Dash</p>
-            <h2 className="mt-1 text-lg font-semibold tracking-[-.025em]">{panelGroup.label}</h2>
-          </div>
-          <div className="p-2">
-            {panelGroup.items.map((item) => {
-              const href = owner ? item.href : (item.adminHref || item.href);
-              const active = pathname === href || pathname.startsWith(`${href}/`);
-              return (
-                <a key={href} href={href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm ${active ? "bg-[#171411] text-white" : "text-black/62 hover:bg-black/[.04] hover:text-black"}`}>
-                  <Icon name={item.icon} className="h-[18px] w-[18px]" />
-                  <span className="min-w-0 flex-1 font-medium">{item.label}</span>
-                  <NotificationBadge count={notificationCounts[item.href]} />
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {panel === "Account" && (
-        <div className="console-flyout fixed bottom-4 left-[86px] z-[60] hidden w-[300px] rounded-[22px] border border-black/[.09] bg-[#fbfaf6]/98 p-4 shadow-[0_30px_90px_rgba(23,20,17,.16)] backdrop-blur-2xl lg:block">
-          <p className="text-sm font-semibold">{user.name || (owner ? "Car Dash Owner" : "Car Dash Staff")}</p>
-          <p className="mt-1 truncate text-xs text-black/38">{user.email}</p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <a href="/account" className="rounded-xl border border-black/[.08] bg-white px-3 py-2.5 text-center text-xs font-semibold text-black/56">Account</a>
-            <button onClick={logout} className="rounded-xl bg-[#171411] px-3 py-2.5 text-xs font-semibold text-white">Sign out</button>
-          </div>
-        </div>
-      )}
 
       {searchOpen && (
         <div className="fixed inset-0 z-[100] bg-black/70 p-4 backdrop-blur-[4px]" onMouseDown={(event) => { if (event.currentTarget === event.target) setSearchOpen(false); }}>
