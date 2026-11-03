@@ -169,7 +169,7 @@ export default function MobileOwnerDashboard({
      <OwnerPrivacyControls bookings={bookings} activity={activity}/>
 
      <section aria-label="Today at a glance" className="grid grid-cols-2 gap-3">
-       {statItems.map(item=><a key={item.title} href={item.href}
+       {statItems.map(item=><a key={item.title} href={recording?"#":item.href} aria-disabled={recording} onClick={event=>{if(recording)event.preventDefault();}}
          className="min-h-[135px] rounded-[20px] border border-white/[.095] bg-[#1d1d1c] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.03)]">
          <div className="flex items-center gap-2 text-[#cbbfae]">
            <OwnerAppIcon name={item.icon} className="h-[17px] w-[17px] text-[#d6b779]"/>
@@ -184,7 +184,7 @@ export default function MobileOwnerDashboard({
        <div className="flex items-start justify-between gap-3">
          <div><p className="text-[10px] font-semibold uppercase tracking-[.19em] text-[#d6b779]">Today’s route</p>
            <h2 className="mt-1 text-lg font-semibold tracking-tight">Appointments & stops</h2></div>
-         <a href="/owner/schedule" className="flex items-center gap-1.5 py-1 text-xs font-semibold text-[#d8c393]">Calendar <OwnerAppIcon name="chevron-right" className="h-3.5 w-3.5"/></a>
+         <a href={recording?"#":"/owner/schedule"} aria-disabled={recording} onClick={event=>{if(recording)event.preventDefault();}} className="flex items-center gap-1.5 py-1 text-xs font-semibold text-[#d8c393]">Calendar <OwnerAppIcon name="chevron-right" className="h-3.5 w-3.5"/></a>
        </div>
        <div className="mt-3 flex flex-wrap items-center gap-2">
          <span className="rounded-full border border-[#d6b779]/25 bg-[#302a21] px-2.5 py-1 text-[10px] font-semibold text-[#dfc79a]">{todaysJobs.length} jobs</span>
@@ -214,7 +214,7 @@ export default function MobileOwnerDashboard({
        <div className="flex items-center justify-between">
          <div><p className="text-[10px] font-semibold uppercase tracking-[.19em] text-[#d6b779]">Next up</p>
            <h2 className="mt-1 text-lg font-semibold tracking-tight">Your next appointment</h2></div>
-         <a href="/owner/bookings" className="text-xs font-semibold text-[#d8c393]">View all</a>
+         <a href={recording?"#":"/owner/bookings"} aria-disabled={recording} onClick={event=>{if(recording)event.preventDefault();}} className="text-xs font-semibold text-[#d8c393]">View all</a>
        </div>
        {!loaded?<p className="mt-4 text-xs text-[#aaa092]">Checking upcoming jobs…</p>
        :nextJob?<div className="mt-4">
@@ -225,7 +225,7 @@ export default function MobileOwnerDashboard({
 
      {activity.length>0&&<section className="rounded-[22px] border border-white/[.105] bg-[#1a1a19] p-4">
        <div className="flex items-center justify-between"><h2 className="text-base font-semibold">Recent customer activity</h2>
-         <a href="/owner/messages" className="text-xs font-semibold text-[#d8c393]">Messages</a>
+         <a href={recording?"#":"/owner/messages"} aria-disabled={recording} onClick={event=>{if(recording)event.preventDefault();}} className="text-xs font-semibold text-[#d8c393]">Messages</a>
        </div>
        <div className="mt-3 divide-y divide-white/10">
          {activity.slice(0,3).map(item=>recording?<div key={item.id} className="py-3">
@@ -244,7 +244,9 @@ export default function MobileOwnerDashboard({
      className="fixed inset-x-0 bottom-0 z-[55] border-t border-[#d6b779]/20 bg-[#181817]/95 px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,.45)] backdrop-blur-2xl"
      style={{paddingBottom:"max(10px, env(safe-area-inset-bottom))"}}>
      <div className="mx-auto grid max-w-lg grid-cols-5 gap-0.5">
-       {TABS.map((tab,i)=><a key={tab.label} href={tab.href} aria-current={i===0?"page":undefined}
+       {TABS.map((tab,i)=><a key={tab.label} href={recording&&i!==0&&tab.label!=="Routes"?"#":tab.href}
+         onClick={event=>{if(recording&&i!==0&&tab.label!=="Routes")event.preventDefault();}}
+         aria-disabled={recording&&i!==0&&tab.label!=="Routes"} aria-current={i===0?"page":undefined}
          className={"flex min-h-[53px] flex-col items-center justify-center gap-1 rounded-xl px-1 text-center transition "+
            (i===0?"text-[#e6c98f]":"text-[#ada293] hover:bg-white/5 hover:text-[#e7d6b6]")}>
          <OwnerAppIcon name={tab.icon} className="h-5 w-5"/>
