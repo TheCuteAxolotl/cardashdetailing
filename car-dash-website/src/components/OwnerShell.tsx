@@ -363,12 +363,12 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 <button type="button" onClick={() => setMobileOpen(true)}
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#2a2824] text-[#e9d9ba]"
                   aria-label="Open workspace menu"><Icon name="menu" className="h-5 w-5" /></button>
-                <a href={homeHref} className="flex min-w-0 items-center gap-2">
-                  {profilePhoto?<img src={profilePhoto} alt="" className="h-8 w-8 shrink-0 rounded-full border border-[#d6b779]/35 object-cover"/>:<img src="/favicon.png" alt="" className="h-8 w-8 shrink-0 rounded-lg border border-[#d6b779]/25 bg-[#292724] object-contain p-1"/>}
-                  <span className="min-w-0">
-                    <span className="block truncate text-[15px] font-semibold tracking-tight text-[#f4ece0]">Car Dash</span>
-                    <span className="block truncate text-[9px] font-semibold uppercase tracking-[.13em] text-[#d6b779]">{owner?"Owner workspace":"Staff workspace"}</span>
-                  </span>
+                <a href={profileHref} aria-label="My profile" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d6b779]/35 bg-[#302921]">
+                  {profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:<span className="text-xs font-semibold text-[#e8d0a3]">{(user.name||"C").slice(0,1).toUpperCase()}</span>}
+                </a>
+                <a href={homeHref} className="min-w-0">
+                  <span className="block truncate text-[15px] font-semibold tracking-tight text-[#f4ece0]">Car Dash</span>
+                  <span className="block truncate text-[9px] font-semibold uppercase tracking-[.13em] text-[#d6b779]">{owner?"Owner workspace":"Staff workspace"}</span>
                 </a>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
