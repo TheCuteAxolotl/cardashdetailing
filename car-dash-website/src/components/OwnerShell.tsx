@@ -29,7 +29,8 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
   {
     label: "Home",
     icon: "home",
-    items: [{ href: "/owner/dashboard", adminHref: "/admin/dashboard", label: "Home", icon: "home" }],
+    items: [{ href: "/owner/dashboard", adminHref: "/admin/dashboard", label: "Home", icon: "home" },
+      { href: "/owner/profile", adminHref: "/admin/profile", label: "My Profile", icon: "people" }],
   },
   {
     label: "Customers",
@@ -161,6 +162,21 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   },[]);
     const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [profilePhoto,setProfilePhoto]=useState<string|null>(null);
+  useEffect(()=>{
+    let active=true;
+    const load=async()=>{
+      try{
+        const response=await fetch("/api/account-profile",{cache:"no-store"});
+        if(!response.ok)return;
+        const data=await response.json();
+        if(active)setProfilePhoto(typeof data.profile?.avatar==="string"?data.profile.avatar:null);
+      }catch{}
+    };
+    void load();
+    window.addEventListener("car-dash-profile-updated",load);
+    return()=>{active=false;window.removeEventListener("car-dash-profile-updated",load);};
+  },[]);
   const owner = user.role === "owner";
   const isOwnerHome = owner && pathname === "/owner/dashboard";
   const isStaffHome = !owner && pathname === "/admin/dashboard";
@@ -218,6 +234,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   )?.label || "Home", [visibleGroups, pathname, owner]);
 
   const homeHref = owner ? "/owner/dashboard" : "/admin/dashboard";
+  const profileHref = owner ? "/owner/profile" : "/admin/profile";
   const quickHref = owner ? "/owner/detail-builder" : allVisibleItems.find((item) => item.label === "Bookings")?.resolvedHref || homeHref;
   const mobileQuickAction = owner ? {href:"/owner/bookings?create=1",icon:"plus" as IconName,label:"New booking"}
     : permissions.includes("bookings") ? {href:"/admin/bookings",icon:"calendar" as IconName,label:"Open bookings"}
@@ -284,9 +301,9 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         <div className="space-y-2 border-t border-white/10 px-4 py-4">
           <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-[#c9bdad] hover:bg-white/10"><Icon name="external" className="h-4 w-4"/> Public website</a>
           <div className="flex items-center gap-3 border-t border-white/10 pt-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#d6b779]/35 bg-[#302921] text-xs font-semibold text-[#ebd3a5]">{(user.name||user.email||"C").slice(0,1).toUpperCase()}</span>
+            <a href={profileHref} aria-label="Open my profile" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d6b779]/35 bg-[#302921] text-xs font-semibold text-[#ebd3a5]">{profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:(user.name||user.email||"C").slice(0,1).toUpperCase()}</a>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-[#f4eee5]">{user.name || (owner?"Owner":"Staff")}</p>
+              <a href={profileHref} className="block truncate text-xs font-semibold text-[#f4eee5] hover:text-[#d6b779]">{user.name || (owner?"Owner":"Staff")}</a>
               <p className="truncate text-[10px] text-[#a79f94]">{user.email}</p>
             </div>
             <button type="button" onClick={logout} title="Sign out" className="rounded-lg border border-white/10 p-2 text-[10px] text-[#ceb78e] hover:bg-white/10">Exit</button>
@@ -347,7 +364,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#2a2824] text-[#e9d9ba]"
                   aria-label="Open workspace menu"><Icon name="menu" className="h-5 w-5" /></button>
                 <a href={homeHref} className="flex min-w-0 items-center gap-2">
-                  <img src="/favicon.png" alt="" className="h-8 w-8 shrink-0 rounded-lg border border-[#d6b779]/25 bg-[#292724] object-contain p-1"/>
+                  {profilePhoto?<img src={profilePhoto} alt="" className="h-8 w-8 shrink-0 rounded-full border border-[#d6b779]/35 object-cover"/>:<img src="/favicon.png" alt="" className="h-8 w-8 shrink-0 rounded-lg border border-[#d6b779]/25 bg-[#292724] object-contain p-1"/>}
                   <span className="min-w-0">
                     <span className="block truncate text-[15px] font-semibold tracking-tight text-[#f4ece0]">Car Dash</span>
                     <span className="block truncate text-[9px] font-semibold uppercase tracking-[.13em] text-[#d6b779]">{owner?"Owner workspace":"Staff workspace"}</span>
