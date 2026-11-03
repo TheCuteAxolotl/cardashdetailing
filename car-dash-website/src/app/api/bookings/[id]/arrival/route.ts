@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { bookingHasSmsConsent, ensureBookingConversation } from "@/lib/booking-chat";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { normalizePhoneNumber, sendTransactionalSms } from "@/lib/twilio-sms";
+import { bookingPhoneWasReleased } from "@/lib/phone-release";
 
 export async function POST(
   request: NextRequest,
@@ -30,6 +31,8 @@ export async function POST(
     if (!normalizePhoneNumber(booking.customerPhone)) {
       return NextResponse.json({ error: "This booking does not have a valid mobile number." }, { status: 400 });
     }
+
+    if(await bookingPhoneWasReleased(booking.customerPhone,booking.createdAt))return NextResponse.json({error:"This customer disconnected the old number. Update the booking contact before sending an arrival text."},{status:409});
 
     const payload = await request.json().catch(() => ({}));
     const mode = String(payload.mode || "").trim();
