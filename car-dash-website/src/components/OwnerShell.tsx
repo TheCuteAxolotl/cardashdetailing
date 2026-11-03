@@ -319,8 +319,35 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       )}
 
       <div className="xl:pl-[248px]">
-        <header className="console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6">
-          <div className="flex min-h-[68px] items-center justify-between gap-3">
+        <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + (owner && pathname === "/owner/dashboard" ? " owner-mobile-dashboard-topbar" : "")}>
+          {owner && pathname === "/owner/dashboard" && (
+            <div className="flex min-h-[66px] items-center justify-between gap-2 md:hidden">
+              <div className="flex min-w-0 items-center gap-2">
+                <button type="button" onClick={() => setMobileOpen(true)}
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#2a2824] text-[#e9d9ba]"
+                  aria-label="Open workspace menu"><Icon name="menu" className="h-5 w-5" /></button>
+                <a href="/owner/dashboard" className="flex min-w-0 items-center gap-2">
+                  <img src="/favicon.png" alt="" className="h-8 w-8 shrink-0 rounded-lg border border-[#d6b779]/25 bg-[#292724] object-contain p-1"/>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[15px] font-semibold tracking-tight text-[#f4ece0]">Car Dash</span>
+                    <span className="block truncate text-[9px] font-semibold uppercase tracking-[.13em] text-[#d6b779]">Owner workspace</span>
+                  </span>
+                </a>
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <button type="button" onClick={() => {setSearchOpen(true);setQuery("");}}
+                  aria-label="Search workspace" className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 bg-[#292724] text-[#f1e4d3]">
+                  <Icon name="search" className="h-5 w-5"/>
+                </button>
+                <a href="/owner/bookings?create=1" aria-label="New booking"
+                  className="grid h-10 w-10 place-items-center rounded-xl bg-[#d6b779] text-[#171613]">
+                  <Icon name="plus" className="h-5 w-5"/>
+                </a>
+                <OwnerActivityBell />
+              </div>
+            </div>
+          )}
+          <div className={"min-h-[68px] items-center justify-between gap-3" + (owner && pathname === "/owner/dashboard" ? " hidden md:flex" : " flex")}>
             <div className="flex min-w-0 items-center gap-3">
               <button onClick={() => setMobileOpen(true)}
                 className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#292826] text-[#f4eee5] xl:hidden" aria-label="Open navigation">
@@ -334,11 +361,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 className="hidden items-center gap-2 rounded-xl border border-white/15 bg-[#282724] px-3.5 py-2.5 text-xs font-semibold text-[#d7ccc0] hover:border-[#d6b779]/60 sm:inline-flex">
                 <Icon name="search" className="h-4 w-4"/> Search
               </button>
-              <OwnerActivityBell/>
+              {owner && pathname === "/owner/dashboard" ? <div className="hidden md:block"><OwnerActivityBell /></div> : <OwnerActivityBell />}
               <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 bg-[#272622] px-3.5 py-2.5 text-xs font-semibold text-[#ebe0ce] hover:border-[#d6b779]/60">View site</a>
             </div>
           </div>
-          <nav aria-label="Business workspace tabs" className="owner-topnav flex max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none]">
+          <nav aria-label="Business workspace tabs" className={"owner-topnav max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none]" + (owner && pathname === "/owner/dashboard" ? " hidden md:flex" : " flex")}>
             {(owner ? [
               {label:"Calendar",href:"/owner/dashboard"},
               {label:"Jobs",href:"/owner/jobs"},
