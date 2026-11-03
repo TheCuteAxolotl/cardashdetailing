@@ -180,6 +180,40 @@
     height: auto !important;
     background: #191918 !important;
   }
+  .editorial-theme .owner-app .owner-mobile-section-layout {
+    min-width: 0;
+    background: #121211 !important;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-context-bar {
+    background: #1b1b1a !important;
+    border-color: #ffffff20 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-bottom-nav {
+    background: #181817f5 !important;
+    border-color: #d6b77930 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout :is(input,select,textarea) {
+    font-size: max(16px, 1rem);
+    color-scheme: dark;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="bg-[#07131B]"] {
+    background-color: #121211 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="text-[#6EAEC6]"] {
+    color: #d6b779 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="border-[#6EAEC6]"] {
+    border-color: #d6b77990 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="focus:border-[#6EAEC6]"]:focus {
+    border-color: #d6b779 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-privacy-gate {
+    min-height: min(420px, calc(100dvh - 230px));
+    display: grid;
+    place-items: center;
+  }
   .editorial-theme .owner-app .owner-mobile-home {
     background: #121211 !important;
     color: #f2ece2 !important;
