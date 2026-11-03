@@ -132,6 +132,7 @@ export const localBusinessSchema = {
   sameAs: [
     "https://www.instagram.com/cardashdetailing",
     "https://www.facebook.com/profile.php?id=61588917429050",
+    "https://www.tiktok.com/@cardashdetailing",
   ],
   hasOfferCatalog: {
     "@type": "OfferCatalog",
