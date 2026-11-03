@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import StaffMobileHome from "@/components/StaffMobileHome";
 
 type User = { id: string; name: string; email: string; role: string };
 
@@ -83,6 +84,9 @@ export default function AdminDashboard() {
   const attention = visible.filter((tool) => (tool.badge || 0) > 0);
 
   return (
+    <>
+      <StaffMobileHome name={user.name} permissions={permissions} tools={visible} smsUnread={smsUnread} />
+      <div className="hidden md:block">
     <main className="console-home px-4 py-6 sm:px-7 lg:px-10 lg:py-9">
       <div className="mx-auto max-w-[1080px]">
         <section className="pb-8 pt-2">
@@ -147,5 +151,7 @@ export default function AdminDashboard() {
         </section>
       </div>
     </main>
+      </div>
+    </>
   );
 }
