@@ -1,151 +1,199 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
+import OwnerScheduleOverview from "@/components/OwnerScheduleOverview";
+import BookingDetailsEditor, { type EditableBooking } from "@/components/BookingDetailsEditor";
+import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 
-type Booking = {
-  id: string; serviceName?: string; customerName?: string;
-  vehicleMake?:string;vehicleModel?:string; preferredDate?:string|null;preferredTime?:string|null;
-  status?:string;quotedPrice?:number|null;createdAt?:string;
-};
 type Activity={id:string;kind:string;title:string;detail:string;href:string;time:string};
-type Metrics={bookings:Booking[];unread:number;activity:Activity[]};
-
-const tools = [
-  {title:"Calendar",href:"/owner/schedule",description:"Jobs and availability",icon:"calendar"},
-  {title:"Clients & bookings",href:"/owner/bookings",description:"Appointments and addresses",icon:"users"},
-  {title:"Messages",href:"/owner/messages",description:"Your complete SMS history",icon:"message"},
-  {title:"Quotes",href:"/owner/quotes",description:"Review and convert leads",icon:"quote"},
-  {title:"Invoices",href:"/owner/invoices",description:"Create and collect payment",icon:"receipt"},
-  {title:"Detail calculator",href:"/owner/estimate-calculator",description:"Price and time estimates",icon:"calculator"},
-  {title:"Training guides",href:"/owner/service-guides",description:"Step-by-step procedures",icon:"book"},
-  {title:"Analytics",href:"/owner/analytics",description:"Performance and results",icon:"chart"},
-  {title:"Gift cards",href:"/owner/gift-cards",description:"Balances and redemption",icon:"gift"},
-  {title:"Website",href:"/owner/website",description:"Content and photos",icon:"globe"},
+type DashboardData={bookings:EditableBooking[];tasks:OwnerScheduleTask[];activity:Activity[];unread:number};
+const actions:{title:string;detail:string;href:string;icon:OwnerIconName}[]=[
+ {title:"Jobs & inspections",detail:"Track progress and quality",href:"/owner/jobs",icon:"calendar"},
+ {title:"Customers",detail:"Records and service history",href:"/owner/crm",icon:"users"},
+ {title:"Quotes",detail:"Respond and convert leads",href:"/owner/quotes",icon:"quote"},
+ {title:"Payments",detail:"Invoices and balances",href:"/owner/invoices",icon:"receipt"},
+ {title:"Subscriptions",detail:"Maintenance plans",href:"/owner/maintenance",icon:"activity"},
+ {title:"Inventory",detail:"Supplies and reorder levels",href:"/owner/inventory",icon:"calculator"},
+ {title:"Employees",detail:"Staff and access",href:"/owner/admins",icon:"users"},
+ {title:"Products & services",detail:"Manage service catalog",href:"/owner/services",icon:"book"},
+ {title:"Promo codes",detail:"Marketing and coupons",href:"/owner/promo-codes",icon:"gift"},
+ {title:"Gift cards",detail:"Sales and redemptions",href:"/owner/gift-cards",icon:"gift"},
+ {title:"Loyalty cards",detail:"Repeat-customer rewards",href:"/owner/loyalty",icon:"check"},
+ {title:"Analytics",detail:"Business performance",href:"/owner/analytics",icon:"chart"},
 ];
-const money=(value:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(value);
-const dayId=(d:Date)=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago",year:"numeric",month:"2-digit",day:"2-digit"}).format(d);
-const niceDate=(value:string)=>new Date(value+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
-const timeLabel=(value?:string|null)=>{
- if(!value)return "Time TBD";
- const match=value.match(/^(\d{1,2}):(\d{2})/);
- if(!match)return value;
- const hours=Number(match[1]);return (hours%12||12)+":"+match[2]+(hours>=12?" PM":" AM");
-};
+const cash=(value:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(value);
+function chicagoToday(){
+ const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+ const pick=(s:string)=>parts.find(p=>p.type===s)?.value||"";
+ return [pick("year"),pick("month"),pick("day")].join("-");
+}
+function niceTime(value:string|null|undefined){
+ const m=String(value||"").match(/^(\d{1,2}):(\d{2})/);
+ if(!m)return "Time TBD";
+ const h=Number(m[1]);return (h%12||12)+":"+m[2]+" "+(h>=12?"PM":"AM");
+}
+function dateLabel(value:string){
+ const [y,m,d]=value.split("-").map(Number);
+ return new Date(y,m-1,d,12).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+}
+function stamp(value:string){
+ const time=new Date(value).getTime();
+ if(!Number.isFinite(time))return "";
+ const minutes=Math.floor((Date.now()-time)/60000);
+ return minutes<1?"Just now":minutes<60?minutes+"m ago":minutes<1440?Math.floor(minutes/60)+"h ago":new Date(value).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+}
 
 export default function OwnerDashboard(){
- const [data,setData]=useState<Metrics>({bookings:[],unread:0,activity:[]});
+ const [data,setData]=useState<DashboardData>({bookings:[],tasks:[],activity:[],unread:0});
  const [loaded,setLoaded]=useState(false);
- const [tab,setTab]=useState<"today"|"upcoming">("today");
- const today=useMemo(()=>dayId(new Date()),[]);
- const greeting=useMemo(()=>new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",weekday:"long",month:"long",day:"numeric"}).format(new Date()),[]);
- useEffect(()=>{
-  let cancelled=false;
-  const run=async()=>{
-   const [bookings,sms,activity]=await Promise.allSettled([
-    fetch("/api/bookings",{cache:"no-store"}).then(async r=>r.ok?r.json():[]),
-    fetch("/api/sms/inbox",{cache:"no-store"}).then(async r=>r.ok?r.json():null),
-    fetch("/api/owner/activity",{cache:"no-store"}).then(async r=>r.ok?r.json():null),
+ const [error,setError]=useState("");
+ const [editor,setEditor]=useState<EditableBooking|null>(null);
+ const [lastUpdated,setLastUpdated]=useState<string|null>(null);
+ const [today,setToday]=useState(chicagoToday);
+ const load=useCallback(async()=>{
+   const results=await Promise.allSettled([
+     fetch("/api/bookings",{cache:"no-store"}).then(async r=>{if(!r.ok)throw Error("Bookings unavailable");return r.json();}),
+     fetch("/api/owner-schedule",{cache:"no-store"}).then(async r=>{if(!r.ok)throw Error("Planner unavailable");return r.json();}),
+     fetch("/api/owner/activity",{cache:"no-store"}).then(async r=>{if(!r.ok)throw Error("Activity unavailable");return r.json();}),
+     fetch("/api/sms/inbox",{cache:"no-store"}).then(async r=>r.ok?r.json():null),
    ]);
-   if(cancelled)return;
-   setData({
-    bookings:bookings.status==="fulfilled"&&Array.isArray(bookings.value)?bookings.value:[],
-    unread:sms.status==="fulfilled"?Number(sms.value?.totalUnread||0):0,
-    activity:activity.status==="fulfilled"&&Array.isArray(activity.value?.alerts)?activity.value.alerts:[],
-   });
-   setLoaded(true);
-  };
-  void run();
-  const interval=setInterval(()=>{if(!document.hidden)void run()},45000);
-  return()=>{cancelled=true;clearInterval(interval)};
+   const bookings=results[0].status==="fulfilled" && Array.isArray(results[0].value) ? results[0].value as EditableBooking[] : null;
+   const tasks=results[1].status==="fulfilled" && Array.isArray(results[1].value?.tasks) ? results[1].value.tasks as OwnerScheduleTask[] : [];
+   const activity=results[2].status==="fulfilled" && Array.isArray(results[2].value?.alerts) ? results[2].value.alerts as Activity[] : [];
+   const unread=results[3].status==="fulfilled" ? Number(results[3].value?.totalUnread||0) : 0;
+   if(bookings) {
+     setData({bookings,tasks,activity,unread:Number.isFinite(unread)?unread:0});
+     setError("");
+     setLastUpdated(new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}));
+   } else setError("Bookings couldn't load. Check your connection and refresh.");
+   setLoaded(true);setToday(chicagoToday());
  },[]);
- const upcoming=useMemo(()=>data.bookings.filter(b=>b.preferredDate&&b.preferredDate>=today&&!["cancelled","completed"].includes((b.status||"").toLowerCase()))
+ useEffect(()=>{
+   void load();
+   const interval=window.setInterval(()=>{if(!document.hidden)void load();},60000);
+   const focus=()=>{void load();};
+   window.addEventListener("focus",focus);
+   return()=>{window.clearInterval(interval);window.removeEventListener("focus",focus);};
+ },[load]);
+ const upcoming=useMemo(()=>data.bookings.filter(b=>b.preferredDate && b.preferredDate>=today && !["cancelled","completed"].includes((b.status||"").toLowerCase()))
    .sort((a,b)=>(a.preferredDate||"").localeCompare(b.preferredDate||"")||(a.preferredTime||"").localeCompare(b.preferredTime||"")),[data.bookings,today]);
- const todayBookings=upcoming.filter(b=>b.preferredDate===today);
- const visibleBookings=tab==="today"?todayBookings:upcoming.slice(0,5);
- const active=data.bookings.filter(b=>!["cancelled","completed"].includes((b.status||"").toLowerCase()));
- const pending=active.filter(b=>(b.status||"").toLowerCase()==="pending");
- const completed=data.bookings.filter(b=>(b.status||"").toLowerCase()==="completed");
- const bookedValue=active.reduce((sum,b)=>sum+Number(b.quotedPrice||0),0);
- const completedValue=completed.reduce((sum,b)=>sum+Number(b.quotedPrice||0),0);
- // Multiple replies in one customer chat should not flood the home overview.
- const seenActivity=new Set<string>();
- const spotlight=data.activity.filter(item=>{
-   const key=item.kind==="message" ? "message:"+item.title.toLowerCase() : item.id;
-   if(seenActivity.has(key))return false;
-   seenActivity.add(key);return true;
- }).slice(0,4);
-
- return <div className="owner-app-home min-h-screen px-4 pb-16 pt-6 sm:px-7 sm:pt-8 xl:px-10">
-  <div className="mx-auto max-w-[1360px]">
-   <div className="flex flex-wrap items-start justify-between gap-4">
-    <div>
-     <p className="text-[10px] font-bold uppercase tracking-[.26em] text-[#e9ab73]"><span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#e58b4b] shadow-[0_0_14px_#e58b4b]"/>Car Dash business command center</p>
-     <h2 className="mt-3 font-sans text-3xl font-semibold tracking-[-.055em] text-[#f5f0e8] sm:text-5xl">Today, at a glance.</h2>
-     <p className="mt-2 text-sm text-[#b8b2aa]">{greeting} <span className="mx-2 text-[#746f67]">/</span> Bookings, conversations, and what needs your attention.</p>
-    </div>
-    <div className="flex flex-wrap gap-2">
-      <a href="/owner/bookings?create=1" className="rounded-xl border border-[#e58b4b]/60 bg-[#e58b4b] px-4 py-3 text-sm font-semibold text-[#131210] shadow-[0_8px_25px_#e58b4b20]">+ New appointment</a>
-      <a href="/owner/schedule" className="rounded-xl border border-white/20 bg-[#25231f] px-4 py-3 text-sm font-semibold text-[#f4eee6]">View calendar →</a>
-    </div>
+ const pending=data.bookings.filter(b=>["pending","requested"].includes((b.status||"").toLowerCase()));
+ const todayJobs=upcoming.filter(b=>b.preferredDate===today);
+ const scheduledValue=upcoming.reduce((sum,b)=>sum+Math.max(0,Number(b.quotedPrice)||0),0);
+ const overdueTasks=data.tasks.filter(t=>!t.completed&&t.date<today).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+ const soonTasks=data.tasks.filter(t=>!t.completed&&t.date>=today).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+ const seen=new Set<string>();
+ const activity=data.activity.filter(item=>{
+   const key=item.kind==="message"?item.title.toLowerCase():item.id;
+   if(seen.has(key))return false;
+   seen.add(key);return true;
+ }).slice(0,5);
+ const nextJobs=upcoming.slice(0,5);
+ const metrics=[
+   {label:"Jobs today",value:todayJobs.length,meta:"Scheduled for your day",icon:"calendar" as OwnerIconName},
+   {label:"Needs confirmation",value:pending.length,meta:"Review pending bookings",icon:"quote" as OwnerIconName},
+   {label:"Unread texts",value:data.unread,meta:"Customer conversations",icon:"message" as OwnerIconName},
+   {label:"Upcoming booked value",value:cash(scheduledValue),meta:"Estimated, not collected",icon:"chart" as OwnerIconName},
+ ];
+ return <div className="owner-calendar-home min-h-screen bg-[#141413] px-3 pb-14 pt-5 text-[#f3ece1] sm:px-6 sm:pt-7 2xl:px-8">
+   <div className="mx-auto max-w-[1720px] space-y-5">
+     <header className="flex flex-wrap items-end justify-between gap-4">
+       <div>
+         <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#d6b779]">Car Dash / Business overview</p>
+         <h2 className="mt-1 text-2xl font-semibold tracking-[-.045em] text-[#f5eee4] sm:text-3xl">Your workspace</h2>
+         <p className="mt-2 text-xs text-[#b8ada0]">Bookings, your team, customer activity and the full schedule in one place.</p>
+       </div>
+       <div className="flex flex-wrap items-center gap-2">
+         {lastUpdated&&<span className="hidden text-[11px] text-[#9f9589] sm:inline">Updated {lastUpdated}</span>}
+         <button type="button" onClick={()=>void load()} className="rounded-xl border border-white/15 bg-[#262522] px-4 py-2.5 text-xs font-semibold text-[#ddd1bf] hover:border-[#d6b779]/50">Refresh</button>
+         <a href="/owner/bookings?create=1" className="inline-flex items-center gap-2 rounded-xl bg-[#d6b779] px-4 py-2.5 text-xs font-bold text-[#171715] hover:bg-[#ead19a]">
+           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+           New booking
+         </a>
+       </div>
+     </header>
+     {error&&<div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#b88d61]/40 bg-[#3b2d20] p-3 text-sm text-[#f6dec0]">
+       {error}<button type="button" onClick={()=>void load()} className="font-semibold underline">Retry</button></div>}
+     <section className="grid grid-cols-2 gap-2.5 lg:grid-cols-4" aria-label="Business summary">
+       {metrics.map((metric,index)=><div key={metric.label}
+         className={"rounded-2xl border p-4 sm:p-5 "+(index===1&&pending.length?"border-[#bd9961]/40 bg-[#29241d]":"border-white/10 bg-[#201f1e]")}>
+         <div className="flex items-start justify-between gap-2"><p className="text-[11px] font-medium leading-4 text-[#bdb3a6]">{metric.label}</p>
+           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-[#d6b779]/20 bg-[#d6b779]/[.07] text-[#d6b779]"><OwnerAppIcon name={metric.icon} className="h-[17px] w-[17px]"/></span>
+         </div>
+         <p className="mt-3 text-2xl font-semibold tabular-nums tracking-[-.05em] text-[#f6efdf] sm:text-3xl">{loaded?metric.value:"—"}</p>
+         <p className="mt-1 text-[10px] leading-4 text-[#9c9387]">{metric.meta}</p>
+       </div>)}
+     </section>
+     <div className="grid min-w-0 items-start gap-4 2xl:grid-cols-[minmax(0,1fr)_310px]">
+       <div className="min-w-0">
+         <OwnerScheduleOverview bookings={data.bookings} tasks={data.tasks} loading={!loaded} onEditBooking={setEditor} initialDate={today}/>
+       </div>
+       <aside className="grid min-w-0 gap-4 sm:grid-cols-2 2xl:grid-cols-1" aria-label="Day planner and customer activity">
+         <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#201f1e]">
+           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+             <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#d6b779]">Up next</p><h3 className="mt-1 text-base font-semibold">Upcoming jobs</h3></div>
+             <a href="/owner/bookings" className="text-[11px] font-semibold text-[#d6b779]">See all</a>
+           </div>
+           <div className="divide-y divide-white/10">
+             {nextJobs.length?nextJobs.map(b=><button key={b.id} onClick={()=>setEditor(b)}
+               className="flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-white/[.035]">
+               <span className="flex w-11 shrink-0 flex-col items-center rounded-lg border border-[#d6b779]/20 bg-[#d6b779]/10 px-1 py-2 text-center">
+                 <span className="text-[10px] font-semibold text-[#dcc092]">{b.preferredDate?dateLabel(b.preferredDate):"TBD"}</span>
+               </span>
+               <span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold text-[#f3e9d9]">{b.customerName}</span>
+                 <span className="mt-1 block truncate text-[11px] text-[#aca395]">{b.serviceName}</span>
+                 <span className="mt-1 block text-[10px] text-[#cdb58a]">{niceTime(b.preferredTime)}</span>
+               </span>
+               <OwnerAppIcon name="chevron-right" className="mt-2 h-4 w-4 shrink-0 text-[#d6b779]"/>
+             </button>):<p className="px-4 py-6 text-xs text-[#aba397]">No upcoming bookings.</p>}
+           </div>
+         </section>
+         <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#201f1e]">
+           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+             <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#d6b779]">Customer updates</p><h3 className="mt-1 text-base font-semibold">Activity</h3></div>
+             <a href="/owner/messages" className="text-[11px] font-semibold text-[#d6b779]">Inbox</a>
+           </div>
+           <div className="divide-y divide-white/10">
+             {activity.length?activity.map(item=><a href={item.href} key={item.id} className="block px-4 py-3.5 transition hover:bg-white/[.035]">
+               <div className="flex items-start justify-between gap-2">
+                 <p className="line-clamp-2 text-xs font-semibold leading-5 text-[#eee5d8]">{item.title}</p>
+                 <span className="shrink-0 text-[10px] text-[#9d9488]">{stamp(item.time)}</span>
+               </div>
+               <p className="mt-1 line-clamp-2 text-[11px] leading-5 text-[#b2a99e]">{item.detail}</p>
+             </a>):<p className="px-4 py-6 text-xs text-[#aba397]">No recent activity.</p>}
+           </div>
+         </section>
+         <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#201f1e] sm:col-span-2 2xl:col-span-1">
+           <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+             <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#d6b779]">Operations</p><h3 className="mt-1 text-base font-semibold">Tasks to handle</h3></div>
+             <a href="/owner/schedule" className="text-[11px] font-semibold text-[#d6b779]">Planner</a>
+           </div>
+           <div className="space-y-2 p-4">
+             {[...overdueTasks,...soonTasks].length?[...overdueTasks,...soonTasks].map(t=><a key={t.id} href="/owner/schedule"
+               className="flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-[#2a2926] px-3 py-2.5 hover:border-[#d6b779]/40">
+               <p className="text-xs font-medium text-[#e9ded0]">{t.title}</p>
+               <time className={"shrink-0 text-[10px] "+(t.date<today?"text-[#f2b5a6]":"text-[#cbb58e]")}>{dateLabel(t.date)}</time>
+             </a>):<p className="text-xs text-[#aba397]">No open tasks. Plan your next service or follow-up.</p>}
+           </div>
+         </section>
+       </aside>
+     </div>
+     <section className="rounded-2xl border border-white/10 bg-[#1d1c1a] p-4 sm:p-5">
+       <div className="flex flex-wrap items-end justify-between gap-3">
+         <div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#d6b779]">Business management</p><h3 className="mt-1 text-xl font-semibold tracking-tight">Everything you need to run Car Dash</h3></div>
+         <a href="/owner/analytics" className="text-xs font-semibold text-[#d6b779]">Business analytics</a>
+       </div>
+       <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+         {actions.map(a=><a key={a.href} href={a.href} className="group rounded-xl border border-white/10 bg-[#272521] p-3.5 transition hover:border-[#d6b779]/50 hover:bg-[#302b22]">
+           <span className="grid h-9 w-9 place-items-center rounded-lg border border-[#d6b779]/20 text-[#d6b779]"><OwnerAppIcon name={a.icon} className="h-4.5 w-4.5"/></span>
+           <p className="mt-3 text-xs font-semibold leading-5 text-[#f1e7d9]">{a.title}</p>
+           <p className="mt-1 text-[10px] leading-4 text-[#a9a092]">{a.detail}</p>
+         </a>)}
+       </div>
+     </section>
+     <p className="pb-4 text-[10px] text-[#8f877c]">Scheduled values are estimates from booking records, not verified payments. Manage invoices and actual collection in Payments.</p>
    </div>
-
-   <section className="mt-7 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Current business metrics">
-    {[
-      {label:"Active bookings",value:active.length,detail:"Appointments in progress",icon:"calendar"},
-      {label:"Awaiting confirmation",value:pending.length,detail:"Requests needing review",icon:"quote"},
-      {label:"Unread messages",value:data.unread,detail:"Customer conversations",icon:"message"},
-      {label:"Booked value",value:money(bookedValue),detail:"Scheduled and pending · not paid",icon:"chart"},
-    ].map((item,i)=><div key={item.label} className={"owner-metric-card group rounded-2xl border p-5 "+(i===1&&pending.length?"border-[#e58b4b]/45 bg-[#2b241e]":"border-white/10 bg-[#20201f]")}>
-      <div className="flex items-center justify-between gap-3"><span className="text-xs font-medium text-[#bbb5ab]">{item.label}</span><span className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-[#e6a56e]"><OwnerAppIcon name={item.icon as OwnerIconName} className="h-[18px] w-[18px]"/></span></div>
-      <p className="mt-5 text-[clamp(27px,3vw,40px)] font-semibold tracking-[-.055em] tabular-nums text-[#f5f0e8]">{loaded?item.value:"—"}</p>
-      <p className="mt-1 text-[11px] text-[#999389]">{item.detail}</p>
-    </div>)}
-   </section>
-
-   <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(330px,.75fr)]">
-    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e1d]">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 px-5 py-5 sm:px-6">
-        <div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#e9ab73]">Schedule</p><h3 className="mt-1 text-xl font-semibold text-[#f4efe5]">Appointments</h3></div>
-        <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-[#151514] p-1">
-          <button onClick={()=>setTab("today")} className={"rounded-lg px-3 py-2 text-xs font-semibold "+(tab==="today"?"bg-[#e58b4b] text-[#18120e]":"text-[#bcb6ac]")}>Today</button>
-          <button onClick={()=>setTab("upcoming")} className={"rounded-lg px-3 py-2 text-xs font-semibold "+(tab==="upcoming"?"bg-[#e58b4b] text-[#18120e]":"text-[#bcb6ac]")}>Upcoming</button>
-        </div>
-      </div>
-      <div className="divide-y divide-white/[.075]">
-       {visibleBookings.length?visibleBookings.map(b=><a href="/owner/bookings" key={b.id} className="group flex items-center gap-4 px-5 py-4 transition hover:bg-white/[.045] sm:px-6">
-         <div className="w-[67px] shrink-0 border-r border-white/10 pr-3 text-center"><p className="text-sm font-bold text-[#e9ab73]">{timeLabel(b.preferredTime)}</p><p className="mt-1 text-[10px] text-[#aaa49c]">{niceDate(b.preferredDate!)}</p></div>
-         <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-[#f4eee6]">{b.customerName||"Customer"}</p><p className="mt-1 truncate text-xs text-[#b5afa5]">{b.serviceName||"Detailing"}{b.vehicleMake?" · "+[b.vehicleMake,b.vehicleModel].filter(Boolean).join(" "):""}</p></div>
-         <div className="flex items-center gap-2"><span className={"hidden rounded-full border px-2.5 py-1 text-[10px] font-medium sm:block "+(b.status==="pending"?"border-[#e58b4b]/40 text-[#f2bd8d]":"border-[#719988]/40 text-[#add4bf]")}>{b.status||"Booked"}</span><OwnerAppIcon name="chevron-right" className="h-4 w-4 text-[#e9ab73]"/></div>
-       </a>):<div className="flex min-h-[124px] flex-col items-center justify-center p-5 text-center sm:min-h-[200px] sm:p-7"><span className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10 text-[#e58b4b]"><OwnerAppIcon name="calendar" className="h-6 w-6"/></span><p className="mt-4 text-sm font-semibold">{loaded?"No appointments "+(tab==="today"?"today":"coming up"):"Checking schedule…"}</p><p className="mt-1 text-xs text-[#999389]">{loaded?"Use the calendar to add your next booking.":"Your bookings will appear here."}</p></div>}
-      </div>
-      <a href="/owner/schedule" className="block border-t border-white/10 px-5 py-3.5 text-center text-xs font-semibold text-[#e9ab73] hover:bg-white/[.04]">Open full calendar →</a>
-    </section>
-
-    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#1e1e1d]">
-      <div className="flex items-center justify-between border-b border-white/10 px-5 py-5 sm:px-6"><div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#e9ab73]">While you were away</p><h3 className="mt-1 text-xl font-semibold">Latest activity</h3></div><span className="relative flex h-2 w-2 rounded-full bg-[#e58b4b]"/></div>
-      <div className="divide-y divide-white/[.075]">
-       {spotlight.length?spotlight.map(item=><a key={item.id} href={item.href} className="block px-5 py-4 transition hover:bg-white/[.05] sm:px-6"><div className="flex justify-between gap-3"><p className="line-clamp-1 text-sm font-semibold text-[#f3ece1]">{item.title}</p><OwnerAppIcon name="arrow-up-right" className="h-4 w-4 shrink-0 text-[#e6a56e]"/></div><p className="mt-1 line-clamp-2 text-xs leading-5 text-[#aaa49a]">{item.detail}</p></a>):<p className="px-6 py-12 text-center text-sm text-[#aaa49a]">{loaded?"No recent customer activity.":"Loading activity…"}</p>}
-      </div>
-      <a href="/owner/messages" className="block border-t border-white/10 px-5 py-3.5 text-center text-xs font-semibold text-[#e9ab73] hover:bg-white/[.04]">Open customer messages →</a>
-    </section>
-   </div>
-
-   <section className="mt-4 rounded-2xl border border-white/10 bg-[#1d1d1b] p-4 sm:p-6">
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#e9ab73]">Quick launch</p><h3 className="mt-1 text-xl font-semibold">Your tools, one tap away.</h3></div>
-      <a href="/owner/analytics" className="text-xs font-semibold text-[#e9ab73]">Detailed performance →</a>
-    </div>
-    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
-      {tools.map(t=><a key={t.href} href={t.href} className="owner-tool-card group rounded-xl border border-white/10 bg-[#262522] p-3.5 transition hover:border-[#e58b4b]/50 hover:bg-[#2b2925] sm:p-4">
-        <span className="grid h-10 w-10 place-items-center rounded-xl border border-[#e58b4b]/15 bg-[#e58b4b]/10 text-[#edae79]"><OwnerAppIcon name={t.icon as OwnerIconName} className="h-5 w-5"/></span>
-        <p className="mt-3 text-[13px] font-semibold leading-5 text-[#f4efe5]">{t.title}</p>
-        <p className="mt-1 text-[11px] leading-5 text-[#aaa49a]">{t.description}</p>
-      </a>)}
-    </div>
-   </section>
-
-   <footer className="mt-6 flex flex-wrap justify-between gap-3 px-1 text-xs text-[#969087]"><p>Car Dash Detailing · Owner workspace</p><p>Completed booking value: {loaded?money(completedValue):"—"} · Based on booked prices, not payment records</p></footer>
-  </div>
+   {editor&&<BookingDetailsEditor key={editor.id} booking={editor} onClose={()=>setEditor(null)} onSaved={load}/>}
  </div>;
 }
