@@ -52,7 +52,7 @@ export type StoreInboundSmsInput = {
   createdAt?: Date | null;
 };
 
-async function findBookingForPhone(phone: string) {
+async function findBookingForPhone(phone: string, releasedAfter: Date | null) {
   const candidates = await prisma.booking.findMany({
     select: {
       id: true,
@@ -73,7 +73,8 @@ async function findBookingForPhone(phone: string) {
   });
 
   const matches = candidates.filter(
-    (booking) => normalizePhoneNumber(booking.customerPhone) === phone
+    (booking) => normalizePhoneNumber(booking.customerPhone) === phone &&
+      (!releasedAfter || booking.createdAt > releasedAfter)
   );
 
   return (
@@ -122,7 +123,14 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
     return { stored: false, reason: "duplicate" as const };
   }
 
-  const booking = await findBookingForPhone(fromPhone);
+  // Once a customer releases a number, future texts must never be appended
+  // to bookings or quotes created by the prior holder of that phone number.
+  const released = await prisma.siteContent.findUnique({
+    where: { key: "phone_released_at_" + fromPhone }, select: { value: true },
+  });
+  const releasedMs = Number(released?.value || 0);
+  const cutoff = Number.isFinite(releasedMs) && releasedMs > 0 ? new Date(releasedMs) : null;
+  const booking = await findBookingForPhone(fromPhone, cutoff);
   const createdAt = input.createdAt && !Number.isNaN(input.createdAt.getTime())
     ? input.createdAt
     : new Date();
@@ -140,12 +148,14 @@ export async function storeInboundSms(input: StoreInboundSmsInput) {
         guestEmail: true,
         guestPhone: true,
         guestVehicle: true,
+        createdAt: true,
         service: { select: { title: true } },
       },
       orderBy: { updatedAt: "desc" },
       take: 250,
     });
-    const quote = guestQuotes.find((item) => normalizePhoneNumber(item.guestPhone || "") === fromPhone) || null;
+    const quote = guestQuotes.find((item) => normalizePhoneNumber(item.guestPhone || "") === fromPhone &&
+      (!cutoff || item.createdAt > cutoff)) || null;
 
     if (quote) {
       await prisma.quoteMessage.create({
