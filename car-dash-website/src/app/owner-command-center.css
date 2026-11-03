@@ -197,6 +197,33 @@
     font-size: max(16px, 1rem);
     color-scheme: dark;
   }
+  /* Restyle legacy staff booking/support surfaces on phones only. Desktop styles remain untouched. */
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="bg-[#0B1822]"],
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="bg-[#1B3241]"] {
+    background-color: #22211f !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="border-[#27404F]"],
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="border-[#365262]"] {
+    border-color: #ffffff24 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="bg-[#6EAEC6]"] {
+    background-color: #d6b779 !important;
+    color: #171613 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="text-[#6EAEC6]"] {
+    color: #e5c995 !important;
+  }
+  .editorial-theme .owner-app .owner-mobile-section-layout [class*="border-[#6EAEC6]"] {
+    border-color: #d6b77970 !important;
+  }
+  .editorial-theme .owner-app .staff-mobile-home {
+    background: #121211 !important;
+    color: #f3ebdd !important;
+  }
+  .editorial-theme .owner-app .staff-mobile-home :is(h1,h2,h3) {
+    font-family: var(--font-geist-sans),Arial,sans-serif !important;
+    letter-spacing: -.035em;
+  }
   .editorial-theme .owner-app .owner-mobile-section-layout [class*="bg-[#07131B]"] {
     background-color: #121211 !important;
   }
