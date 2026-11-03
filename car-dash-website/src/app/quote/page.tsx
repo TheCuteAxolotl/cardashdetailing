@@ -104,11 +104,22 @@ export default function QuotePage() {
 
     const md = await me.json();
     setUser(md.user);
-    const [v, t] = await Promise.all([
+    const [v, t, p] = await Promise.all([
       fetch("/api/vehicles", { cache: "no-store" }),
       fetch("/api/quotes", { cache: "no-store" }),
+      fetch("/api/account-profile", { cache: "no-store" }),
     ]);
     if (v.ok) setVehicles(await v.json());
+    if(p.ok){
+      const profileData=await p.json();
+      const stored=profileData.profile;
+      const address=stored?.addresses?.find((item:{id:string})=>item.id===stored.defaultAddressId);
+      setPhone(current=>current||stored?.phone||"");
+      if(address)setServiceAddress(current=>current||[address.line1,address.line2,address.city,
+        address.state+" "+address.postalCode].filter(Boolean).join(", "));
+      setGuestName(current=>current||profileData.user?.name||"");
+      setGuestEmail(current=>current||profileData.user?.email||"");
+    }
     if (t.ok) {
       const ts = await t.json();
       setThreads(ts);
