@@ -1,3 +1,7 @@
-// Keep the existing server-side staff-guide permission check and content while
-// rendering it inside /admin's persistent mobile staff workspace.
-export { default, dynamic } from "@/app/staff-guide/page";
+import StaffGuidePage from "@/app/staff-guide/page";
+
+// The underlying guide enforces its existing server-side staffGuide permission.
+export const dynamic = "force-dynamic";
+export default function StaffGuideWorkspacePage() {
+  return <StaffGuidePage />;
+}
