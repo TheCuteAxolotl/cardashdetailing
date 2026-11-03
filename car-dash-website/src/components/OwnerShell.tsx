@@ -163,6 +163,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [profilePhoto,setProfilePhoto]=useState<string|null>(null);
+  const [profileName,setProfileName]=useState<string|null>(null);
   useEffect(()=>{
     let active=true;
     const load=async()=>{
@@ -170,7 +171,10 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         const response=await fetch("/api/account-profile",{cache:"no-store"});
         if(!response.ok)return;
         const data=await response.json();
-        if(active)setProfilePhoto(typeof data.profile?.avatar==="string"?data.profile.avatar:null);
+        if(active){
+          setProfilePhoto(typeof data.profile?.avatar==="string"?data.profile.avatar:null);
+          setProfileName(typeof data.user?.name==="string"?data.user.name:null);
+        }
       }catch{}
     };
     void load();
@@ -301,9 +305,9 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         <div className="space-y-2 border-t border-white/10 px-4 py-4">
           <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-[#c9bdad] hover:bg-white/10"><Icon name="external" className="h-4 w-4"/> Public website</a>
           <div className="flex items-center gap-3 border-t border-white/10 pt-3">
-            <a href={profileHref} aria-label="Open my profile" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d6b779]/35 bg-[#302921] text-xs font-semibold text-[#ebd3a5]">{profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:(user.name||user.email||"C").slice(0,1).toUpperCase()}</a>
+            <a href={profileHref} aria-label="Open my profile" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d6b779]/35 bg-[#302921] text-xs font-semibold text-[#ebd3a5]">{profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:(profileName||user.name||user.email||"C").slice(0,1).toUpperCase()}</a>
             <div className="min-w-0 flex-1">
-              <a href={profileHref} className="block truncate text-xs font-semibold text-[#f4eee5] hover:text-[#d6b779]">{user.name || (owner?"Owner":"Staff")}</a>
+              <a href={profileHref} className="block truncate text-xs font-semibold text-[#f4eee5] hover:text-[#d6b779]">{profileName || user.name || (owner?"Owner":"Staff")}</a>
               <p className="truncate text-[10px] text-[#a79f94]">{user.email}</p>
             </div>
             <button type="button" onClick={logout} title="Sign out" className="rounded-lg border border-white/10 p-2 text-[10px] text-[#ceb78e] hover:bg-white/10">Exit</button>
@@ -364,7 +368,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#2a2824] text-[#e9d9ba]"
                   aria-label="Open workspace menu"><Icon name="menu" className="h-5 w-5" /></button>
                 <a href={profileHref} aria-label="My profile" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d6b779]/35 bg-[#302921]">
-                  {profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:<span className="text-xs font-semibold text-[#e8d0a3]">{(user.name||"C").slice(0,1).toUpperCase()}</span>}
+                  {profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:<span className="text-xs font-semibold text-[#e8d0a3]">{(profileName||user.name||"C").slice(0,1).toUpperCase()}</span>}
                 </a>
                 <a href={homeHref} className="min-w-0">
                   <span className="block truncate text-[15px] font-semibold tracking-tight text-[#f4ece0]">Car Dash</span>
