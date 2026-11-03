@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import OwnerActivityBell from "@/components/OwnerActivityBell";
 import OwnerMobileBottomNav from "@/components/OwnerMobileBottomNav";
+import StaffMobileBottomNav from "@/components/StaffMobileBottomNav";
 import { useOwnerScreenPrivacy } from "@/lib/owner-screen-privacy";
 
 type OwnerUser = { name?: string | null; email?: string | null; role?: string | null };
@@ -162,8 +163,10 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   const [query, setQuery] = useState("");
   const owner = user.role === "owner";
   const isOwnerHome = owner && pathname === "/owner/dashboard";
-  const privateOwnerPage = owner && pathname.startsWith("/owner/") && !isOwnerHome;
-  const {recording, changeRecording}=useOwnerScreenPrivacy();
+  const isStaffHome = !owner && pathname === "/admin/dashboard";
+  const privateWorkspacePage = (owner && pathname.startsWith("/owner/") && !isOwnerHome)
+    || (!owner && !isStaffHome);
+  const {recording, changeRecording}=useOwnerScreenPrivacy(owner?"owner":"staff");
   const [notificationCounts,setNotificationCounts]=useState<Record<string,number>>({});
   useEffect(()=>{
     let disposed=false;
@@ -216,6 +219,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
 
   const homeHref = owner ? "/owner/dashboard" : "/admin/dashboard";
   const quickHref = owner ? "/owner/detail-builder" : allVisibleItems.find((item) => item.label === "Bookings")?.resolvedHref || homeHref;
+  const mobileQuickAction = owner ? {href:"/owner/bookings?create=1",icon:"plus" as IconName,label:"New booking"}
+    : permissions.includes("bookings") ? {href:"/admin/bookings",icon:"calendar" as IconName,label:"Open bookings"}
+    : permissions.includes("assignedJobs") ? {href:"/owner/jobs",icon:"photo" as IconName,label:"My jobs"}
+    : permissions.includes("quoteChats") ? {href:"/admin/quotes",icon:"quote" as IconName,label:"Open quotes"}
+    : null;
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
@@ -332,18 +340,18 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       )}
 
       <div className="xl:pl-[248px]">
-        <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + (owner ? " owner-mobile-dashboard-topbar" : "")}>
-          {owner && (
+        <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + " owner-mobile-dashboard-topbar"}>
+          {
             <div className="flex min-h-[66px] items-center justify-between gap-2 md:hidden">
               <div className="flex min-w-0 items-center gap-2">
                 <button type="button" onClick={() => setMobileOpen(true)}
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#2a2824] text-[#e9d9ba]"
                   aria-label="Open workspace menu"><Icon name="menu" className="h-5 w-5" /></button>
-                <a href="/owner/dashboard" className="flex min-w-0 items-center gap-2">
+                <a href={homeHref} className="flex min-w-0 items-center gap-2">
                   <img src="/favicon.png" alt="" className="h-8 w-8 shrink-0 rounded-lg border border-[#d6b779]/25 bg-[#292724] object-contain p-1"/>
                   <span className="min-w-0">
                     <span className="block truncate text-[15px] font-semibold tracking-tight text-[#f4ece0]">Car Dash</span>
-                    <span className="block truncate text-[9px] font-semibold uppercase tracking-[.13em] text-[#d6b779]">Owner workspace</span>
+                    <span className="block truncate text-[9px] font-semibold uppercase tracking-[.13em] text-[#d6b779]">{owner?"Owner workspace":"Staff workspace"}</span>
                   </span>
                 </a>
               </div>
@@ -352,15 +360,15 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                   aria-label="Search workspace" className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 bg-[#292724] text-[#f1e4d3]">
                   <Icon name="search" className="h-5 w-5"/>
                 </button>
-                <a href="/owner/bookings?create=1" aria-label="New booking"
+                {mobileQuickAction && <a href={mobileQuickAction.href} aria-label={mobileQuickAction.label}
                   className="grid h-10 w-10 place-items-center rounded-xl bg-[#d6b779] text-[#171613]">
-                  <Icon name="plus" className="h-5 w-5"/>
-                </a>
-                {phoneViewport && <OwnerActivityBell />}
+                  <Icon name={mobileQuickAction.icon} className="h-5 w-5"/>
+                </a>}
+                {phoneViewport && <OwnerActivityBell privacyScope={owner?"owner":"staff"} />}
               </div>
             </div>
           )}
-          <div className={"min-h-[68px] items-center justify-between gap-3" + (owner ? " hidden md:flex" : " flex")}>
+          <div className="hidden min-h-[68px] items-center justify-between gap-3 md:flex">
             <div className="flex min-w-0 items-center gap-3">
               <button onClick={() => setMobileOpen(true)}
                 className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#292826] text-[#f4eee5] xl:hidden" aria-label="Open navigation">
@@ -374,11 +382,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 className="hidden items-center gap-2 rounded-xl border border-white/15 bg-[#282724] px-3.5 py-2.5 text-xs font-semibold text-[#d7ccc0] hover:border-[#d6b779]/60 sm:inline-flex">
                 <Icon name="search" className="h-4 w-4"/> Search
               </button>
-              {(!owner || !phoneViewport) && <OwnerActivityBell />}
+              {!phoneViewport && <OwnerActivityBell privacyScope={owner?"owner":"staff"} />}
               <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 bg-[#272622] px-3.5 py-2.5 text-xs font-semibold text-[#ebe0ce] hover:border-[#d6b779]/60">View site</a>
             </div>
           </div>
-          <nav aria-label="Business workspace tabs" className={"owner-topnav max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none]" + (owner ? " hidden md:flex" : " flex")}>
+          <nav aria-label="Business workspace tabs" className="owner-topnav hidden max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none] md:flex">
             {(owner ? [
               {label:"Calendar",href:"/owner/dashboard"},
               {label:"Jobs",href:"/owner/jobs"},
@@ -399,9 +407,9 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             })}
           </nav>
         </header>
-        {privateOwnerPage && <div className="owner-mobile-context-bar sticky top-[66px] z-30 flex items-center justify-between gap-3 border-b border-white/10 bg-[#1b1b1a]/95 px-4 py-3 text-[#f4eee5] backdrop-blur-lg md:hidden">
+        {privateWorkspacePage && <div className="owner-mobile-context-bar sticky top-[66px] z-30 flex items-center justify-between gap-3 border-b border-white/10 bg-[#1b1b1a]/95 px-4 py-3 text-[#f4eee5] backdrop-blur-lg md:hidden">
           <div className="min-w-0">
-            <p className="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Car Dash / Owner</p>
+            <p className="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Car Dash / {owner?"Owner":"Staff"}</p>
             <p className="mt-1 truncate text-sm font-semibold">{pageTitle(pathname,owner)}</p>
           </div>
           <button type="button" role="switch" aria-checked={recording} aria-label="Recording privacy mode"
@@ -411,7 +419,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
           </button>
         </div>}
         <main className="owner-shell-content owner-mobile-section-layout min-h-[calc(100vh-112px)]">
-          {privateOwnerPage && recording ? <>
+          {privateWorkspacePage && recording ? <>
             <div className="owner-mobile-privacy-gate px-4 py-8 md:hidden">
               <div className="mx-auto max-w-lg rounded-2xl border border-[#d6b779]/25 bg-[#211f1b] p-6 text-center">
                 <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-[#d6b779]/30 bg-[#d6b779]/10 text-xl text-[#d6b779]" aria-hidden="true">•••</div>
@@ -424,7 +432,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             <div className="hidden md:block">{children}</div>
           </> : children}
         </main>
-        {owner && <OwnerMobileBottomNav />}
+        {owner ? <OwnerMobileBottomNav /> : <StaffMobileBottomNav permissions={permissions} onOpenMenu={()=>setMobileOpen(true)} />}
       </div>
     </div>
   );
