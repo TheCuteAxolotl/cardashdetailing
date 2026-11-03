@@ -10,6 +10,7 @@ import {
   verifyBookingChatKey,
 } from "@/lib/booking-chat";
 import { sendTransactionalSms } from "@/lib/twilio-sms";
+import { bookingPhoneWasReleased } from "@/lib/phone-release";
 
 async function getAccess(request: NextRequest, bookingId: string) {
   const booking = await prisma.booking.findUnique({
@@ -174,6 +175,12 @@ export async function POST(
     // The same message stays in the booking conversation so the website and text thread
     // remain synchronized.
     if (bookingHasSmsConsent(allowed.booking.notes)) {
+      if(await bookingPhoneWasReleased(allowed.booking.customerPhone,allowed.booking.createdAt)){
+        return NextResponse.json({
+          success:true,delivery:"website",
+          warning:"Message saved in the website chat. The customer removed this phone number; update the booking before texting.",
+        });
+      }
       const sms = await sendTransactionalSms({
         to: allowed.booking.customerPhone,
         body: `Car Dash Detailing: ${message}`,
