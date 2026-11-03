@@ -14,6 +14,34 @@
     border-color: #ffffff20 !important;
     color: #f4efe5 !important;
   }
+  .editorial-theme .owner-app .owner-workspace-sidebar {
+    background: #1b1b1a !important;
+    border-color: #ffffff20 !important;
+    color: #f4eee5 !important;
+  }
+  .editorial-theme .owner-app .owner-workspace-sidebar .owner-nav-link {
+    color: #cfc5b7 !important;
+  }
+  .editorial-theme .owner-app .owner-workspace-sidebar .owner-nav-link-active {
+    background: #d6b779 !important;
+    color: #171613 !important;
+  }
+  .editorial-theme .owner-app .owner-workspace-sidebar .owner-nav-link-active :is(span,svg) {
+    color: #171613 !important;
+  }
+  .editorial-theme .owner-app .owner-sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: #62553e transparent;
+  }
+  .editorial-theme .owner-app .owner-workspace-topbar .owner-topnav a[aria-current="page"] {
+    border-color: #d6b77980 !important;
+    background: #d6b77920 !important;
+    color: #f2d6a1 !important;
+  }
+  .editorial-theme .owner-app .owner-workspace-topbar {
+    height: auto !important;
+    min-height: 112px;
+  }
   .editorial-theme .owner-app .console-topbar {
     box-shadow: 0 1px 0 #ffffff08;
   }
@@ -24,9 +52,9 @@
     color: #bfb8ac !important;
   }
   .editorial-theme .owner-app .console-rail-button-active {
-    background: #e58b4b !important;
+    background: #d6b779 !important;
     color: #141210 !important;
-    box-shadow: 0 0 0 1px #e58b4b4d, 0 6px 18px #e58b4b1c;
+    box-shadow: 0 0 0 1px #d6b7794d, 0 6px 18px #d6b7791c;
   }
   .editorial-theme .owner-app .console-flyout a,
   .editorial-theme .owner-app .console-rail-expanded a {
@@ -34,17 +62,17 @@
   }
   .editorial-theme .owner-app .console-flyout a:hover,
   .editorial-theme .owner-app .console-rail-expanded a:hover {
-    background: #e58b4b1c !important;
+    background: #d6b7791c !important;
     color: #f4efe5 !important;
   }
   .editorial-theme .owner-app .console-rail-expanded a[class*="bg-[#171411]"],
   .editorial-theme .owner-app .console-flyout a[class*="bg-[#171411]"] {
-    background: #e58b4b !important;
+    background: #d6b779 !important;
     color: #101010 !important;
   }
   .editorial-theme .owner-app .console-rail-expanded [class~="text-black/32"],
   .editorial-theme .owner-app .console-flyout [class~="text-black/30"] {
-    color: #e5aa7a !important;
+    color: #e8d1a3 !important;
   }
   .editorial-theme .owner-app .console-topbar h1 {
     color: #f4efe5 !important;
@@ -89,18 +117,18 @@
   .editorial-theme .owner-app .owner-activity-panel [class*="text-[#969089]"] {
     color: #bdb7ad !important;
   }
-  .editorial-theme .owner-app .owner-activity-panel :is(button,a):not([class*="bg-[#e58b4b]"]):hover {
+  .editorial-theme .owner-app .owner-activity-panel :is(button,a):not([class*="bg-[#d6b779]"]):hover {
     background-color: #ffffff0a;
   }
   .editorial-theme .owner-app .console-notification-badge {
-    background-color: #ef7f36 !important;
+    background-color: #d6b779 !important;
     color: #101010 !important;
   }
   .editorial-theme .owner-app .console-rail-expanded,
   .editorial-theme .owner-app .console-rail-collapsed {
     scrollbar-color: #51453a transparent;
   }
-  @media (max-width: 1023px) {
+  @media (max-width: 1279px) {
     .editorial-theme .owner-app aside[class*="max-w-[88vw]"] {
       background: #1c1c1b !important;
       color: #f4efe5 !important;
@@ -117,11 +145,11 @@
       border-color: #ffffff38 !important;
     }
     .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-search:hover {
-      border-color: #e58b4b90 !important;
+      border-color: #d6b77990 !important;
       background: #35302b !important;
     }
     .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-search svg {
-      color: #e6aa77 !important;
+      color: #e8d1a3 !important;
     }
     .editorial-theme .owner-app .owner-mobile-drawer button.owner-menu-close {
       background: #2b2926 !important;
@@ -132,7 +160,7 @@
       color: #ddd4c9 !important;
     }
     .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active {
-      background: #e58b4b !important;
+      background: #d6b779 !important;
       color: #171310 !important;
     }
     .editorial-theme .owner-app .owner-mobile-drawer a.owner-nav-link-active :is(span,svg) {
