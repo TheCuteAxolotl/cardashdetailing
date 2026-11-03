@@ -93,7 +93,7 @@ export default function OwnerScheduleOverview({
   : view==="week"?dateText(weekDays[6]):selected;
  const periodBookings = activeBookings.filter(b=>b.preferredDate!>=periodStart&&b.preferredDate!<=periodEnd);
  const periodValue = periodBookings.reduce((sum,b)=>sum+(Number(b.quotedPrice)||0),0);
- const open = (event:Event)=>{ if(event.booking)onEditBooking(event.booking); };
+ const open = (event:Event)=>{ if(event.booking)onEditBooking(event.booking); else if(event.task)window.location.assign("/owner/schedule"); };
  const title = view==="month"?monthTitle(anchor):view==="week"
   ? dayName(weekDays[0])+" – "+dayName(weekDays[6]):dayName(anchor);
  const views:ScheduleView[]=["month","week","day","agenda"];
@@ -149,13 +149,12 @@ export default function OwnerScheduleOverview({
            const id=dateText(d),onMonth=d.getMonth()===anchor.getMonth(),current=id===today;
            const rows=indexed.get(id)||[];
            const selectedDay=id===selected;
-           return <button key={id} type="button" onClick={()=>selectDate(id)}
-             aria-label={dayName(d)+", "+rows.length+" items"} aria-pressed={selectedDay}
+           return <div key={id}
              className={"min-h-[99px] min-w-0 border-b border-r border-white/[.09] px-1.5 py-1.5 text-left align-top transition sm:min-h-[124px] sm:px-2 sm:py-2 "+(selectedDay?"bg-[#d6b779]/10 ring-1 ring-inset ring-[#d6b779]/35":"hover:bg-white/[.035]")+" "+(!onMonth?"opacity-40":"")}>
-             <span className={"mb-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-semibold "+(current?"bg-[#d6b779] text-[#181715]":selectedDay?"text-[#f1d59e]":"text-[#c5bdb2]")}>{d.getDate()}</span>
+             <button type="button" onClick={()=>selectDate(id)} aria-pressed={selectedDay} aria-label={dayName(d)+", "+rows.length+" items"} className={"mb-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-semibold "+(current?"bg-[#d6b779] text-[#181715]":selectedDay?"text-[#f1d59e]":"text-[#c5bdb2]")}>{d.getDate()}</button>
              <span className="block space-y-1">{rows.slice(0,3).map(e=>eventBadge(e,true))}</span>
-             {rows.length>3&&<span className="mt-1 block text-[10px] font-semibold text-[#d6b779]">+{rows.length-3} more</span>}
-           </button>;
+             {rows.length>3&&<button type="button" onClick={()=>{selectDate(id);setView("day");}} className="mt-1 block text-[10px] font-semibold text-[#d6b779]">+{rows.length-3} more</button>}
+           </div>;
          })}
        </div>
      </div>
