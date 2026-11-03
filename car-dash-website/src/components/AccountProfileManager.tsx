@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { EMPTY_ACCOUNT_PROFILE,formatSavedAddress,type AccountProfile,type SavedAddress } from "@/lib/account-profile";
+import { prepareAvatar } from "@/lib/avatar-image";
 
 type CurrentUser={id:string;name:string;email:string;role:string};
 type SavedVehicle={
@@ -20,32 +21,6 @@ const BUTTON="rounded-xl border border-white/20 px-4 py-2.5 text-xs font-semibol
 function vehicleToForm(value:SavedVehicle):VehicleForm{
  return {nickname:value.nickname||"",year:value.year,make:value.make,model:value.model,
  trim:value.trim||"",vehicleType:value.vehicleType,color:value.color||""};
-}
-async function compressAvatar(file:File):Promise<string>{
- if(file.size>8*1024*1024)throw new Error("Choose an image under 8 MB.");
- if(!["image/jpeg","image/png","image/webp","image/heic","image/heif"].includes(file.type))
-   throw new Error("Choose a JPEG, PNG, WebP, or supported iPhone photo.");
- const src=URL.createObjectURL(file);
- try{
-   const image=await new Promise<HTMLImageElement>((resolve,reject)=>{
-     const value=new Image();
-     value.onload=()=>resolve(value);
-     value.onerror=()=>reject(new Error("This photo could not be read by your browser."));
-     value.src=src;
-   });
-   if(image.naturalWidth<8||image.naturalHeight<8)throw new Error("Choose a larger photo.");
-   const canvas=document.createElement("canvas");
-   canvas.width=256;canvas.height=256;
-   const ctx=canvas.getContext("2d");
-   if(!ctx)throw new Error("This browser could not prepare the image.");
-   const side=Math.min(image.naturalWidth,image.naturalHeight);
-   ctx.drawImage(image,(image.naturalWidth-side)/2,(image.naturalHeight-side)/2,side,side,0,0,256,256);
-   for(const quality of [.8,.65,.5,.4]){
-     const data=canvas.toDataURL("image/jpeg",quality);
-     if(data.length<=150000)return data;
-   }
-   throw new Error("Photo is too large. Try a different image.");
- }finally{URL.revokeObjectURL(src);}
 }
 export default function AccountProfileManager(){
  const pathname=usePathname();
@@ -96,7 +71,7 @@ export default function AccountProfileManager(){
    const file=event.target.files?.[0];event.target.value="";
    if(!file)return;
    setAvatarBusy(true);setError("");setNotice("");
-   try{const avatar=await compressAvatar(file);setProfile(prev=>({...prev,avatar}));
+   try{const avatar=await prepareAvatar(file);setProfile(prev=>({...prev,avatar}));
      setNotice("New photo ready. Press Save profile to keep it.");}
    catch(e){setError(e instanceof Error?e.message:"Unable to prepare photo.");}
    finally{setAvatarBusy(false);}
@@ -171,11 +146,11 @@ export default function AccountProfileManager(){
            </div>
            <div className="min-w-0">
              <h2 className="text-lg font-semibold">Profile photo</h2>
-             <p className="mt-1 text-xs leading-5 text-[#ada396]">Square-cropped and saved privately with your account.</p>
+             <p className="mt-1 text-xs leading-5 text-[#ada396]">JPEG, PNG, HEIC/HEIF, WebP, GIF, AVIF, BMP, or TIFF. We crop and compress it automatically.</p>
              <div className="mt-2 flex flex-wrap items-center gap-3">
                <label className="cursor-pointer rounded-lg border border-[#d6b779]/40 px-3 py-2 text-xs font-semibold text-[#e7d2aa]">
                  {avatarBusy?"Preparing…":"Choose photo"}
-                 <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" onChange={upload} disabled={avatarBusy} className="sr-only"/>
+                 <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/bmp,image/tiff,image/heic,image/heif,.jpg,.jpeg,.jfif,.png,.webp,.gif,.avif,.bmp,.tif,.tiff,.heic,.heif" onChange={upload} disabled={avatarBusy} className="sr-only"/>
                </label>
                {profile.avatar&&<button type="button" onClick={()=>setProfile(prev=>({...prev,avatar:null}))} className="text-xs text-[#c4b6a3] underline">Remove</button>}
              </div>
