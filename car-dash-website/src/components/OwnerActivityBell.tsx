@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
+import { useOwnerScreenPrivacy, safeCustomerText } from "@/lib/owner-screen-privacy";
 
 type Alert = {id:string;kind:"booking"|"quote"|"message"|"call"|"support";title:string;detail:string;href:string;time:string};
 type Payload = {alerts:Alert[];unread:number;seenAt:string|null};
@@ -16,6 +17,14 @@ export default function OwnerActivityBell() {
   const [enabled,setEnabled]=useState(false);
   const [message,setMessage]=useState("");
   const [toast,setToast]=useState<Alert|null>(null);
+  const {recording,aliases}=useOwnerScreenPrivacy();
+  const privacy=useRef({recording,aliases});
+  privacy.current={recording,aliases};
+  const showTitle=(alert:Alert)=>recording?({
+    booking:"New booking activity",quote:"New quote activity",message:"New customer message",
+    call:"New call activity",support:"New support activity",
+  }[alert.kind]):safeCustomerText(alert.title,aliases);
+  const showDetail=(alert:Alert)=>recording?"Customer details hidden during recording.":safeCustomerText(alert.detail,aliases);
   const ready=useRef(false);
   const last=useRef(new Set<string>());
   const wrapper=useRef<HTMLDivElement>(null);
@@ -36,8 +45,8 @@ export default function OwnerActivityBell() {
           try {
             if("Notification" in window&&Notification.permission==="granted"&&"serviceWorker" in navigator) {
               const reg=await navigator.serviceWorker.getRegistration("/"); 
-              if(reg) await reg.showNotification(latest.title,{
-                body:latest.detail.slice(0,90),icon:"/favicon.png",tag:latest.id,
+              if(reg) await reg.showNotification(privacy.current.recording?"New Car Dash activity":safeCustomerText(latest.title,privacy.current.aliases),{
+                body:privacy.current.recording?"Open Car Dash to review the update.":safeCustomerText(latest.detail.slice(0,90),privacy.current.aliases),icon:"/favicon.png",tag:latest.id,
                 data:{url:latest.href},
               });
             }
@@ -103,9 +112,9 @@ export default function OwnerActivityBell() {
         <button type="button" onClick={()=>void markRead()} disabled={!payload?.unread} className="text-xs font-semibold text-[#e7cfa2] disabled:opacity-40">Mark read</button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain divide-y divide-white/10 sm:max-h-[min(56vh,460px)]">
-        {payload?.alerts.length ? payload.alerts.map(alert=><a key={alert.id} href={alert.href} className="flex items-start gap-3 px-4 py-3.5 hover:bg-white/[.055]">
+        {payload?.alerts.length ? payload.alerts.map(alert=><a key={alert.id} href={recording?"#":alert.href} onClick={event=>{if(recording){event.preventDefault();setMessage("Turn off Recording mode to open a customer conversation.");}}} className="flex items-start gap-3 px-4 py-3.5 hover:bg-white/[.055]">
           <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#d6b779]/15 text-[#d6b779]"><OwnerAppIcon name={icon[alert.kind]} className="h-[18px] w-[18px]"/></span>
-          <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{alert.title}</span><span className="mt-1 block line-clamp-2 break-words text-xs leading-5 text-[#bdb8b0]">{alert.detail}</span></span>
+          <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{showTitle(alert)}</span><span className="mt-1 block line-clamp-2 break-words text-xs leading-5 text-[#bdb8b0]">{showDetail(alert)}</span></span>
           <time className="shrink-0 text-[10px] text-[#969089]">{age(alert.time)}</time>
         </a>) : <p className="px-5 py-10 text-center text-sm text-[#bdb8b0]">No recent activity yet.</p>}
       </div>
@@ -119,7 +128,7 @@ export default function OwnerActivityBell() {
     </div>}
     {toast && <div className="fixed bottom-5 right-4 z-[120] w-[min(340px,calc(100vw-32px))] rounded-2xl border border-[#d6b779]/35 bg-[#25221d] px-4 py-4 text-[#f4efe5] shadow-[0_20px_80px_#000a]" role="status">
       <div className="flex items-start justify-between gap-3"><p className="text-xs font-bold uppercase tracking-[.14em] text-[#e7cfa2]">New activity</p><button onClick={()=>setToast(null)} aria-label="Dismiss notification" className="text-lg leading-none text-[#cbc3b5]">×</button></div>
-      <a href={toast.href} className="mt-2 block text-sm font-semibold">{toast.title}<span className="mt-1 block text-xs font-normal text-[#bdb8b0]">{toast.detail.slice(0,110)}</span></a>
+      <a href={recording?"#":toast.href} onClick={event=>{if(recording)event.preventDefault();}} className="mt-2 block text-sm font-semibold">{showTitle(toast)}<span className="mt-1 block text-xs font-normal text-[#bdb8b0]">{showDetail(toast).slice(0,110)}</span></a>
     </div>}
   </div>;
 }
