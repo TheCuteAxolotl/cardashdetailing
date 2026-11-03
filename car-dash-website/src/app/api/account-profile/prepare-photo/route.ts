@@ -4,7 +4,7 @@ import { getCurrentAccountFromRequest } from "@/lib/permissions";
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 const NO_CACHE={"Cache-Control":"private, no-store"};
-const FORMATS=new Set(["jpeg","png","webp","gif","avif","tiff","magick"]);
+const FORMATS=new Set(["jpeg","png","webp","gif","avif","heif","tiff","magick"]);
 
 export async function POST(request:NextRequest){
  try{
