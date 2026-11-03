@@ -4,6 +4,7 @@ import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import PageMediaBand from "@/components/PageMediaBand";
+import { formatSavedAddress, type SavedAddress } from "@/lib/account-profile";
 
 type Vehicle = {
   id: string;
@@ -59,6 +60,7 @@ async function compressImage(file: File) {
 export default function QuotePage() {
   const [user, setUser] = useState<any>(undefined);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [savedAddresses,setSavedAddresses]=useState<SavedAddress[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [selected, setSelected] = useState("");
@@ -113,6 +115,7 @@ export default function QuotePage() {
     if(p.ok){
       const profileData=await p.json();
       const stored=profileData.profile;
+      if(Array.isArray(stored?.addresses))setSavedAddresses(stored.addresses);
       const address=stored?.addresses?.find((item:{id:string})=>item.id===stored.defaultAddressId);
       setPhone(current=>current||stored?.phone||"");
       if(address)setServiceAddress(current=>current||[address.line1,address.line2,address.city,
@@ -283,6 +286,13 @@ export default function QuotePage() {
               <label className="text-sm text-white/65">Service<select className={`${input} mt-2`} value={serviceId} onChange={(e)=>setServiceId(e.target.value)}><option value="">Not sure yet</option>{services.map((service)=><option key={service.id} value={service.id}>{service.title}</option>)}</select></label>
             </div>
 
+            {savedAddresses.length>0&&<div className="mt-5"><label className="block text-sm text-[#dbc79f]">Saved service address
+              <select className={input+" mt-2"} value={savedAddresses.some(a=>formatSavedAddress(a)===serviceAddress)?serviceAddress:""}
+                onChange={e=>setServiceAddress(e.target.value)}>
+                <option value="">Use a different address</option>
+                {savedAddresses.map(a=><option key={a.id} value={formatSavedAddress(a)}>{a.label||"Saved address"} — {formatSavedAddress(a)}</option>)}
+              </select>
+            </label></div>}
             <div className="mt-5"><label className="block text-sm text-white/65">Service address (optional)<input name="serviceAddress" autoComplete="street-address" maxLength={500} className={`${input} mt-2`} value={serviceAddress} onChange={(e)=>setServiceAddress(e.target.value)} placeholder="Street address, unit, city, state, ZIP code" /><span className="mt-2 block text-xs leading-5 text-white/45">Add it now to make booking easier, so you won’t have to send your address again after your quote.</span></label></div>
 
             <div className="mt-7 border-t border-white/10 pt-7">
