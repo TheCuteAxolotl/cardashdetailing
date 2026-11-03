@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import OwnerAppIcon from "@/components/OwnerAppIcon";
 import type { EditableBooking } from "@/components/BookingDetailsEditor";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
@@ -47,8 +47,12 @@ export default function OwnerScheduleOverview({
  const [anchor,setAnchor]=useState(()=>fromISO(initialDate || dateText(new Date())));
  const [selected,setSelected]=useState(()=>initialDate || dateText(new Date()));
  const [view,setView]=useState<ScheduleView>("month");
+ // A full seven-column grid is useful on desktop; use the readable agenda on phones.
+ useEffect(()=>{
+   if(window.matchMedia("(max-width: 639px)").matches)setView("agenda");
+ },[]);
  const [status,setStatus]=useState<StatusFilter>("all");
- const today=dateText(new Date());
+ const today=initialDate||dateText(new Date());
  const activeBookings=useMemo(()=>bookings.filter(b=>{
   const s=(b.status||"").toLowerCase();
   return Boolean(b.preferredDate) && (status==="all" || (status==="confirmed"
