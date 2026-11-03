@@ -150,6 +150,14 @@ function NotificationBadge({count=0}:{count?:number}) {
 export default function OwnerShell({ children, user, permissions = [] }: { children: ReactNode; user: OwnerUser; permissions?: string[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [phoneViewport,setPhoneViewport] = useState(false);
+  useEffect(()=>{
+    const query=window.matchMedia("(max-width: 767px)");
+    const refresh=()=>setPhoneViewport(query.matches);
+    refresh();
+    query.addEventListener("change",refresh);
+    return()=>query.removeEventListener("change",refresh);
+  },[]);
     const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const owner = user.role === "owner";
@@ -348,7 +356,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                   className="grid h-10 w-10 place-items-center rounded-xl bg-[#d6b779] text-[#171613]">
                   <Icon name="plus" className="h-5 w-5"/>
                 </a>
-                <OwnerActivityBell />
+                {phoneViewport && <OwnerActivityBell />}
               </div>
             </div>
           )}
@@ -366,7 +374,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 className="hidden items-center gap-2 rounded-xl border border-white/15 bg-[#282724] px-3.5 py-2.5 text-xs font-semibold text-[#d7ccc0] hover:border-[#d6b779]/60 sm:inline-flex">
                 <Icon name="search" className="h-4 w-4"/> Search
               </button>
-              {owner ? <div className="hidden md:block"><OwnerActivityBell /></div> : <OwnerActivityBell />}
+              {(!owner || !phoneViewport) && <OwnerActivityBell />}
               <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 bg-[#272622] px-3.5 py-2.5 text-xs font-semibold text-[#ebe0ce] hover:border-[#d6b779]/60">View site</a>
             </div>
           </div>
