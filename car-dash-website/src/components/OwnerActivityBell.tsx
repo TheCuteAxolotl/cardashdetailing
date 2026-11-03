@@ -11,13 +11,13 @@ const age = (value:string) => {
 };
 const icon:Record<Alert["kind"],OwnerIconName>={booking:"calendar",quote:"quote",message:"message",call:"phone",support:"support"};
 
-export default function OwnerActivityBell() {
+export default function OwnerActivityBell({ privacyScope="owner" }: { privacyScope?:"owner"|"staff" }) {
   const [payload,setPayload]=useState<Payload|null>(null);
   const [open,setOpen]=useState(false);
   const [enabled,setEnabled]=useState(false);
   const [message,setMessage]=useState("");
   const [toast,setToast]=useState<Alert|null>(null);
-  const {recording,aliases}=useOwnerScreenPrivacy();
+  const {recording,aliases}=useOwnerScreenPrivacy(privacyScope);
   const privacy=useRef({recording,aliases});
   privacy.current={recording,aliases};
   const showTitle=(alert:Alert)=>recording?({
