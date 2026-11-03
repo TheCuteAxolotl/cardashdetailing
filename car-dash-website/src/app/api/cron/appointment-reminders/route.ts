@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { BOOKING_AVAILABILITY_KEY, normalizeBookingTime, parseBookingAvailabilityConfig } from "@/lib/booking-availability";
 import { bookingHasSmsConsent, ensureBookingConversation } from "@/lib/booking-chat";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
+import { bookingPhoneWasReleased } from "@/lib/phone-release";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
 import {
   appointmentReminderBody,
@@ -57,7 +58,8 @@ export async function GET(request: NextRequest) {
       if (
         !isDueForReminder(candidate, now, timezone) ||
         !bookingHasSmsConsent(candidate.notes) ||
-        !normalizePhoneNumber(candidate.customerPhone)
+        !normalizePhoneNumber(candidate.customerPhone) ||
+        await bookingPhoneWasReleased(candidate.customerPhone,candidate.createdAt)
       ) {
         totals.skipped++;
         continue;
@@ -86,6 +88,7 @@ export async function GET(request: NextRequest) {
           !isDueForReminder(booking, new Date(), timezone) ||
           !bookingHasSmsConsent(booking.notes) ||
           !normalizePhoneNumber(booking.customerPhone) ||
+          await bookingPhoneWasReleased(booking.customerPhone,booking.createdAt) ||
           booking.preferredDate !== candidate.preferredDate ||
           normalizeBookingTime(booking.preferredTime) !== normalizeBookingTime(candidate.preferredTime)
         ) {
