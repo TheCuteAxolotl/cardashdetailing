@@ -348,8 +348,22 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         const authData = await authResponse.json();
         if (!cancelled && authData?.user) {
           setForm((current) => ({ ...current, name: authData.user.name || current.name, email: authData.user.email || current.email }));
-          const vehicleResponse = await fetch("/api/vehicles", { cache: "no-store" });
+          const [vehicleResponse,profileResponse] = await Promise.all([
+            fetch("/api/vehicles", { cache: "no-store" }),
+            fetch("/api/account-profile", { cache: "no-store" }),
+          ]);
           if (vehicleResponse.ok && !cancelled) setVehicles(await vehicleResponse.json());
+          if(profileResponse.ok && !cancelled){
+            const data=await profileResponse.json();
+            const pref=data.profile;
+            const defaultAddress=pref?.addresses?.find((item:{id:string})=>item.id===pref.defaultAddressId);
+            if(pref)setForm(current=>({
+              ...current,
+              phone:current.phone||pref.phone||"",
+              serviceAddress:current.serviceAddress||(defaultAddress?
+                [defaultAddress.line1,defaultAddress.line2,defaultAddress.city,defaultAddress.state+" "+defaultAddress.postalCode].filter(Boolean).join(", "):""),
+            }));
+          }
         }
       }
 
@@ -391,7 +405,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           setForm((current) => ({
             ...current,
             quoteThreadId: quoteData.id,
-            serviceAddress: current.serviceAddress || quoteData.messages?.find((message) => message.sender === "system" && message.body.startsWith("Service address: "))?.body.slice("Service address: ".length) || "",
+            serviceAddress: quoteData.messages?.find((message) => message.sender === "system" && message.body.startsWith("Service address: "))?.body.slice("Service address: ".length) || current.serviceAddress || "",
             serviceId: quoteData.service?.id || "",
             selectedPackage: quoteData.service?.title || quoteData.subject,
             vehicleId: quoteData.vehicle?.id || current.vehicleId,
