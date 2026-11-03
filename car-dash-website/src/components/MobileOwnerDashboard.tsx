@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
 import { bookingServiceAddress } from "@/lib/booking-owner-details";
+import OwnerPrivacyControls from "@/components/OwnerPrivacyControls";
+import { useOwnerScreenPrivacy, normalizeContactPhone, safeCustomerText, type ContactAliases } from "@/lib/owner-screen-privacy";
 import type { EditableBooking } from "@/components/BookingDetailsEditor";
 
 type Activity = { id:string; kind:string; title:string; detail:string; href:string; time:string };
@@ -65,13 +67,15 @@ function routeUrl(addresses:string[]){
 }
 
 function MobileStop({
- booking,index,onEdit,
+ booking,index,onEdit,recording,aliases,
 }:{
  booking:EditableBooking;index:number;onEdit:(booking:EditableBooking)=>void;
+ recording:boolean;aliases:ContactAliases;
 }){
  const address=bookingServiceAddress(booking.notes);
  const phone=(booking.customerPhone||"").trim();
  const label=booking.status||"Requested";
+ const displayName=recording?"Client "+(index+1):safeCustomerText(aliases[normalizeContactPhone(phone)]||booking.customerName||"Customer",aliases);
  return <article className="rounded-2xl border border-white/[.09] bg-[#201f1d] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.025)]">
    <div className="flex items-start gap-3">
      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-[#d6b779]/40 bg-[#d6b779]/10 text-sm font-bold text-[#e8cf9e]">{index+1}</div>
@@ -80,25 +84,29 @@ function MobileStop({
          <p className="text-sm font-semibold text-[#f7efe2]">{time(booking.preferredTime)}</p>
          {booking.quotedPrice!=null&&<p className="text-sm font-semibold tabular-nums text-[#e7cf9f]">{money(Number(booking.quotedPrice))}</p>}
        </div>
-       <h4 className="mt-1 text-base font-semibold tracking-tight text-[#f4ede1]">{booking.customerName||"Customer"}</h4>
-       <p className="mt-1 text-xs leading-5 text-[#bdb2a3]">{booking.serviceName||"Detailing service"}</p>
+       <h4 className="mt-1 text-base font-semibold tracking-tight text-[#f4ede1]">{displayName}</h4>
+       <p className="mt-1 text-xs leading-5 text-[#bdb2a3]">{recording?"Detailing appointment":safeCustomerText(booking.serviceName||"Detailing service",aliases)}</p>
        <span className={"mt-2 inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold capitalize "+statusStyle(booking.status)}>{label}</span>
        <p className={"mt-3 flex items-start gap-1.5 text-xs leading-5 "+(address?"text-[#c9bdb0]":"text-[#efd1a1]")}>
          <OwnerAppIcon name="map-pin" className="mt-0.5 h-3.5 w-3.5 shrink-0"/>
-         <span>{address||"Service address missing — edit booking"}</span>
+         <span>{recording?"Address hidden for recording":address||"Service address missing — edit booking"}</span>
        </p>
      </div>
    </div>
    <div className="mt-4 grid grid-cols-3 gap-2 border-t border-white/[.085] pt-3">
-     {phone?<a href={"/owner/messages?phone="+encodeURIComponent(phone)+"&name="+encodeURIComponent(booking.customerName||"Customer")}
+     {recording?<button type="button" disabled title="Turn off Recording mode to view customer conversations"
+       className="flex min-h-10 items-center justify-center rounded-lg border border-white/10 bg-[#282622] px-2 py-2 text-[11px] text-[#968c80]">Hidden</button>
+     :phone?<a href={"/owner/messages?phone="+encodeURIComponent(phone)+"&name="+encodeURIComponent(booking.customerName||"Customer")}
        className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-[#2a2824] px-2 py-2 text-[11px] font-semibold text-[#e9dcc6]">
        <OwnerAppIcon name="message" className="h-3.5 w-3.5"/> Text
      </a>:<button type="button" onClick={()=>onEdit(booking)} className="rounded-lg border border-[#a38156]/30 px-2 py-2 text-[11px] text-[#e4c89c]">Add phone</button>}
-     {address?<a href={mapsUrl(address)} target="_blank" rel="noopener noreferrer"
+     {recording?<button type="button" disabled title="Turn off Recording mode to open a customer address"
+       className="flex min-h-10 items-center justify-center rounded-lg border border-white/10 bg-[#282622] px-2 py-2 text-[11px] text-[#968c80]">Hidden</button>
+     :address?<a href={mapsUrl(address)} target="_blank" rel="noopener noreferrer"
        className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-[#2a2824] px-2 py-2 text-[11px] font-semibold text-[#e9dcc6]">
        <OwnerAppIcon name="map-pin" className="h-3.5 w-3.5"/> Maps
      </a>:<button type="button" onClick={()=>onEdit(booking)} className="rounded-lg border border-[#a38156]/30 px-2 py-2 text-[11px] text-[#e4c89c]">Add address</button>}
-     <button type="button" onClick={()=>onEdit(booking)}
+     <button type="button" onClick={()=>onEdit(booking)} disabled={recording} title={recording?"Turn off Recording mode to edit":undefined}
        className="flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-[#d6b779]/35 bg-[#d6b779]/10 px-2 py-2 text-[11px] font-semibold text-[#e9ce99]">
        <OwnerAppIcon name="receipt" className="h-3.5 w-3.5"/> Edit
      </button>
@@ -109,6 +117,16 @@ function MobileStop({
 export default function MobileOwnerDashboard({
   bookings,activity,unread,today,loaded,error,onRefresh,onEdit,
 }:MobileProps){
+ const {recording,aliases}=useOwnerScreenPrivacy();
+ const displayAliases=useMemo(()=>{
+   const known:ContactAliases={};
+   for(const b of bookings){
+     const normalized=normalizeContactPhone(b.customerPhone||"");
+     const customer=b.customerName?.trim();
+     if(normalized&&customer&&!/[+()]/.test(customer)&&!/^\d+$/.test(customer))known[normalized]=customer;
+   }
+   return {...known,...aliases};
+ },[bookings,aliases]);
  const todaysJobs=useMemo(()=>bookings.filter(b=>b.preferredDate===today&&active(b))
   .sort((a,b)=>(a.preferredTime||"99:99").localeCompare(b.preferredTime||"99:99")),[bookings,today]);
  const upcoming=useMemo(()=>bookings.filter(b=>b.preferredDate && b.preferredDate>=today && active(b)&&!finished(b))
@@ -148,6 +166,8 @@ export default function MobileOwnerDashboard({
        {error} <button type="button" onClick={onRefresh} className="font-bold underline">Retry</button>
      </div>}
 
+     <OwnerPrivacyControls bookings={bookings} activity={activity}/>
+
      <section aria-label="Today at a glance" className="grid grid-cols-2 gap-3">
        {statItems.map(item=><a key={item.title} href={item.href}
          className="min-h-[135px] rounded-[20px] border border-white/[.095] bg-[#1d1d1c] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.03)]">
@@ -173,7 +193,7 @@ export default function MobileOwnerDashboard({
        </div>
        <div className="mt-4 space-y-3">
          {!loaded?<div className="rounded-xl border border-white/10 bg-[#232221] p-6 text-center text-xs text-[#aaa092]">Loading appointments…</div>
-         :todaysJobs.length?todaysJobs.map((booking,i)=><MobileStop key={booking.id} booking={booking} index={i} onEdit={onEdit}/>)
+         :todaysJobs.length?todaysJobs.map((booking,i)=><MobileStop key={booking.id} booking={booking} index={i} onEdit={onEdit} recording={recording} aliases={displayAliases}/>)
          :<div className="rounded-xl border border-white/10 bg-[#232221] px-5 py-8 text-center">
            <OwnerAppIcon name="calendar" className="mx-auto h-8 w-8 text-[#d6b779]"/>
            <p className="mt-3 text-sm font-semibold">No appointments scheduled today</p>
@@ -181,7 +201,7 @@ export default function MobileOwnerDashboard({
            <a href="/owner/bookings?create=1" className="mt-4 inline-flex rounded-lg border border-[#d6b779]/40 px-4 py-2.5 text-xs font-semibold text-[#e7d0a2]">Create booking</a>
          </div>}
        </div>
-       {directions&&<div className="mt-3">
+       {!recording&&directions&&<div className="mt-3">
          <a href={directions} target="_blank" rel="noopener noreferrer"
            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#d6b779]/40 bg-[#2a261f] text-xs font-bold text-[#e7ce9f]">
            <OwnerAppIcon name="map-pin" className="h-4 w-4"/> Open {todayAddresses.length>4?"first four stops":"today’s stops"} in Maps
@@ -199,7 +219,7 @@ export default function MobileOwnerDashboard({
        {!loaded?<p className="mt-4 text-xs text-[#aaa092]">Checking upcoming jobs…</p>
        :nextJob?<div className="mt-4">
          <p className="mb-2 text-[11px] font-semibold text-[#d6b779]">{nextJob.preferredDate===today?"Today":nextJob.preferredDate?timestamp(nextJob.preferredDate+"T12:00:00"):"Unscheduled"}</p>
-         <MobileStop booking={nextJob} index={0} onEdit={onEdit}/>
+         <MobileStop booking={nextJob} index={upcoming.indexOf(nextJob)} onEdit={onEdit} recording={recording} aliases={displayAliases}/>
        </div>:<p className="mt-4 rounded-xl border border-white/10 bg-[#232221] p-5 text-xs text-[#aaa092]">No upcoming appointment yet.</p>}
      </section>
 
@@ -208,9 +228,12 @@ export default function MobileOwnerDashboard({
          <a href="/owner/messages" className="text-xs font-semibold text-[#d8c393]">Messages</a>
        </div>
        <div className="mt-3 divide-y divide-white/10">
-         {activity.slice(0,3).map(item=><a key={item.id} href={item.href} className="block py-3">
-           <p className="line-clamp-1 text-xs font-semibold text-[#ede4d8]">{item.title}</p>
-           <p className="mt-1 line-clamp-2 text-[11px] leading-5 text-[#b5a99b]">{item.detail}</p>
+         {activity.slice(0,3).map(item=>recording?<div key={item.id} className="py-3">
+           <p className="text-xs font-semibold text-[#ede4d8]">New Car Dash activity</p>
+           <p className="mt-1 text-[11px] text-[#b5a99b]">Customer details hidden during recording.</p>
+         </div>:<a key={item.id} href={item.href} className="block py-3">
+           <p className="line-clamp-1 text-xs font-semibold text-[#ede4d8]">{safeCustomerText(item.title,displayAliases)}</p>
+           <p className="mt-1 line-clamp-2 text-[11px] leading-5 text-[#b5a99b]">{safeCustomerText(item.detail,displayAliases)}</p>
          </a>)}
        </div>
      </section>}
