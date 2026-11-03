@@ -14,6 +14,15 @@ const links = [
     ),
   },
   {
+    name: "TikTok",
+    href: "https://www.tiktok.com/@cardashdetailing",
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+        <path d="M16.7 2c.3 2.45 1.77 3.93 4.3 4.1v3.5a9.02 9.02 0 0 1-4.3-1.16v6.05a7.05 7.05 0 1 1-7.04-7.03c.43 0 .86.04 1.26.12v3.6a3.53 3.53 0 1 0 2.24 3.31V2h3.54Z"/>
+      </svg>
+    ),
+  },
+  {
     name: "Google",
     href: "https://share.google/WlNx2ffVbM4Pl5WUv",
     icon: (
