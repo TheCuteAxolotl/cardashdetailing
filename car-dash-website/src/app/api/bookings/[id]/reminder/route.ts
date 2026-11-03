@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { BOOKING_AVAILABILITY_KEY, isStartInPast, normalizeBookingTime, parseBookingAvailabilityConfig } from "@/lib/booking-availability";
 import { bookingHasSmsConsent, ensureBookingConversation } from "@/lib/booking-chat";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
+import { bookingPhoneWasReleased } from "@/lib/phone-release";
 import { appointmentReminderBody, appointmentReminderKey, DEFAULT_REMINDER_TIMEZONE } from "@/lib/detail-appointment-reminders";
 import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
@@ -28,6 +29,8 @@ async function getReminderDetails(id: string) {
   if (!normalizePhoneNumber(booking.customerPhone)) {
     return { error: "Add a valid customer mobile number before sending.", status: 400 } as const;
   }
+
+  if(await bookingPhoneWasReleased(booking.customerPhone,booking.createdAt))return {error:"This number was disconnected from the customer account. Update the booking phone before texting.",status:409} as const;
 
   const config = await prisma.siteContent.findUnique({
     where: { key: BOOKING_AVAILABILITY_KEY },
