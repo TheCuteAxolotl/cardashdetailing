@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import OwnerAppIcon from "@/components/OwnerAppIcon";
 import type { EditableBooking } from "@/components/BookingDetailsEditor";
+import { bookingServiceAddress } from "@/lib/booking-owner-details";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 
-export type ScheduleView = "month" | "week" | "day" | "agenda";
+export type ScheduleView = "month" | "week" | "day" | "agenda" | "locations";
 type StatusFilter = "all" | "pending" | "confirmed" | "completed";
 type Event = { id: string; date: string; time: string; title: string; detail: string; booking?: EditableBooking; task?: OwnerScheduleTask; tone: string };
 const C = {
@@ -100,7 +101,7 @@ export default function OwnerScheduleOverview({
  const open = (event:Event)=>{ if(event.booking)onEditBooking(event.booking); else if(event.task)window.location.assign("/owner/schedule"); };
  const title = view==="month"?monthTitle(anchor):view==="week"
   ? dayName(weekDays[0])+" – "+dayName(weekDays[6]):dayName(anchor);
- const views:ScheduleView[]=["month","week","day","agenda"];
+ const views:ScheduleView[]=["month","week","day","agenda","locations"];
 
  const eventBadge=(event:Event,compact:boolean)=>(
   <button type="button" key={event.id} onClick={(e)=>{e.stopPropagation();open(event);}}
@@ -183,6 +184,30 @@ export default function OwnerScheduleOverview({
            <span className={"h-3 w-3 shrink-0 rounded-full border "+e.tone}/>
          </button>)
      }
+   </div>}
+
+   {view==="locations"&&<div className="min-h-[230px] divide-y divide-white/10">
+     <div className="border-b border-white/10 bg-[#25231f] px-5 py-4">
+       <p className="text-xs font-semibold text-[#f0e2cd]">Mobile service locations</p>
+       <p className="mt-1 text-[11px] text-[#ada397]">Open a saved address in Maps or edit the booking to add one. Customer addresses are only shown inside the signed-in owner workspace.</p>
+     </div>
+     {activeBookings.filter(b=>b.preferredDate && b.preferredDate>=today).slice(0,50).length
+       ? activeBookings.filter(b=>b.preferredDate&&b.preferredDate>=today).slice(0,50).map(b=>{
+         const address=bookingServiceAddress(b.notes);
+         return <div key={b.id} className="flex flex-wrap items-center gap-3 px-5 py-4">
+           <div className="min-w-[150px] flex-1">
+             <p className="text-sm font-semibold text-[#eee5d8]">{b.customerName}</p>
+             <p className="mt-1 text-[11px] text-[#aaa195]">{b.preferredDate} · {timeText(b.preferredTime)} · {b.serviceName}</p>
+             <p className={"mt-2 text-xs "+(address?"text-[#d7cbb9]":"text-[#efc08d]")}>{address||"Service address missing"}</p>
+           </div>
+           <div className="flex items-center gap-2">
+             <button type="button" onClick={()=>onEditBooking(b)} className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold text-[#eee3d2]">Edit</button>
+             {address&&<a href={"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(address)}
+               target="_blank" rel="noopener noreferrer"
+               className="rounded-lg border border-[#d6b779]/40 bg-[#d6b779]/10 px-3 py-2 text-xs font-semibold text-[#eed3a2]">Open Maps</a>}
+           </div>
+         </div>;
+       }):<p className="px-5 py-10 text-center text-sm text-[#aaa195]">No upcoming service locations.</p>}
    </div>}
 
    {(view==="month"||view==="week")&&<div className="border-t border-white/10 bg-[#211f1d] px-4 py-4 sm:px-6">
