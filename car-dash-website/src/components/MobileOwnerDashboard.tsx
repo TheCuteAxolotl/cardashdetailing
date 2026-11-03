@@ -18,14 +18,6 @@ type MobileProps = {
   onRefresh: () => void;
   onEdit: (booking: EditableBooking) => void;
 };
-type Tab = { label:string; href:string; icon:OwnerIconName };
-const TABS:Tab[] = [
-  { label:"Today", href:"/owner/dashboard", icon:"activity" },
-  { label:"Calendar", href:"/owner/schedule", icon:"calendar" },
-  { label:"Routes", href:"#today-route", icon:"map-pin" },
-  { label:"SMS", href:"/owner/messages", icon:"message" },
-  { label:"Customers", href:"/owner/crm", icon:"users" },
-];
 const money=(value:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(value);
 const timestamp=(value:string)=>new Date(value).toLocaleDateString("en-US",{month:"short",day:"numeric"});
 const time=(value?:string|null)=>{
@@ -145,8 +137,7 @@ export default function MobileOwnerDashboard({
    {title:"Unread messages",value:String(unread),subtitle:"Saved customer conversations",icon:"message",href:"/owner/messages"},
    {title:"Pending bookings",value:String(pending),subtitle:"Review and confirm",icon:"quote",href:"/owner/bookings"},
  ];
- return <div className="owner-mobile-home min-h-screen bg-[#121211] px-4 pb-24 pt-5 text-[#f2ece2] md:hidden"
-   style={{paddingBottom:"calc(104px + env(safe-area-inset-bottom))"}}>
+ return <div className="owner-mobile-home min-h-screen bg-[#121211] px-4 pb-6 pt-5 text-[#f2ece2] md:hidden">
    <div className="mx-auto max-w-lg space-y-5">
      <section>
        <p className="text-xs font-medium tracking-[.035em] text-[#b9afa2]">{when(today)}</p>
@@ -240,19 +231,5 @@ export default function MobileOwnerDashboard({
      <p className="px-1 text-center text-[10px] leading-5 text-[#8f8577]">Booked totals are estimates, not payments collected.</p>
    </div>
 
-   <nav aria-label="Mobile owner navigation"
-     className="fixed inset-x-0 bottom-0 z-[55] border-t border-[#d6b779]/20 bg-[#181817]/95 px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,.45)] backdrop-blur-2xl"
-     style={{paddingBottom:"max(10px, env(safe-area-inset-bottom))"}}>
-     <div className="mx-auto grid max-w-lg grid-cols-5 gap-0.5">
-       {TABS.map((tab,i)=><a key={tab.label} href={recording&&i!==0&&tab.label!=="Routes"?"#":tab.href}
-         onClick={event=>{if(recording&&i!==0&&tab.label!=="Routes")event.preventDefault();}}
-         aria-disabled={recording&&i!==0&&tab.label!=="Routes"} aria-current={i===0?"page":undefined}
-         className={"flex min-h-[53px] flex-col items-center justify-center gap-1 rounded-xl px-1 text-center transition "+
-           (i===0?"text-[#e6c98f]":"text-[#ada293] hover:bg-white/5 hover:text-[#e7d6b6]")}>
-         <OwnerAppIcon name={tab.icon} className="h-5 w-5"/>
-         <span className="text-[10px] font-semibold">{tab.label}</span>
-       </a>)}
-     </div>
-   </nav>
  </div>;
 }
