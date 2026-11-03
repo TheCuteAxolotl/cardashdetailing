@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export type OwnerIconName =
   | "calendar" | "users" | "message" | "quote" | "receipt" | "calculator"
   | "book" | "chart" | "gift" | "globe" | "bell" | "phone" | "support"
-  | "arrow-up-right" | "chevron-right" | "chevron-left" | "check" | "activity";
+  | "arrow-up-right" | "chevron-right" | "chevron-left" | "check" | "activity" | "map-pin" | "plus" | "search" | "menu";
 
 const drawings: Record<OwnerIconName, ReactNode> = {
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 10h18" /></>,
@@ -24,6 +24,10 @@ const drawings: Record<OwnerIconName, ReactNode> = {
   "chevron-left": <path d="m15 5-7 7 7 7"/>,
   check: <path d="m4 12 5 5L20 6"/>,
   activity: <><path d="M3 12h4l3-7 4 14 3-7h4"/></>,
+  "map-pin": <><path d="M20 10c0 5.2-8 12-8 12S4 15.2 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></>,
+  plus: <path d="M12 5v14M5 12h14"/>,
+  search: <><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></>,
+  menu: <path d="M4 7h16M4 12h16M4 17h16"/>,
 };
 
 export default function OwnerAppIcon({name, className = "h-5 w-5"}: {name: OwnerIconName; className?: string}) {
