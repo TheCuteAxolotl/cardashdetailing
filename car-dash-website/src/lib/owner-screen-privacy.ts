@@ -28,10 +28,10 @@ export function safeCustomerText(text:string,aliases:ContactAliases):string {
     return normalized?(aliases[normalized]||"Unknown customer"):match;
   });
 }
-function readAliases():ContactAliases {
+function readAliases(key=ALIAS_KEY):ContactAliases {
   if(typeof window==="undefined")return {};
   try{
-    const raw=JSON.parse(window.localStorage.getItem(ALIAS_KEY)||"{}");
+    const raw=JSON.parse(window.localStorage.getItem(key)||"{}");
     if(!raw||typeof raw!=="object"||Array.isArray(raw))return {};
     const clean:ContactAliases={};
     for(const [key,value] of Object.entries(raw)){
@@ -43,13 +43,15 @@ function readAliases():ContactAliases {
     return clean;
   }catch{return {};}
 }
-export function useOwnerScreenPrivacy(){
+export function useOwnerScreenPrivacy(scope:"owner"|"staff"="owner"){
+  const modeKey=scope==="staff"?"cardash_staff_recording_mode_v1":MODE_KEY;
+  const aliasKey=scope==="staff"?"cardash_staff_display_names_v1":ALIAS_KEY;
   const [recording,setRecording]=useState(true);
   const [aliases,setAliases]=useState<ContactAliases>({});
   useEffect(()=>{
     const load=()=>{
-      setRecording(window.localStorage.getItem(MODE_KEY)==="yes");
-      setAliases(readAliases());
+      setRecording(window.localStorage.getItem(modeKey)==="yes");
+      setAliases(readAliases(aliasKey));
     };
     load();
     window.addEventListener("storage",load);
@@ -58,9 +60,9 @@ export function useOwnerScreenPrivacy(){
       window.removeEventListener("storage",load);
       window.removeEventListener(OWNER_PRIVACY_EVENT,load);
     };
-  },[]);
+  },[modeKey,aliasKey]);
   const changeRecording=(value:boolean)=>{
-    try{window.localStorage.setItem(MODE_KEY,value?"yes":"no");}catch{}
+    try{window.localStorage.setItem(modeKey,value?"yes":"no");}catch{}
     setRecording(value);
     window.dispatchEvent(new Event(OWNER_PRIVACY_EVENT));
   };
@@ -69,9 +71,9 @@ export function useOwnerScreenPrivacy(){
     const name=nameInput.replace(/[\r\n\t]+/g," ").trim().slice(0,64);
     if(!phone)return "Enter a valid 10-digit US phone number.";
     if(name&&phoneMatches(name).length)return "Display names cannot contain phone numbers.";
-    const next={...readAliases()};
+    const next={...readAliases(aliasKey)};
     if(name)next[phone]=name;else delete next[phone];
-    try{window.localStorage.setItem(ALIAS_KEY,JSON.stringify(next));}catch{return "Could not save the label on this device.";}
+    try{window.localStorage.setItem(aliasKey,JSON.stringify(next));}catch{return "Could not save the label on this device.";}
     setAliases(next);
     window.dispatchEvent(new Event(OWNER_PRIVACY_EVENT));
     return "";
