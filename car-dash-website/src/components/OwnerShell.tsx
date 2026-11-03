@@ -341,7 +341,6 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
 
       <div className="xl:pl-[248px]">
         <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + " owner-mobile-dashboard-topbar"}>
-          {
             <div className="flex min-h-[66px] items-center justify-between gap-2 md:hidden">
               <div className="flex min-w-0 items-center gap-2">
                 <button type="button" onClick={() => setMobileOpen(true)}
@@ -367,7 +366,6 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 {phoneViewport && <OwnerActivityBell privacyScope={owner?"owner":"staff"} />}
               </div>
             </div>
-          )}
           <div className="hidden min-h-[68px] items-center justify-between gap-3 md:flex">
             <div className="flex min-w-0 items-center gap-3">
               <button onClick={() => setMobileOpen(true)}
