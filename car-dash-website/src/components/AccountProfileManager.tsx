@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { EMPTY_ACCOUNT_PROFILE,formatSavedAddress,type AccountProfile,type SavedAddress } from "@/lib/account-profile";
 
 type CurrentUser={id:string;name:string;email:string;role:string};
@@ -20,7 +21,6 @@ function vehicleToForm(value:SavedVehicle):VehicleForm{
  return {nickname:value.nickname||"",year:value.year,make:value.make,model:value.model,
  trim:value.trim||"",vehicleType:value.vehicleType,color:value.color||""};
 }
-function ownerLink(role:string){return role==="owner"?"/owner/dashboard":role==="admin"?"/admin/dashboard":"/dashboard";}
 async function compressAvatar(file:File):Promise<string>{
  if(file.size>8*1024*1024)throw new Error("Choose an image under 8 MB.");
  if(!["image/jpeg","image/png","image/webp","image/heic","image/heif"].includes(file.type))
@@ -48,6 +48,8 @@ async function compressAvatar(file:File):Promise<string>{
  }finally{URL.revokeObjectURL(src);}
 }
 export default function AccountProfileManager(){
+ const pathname=usePathname();
+ const backHref=pathname.startsWith("/owner/")?"/owner/dashboard":pathname.startsWith("/admin/")?"/admin/dashboard":"/dashboard";
  const [user,setUser]=useState<CurrentUser|null>(null);
  const [name,setName]=useState("");
  const [profile,setProfile]=useState<AccountProfile>({...EMPTY_ACCOUNT_PROFILE});
@@ -156,7 +158,7 @@ export default function AccountProfileManager(){
          <h1 className="mt-2 text-3xl font-semibold tracking-tight">My profile</h1>
          <p className="mt-2 text-sm text-[#b1a89c]">Save your information once for your account. Only you can edit your personal profile and garage.</p>
        </div>
-       <Link href={ownerLink(user.role)} className={BUTTON}>Back to dashboard</Link>
+       <Link href={backHref} className={BUTTON}>Back to dashboard</Link>
      </header>
      {error&&<p role="alert" className="rounded-xl border border-red-400/30 bg-red-900/20 p-4 text-sm text-red-100">{error}</p>}
      {notice&&<p role="status" className="rounded-xl border border-[#d6b779]/25 bg-[#30291e] p-4 text-sm text-[#ead4a9]">{notice}</p>}
