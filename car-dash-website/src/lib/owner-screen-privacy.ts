@@ -44,7 +44,7 @@ function readAliases():ContactAliases {
   }catch{return {};}
 }
 export function useOwnerScreenPrivacy(){
-  const [recording,setRecording]=useState(false);
+  const [recording,setRecording]=useState(true);
   const [aliases,setAliases]=useState<ContactAliases>({});
   useEffect(()=>{
     const load=()=>{
