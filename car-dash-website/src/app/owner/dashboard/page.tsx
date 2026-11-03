@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
 import OwnerScheduleOverview from "@/components/OwnerScheduleOverview";
+import MobileOwnerDashboard from "@/components/MobileOwnerDashboard";
 import BookingDetailsEditor, { type EditableBooking } from "@/components/BookingDetailsEditor";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 
@@ -96,6 +97,18 @@ export default function OwnerDashboard(){
    {label:"Unread texts",value:data.unread,meta:"Customer conversations",icon:"message" as OwnerIconName},
    {label:"Upcoming booked value",value:cash(scheduledValue),meta:"Estimated, not collected",icon:"chart" as OwnerIconName},
  ];
+ return <>
+   <MobileOwnerDashboard
+     bookings={data.bookings}
+     activity={activity}
+     unread={data.unread}
+     today={today}
+     loaded={loaded}
+     error={error}
+     onRefresh={() => { void load(); }}
+     onEdit={setEditor}
+   />
+   <div className="hidden md:block">
  return <div className="owner-calendar-home min-h-screen bg-[#141413] px-3 pb-14 pt-5 text-[#f3ece1] sm:px-6 sm:pt-7 2xl:px-8">
    <div className="mx-auto max-w-[1720px] space-y-5">
      <header className="flex flex-wrap items-end justify-between gap-4">
@@ -194,6 +207,7 @@ export default function OwnerDashboard(){
      </section>
      <p className="pb-4 text-[10px] text-[#8f877c]">Scheduled values are estimates from booking records, not verified payments. Manage invoices and actual collection in Payments.</p>
    </div>
+ </div>
    {editor&&<BookingDetailsEditor key={editor.id} booking={editor} onClose={()=>setEditor(null)} onSaved={load}/>}
- </div>;
+ </>;
 }
