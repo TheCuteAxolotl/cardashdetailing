@@ -267,6 +267,7 @@ export default function AccountPage() {
                   {staffAccess ? "Staff Dashboard" : "Dashboard"}
                 </a>
               )}
+              <a href={staffAccess ? "/admin/profile" : "/profile"} className="rounded-full border border-[#d6b779]/40 bg-[#d6b779]/10 px-5 py-3 text-sm font-semibold text-[#e8d0a0]">Photo, addresses & cars</a>
               <a href="/#book" className="rounded-full bg-[#6EAEC6] px-5 py-3 text-sm font-semibold text-[#0B1822] transition hover:bg-[#6EAEC6]">
                 Request a Detail
               </a>
