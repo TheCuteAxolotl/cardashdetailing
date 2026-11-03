@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import OwnerActivityBell from "@/components/OwnerActivityBell";
+import OwnerMobileBottomNav from "@/components/OwnerMobileBottomNav";
+import { useOwnerScreenPrivacy } from "@/lib/owner-screen-privacy";
 
 type OwnerUser = { name?: string | null; email?: string | null; role?: string | null };
 
@@ -151,6 +153,9 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const owner = user.role === "owner";
+  const isOwnerHome = owner && pathname === "/owner/dashboard";
+  const privateOwnerPage = owner && pathname.startsWith("/owner/") && !isOwnerHome;
+  const {recording, changeRecording}=useOwnerScreenPrivacy();
   const [notificationCounts,setNotificationCounts]=useState<Record<string,number>>({});
   useEffect(()=>{
     let disposed=false;
@@ -319,8 +324,8 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       )}
 
       <div className="xl:pl-[248px]">
-        <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + (owner && pathname === "/owner/dashboard" ? " owner-mobile-dashboard-topbar" : "")}>
-          {owner && pathname === "/owner/dashboard" && (
+        <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + (owner ? " owner-mobile-dashboard-topbar" : "")}>
+          {owner && (
             <div className="flex min-h-[66px] items-center justify-between gap-2 md:hidden">
               <div className="flex min-w-0 items-center gap-2">
                 <button type="button" onClick={() => setMobileOpen(true)}
@@ -347,7 +352,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               </div>
             </div>
           )}
-          <div className={"min-h-[68px] items-center justify-between gap-3" + (owner && pathname === "/owner/dashboard" ? " hidden md:flex" : " flex")}>
+          <div className={"min-h-[68px] items-center justify-between gap-3" + (owner ? " hidden md:flex" : " flex")}>
             <div className="flex min-w-0 items-center gap-3">
               <button onClick={() => setMobileOpen(true)}
                 className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#292826] text-[#f4eee5] xl:hidden" aria-label="Open navigation">
@@ -361,11 +366,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
                 className="hidden items-center gap-2 rounded-xl border border-white/15 bg-[#282724] px-3.5 py-2.5 text-xs font-semibold text-[#d7ccc0] hover:border-[#d6b779]/60 sm:inline-flex">
                 <Icon name="search" className="h-4 w-4"/> Search
               </button>
-              {owner && pathname === "/owner/dashboard" ? <div className="hidden md:block"><OwnerActivityBell /></div> : <OwnerActivityBell />}
+              {owner ? <div className="hidden md:block"><OwnerActivityBell /></div> : <OwnerActivityBell />}
               <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 bg-[#272622] px-3.5 py-2.5 text-xs font-semibold text-[#ebe0ce] hover:border-[#d6b779]/60">View site</a>
             </div>
           </div>
-          <nav aria-label="Business workspace tabs" className={"owner-topnav max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none]" + (owner && pathname === "/owner/dashboard" ? " hidden md:flex" : " flex")}>
+          <nav aria-label="Business workspace tabs" className={"owner-topnav max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none]" + (owner ? " hidden md:flex" : " flex")}>
             {(owner ? [
               {label:"Calendar",href:"/owner/dashboard"},
               {label:"Jobs",href:"/owner/jobs"},
@@ -386,7 +391,32 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             })}
           </nav>
         </header>
-        <main className="owner-shell-content min-h-[calc(100vh-112px)]">{children}</main>
+        {privateOwnerPage && <div className="owner-mobile-context-bar sticky top-[66px] z-30 flex items-center justify-between gap-3 border-b border-white/10 bg-[#1b1b1a]/95 px-4 py-3 text-[#f4eee5] backdrop-blur-lg md:hidden">
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Car Dash / Owner</p>
+            <p className="mt-1 truncate text-sm font-semibold">{pageTitle(pathname,owner)}</p>
+          </div>
+          <button type="button" role="switch" aria-checked={recording} aria-label="Recording privacy mode"
+            onClick={()=>changeRecording(!recording)}
+            className={"shrink-0 rounded-full border px-3 py-2 text-[11px] font-semibold "+(recording?"border-[#d6b779]/50 bg-[#d6b779]/15 text-[#f0d6a5]":"border-white/20 bg-[#282723] text-[#ccc1b2]")}>
+            {recording?"Recording on":"Recording off"}
+          </button>
+        </div>}
+        <main className="owner-shell-content owner-mobile-section-layout min-h-[calc(100vh-112px)]">
+          {privateOwnerPage && recording ? <>
+            <div className="owner-mobile-privacy-gate px-4 py-8 md:hidden">
+              <div className="mx-auto max-w-lg rounded-2xl border border-[#d6b779]/25 bg-[#211f1b] p-6 text-center">
+                <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-[#d6b779]/30 bg-[#d6b779]/10 text-xl text-[#d6b779]" aria-hidden="true">•••</div>
+                <h2 className="mt-4 text-lg font-semibold text-[#f4ece1]">Customer details are hidden</h2>
+                <p className="mt-3 text-sm leading-6 text-[#b9afa2]">Recording mode keeps this section out of your screen recording. You can still use the navigation below.</p>
+                <button type="button" onClick={()=>changeRecording(false)}
+                  className="mt-5 w-full rounded-xl bg-[#d6b779] px-4 py-3 text-sm font-bold text-[#171613]">Turn off Recording mode to view</button>
+              </div>
+            </div>
+            <div className="hidden md:block">{children}</div>
+          </> : children}
+        </main>
+        {owner && <OwnerMobileBottomNav />}
       </div>
     </div>
   );
