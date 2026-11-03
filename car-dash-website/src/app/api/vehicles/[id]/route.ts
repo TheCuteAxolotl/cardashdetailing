@@ -24,7 +24,7 @@ export async function PUT(request:NextRequest,context:{params:Promise<{id:string
  const year=string(body.year,4),make=string(body.make,70),model=string(body.model,70);
  const allowed=["Sedan","Coupe","SUV","Truck","Van","Marine"];
  const vehicleType=string(body.vehicleType,20);
- if(!/^\\d{4}$/.test(year)||Number(year)<1885||Number(year)>2100||!make||!model||!allowed.includes(vehicleType)){
+ if(!/^\d{4}$/.test(year)||Number(year)<1885||Number(year)>2100||!make||!model||!allowed.includes(vehicleType)){
    return NextResponse.json({error:"Enter a valid year, make, model, and vehicle category."},{status:400});
  }
  const result=await prisma.vehicle.updateMany({
