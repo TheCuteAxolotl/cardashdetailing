@@ -1,4 +1,5 @@
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
+import { bookingPhoneWasReleased } from "@/lib/phone-release";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -119,7 +120,7 @@ export async function PUT(
         } catch (error) {
           console.error("Booking chat schedule update failed:", error);
         }
-        if (bookingHasSmsConsent(existing.notes) && customerPhone) {
+        if (bookingHasSmsConsent(existing.notes) && customerPhone && !(await bookingPhoneWasReleased(customerPhone,booking.createdAt))) {
           const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
           try {
             await sendCustomerSmsWithHistory({
@@ -174,7 +175,7 @@ export async function PUT(
         console.error("Booking schedule chat message failed:", error);
       }
 
-      if (bookingHasSmsConsent(booking.notes)) {
+      if (bookingHasSmsConsent(booking.notes) && !(await bookingPhoneWasReleased(booking.customerPhone,booking.createdAt))) {
         const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
         await sendCustomerSmsWithHistory({
           to: booking.customerPhone,
@@ -208,7 +209,7 @@ export async function PUT(
         console.error("Booking chat status message failed:", error);
       }
 
-      if (bookingHasSmsConsent(booking.notes)) {
+      if (bookingHasSmsConsent(booking.notes) && !(await bookingPhoneWasReleased(booking.customerPhone,booking.createdAt))) {
         const chatUrl = getBookingChatUrl(booking.id, booking.customerEmail, Boolean(booking.userId));
         const smsBody = statusSms(booking, chatUrl);
         if (smsBody) {
