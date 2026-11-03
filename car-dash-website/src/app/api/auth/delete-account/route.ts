@@ -80,8 +80,9 @@ export async function DELETE(request: NextRequest) {
 
     // Relations in the Prisma schema use cascading deletes for customer-owned
     // data such as vehicles, quote threads, warranties, and account bookings.
-    await prisma.user.delete({
-      where: { id: user.id },
+    await prisma.$transaction(async tx => {
+      await tx.siteContent.deleteMany({where:{key:"private_account_profile_v1:"+user.id}});
+      await tx.user.delete({where:{id:user.id}});
     });
 
     const response = NextResponse.json(
