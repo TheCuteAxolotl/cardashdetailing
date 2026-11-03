@@ -13,6 +13,7 @@ const ADMIN_ROUTE_PERMISSIONS: Array<{ prefix: string; permission: string }> = [
   { prefix: "/admin/messages", permission: "smsInbox" },
   { prefix: "/admin/quotes", permission: "quoteChats" },
   { prefix: "/admin/support", permission: "support" },
+  { prefix: "/admin/staff-guide", permission: "staffGuide" },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
