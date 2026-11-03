@@ -21,6 +21,7 @@ import type { SiteContent } from "@/lib/site-defaults";
 import BookingDatePicker from "@/components/BookingDatePicker";
 import BookingServiceCatalog from "@/components/BookingServiceCatalog";
 import { recommendedServiceMinutes, totalBookingMinutes } from "@/lib/booking-duration";
+import { formatSavedAddress, type SavedAddress } from "@/lib/account-profile";
 
 
  type PricingKind = "packages" | "exterior" | "interior";
@@ -168,6 +169,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
   const [slots, setSlots] = useState<string[]>([]);
   const [pastSlots, setPastSlots] = useState<string[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [savedAddresses,setSavedAddresses]=useState<SavedAddress[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [packageSelection, setPackageSelection] = useState<PackageSelection | null>(null);
@@ -356,6 +358,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           if(profileResponse.ok && !cancelled){
             const data=await profileResponse.json();
             const pref=data.profile;
+            if(Array.isArray(pref?.addresses))setSavedAddresses(pref.addresses);
             const defaultAddress=pref?.addresses?.find((item:{id:string})=>item.id===pref.defaultAddressId);
             if(pref)setForm(current=>({
               ...current,
@@ -753,6 +756,14 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           <label className="text-sm text-white/55 sm:col-span-2">Email<input type="email" className={input} value={form.email} onChange={(event) => set("email", event.target.value)} required /></label>
         </div>
 
+        {savedAddresses.length>0&&<label className="mt-4 block text-sm text-[#dbc79f]">
+          Choose a saved address
+          <select className={input} value={savedAddresses.some(a=>formatSavedAddress(a)===form.serviceAddress)?form.serviceAddress:""}
+            onChange={event=>set("serviceAddress",event.target.value)}>
+            <option value="">Enter a different address</option>
+            {savedAddresses.map(a=><option key={a.id} value={formatSavedAddress(a)}>{a.label||"Saved address"} — {formatSavedAddress(a)}</option>)}
+          </select>
+        </label>}
         <label className="mt-4 block text-sm text-white/55">
           Service address (required)
           <input name="serviceAddress" autoComplete="street-address" className={input} value={form.serviceAddress} onChange={(event) => set("serviceAddress", event.target.value)} placeholder="Street address, unit, city, state, ZIP code" aria-describedby="service-address-help" required />
