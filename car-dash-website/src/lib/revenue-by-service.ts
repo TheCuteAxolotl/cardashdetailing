@@ -17,7 +17,13 @@ export function serviceCategory(text:string):string{
 function cents(value:number){return Math.round((Number.isFinite(value)?value:0)*100)/100;}
 function paymentMonth(value:string){
  const date=new Date(value);
- return Number.isFinite(date.getTime())?date.toISOString().slice(0,7):"";
+ if(!Number.isFinite(date.getTime()))return "";
+ const parts=new Intl.DateTimeFormat("en-US",{
+   timeZone:"America/Chicago",year:"numeric",month:"2-digit",
+ }).formatToParts(date);
+ const year=parts.find(x=>x.type==="year")?.value||"";
+ const month=parts.find(x=>x.type==="month")?.value||"";
+ return year+"-"+month;
 }
 /** Allocate actually recorded payments, not booking quotes.
  * Splits payments among an invoice's line items proportionally; discounts
@@ -45,7 +51,8 @@ export function revenueForMonth(invoices:InvoiceRecord[],month:string):RevenueMo
    // Preserve full payment total by allocating any cent-rounding remainder.
    let allocated=0;
    buckets.forEach((part,index)=>{
-     const value=index===buckets.length-1?cents(amount-allocated):cents(amount*part.share);
+     const remaining=Math.max(0,cents(amount-allocated));
+     const value=index===buckets.length-1?remaining:Math.min(remaining,cents(amount*part.share));
      allocated+=value;
      const row=map.get(part.service)||{received:0,ids:new Set<string>()};
      row.received=cents(row.received+value);
