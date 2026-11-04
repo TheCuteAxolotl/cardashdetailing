@@ -36,6 +36,8 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Customers",
     icon: "people",
     items: [
+      { href: "/owner/workspace", label: "CRM workspace", icon: "grid", ownerOnly: true },
+      { href: "/owner/leads", label: "New leads", icon: "quote", ownerOnly: true },
       { href: "/owner/crm", label: "Customers", icon: "people", ownerOnly: true },
       { href: "/owner/bookings", adminHref: "/admin/bookings", label: "Bookings", icon: "calendar", permissions: ["bookings"] },
       { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
@@ -64,6 +66,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     items: [
       { href: "/owner/schedule", label: "Schedule", icon: "calendar", ownerOnly: true },
       { href: "/owner/analytics", label: "Analytics", icon: "chart", permissions: ["analytics"] },
+      { href: "/owner/revenue", label: "Revenue by service", icon: "chart", ownerOnly: true },
     ],
   },
   {
@@ -83,6 +86,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     icon: "grid",
     items: [
       { href: "/owner/jobs", label: "Jobs & Quality", icon: "photo", permissions: ["assignedJobs"] },
+      { href: "/owner/inspection", label: "Final inspection", icon: "shield", permissions: ["assignedJobs"] },
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
       { href: "/owner/inventory", label: "Supply inventory", icon: "grid", ownerOnly: true },
       { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
@@ -95,6 +99,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     icon: "settings",
     items: [
       { href: "/owner/admins", label: "Employees & resources", icon: "people", ownerOnly: true },
+      { href: "/owner/pay-tracking", label: "Pay tracking", icon: "price", ownerOnly: true },
       { href: "/owner/settings", label: "Settings", icon: "settings", ownerOnly: true },
     ],
   },
