@@ -28,6 +28,7 @@ const QUIET_CUSTOMER_PREFIXES = [
   "/register",
   "/booking-chat",
   "/invoice",
+  "/service-lookup",
 ];
 
 export default function SiteChrome({ children, footerBlurb, initialSiteContent }: { children: ReactNode; footerBlurb: string; initialSiteContent: SiteContent }) {

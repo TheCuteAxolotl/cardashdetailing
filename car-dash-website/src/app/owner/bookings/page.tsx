@@ -4,6 +4,7 @@ import NumberInput from "@/components/NumberInput";
 
 import { useEffect, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
+import BookingCertificateButton from "@/components/BookingCertificateButton";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 import BookingDetailsEditor from "@/components/BookingDetailsEditor";
 import OwnerBookingModal from "@/components/OwnerBookingModal";
@@ -14,6 +15,7 @@ import { bookingServiceAddress } from "@/lib/booking-owner-details";
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#6EAEC6]/60";
 
 type Booking = {
+  bookingNumber?: string;
   id: string;
   serviceName: string;
   serviceMethod: string;
@@ -395,6 +397,7 @@ export default function OwnerBookings() {
                         {booking.customerPhone ? "Send Reminder Now · SMS" : "Add phone to send reminder"}
                       </button>
                     )}
+                  <BookingCertificateButton booking={booking} />
                     {["confirmed", "completed"].includes(booking.status) && (booking.customerPhone ? <button type="button" onClick={() => setReceiptBooking(booking)} className="rounded-lg border border-emerald-400/35 bg-emerald-400/12 px-4 py-3 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20">Create receipt · SMS</button> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add phone to send receipt</button>)}
 
                     {!canDelete && (
