@@ -72,7 +72,7 @@ export default function OwnerLeadsPage(){
  },[]);
  useEffect(()=>{void load();},[load]);
  const filtered=useMemo(()=>leads.filter(c=>leadStage(c)===tab&&
-   (c.profile.name||c.name+" "+c.profile.phone||c.phone+" "+c.profile.source||"").toLowerCase().includes(search.toLowerCase())),
+   [c.profile.name||c.name,c.profile.phone||c.phone,c.profile.email||c.email,c.profile.source||""].join(" ").toLowerCase().includes(search.trim().toLowerCase())),
    [leads,tab,search]);
  const counts=Object.fromEntries(tabNames.map(x=>[x,leads.filter(c=>leadStage(c)===x).length])) as Record<Stage,number>;
  async function move(c:Lead,next:"Contacted"|"Quoted"|"Inactive"){
