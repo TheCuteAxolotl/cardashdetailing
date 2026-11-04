@@ -26,11 +26,10 @@ function leadDate(c:Lead){
  if(Number.isNaN(at.getTime()))return "Added to Car Dash";
  return at.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"America/Chicago"});
 }
-function bookingPrefill(c:Lead){
- const recent=c.bookings[0];
- const quote=c.quotes[0];
- const fields=new URLSearchParams({create:"1",customerName:c.profile.name||c.name});
+function bookingDraft(c:Lead){
+ const recent=c.bookings[0],quote=c.quotes[0];
  const values:Record<string,string>={
+   customerName:c.profile.name||c.name,
    customerEmail:c.profile.email||c.email,
    customerPhone:c.profile.phone||c.phone,
    serviceName:recent?.serviceName||quote?.subject||"",
@@ -39,8 +38,7 @@ function bookingPrefill(c:Lead){
    vehicleModel:recent?.vehicleModel||"",
    serviceAddress:c.profile.address||c.address||"",
  };
- for(const [key,value]of Object.entries(values))if(value)fields.set(key,value.slice(0,240));
- return "/owner/bookings?"+fields;
+ return Object.fromEntries(Object.entries(values).map(([key,value])=>[key,value.slice(0,240)]));
 }
 function detail(c:Lead){
  const booking=c.bookings[0];
@@ -139,7 +137,8 @@ export default function OwnerLeadsPage(){
           <div className="mt-4 grid grid-cols-2 gap-2">
            {phone?<a href={"tel:"+phone.replace(/[^+\d]/g,"")} className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-[#2b2926] px-2 text-xs font-semibold text-[#f1e8db]"><OwnerAppIcon name="phone" className="h-4 w-4"/> Call</a>
             :<span className="grid min-h-11 place-items-center rounded-xl border border-white/10 px-2 text-xs text-[#9c9285]">Contact unavailable</span>}
-           <Link href={recording?"/owner/crm":bookingPrefill(c)}
+           <Link href={recording?"/owner/crm":"/owner/bookings?create=1&from=crm"}
+             onClick={()=>{if(!recording){try{window.sessionStorage.setItem("car-dash-crm-booking-draft",JSON.stringify(bookingDraft(c)));}catch{}}}}
              className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#d6b779] px-2 text-xs font-bold text-[#1a1713]">
              <OwnerAppIcon name="calendar" className="h-4 w-4"/>{recording?"View CRM":"Make it a job"}
            </Link>
