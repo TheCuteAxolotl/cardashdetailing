@@ -9,18 +9,20 @@ export default function StaffMobileBottomNav({
 }:{permissions:string[];onOpenMenu:()=>void}){
  const pathname=usePathname();
  const has=(value:string)=>permissions.includes(value);
- const jobsHref=has("assignedJobs")?"/owner/jobs":has("bookings")?"/admin/bookings":"/admin/dashboard";
- const chatHref=has("smsInbox")?"/admin/messages":has("quoteChats")?"/admin/quotes":has("support")?"/admin/support":"/admin/dashboard";
- const teamHref=has("staffGuide")?"/admin/staff-guide":"/admin/profile";
- const tabs:Tab[]=[
+ const jobsHref=has("assignedJobs")?"/owner/jobs":has("bookings")?"/admin/bookings":null;
+ const chatHref=has("smsInbox")?"/admin/messages":has("quoteChats")?"/admin/quotes":has("support")?"/admin/support":null;
+ const candidates:Tab[]=[
   {label:"Home",href:"/admin/dashboard",icon:"activity",match:["/admin/dashboard"]},
-  {label:has("assignedJobs")?"Jobs":has("bookings")?"Bookings":"Home",href:jobsHref,icon:"calendar",match:["/owner/jobs","/owner/inspection","/admin/bookings"]},
-  {label:has("staffGuide")?"Team":"Profile",href:teamHref,icon:"users",match:["/admin/staff-guide","/admin/profile"]},
-  {label:chatHref==="/admin/dashboard"?"Home":"Chat",href:chatHref,icon:"message",match:["/admin/messages","/admin/quotes","/admin/support"]},
+  ...(jobsHref?[{label:has("assignedJobs")?"Jobs":"Bookings",href:jobsHref,icon:"calendar" as OwnerIconName,match:["/owner/jobs","/owner/inspection","/admin/bookings"]}]:[]),
+  ...(has("staffGuide")?[{label:"Team",href:"/admin/staff-guide",icon:"users" as OwnerIconName,match:["/admin/staff-guide"]}]:[]),
+  ...(chatHref?[{label:"Chat",href:chatHref,icon:"message" as OwnerIconName,match:["/admin/messages","/admin/quotes","/admin/support"]}]:[]),
+  {label:"Profile",href:"/admin/profile",icon:"users",match:["/admin/profile"]},
+  {label:"Website",href:"/",icon:"globe",match:[]},
  ];
+ const tabs=candidates.filter((tab,index,all)=>all.findIndex(x=>x.href===tab.href)===index).slice(0,4);
  return <nav aria-label="Staff mobile navigation" className="owner-mobile-bottom-nav staff-mobile-bottom-nav fixed inset-x-0 bottom-0 z-[55] border-t border-[#d6b779]/20 bg-[#181817]/95 px-2 pt-2 shadow-[0_-12px_40px_rgba(0,0,0,.45)] backdrop-blur-2xl md:hidden"
    style={{paddingBottom:"max(10px,env(safe-area-inset-bottom))"}}>
-   <div className="mx-auto grid max-w-lg grid-cols-5 gap-0.5">
+   <div className="mx-auto grid max-w-lg gap-0.5" style={{gridTemplateColumns:"repeat("+ (tabs.length+1) +",minmax(0,1fr))"}}>
      {tabs.map((tab,index)=>{
        const active=tab.match.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"))
          ||(index===0&&pathname==="/admin/dashboard");
