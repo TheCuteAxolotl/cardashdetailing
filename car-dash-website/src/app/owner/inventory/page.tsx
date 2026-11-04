@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import OwnerAppIcon from "@/components/OwnerAppIcon";
-type Item={id:string;name:string;category:string;quantity:number;unit:string;reorderAt:number;unitCost:number;notes:string};
+type Item={id:string;name:string;category:string;quantity:number;unit:string;reorderAt:number;unitCost:number;notes:string;onOrder:number;eta:string};
 const CATEGORIES=["Chemicals","Equipment","Towels & pads","Consumables","Other"];
 const UNITS=["each","bottles","liters","gallons","packs","pads","towels","ounces"];
 const INPUT="mt-1.5 w-full rounded-xl border border-white/15 bg-[#282723] px-3.5 py-3 text-base text-[#f2ebdf] outline-none placeholder:text-[#948b7e] focus:border-[#d6b779]";
 const money=(n:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n);
 function fresh():Item{
  return {id:"item-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8),
- name:"",category:"Chemicals",quantity:0,unit:"bottles",reorderAt:1,unitCost:0,notes:""};
+ name:"",category:"Chemicals",quantity:0,unit:"bottles",reorderAt:1,unitCost:0,notes:"",onOrder:0,eta:""};
 }
 export default function OwnerInventory(){
  const [items,setItems]=useState<Item[]>([]);
@@ -36,6 +36,8 @@ export default function OwnerInventory(){
  }
  useEffect(()=>{void reload();},[]);
  const low=items.filter(x=>x.quantity<=x.reorderAt);
+ const onOrder=items.filter(x=>(x.onOrder||0)>0);
+ const inStock=items.filter(x=>x.quantity>x.reorderAt);
  const filtered=useMemo(()=>items.filter(x=>
   (category==="All"||x.category===category)&&
   (!lowOnly||x.quantity<=x.reorderAt)&&
@@ -46,7 +48,7 @@ export default function OwnerInventory(){
  const commitDraft=()=>{
   if(!draft)return;
   if(!draft.name.trim()){setError("Enter a supply name.");return;}
-  if([draft.quantity,draft.reorderAt,draft.unitCost].some(n=>!Number.isFinite(n)||n<0)){setError("Quantities and costs must be zero or greater.");return;}
+  if([draft.quantity,draft.reorderAt,draft.unitCost,draft.onOrder||0].some(n=>!Number.isFinite(n)||n<0)){setError("Quantities and costs must be zero or greater.");return;}
   setItems(current=>current.some(x=>x.id===draft.id)?current.map(x=>x.id===draft.id?{...draft,name:draft.name.trim()}:x):[...current,{...draft,name:draft.name.trim()}]);
   setDraft(null);setDirty(true);setError("");setMessage("Change staged. Save inventory to store it.");
  };
@@ -77,9 +79,9 @@ export default function OwnerInventory(){
    </header>
    <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
     {[
-      {label:"Supplies tracked",value:items.length},
-      {label:"Low / reorder",value:low.length},
-      {label:"Categories in use",value:new Set(items.map(x=>x.category)).size},
+      {label:"In stock",value:inStock.length},
+      {label:"Needs ordering",value:low.length},
+      {label:"On order",value:onOrder.length},
       {label:"Stock value estimate",value:money(stockValue)},
     ].map(x=><div key={x.label} className="rounded-2xl border border-white/10 bg-[#211f1e] p-4">
       <p className="text-xs text-[#aaa194]">{x.label}</p><p className="mt-2 text-2xl font-semibold tabular-nums text-[#f5ebd9]">{loading?"—":x.value}</p>
@@ -87,6 +89,18 @@ export default function OwnerInventory(){
    </section>
    {error&&<p role="alert" className="mt-5 rounded-xl border border-red-400/25 bg-red-900/20 p-4 text-sm text-red-100">{error}</p>}
    {message&&<p role="status" className="mt-5 rounded-xl border border-[#d6b779]/25 bg-[#2d271f] p-4 text-sm text-[#e7cfa2]">{message}</p>}
+   {onOrder.length>0&&<section className="mt-6 rounded-2xl border border-[#d6b779]/25 bg-[#25221c] p-4 sm:p-5">
+      <h2 className="text-base font-semibold">On order</h2>
+      <p className="mt-1 text-xs text-[#afa493]">Incoming supplies are recorded separately from stock already on hand.</p>
+      <div className="mt-3 divide-y divide-white/10">
+        {onOrder.map(x=><div key={x.id} className="flex items-center justify-between gap-3 py-3">
+          <div className="min-w-0"><p className="truncate text-xs font-semibold text-[#f0e4d4]">{x.name}</p>
+            <p className="mt-1 text-[11px] text-[#b7a98e]">{x.onOrder} {x.unit} ordered</p>
+          </div>
+          <span className="shrink-0 rounded-full border border-[#d6b779]/25 bg-[#3c3323] px-2.5 py-1 text-[11px] font-semibold text-[#e8d1a2]">{x.eta?"ETA "+x.eta:"ETA not set"}</span>
+        </div>)}
+      </div>
+    </section>}
    <section className="mt-6 rounded-2xl border border-white/10 bg-[#1f1e1d]">
     <div className="flex flex-wrap items-end gap-3 border-b border-white/10 p-4 sm:p-5">
       <label className="min-w-[180px] flex-1 text-xs font-semibold text-[#c6bbae]">Search stock
@@ -112,8 +126,9 @@ export default function OwnerInventory(){
         </div>
         <div className="min-w-[110px]"><p className="text-[10px] text-[#aaa194]">On hand</p><p className="mt-1 text-sm font-semibold tabular-nums">{item.quantity} {item.unit}</p></div>
         <div className="min-w-[100px]"><p className="text-[10px] text-[#aaa194]">Reorder at</p><p className="mt-1 text-sm">{item.reorderAt} {item.unit}</p></div>
-        {item.quantity<=item.reorderAt?<span className="rounded-full border border-[#ac8156]/45 bg-[#443124] px-3 py-1 text-[11px] font-semibold text-[#f2c59a]">Low stock</span>
+        {item.quantity<=item.reorderAt?<span className="rounded-full border border-[#ac8156]/45 bg-[#443124] px-3 py-1 text-[11px] font-semibold text-[#f2c59a]">{item.quantity===0?"Out of stock":"Low stock"}</span>
          :<span className="rounded-full border border-[#567b64]/40 bg-[#283e30] px-3 py-1 text-[11px] font-semibold text-[#b7dbc4]">In stock</span>}
+        {(item.onOrder||0)>0&&<span className="rounded-full border border-[#d6b779]/30 bg-[#3c3323] px-3 py-1 text-[11px] font-semibold text-[#e8d1a2]">On order</span>}
         <button type="button" onClick={()=>edit(item)} className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold hover:border-[#d6b779]/50">Edit</button>
         <button type="button" onClick={()=>remove(item.id)} className="rounded-lg border border-red-400/20 px-3 py-2 text-xs font-semibold text-red-200 hover:border-red-300/50">Remove</button>
       </div>)}
@@ -151,6 +166,15 @@ export default function OwnerInventory(){
         <label className="text-xs text-[#c9bdac] sm:col-span-2">Cost per unit (optional, for estimates)
           <input type="number" min="0" step=".01" value={draft.unitCost} onChange={e=>setDraft({...draft,unitCost:Number(e.target.value)})} className={INPUT}/>
         </label>
+        <label className="text-xs text-[#c9bdac]">Quantity on order (not yet delivered)
+          <input type="number" min="0" step=".01" value={draft.onOrder||0}
+            onChange={e=>setDraft({...draft,onOrder:Number(e.target.value)})} className={INPUT}/>
+        </label>
+        <label className="text-xs text-[#c9bdac]">Expected arrival date
+          <input type="date" value={draft.eta||""} onChange={e=>setDraft({...draft,eta:e.target.value})}
+            className={INPUT}/>
+        </label>
+        <p className="text-[11px] leading-5 text-[#ada293] sm:col-span-2">When an order arrives, increase Quantity on hand and reduce Quantity on order. This tracker does not place purchases automatically.</p>
         <label className="text-xs text-[#c9bdac] sm:col-span-2">Notes
           <textarea rows={3} maxLength={800} value={draft.notes} onChange={e=>setDraft({...draft,notes:e.target.value})} className={INPUT} placeholder="Storage location or notes"/>
         </label>
