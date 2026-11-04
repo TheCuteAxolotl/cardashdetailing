@@ -3,16 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export function newBookingReference() {
   const alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const bytes = randomBytes(8);
-  // Rejection sampling avoids modulo bias while excluding easily confused characters.
-  let code = "";
-  for (const byte of bytes) {
-    if (byte < 248) code += alphabet[byte % alphabet.length];
-  }
-  while (code.length < 8) {
-    const byte = randomBytes(1)[0];
-    if (byte < 248) code += alphabet[byte % alphabet.length];
-  }
+  const code = Array.from(randomBytes(8), byte => alphabet[byte % alphabet.length]).join("");
   return `CD-${code}`;
 }
 export function normalizeBookingReference(value: string) {
