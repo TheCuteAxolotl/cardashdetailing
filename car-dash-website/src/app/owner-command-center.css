@@ -261,3 +261,35 @@
 @media (prefers-reduced-motion: reduce) {
   .owner-app .owner-tool-card,.owner-app .owner-metric-card {transition:none !important}
 }
+
+/* Shared mobile CRM presentation for the owner and permission-filtered staff shell. */
+@media (max-width: 767px) {
+  .editorial-theme .owner-app .owner-shell-content :is(h1,h2,h3) {
+    font-family: var(--font-geist-sans), Arial, sans-serif;
+    font-weight: 650;
+    letter-spacing: -.025em;
+    text-wrap: pretty;
+  }
+  .owner-app .owner-mobile-drawer {
+    position: absolute;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: none;
+    height: min(88dvh, 860px);
+    border-radius: 24px 24px 0 0;
+    border-top: 1px solid #d6b77955;
+    padding: 20px 16px max(24px, env(safe-area-inset-bottom));
+  }
+  .owner-mobile-drawer .owner-nav-link {
+    min-height: 48px;
+    border: 1px solid #ffffff12;
+    background: #252421;
+  }
+  .owner-mobile-drawer .owner-nav-link-active { background: #d6b779; }
+  .owner-mobile-drawer .space-y-1 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .owner-mobile-drawer .space-y-1 > * { margin: 0; }
+  .owner-mobile-drawer .owner-nav-link { font-size: 12px; gap: 8px; padding: 12px 10px; }
+  .owner-mobile-drawer .owner-nav-link svg { flex-shrink: 0; }
+  .owner-app .owner-shell-content { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+  .owner-app .crm-save-bar { bottom: calc(84px + env(safe-area-inset-bottom)); }
+}
