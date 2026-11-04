@@ -23,7 +23,7 @@ async function main() {
  records.set('invoice:booking-paid-old', {key:'invoice:booking-paid-old', value:JSON.stringify({invoiceNumber:'CD-2026-0045'})});
  assert.equal(await ensureBookingReference('old'), 'CD-2026-0045');
  assert.notEqual(await ensureBookingReference('two'), refs[0]);
- assert.match(newBookingReference(), /^CD-[A-F0-9]{20}$/);
+ assert.match(newBookingReference(), /^CD-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{8}$/);
  assert.equal(normalizeBookingReference(' cd-abcd '), 'CD-ABCD');
  const booking = {serviceName:'Full Detail', preferredDate:'2026-11-04',status:'completed',vehicleYear:'2026',vehicleMake:'Tesla',vehicleModel:'Model Y',vehicleTrim:null,notes:'Add-ons: Pet Hair (+$39.00)\nService address: PRIVATE\nCustomer notes: PRIVATE',customerName:'PRIVATE', customerPhone:'PRIVATE'};
  const details = certificateDetails(booking, refs[0]);

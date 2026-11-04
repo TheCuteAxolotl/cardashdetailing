@@ -2,7 +2,9 @@ import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 
 export function newBookingReference() {
-  return `CD-${randomBytes(10).toString("hex").toUpperCase()}`;
+  const alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const code = Array.from(randomBytes(8), byte => alphabet[byte % alphabet.length]).join("");
+  return `CD-${code}`;
 }
 export function normalizeBookingReference(value: string) {
   return value.trim().toUpperCase();
