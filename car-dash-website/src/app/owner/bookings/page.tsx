@@ -98,10 +98,20 @@ export default function OwnerBookings() {
   }, []);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("create") === "1") {
-      setConvertingId(null);
-      setShowManual(true);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("create") !== "1") return;
+    setConvertingId(null);
+    // CRM leads can prefill a draft, but only an explicit Add & Block Time
+    // submission can create a booking or send the confirmation text.
+    const fields = ["customerName","customerEmail","customerPhone","serviceName",
+      "vehicleYear","vehicleMake","vehicleModel","serviceAddress"] as const;
+    const draft:Partial<ManualBookingForm>={};
+    for(const key of fields){
+      const value=params.get(key)?.trim();
+      if(value && value.length<=240) Object.assign(draft,{[key]:value});
     }
+    setManual(prev=>({...prev,...draft}));
+    setShowManual(true);
   }, []);
 
   const load = async () => {
