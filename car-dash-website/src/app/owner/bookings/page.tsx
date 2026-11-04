@@ -106,8 +106,16 @@ export default function OwnerBookings() {
     const fields = ["customerName","customerEmail","customerPhone","serviceName",
       "vehicleYear","vehicleMake","vehicleModel","serviceAddress"] as const;
     const draft:Partial<ManualBookingForm>={};
+    let stored:Record<string,unknown>={};
+    if(params.get("from")==="crm"){
+      try{
+        const raw=window.sessionStorage.getItem("car-dash-crm-booking-draft");
+        if(raw)stored=JSON.parse(raw) as Record<string,unknown>;
+        window.sessionStorage.removeItem("car-dash-crm-booking-draft");
+      }catch{stored={};}
+    }
     for(const key of fields){
-      const value=params.get(key)?.trim();
+      const value=typeof stored[key]==="string"?(stored[key] as string).trim():params.get(key)?.trim();
       if(value && value.length<=240) Object.assign(draft,{[key]:value});
     }
     setManual(prev=>({...prev,...draft}));
