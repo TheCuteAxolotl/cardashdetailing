@@ -89,6 +89,16 @@ export default function OwnerInventory(){
    </section>
    {error&&<p role="alert" className="mt-5 rounded-xl border border-red-400/25 bg-red-900/20 p-4 text-sm text-red-100">{error}</p>}
    {message&&<p role="status" className="mt-5 rounded-xl border border-[#d6b779]/25 bg-[#2d271f] p-4 text-sm text-[#e7cfa2]">{message}</p>}
+   {!loading&&low.length>0&&<section className="mt-6 rounded-2xl border border-white/15 bg-[#211f1e] p-4 sm:p-5">
+     <h2 className="text-lg font-semibold">Needs ordering <span className="text-[#d6b779]">· {low.length}</span></h2>
+     <div className="mt-2 divide-y divide-white/10">
+       {low.map(item=><button type="button" key={item.id} onClick={()=>edit(item)} className="flex w-full items-center justify-between gap-3 py-4 text-left">
+         <span className="min-w-0"><span className="block text-sm font-semibold">{item.name}</span>
+           <span className="mt-1 block text-xs text-[#b4ab9e]">{item.quantity} {item.unit} · reorder at {item.reorderAt}</span></span>
+         <span className={"shrink-0 rounded-full px-3 py-1 text-xs font-semibold "+(item.quantity===0?"bg-red-900/30 text-red-200":"bg-amber-900/30 text-amber-200")}>{item.quantity===0?"Out":"Low"}</span>
+       </button>)}
+     </div>
+   </section>}
    {onOrder.length>0&&<section className="mt-6 rounded-2xl border border-[#d6b779]/25 bg-[#25221c] p-4 sm:p-5">
       <h2 className="text-base font-semibold">On order</h2>
       <p className="mt-1 text-xs text-[#afa493]">Incoming supplies are recorded separately from stock already on hand.</p>
@@ -134,7 +144,7 @@ export default function OwnerInventory(){
       </div>)}
     </div>
    </section>
-   <div className="sticky bottom-3 mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#d6b779]/30 bg-[#1d1b18]/95 px-4 py-3 shadow-2xl backdrop-blur-xl">
+   <div className="crm-save-bar sticky bottom-3 mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#d6b779]/30 bg-[#1d1b18]/95 px-4 py-3 shadow-2xl backdrop-blur-xl">
      <p className="text-xs text-[#d8c5a3]">{dirty?"Unsaved changes — save to keep your inventory.":"Inventory changes are stored in your owner workspace."}</p>
      <div className="flex gap-2">
        <button type="button" onClick={()=>void reload()} disabled={loading||saving} className="rounded-xl border border-white/20 px-4 py-2.5 text-xs font-semibold disabled:opacity-50">Reload</button>

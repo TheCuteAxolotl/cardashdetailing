@@ -263,6 +263,25 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   };
 
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previous = document.body.style.overflow;
+    const trigger = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    const dialog = document.querySelector<HTMLElement>(".owner-mobile-drawer");
+    const focusable = () => Array.from(dialog?.querySelectorAll<HTMLElement>('a[href],button,input,[tabindex="0"]') || []);
+    focusable()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+      if (event.key !== "Tab") return;
+      const items = focusable(), first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = previous; document.removeEventListener("keydown", onKey); trigger?.focus(); };
+  }, [mobileOpen]);
+
   const textualNav = (
     <div className="space-y-4">
       {visibleGroups.map((group) => (
@@ -288,7 +307,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
 
   return (
     <div className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
-      <aside aria-label="Owner workspace sidebar" className="owner-workspace-sidebar fixed inset-y-0 left-0 z-50 hidden w-[248px] flex-col border-r border-white/10 bg-[#1b1b1a] text-[#f4eee5] xl:flex">
+      <aside aria-label={owner ? "Owner workspace sidebar" : "Staff workspace sidebar"} className="owner-workspace-sidebar fixed inset-y-0 left-0 z-50 hidden w-[248px] flex-col border-r border-white/10 bg-[#1b1b1a] text-[#f4eee5] xl:flex">
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
           <img src="/favicon.png" alt="Car Dash" className="h-10 w-10 rounded-xl border border-[#d6b779]/25 bg-[#25241f] p-1.5 object-contain" />
           <div className="min-w-0"><p className="truncate text-base font-semibold tracking-tight text-[#f6efe2]">Car Dash</p><p className="mt-0.5 text-[9px] font-semibold uppercase tracking-[.20em] text-[#d6b779]">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
@@ -344,13 +363,13 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       {mobileOpen && (
         <div className="owner-mobile-menu fixed inset-0 z-[90] xl:hidden">
           <button aria-label="Close navigation" className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="owner-mobile-drawer relative h-full w-[310px] max-w-[88vw] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#1c1c1b] px-4 pb-10 pt-5 text-[#f4efe5] shadow-2xl">
+          <aside role="dialog" aria-modal="true" aria-label="More workspace tools" className="owner-mobile-drawer relative h-full w-[310px] max-w-[88vw] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#1c1c1b] px-4 pb-10 pt-5 text-[#f4efe5] shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <a href={homeHref} className="flex items-center gap-3">
                 <img src="/favicon.png" alt="" className="h-9 w-9 rounded-full border border-black/[.08] bg-white p-1" />
                 <div><p className="text-sm font-semibold tracking-[-.02em]">Car Dash</p><p className="text-[9px] uppercase tracking-[.16em] text-[#d6b779]">{owner ? "Owner workspace" : "Staff workspace"}</p></div>
               </a>
-              <button onClick={() => setMobileOpen(false)} className="owner-menu-close grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-[#292723] text-[#f4efe5]"><Icon name="close" className="h-5 w-5" /></button>
+              <button aria-label="Close More" onClick={() => setMobileOpen(false)} className="owner-menu-close grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-[#292723] text-[#f4efe5]"><Icon name="close" className="h-5 w-5" /></button>
             </div>
             <button onClick={() => { setMobileOpen(false); setSearchOpen(true); }} className="owner-menu-search mb-5 flex w-full items-center gap-3 rounded-xl border border-white/15 bg-[#2c2a27] px-4 py-3 text-sm font-medium text-[#e1d8cc] hover:border-[#e58b4b]/50">
               <Icon name="search" className="h-4 w-4" /> Search tools
@@ -369,9 +388,6 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         <header className={"console-topbar owner-workspace-topbar sticky top-0 z-40 border-b border-white/10 bg-[#1a1a19]/95 px-3 backdrop-blur-xl sm:px-6" + " owner-mobile-dashboard-topbar"}>
             <div className="flex min-h-[66px] items-center justify-between gap-2 md:hidden">
               <div className="flex min-w-0 items-center gap-2">
-                <button type="button" onClick={() => setMobileOpen(true)}
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-[#2a2824] text-[#e9d9ba]"
-                  aria-label="Open workspace menu"><Icon name="menu" className="h-5 w-5" /></button>
                 <a href={profileHref} aria-label="My profile" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#d6b779]/35 bg-[#302921]">
                   {profilePhoto?<img src={profilePhoto} alt="" className="h-full w-full object-cover"/>:<span className="text-xs font-semibold text-[#e8d0a3]">{(profileName||user.name||"C").slice(0,1).toUpperCase()}</span>}
                 </a>
@@ -456,7 +472,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             <div className="hidden md:block">{children}</div>
           </> : children}
         </main>
-        {owner ? <OwnerMobileBottomNav /> : <StaffMobileBottomNav permissions={permissions} onOpenMenu={()=>setMobileOpen(true)} />}
+        {owner ? <OwnerMobileBottomNav onOpenMenu={()=>setMobileOpen(true)} menuOpen={mobileOpen} /> : <StaffMobileBottomNav permissions={permissions} onOpenMenu={()=>setMobileOpen(true)} menuOpen={mobileOpen} />}
       </div>
     </div>
   );

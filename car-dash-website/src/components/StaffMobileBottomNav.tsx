@@ -5,8 +5,8 @@ import OwnerAppIcon, {type OwnerIconName} from "@/components/OwnerAppIcon";
 
 type Tab={label:string;href:string;icon:OwnerIconName;match:string[]};
 export default function StaffMobileBottomNav({
- permissions,onOpenMenu,
-}:{permissions:string[];onOpenMenu:()=>void}){
+ permissions,onOpenMenu,menuOpen=false,
+}:{permissions:string[];onOpenMenu:()=>void;menuOpen?:boolean}){
  const pathname=usePathname();
  const has=(value:string)=>permissions.includes(value);
  const jobsHref=has("assignedJobs")?"/owner/jobs":has("bookings")?"/admin/bookings":null;
@@ -24,15 +24,15 @@ export default function StaffMobileBottomNav({
    style={{paddingBottom:"max(10px,env(safe-area-inset-bottom))"}}>
    <div className="mx-auto grid max-w-lg gap-0.5" style={{gridTemplateColumns:"repeat("+ (tabs.length+1) +",minmax(0,1fr))"}}>
      {tabs.map((tab,index)=>{
-       const active=tab.match.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"))
-         ||(index===0&&pathname==="/admin/dashboard");
+       const active=!menuOpen && (tab.match.some(prefix=>pathname===prefix||pathname.startsWith(prefix+"/"))
+         ||(index===0&&pathname==="/admin/dashboard"));
        return <Link key={index} href={tab.href} aria-current={active?"page":undefined}
          className={"flex min-h-[53px] min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 text-center transition "+(active?"bg-[#d6b779]/10 text-[#e6c98f]":"text-[#ada293] hover:bg-white/5 hover:text-[#e7d6b6]")}>
          <OwnerAppIcon name={tab.icon} className="h-5 w-5"/><span className="text-[10px] font-semibold">{tab.label}</span>
        </Link>;
      })}
-     <button type="button" onClick={onOpenMenu} aria-label="Open additional permitted tools"
-       className="flex min-h-[53px] min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 text-center text-[#ada293] hover:bg-white/5 hover:text-[#e7d6b6]">
+     <button type="button" onClick={onOpenMenu} aria-label="Open additional permitted tools" aria-expanded={menuOpen} aria-haspopup="dialog"
+       className={"flex min-h-[53px] min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 text-center "+(menuOpen?"bg-[#d6b779]/10 text-[#e6c98f]":"text-[#ada293] hover:bg-white/5 hover:text-[#e7d6b6]")}>
        <OwnerAppIcon name="menu" className="h-5 w-5"/><span className="text-[10px] font-semibold">More</span>
      </button>
    </div>
