@@ -37,6 +37,7 @@ type ManualBookingForm = {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  sendConfirmationSms: boolean;
   serviceName: string;
   serviceMethod: string;
   vehicleYear: string;
@@ -54,6 +55,7 @@ const EMPTY_MANUAL: ManualBookingForm = {
   customerName: "",
   customerEmail: "",
   customerPhone: "",
+  sendConfirmationSms: true,
   serviceName: "Outside Booking",
   serviceMethod: "mobile",
   vehicleYear: "",
@@ -144,7 +146,17 @@ export default function OwnerBookings() {
       setConvertingId(null);
       setManual(EMPTY_MANUAL);
       setShowManual(false);
-      setMessage("Booking saved to your schedule. That time is now reserved.");
+      if (convertingId) {
+        setMessage("Booking request confirmed and added to the schedule.");
+      } else if (data.confirmationSms?.status === "sent") {
+        setMessage("Booking saved and confirmation text sent to the customer's number.");
+      } else if (data.confirmationSms?.status === "failed") {
+        setMessage("Booking saved and time blocked, but the confirmation text could not be sent. Check the number and your SMS settings before notifying the customer.");
+      } else if (data.confirmationSms?.reason === "missing_phone") {
+        setMessage("Booking saved and time blocked. No confirmation text was sent because no phone number was entered.");
+      } else {
+        setMessage("Booking saved and time blocked. Automatic confirmation text was turned off.");
+      }
       await load();
     } catch {
       setMessage("Could not add the booking.");
@@ -273,6 +285,15 @@ export default function OwnerBookings() {
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <label className="text-sm text-white/55">Customer name<input className={`${input} mt-2`} value={manual.customerName} onChange={(e) => setManual((current) => ({ ...current, customerName: e.target.value }))} required /></label>
               <label className="text-sm text-white/55">Phone<input className={`${input} mt-2`} value={manual.customerPhone} onChange={(e) => setManual((current) => ({ ...current, customerPhone: e.target.value }))} /></label>
+              {!convertingId && <label className="flex items-start gap-3 rounded-xl border border-[#d6b779]/35 bg-[#d6b779]/10 p-3 text-xs leading-5 text-[#e8d5af] md:col-span-2">
+                <input type="checkbox" checked={manual.sendConfirmationSms}
+                  onChange={(e) => setManual(current => ({ ...current, sendConfirmationSms: e.target.checked }))}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#d6b779]" />
+                <span><strong className="block text-sm text-[#f1dfb9]">Automatically send booking confirmation SMS</strong>
+                  When you click Add &amp; Block Time, Car Dash will text the customer the service, appointment date, time, and price.
+                  Keep this on only when the customer provided their number and agreed to receive appointment updates.
+                  Without a phone number, the booking will be saved but no text will be sent.</span>
+              </label>}
               <label className="text-sm text-white/55">Email<input type="email" className={`${input} mt-2`} value={manual.customerEmail} onChange={(e) => setManual((current) => ({ ...current, customerEmail: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Service<input className={`${input} mt-2`} value={manual.serviceName} onChange={(e) => setManual((current) => ({ ...current, serviceName: e.target.value }))} required /></label>
               <label className="text-sm text-white/55">Price (optional)<NumberInput type="number" min="0" step="0.01" className={`${input} mt-2`} value={manual.quotedPrice} onChange={(e) => setManual((current) => ({ ...current, quotedPrice: e.target.value }))} /></label>
