@@ -10,6 +10,7 @@ type User = { id: string; name?: string | null; email?: string | null; role?: st
 
 const SHARED_OWNER_ROUTES: Array<{ prefix: string; permissions: string[] }> = [
   { prefix: "/owner/jobs", permissions: ["assignedJobs"] },
+  { prefix: "/owner/inspection", permissions: ["assignedJobs"] },
   { prefix: "/owner/calls", permissions: ["businessPhone"] },
   { prefix: "/owner/warranties", permissions: ["warranties"] },
   { prefix: "/owner/analytics", permissions: ["analytics"] },
