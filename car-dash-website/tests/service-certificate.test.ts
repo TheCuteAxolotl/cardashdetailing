@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { certificateDetails, escapeCertificateHtml } from '../src/lib/service-certificate';
 import { ensureBookingReference, newBookingReference, normalizeBookingReference } from '../src/lib/booking-reference';
+import { POST as lookup } from '../src/app/api/service-lookup/route';
+import { GET as certificate } from '../src/app/api/bookings/[id]/certificate/route';
+import { NextRequest } from 'next/server';
 import { prisma } from '../src/lib/prisma';
 import { sanitizeInvoiceInput } from '../src/lib/invoices';
 
@@ -30,6 +33,14 @@ async function main() {
  assert.equal(escapeCertificateHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
  const existing = sanitizeInvoiceInput({id:'booking-paid-one',invoiceNumber:refs[0]});
  assert.equal(sanitizeInvoiceInput({...existing,invoiceNumber:'CHANGED'},existing).invoiceNumber,refs[0]);
+ prisma.booking.findUnique = (async () => booking) as any;
+ const response = await lookup(new Request('https://example.com/api/service-lookup', {method:'POST',body:JSON.stringify({number:refs[0].toLowerCase()})}));
+ assert.equal(response.status,200);
+ assert.ok(!(await response.text()).includes('PRIVATE'));
+ booking.status = 'cancelled';
+ assert.equal((await lookup(new Request('https://example.com/api/service-lookup', {method:'POST',body:JSON.stringify({number:refs[0]})}))).status,404);
+ assert.equal((await lookup(new Request('https://example.com/api/service-lookup', {method:'POST',body:JSON.stringify({number:'invalid'})}))).status,400);
+ assert.equal((await certificate(new NextRequest('https://example.com/api/bookings/one/certificate'),{params:Promise.resolve({id:'one'})})).status,403);
  console.log('Certificate tests passed: concurrency, stable references, legacy receipts, privacy, escaping, invoice number lock.');
 }
 main();
