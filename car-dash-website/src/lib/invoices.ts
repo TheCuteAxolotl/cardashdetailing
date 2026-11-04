@@ -180,7 +180,7 @@ export function sanitizeInvoiceInput(input: unknown, existing?: InvoiceRecord): 
 
   const invoice: InvoiceRecord = {
     id,
-    invoiceNumber: cleanString(body.invoiceNumber, 80) || existing?.invoiceNumber || "",
+    invoiceNumber: existing?.id.startsWith("booking-paid-") ? existing.invoiceNumber : cleanString(body.invoiceNumber, 80) || existing?.invoiceNumber || "",
     shareToken,
     customerName: cleanString(body.customerName, 160),
     customerPhone: cleanString(body.customerPhone, 80),

@@ -1,9 +1,10 @@
+import { ensureBookingReference } from "@/lib/booking-reference";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureBookingConversation } from "@/lib/booking-chat";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { bookingPhoneWasReleased } from "@/lib/phone-release";
-import { calculateInvoiceTotals, getInvoice, nextInvoiceNumber, requireOwner, sanitizeInvoiceInput } from "@/lib/invoices";
+import { calculateInvoiceTotals, getInvoice, requireOwner, sanitizeInvoiceInput } from "@/lib/invoices";
 import type { InvoicePayment, InvoiceRecord } from "@/lib/invoices";
 import { getPublicSiteUrl, normalizePhoneNumber } from "@/lib/twilio-sms";
 import { paidReceiptInvoiceId, paymentReceiptSmsText } from "@/lib/paid-receipt";
@@ -116,7 +117,7 @@ export async function POST(request: Request, context: Context) {
           .filter((part) => part && !/^not specified$/i.test(part)).join(" ");
         const newInvoice = sanitizeInvoiceInput({
           id: identifier,
-          invoiceNumber: await nextInvoiceNumber(),
+          invoiceNumber: await ensureBookingReference(id),
           customerName: booking.customerName,
           customerPhone: booking.customerPhone,
           customerEmail: booking.customerEmail,

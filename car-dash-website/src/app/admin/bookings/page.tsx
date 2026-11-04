@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BookingCertificateButton from "@/components/BookingCertificateButton";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 
 type Booking = {
+  bookingNumber?: string;
   id: string;
   serviceName: string;
   serviceMethod: string;
@@ -117,6 +119,7 @@ export default function AdminBookings() {
                   <BookingPhotoEvidence notes={b.notes} />
                 </div>
                 <div className="flex min-w-48 flex-col gap-2">
+                  <BookingCertificateButton booking={b} />
                   {b.customerPhone ? <a
                     href={`/admin/messages?phone=${encodeURIComponent(b.customerPhone)}&name=${encodeURIComponent(b.customerName || "Customer")}`}
                     className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-center text-sm font-semibold text-[#6EAEC6] transition hover:bg-[#6EAEC6]/18"

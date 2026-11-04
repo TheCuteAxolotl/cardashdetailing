@@ -1,3 +1,4 @@
+import { ensureBookingReference } from "@/lib/booking-reference";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { discordIpLine } from "@/lib/discord-ip";
 import { NextRequest, NextResponse } from "next/server";
@@ -88,7 +89,21 @@ export async function GET(request: NextRequest) {
       include: { user: { select: { name: true, email: true } } },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(staff ? bookings : bookings.map(booking => ({ ...booking, notes: customerVisibleBookingNotes(booking.notes) })));
+    const references = await prisma.siteContent.findMany({
+      where: { key: { in: bookings.map(booking => `booking-reference:${booking.id}`) } },
+      select: { key: true, value: true },
+    });
+    const referenceMap = new Map(references.map(row => [row.key, row.value]));
+    const numbered = [];
+    for (const booking of bookings) {
+      let bookingNumber = referenceMap.get(`booking-reference:${booking.id}`);
+      if (!bookingNumber) {
+        try { bookingNumber = await ensureBookingReference(booking.id); }
+        catch (error) { console.error("Could not assign booking reference:", booking.id, error); }
+      }
+      numbered.push({ ...booking, bookingNumber });
+    }
+    return NextResponse.json(staff ? numbered : numbered.map(booking => ({ ...booking, notes: customerVisibleBookingNotes(booking.notes) })), { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
