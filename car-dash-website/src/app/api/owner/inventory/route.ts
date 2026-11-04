@@ -9,7 +9,7 @@ const CATEGORIES = new Set(["Chemicals","Equipment","Towels & pads","Consumables
 const UNITS = new Set(["each","bottles","liters","gallons","packs","pads","towels","ounces"]);
 type Entry = {
  id:string; name:string; category:string; quantity:number;
- unit:string; reorderAt:number; unitCost:number; notes:string;
+ unit:string; reorderAt:number; unitCost:number; notes:string; onOrder:number; eta:string;
 };
 function validate(body:unknown):Entry[]|null {
  if(!Array.isArray(body)||body.length>200)return null;
@@ -22,12 +22,14 @@ function validate(body:unknown):Entry[]|null {
   if(!/^[a-z0-9-]{6,90}$/i.test(id)||ids.has(id)||!name)return null;
   ids.add(id);
   const category=String(x.category??"Other"),unit=String(x.unit??"each");
-  const quantity=Number(x.quantity),reorderAt=Number(x.reorderAt),unitCost=Number(x.unitCost);
+  const quantity=Number(x.quantity),reorderAt=Number(x.reorderAt),unitCost=Number(x.unitCost),onOrder=Number(x.onOrder??0);
+  const eta=String(x.eta??"");
   if(!CATEGORIES.has(category)||!UNITS.has(unit))return null;
-  if(![quantity,reorderAt,unitCost].every(v=>Number.isFinite(v)&&v>=0&&v<=1000000))return null;
+  if(![quantity,reorderAt,unitCost,onOrder].every(v=>Number.isFinite(v)&&v>=0&&v<=1000000))return null;
+  if(eta&&!/^\d{4}-\d{2}-\d{2}$/.test(eta))return null;
   items.push({id,name,category,unit,quantity:Math.round(quantity*100)/100,
    reorderAt:Math.round(reorderAt*100)/100,unitCost:Math.round(unitCost*100)/100,
-   notes:String(x.notes??"").slice(0,800)});
+   notes:String(x.notes??"").slice(0,800),onOrder:Math.round(onOrder*100)/100,eta:onOrder?eta:""});
  }
  return items;
 }
