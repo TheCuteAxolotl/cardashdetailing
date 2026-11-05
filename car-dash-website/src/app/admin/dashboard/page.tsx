@@ -1,5 +1,6 @@
 "use client";
 
+import { employeePreview, displayPermissions } from "@/lib/workspace-preferences";
 import { useEffect, useMemo, useState } from "react";
 import StaffMobileHome from "@/components/StaffMobileHome";
 
@@ -38,10 +39,10 @@ export default function AdminDashboard() {
       const response = await fetch("/api/auth/me", { cache: "no-store" });
       if (!response.ok) return window.location.assign("/login");
       const data = await response.json();
-      if (data.user.role === "owner") return window.location.assign("/owner/dashboard");
+      if (data.user.role === "owner" && !employeePreview(data.user)) return window.location.assign("/owner/dashboard");
       if (!data.staffAccess) return window.location.assign("/dashboard");
       setUser(data.user);
-      setPermissions(Array.isArray(data.permissions) ? data.permissions : []);
+      setPermissions(displayPermissions(data.user, Array.isArray(data.permissions) ? data.permissions : []));
     })();
   }, []);
 

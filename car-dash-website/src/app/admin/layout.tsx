@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { employeePreview, displayPermissions } from "@/lib/workspace-preferences";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import OwnerShell from "@/components/OwnerShell";
@@ -44,9 +45,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
         const data = await response.json();
         const role = String(data.user?.role || "user");
-        const nextPermissions = Array.isArray(data.permissions) ? data.permissions : [];
+        const nextPermissions = displayPermissions(data.user, Array.isArray(data.permissions) ? data.permissions : []);
 
-        if (role === "owner") {
+        if (role === "owner" && !employeePreview(data.user)) {
           if (!cancelled) {
             setState("redirecting");
             window.location.assign("/owner/dashboard");

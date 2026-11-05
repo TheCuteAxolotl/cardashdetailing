@@ -1,5 +1,6 @@
 "use client";
 
+import { appearanceFor, employeePreview, savePreference, type Appearance } from "@/lib/workspace-preferences";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -8,7 +9,7 @@ import OwnerMobileBottomNav from "@/components/OwnerMobileBottomNav";
 import StaffMobileBottomNav from "@/components/StaffMobileBottomNav";
 import { useOwnerScreenPrivacy } from "@/lib/owner-screen-privacy";
 
-type OwnerUser = { name?: string | null; email?: string | null; role?: string | null };
+type OwnerUser = { id: string; name?: string | null; email?: string | null; role?: string | null };
 
 type IconName =
   | "home" | "chart" | "calendar" | "quote" | "message" | "invoice" | "phone"
@@ -100,7 +101,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     items: [
       { href: "/owner/admins", label: "Employees & resources", icon: "people", ownerOnly: true },
       { href: "/owner/pay-tracking", label: "Pay tracking", icon: "price", ownerOnly: true },
-      { href: "/owner/settings", label: "Settings", icon: "settings", ownerOnly: true },
+      { href: "/owner/settings", adminHref: "/admin/settings", label: "Settings", icon: "settings" },
     ],
   },
 ];
@@ -186,7 +187,20 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     window.addEventListener("car-dash-profile-updated",load);
     return()=>{active=false;window.removeEventListener("car-dash-profile-updated",load);};
   },[]);
-  const owner = user.role === "owner";
+  const preview = employeePreview(user);
+  const owner = user.role === "owner" && !preview;
+  const [appearance, setAppearance] = useState<Appearance>(() => appearanceFor(user.id));
+  const [preferenceError, setPreferenceError] = useState("");
+  function choose(setting: "appearance" | "view", value: string) {
+    try {
+      savePreference(user.id, setting, value);
+      setPreferenceError("");
+      if (setting === "appearance") setAppearance(appearanceFor(user.id));
+      else window.location.assign(value === "employee" ? "/admin/dashboard" : "/owner/dashboard");
+    } catch {
+      setPreferenceError("Allow browser storage to save your workspace preference.");
+    }
+  }
   const isOwnerHome = owner && pathname === "/owner/dashboard";
   const isStaffHome = !owner && pathname === "/admin/dashboard";
   const privateWorkspacePage = (owner && pathname.startsWith("/owner/") && !isOwnerHome)
@@ -220,7 +234,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     items: group.items.filter((item) => {
       if (owner) return true;
       if (item.ownerOnly) return false;
-      if (!item.permissions?.length) return group.label === "Home";
+      if (!item.permissions?.length) return group.label === "Home" || item.adminHref === "/admin/settings";
       return item.permissions.some((permission) => permissions.includes(permission));
     }),
   })).filter((group) => group.items.length), [owner, permissions]);
@@ -306,7 +320,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   );
 
   return (
-    <div className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
+    <div data-appearance={appearance} className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
       <aside aria-label={owner ? "Owner workspace sidebar" : "Staff workspace sidebar"} className="owner-workspace-sidebar fixed inset-y-0 left-0 z-50 hidden w-[248px] flex-col border-r border-white/10 bg-[#1b1b1a] text-[#f4eee5] xl:flex">
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
           <img src="/favicon.png" alt="Car Dash" className="h-10 w-10 rounded-xl border border-[#d6b779]/25 bg-[#25241f] p-1.5 object-contain" />
@@ -458,7 +472,27 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             {recording?"Recording on":"Recording off"}
           </button>
         </div>}
+        {preview && <div className="flex items-center justify-between gap-3 border-b border-white/15 bg-[#282723] px-4 py-2 text-sm">
+          <span>Employee view · Owner account</span>
+          <button type="button" onClick={() => choose("view", "owner")} className="rounded-lg border border-white/20 px-3 py-2">Return to Owner view</button>
+        </div>}
+        {preferenceError && <p role="alert" className="p-3">{preferenceError}</p>}
         <main className="owner-shell-content owner-mobile-section-layout min-h-[calc(100vh-112px)]">
+          {(pathname === "/owner/settings" || pathname === "/admin/settings") && <section aria-label="Workspace preferences" className="mx-auto max-w-2xl space-y-5 px-6 py-6">
+            <h2 className="text-xl font-semibold">Workspace preferences</h2>
+            <fieldset><legend className="mb-2 font-semibold">Appearance</legend>
+              {(["light", "dark"] as const).map(mode => <label key={mode} className="mr-5 inline-flex min-h-11 items-center gap-2">
+                <input type="radio" name="appearance" checked={appearance === mode} onChange={() => choose("appearance", mode)} />
+                {mode === "light" ? "Light mode" : "Dark mode"}
+              </label>)}
+            </fieldset>
+            {user.role === "owner" && <fieldset><legend className="mb-2 font-semibold">Workspace view</legend>
+              {(["owner", "employee"] as const).map(view => <label key={view} className="mr-5 inline-flex min-h-11 items-center gap-2">
+                <input type="radio" name="workspace-view" checked={view === (preview ? "employee" : "owner")} onChange={() => choose("view", view)} />
+                {view === "owner" ? "Owner view" : "Employee view"}
+              </label>)}
+            </fieldset>}
+          </section>}
           {privateWorkspacePage && recording ? <>
             <div className="owner-mobile-privacy-gate px-4 py-8 md:hidden">
               <div className="mx-auto max-w-lg rounded-2xl border border-[#d6b779]/25 bg-[#211f1b] p-6 text-center">

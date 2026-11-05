@@ -1,4 +1,5 @@
 "use client";
+import { employeePreview } from "@/lib/workspace-preferences";
 
 import { useEffect, useState } from "react";
 import BookingCertificateButton from "@/components/BookingCertificateButton";
@@ -36,7 +37,7 @@ export default function AdminBookings() {
       const response = await fetch("/api/auth/me", { cache: "no-store" });
       if (!response.ok) return window.location.assign("/login");
       const data = await response.json();
-      if (data.user.role === "owner") return window.location.assign("/owner/bookings");
+      if (data.user.role === "owner" && !employeePreview(data.user)) return window.location.assign("/owner/bookings");
       if (!data.permissions?.includes("bookings")) return window.location.assign(data.staffAccess ? "/admin/dashboard" : "/dashboard");
     })();
   }, []);
