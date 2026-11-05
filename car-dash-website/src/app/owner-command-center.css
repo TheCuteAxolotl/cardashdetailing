@@ -293,3 +293,28 @@
   .owner-app .owner-shell-content { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
   .owner-app .crm-save-bar { bottom: calc(84px + env(safe-area-inset-bottom)); }
 }
+
+@media screen {
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] {
+    color-scheme: light;
+    --theme-ink: #24211c;
+    --theme-muted: #625d54;
+    --theme-panel: white;
+    --theme-canvas: #f7f6f2;
+    background: var(--theme-canvas) !important;
+    color: var(--theme-ink) !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] :is(.owner-shell-content, main, .console-home, .owner-app-home) {
+    background: #f7f6f2 !important;
+    color: #24211c !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] :is([class*="bg-[#"],[class*="bg-white"],.console-topbar,.owner-workspace-sidebar,.owner-mobile-bottom-nav,.owner-mobile-drawer,thead,input,select,textarea) {
+    background-color: #fff !important;
+    background-image: none !important;
+    color: #24211c !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] :is([class*="text-[#"],[class*="text-white"],[class*="text-black"],h1,h2,h3,.owner-nav-link,table) { color: #38342d !important; }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] :is([class*="border-"],th,td,input,select,textarea) { border-color: #d5cfc3 !important; }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] :is([aria-current="page"],.owner-nav-link-active,[class~="bg-[#d6b779]"],[class~="bg-[#6EAEC6]"]) { background-color: #ebd39e !important; color: #302511 !important; }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] :is(input,textarea)::placeholder { color: #746d61 !important; }
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { employeePreview, displayPermissions } from "@/lib/workspace-preferences";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -53,10 +54,18 @@ export default function OwnerLayout({ children }: { children: ReactNode }) {
         const role = String(data.user?.role || "user");
         const nextPermissions = Array.isArray(data.permissions) ? data.permissions : [];
 
+        const previewPermissions = displayPermissions(data.user, nextPermissions);
+        if (employeePreview(data.user) && !requiredPermissions?.some(key => previewPermissions.includes(key))) {
+          if (!cancelled) {
+            setState("redirecting");
+            window.location.replace("/admin/dashboard");
+          }
+          return;
+        }
         if (role === "owner") {
           if (!cancelled) {
             setUser(data.user);
-            setPermissions(nextPermissions);
+            setPermissions(previewPermissions);
             setState("allowed");
           }
           return;

@@ -1,4 +1,5 @@
 "use client";
+import { employeePreview } from "@/lib/workspace-preferences";
 import SendPhotos from "@/components/SendPhotos";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -18,7 +19,7 @@ export default function AdminSupportPage() {
       const response = await fetch("/api/auth/me", { cache: "no-store" });
       if (!response.ok) return window.location.assign("/login");
       const data = await response.json();
-      if (data.user.role === "owner") return window.location.assign("/owner/support");
+      if (data.user.role === "owner" && !employeePreview(data.user)) return window.location.assign("/owner/support");
       if (!data.permissions?.includes("support")) return window.location.assign(data.staffAccess ? "/admin/dashboard" : "/dashboard");
     })();
   }, []);
