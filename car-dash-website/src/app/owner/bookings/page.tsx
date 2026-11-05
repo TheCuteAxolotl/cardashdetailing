@@ -4,6 +4,7 @@ import NumberInput from "@/components/NumberInput";
 
 import { useEffect, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
+import DetailReport from "@/components/DetailReport";
 import BookingCertificateButton from "@/components/BookingCertificateButton";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
 import BookingDetailsEditor from "@/components/BookingDetailsEditor";
@@ -402,6 +403,7 @@ export default function OwnerBookings() {
                       </button>
                     )}
                   <BookingCertificateButton booking={booking} />
+                  <DetailReport booking={booking} />
                     {["confirmed", "completed"].includes(booking.status) && (booking.customerPhone ? <button type="button" onClick={() => setReceiptBooking(booking)} className="rounded-lg border border-emerald-400/35 bg-emerald-400/12 px-4 py-3 text-sm font-bold text-emerald-200 hover:bg-emerald-400/20">Create receipt · SMS</button> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add phone to send receipt</button>)}
 
                     {!canDelete && (
