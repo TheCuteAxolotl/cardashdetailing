@@ -63,6 +63,8 @@ export default function BookingDetailsEditor({
     quotedPrice: booking.quotedPrice == null ? "" : String(booking.quotedPrice),
   });
   const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(booking.status);
+  const [revision, setRevision] = useState(booking.updatedAt);
   const [error, setError] = useState("");
   const update = (key: keyof FormFields, value: string) => setDraft(current => ({ ...current, [key]: value }));
   const address = draft.serviceAddress.trim();
@@ -74,6 +76,25 @@ export default function BookingDetailsEditor({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, saving]);
+
+  async function changeBooking(remove: boolean) {
+    const prompt = remove ? "Permanently delete this booking? This cannot be undone." : "Cancel this booking and release its time slot? Customers who opted into texts may receive a cancellation message.";
+    if (saving || !window.confirm(prompt)) return;
+    setSaving(true);
+    setError("");
+    try {
+      const response = await fetch("/api/bookings/" + encodeURIComponent(booking.id), remove ? {method:"DELETE"} : {
+        method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status:"cancelled"})
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not update the booking.");
+      if (!remove) { setStatus("cancelled"); setRevision(result.updatedAt); }
+      await onSaved();
+      if (remove) onClose();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not update the booking.");
+    } finally { setSaving(false); }
+  }
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,7 +108,7 @@ export default function BookingDetailsEditor({
         body: JSON.stringify({
           action: "editDetails",
           ...draft,
-          updatedAt: booking.updatedAt,
+          updatedAt: revision,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -101,14 +122,14 @@ export default function BookingDetailsEditor({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="booking-editor-title">
-      <button aria-label="Close booking editor" type="button" onClick={onClose} className="fixed inset-0 cursor-default" />
+      <button aria-label="Close booking editor" type="button" onClick={onClose} disabled={saving} className="fixed inset-0 cursor-default" />
       <form onSubmit={save} className="relative z-10 my-0 flex max-h-[94dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[24px] border border-white/15 bg-[#191919] text-[#f4efe5] shadow-2xl sm:my-6 sm:rounded-[24px]">
         <header className="shrink-0 border-b border-white/10 bg-[#1d1d1d] px-5 py-4 sm:px-7">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[.2em] text-[#d6b779]">Car Dash · Booking details</p>
               <h2 id="booking-editor-title" className="mt-1.5 font-serif text-2xl text-[#f4efe5] sm:text-3xl">Edit appointment</h2>
-              <p className="mt-1 text-xs text-[#aaa49b]">{booking.status || "Booking"} · Changes save to this existing appointment</p>
+              <p className="mt-1 text-xs text-[#aaa49b]">{status || "Booking"} · Changes save to this existing appointment</p>
             </div>
             <button type="button" onClick={onClose} disabled={saving} aria-label="Close" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 text-xl text-[#d9d2c7]">×</button>
           </div>
@@ -154,7 +175,9 @@ export default function BookingDetailsEditor({
           {error && <p role="alert" className="mb-3 rounded-lg border border-red-400/30 bg-red-900/20 p-3 text-sm text-red-200">{error}</p>}
           <p className="mb-3 text-xs leading-5 text-[#aaa49b]">Changing the appointment time checks for conflicts. A time change can notify customers who opted into SMS; private note and address edits do not send messages.</p>
           <div className="flex flex-wrap justify-end gap-2">
-            <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-white/20 px-5 py-3 text-sm font-medium text-[#d3cec5]">Cancel</button>
+            <button type="button" disabled={saving} onClick={() => void changeBooking(status === "completed" || status === "cancelled")}
+              className="mr-auto rounded-xl border border-red-400/45 px-4 py-3 text-sm font-semibold text-red-200">{status === "completed" || status === "cancelled" ? "Delete permanently" : "Cancel booking"}</button>
+            <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-white/20 px-5 py-3 text-sm font-medium text-[#d3cec5]">Close</button>
             <button type="submit" disabled={saving} className="rounded-xl bg-[#d6b779] px-6 py-3 text-sm font-bold text-[#101010] disabled:opacity-50">{saving ? "Saving changes…" : "Save booking changes"}</button>
           </div>
         </footer>

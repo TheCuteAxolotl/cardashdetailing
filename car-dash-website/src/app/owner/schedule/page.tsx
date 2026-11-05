@@ -7,7 +7,7 @@ import OwnerCalendarBoard from "@/components/OwnerCalendarBoard";
 import BookingDetailsEditor, {
   type EditableBooking,
 } from "@/components/BookingDetailsEditor";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 
@@ -134,6 +134,17 @@ export default function OwnerSchedulePage() {
   const [savingTask, setSavingTask] = useState(false);
   const [message, setMessage] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
+  const [createDate, setCreateDate] = useState("");
+  const [createTime, setCreateTime] = useState("");
+  function chooseActivity(date: string, time = "") {
+    setCreateTime(time);
+    setSelectedDay(date);
+    setCreateDate(date);
+  }
+  const chooser = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (createDate && !loading) chooser.current?.showModal();
+  }, [createDate, loading]);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [draft, setDraft] = useState<TaskDraft>(EMPTY_DRAFT);
 
@@ -151,7 +162,18 @@ export default function OwnerSchedulePage() {
         const bookingData = await bookingsResponse.json();
         const scheduleData = await scheduleResponse.json();
         setBookings(Array.isArray(bookingData) ? bookingData : []);
-        setTasks(Array.isArray(scheduleData?.tasks) ? scheduleData.tasks : []);
+        const loadedTasks: OwnerScheduleTask[] = Array.isArray(scheduleData?.tasks) ? scheduleData.tasks : [];
+        setTasks(loadedTasks);
+        const params = new URLSearchParams(window.location.search);
+        const task = loadedTasks.find(item => item.id === params.get("editTask"));
+        const date = task?.date || params.get("add");
+        if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          setSelectedDay(date);
+          setCursor(dateFromIso(date));
+          if (task) openEditTask(task);
+          else setCreateDate(date);
+          window.history.replaceState(window.history.state, "", window.location.pathname);
+        }
       } catch (error) {
         setMessage(
           error instanceof Error ? error.message : "Could not load schedule.",
@@ -259,8 +281,8 @@ export default function OwnerSchedulePage() {
     setSelectedDay(isoDate(value));
   }
 
-  function openNewTask(date = isoDate(cursor), type: "todo" | "plan" = "todo") {
-    setDraft({ ...EMPTY_DRAFT, date, type });
+  function openNewTask(date = isoDate(cursor), type: "todo" | "plan" = "todo", time = "") {
+    setDraft({ ...EMPTY_DRAFT, date, type, time });
     setEditorOpen(true);
     setMessage("");
   }
@@ -360,8 +382,7 @@ export default function OwnerSchedulePage() {
   async function deleteTask(task: OwnerScheduleTask) {
     if (!window.confirm(`Delete “${task.title}” from your schedule?`)) return;
     const next = tasks.filter((item) => item.id !== task.id);
-    setTasks(next);
-    await persistTasks(next, "Schedule item deleted.");
+    if (await persistTasks(next, "Schedule item deleted.")) setEditorOpen(false);
   }
 
   if (loading) {
@@ -403,7 +424,7 @@ export default function OwnerSchedulePage() {
             </a>
             <button
               type="button"
-              onClick={() => openNewTask(selectedDay, "todo")}
+              onClick={() => chooseActivity(selectedDay)}
               className="rounded-xl bg-[#d6b779] px-4 py-2.5 text-sm font-semibold text-[#101010] hover:bg-[#e5c995]"
             >
               + Add event
@@ -509,6 +530,7 @@ export default function OwnerSchedulePage() {
                   if (e.target.value) {
                     setCursor(dateFromIso(e.target.value));
                     setSelectedDay(e.target.value);
+                    chooseActivity(e.target.value);
                   }
                 }}
                 className="min-w-0 rounded-xl border border-white/20 bg-[#161616] px-3 py-2.5 text-base text-[#eee] [color-scheme:dark]"
@@ -547,7 +569,7 @@ export default function OwnerSchedulePage() {
               tasks={tasks}
               onEditBooking={setEditingBooking}
               onEditTask={openEditTask}
-              onAddTask={openNewTask}
+              onAddTask={chooseActivity}
             />
           ) : (
             <OwnerCalendarBoard
@@ -560,7 +582,7 @@ export default function OwnerSchedulePage() {
               tasks={currentTasks}
               onSelectDay={(date) => setSelectedDay(date)}
               onEditBooking={(booking) => setEditingBooking(booking)}
-              onAddTask={(date) => openNewTask(date)}
+              onAddTask={chooseActivity}
               onEditTask={openEditTask}
               onToggleTask={toggleTask}
             />
@@ -609,6 +631,16 @@ export default function OwnerSchedulePage() {
         </details>
       </div>
 
+      {createDate && <dialog ref={chooser} aria-labelledby="add-calendar-title" onClose={() => setCreateDate("")}
+        className="fixed inset-0 m-auto w-[min(92vw,24rem)] rounded-2xl border border-white/20 bg-[#211f1c] p-5 text-[#f4efe5] backdrop:bg-black/70">
+        <h2 id="add-calendar-title" className="text-xl font-semibold">Add to calendar</h2>
+        <p className="mb-4 mt-1 text-sm">{dateFromIso(createDate).toLocaleDateString("en-US", {weekday:"long", month:"long", day:"numeric", year:"numeric"})}{createTime && " · " + prettyTime(createTime)}</p>
+        <div className="grid gap-2">
+          <a href={"/owner/bookings?create=1&date=" + createDate + (createTime ? "&time=" + encodeURIComponent(createTime) : "")} className="rounded-xl bg-[#d6b779] px-4 py-3 text-center font-semibold text-[#191714]">Customer booking</a>
+          {(["todo","plan"] as const).map(kind => <button key={kind} type="button" className="rounded-xl border px-4 py-3" onClick={() => { openNewTask(createDate, kind, createTime); setCreateDate(""); }}>{kind === "todo" ? "Private to-do" : "Private plan"}</button>)}
+          <button type="button" onClick={() => chooser.current?.close()} className="py-2">Close</button>
+        </div>
+      </dialog>}
       {editingBooking && (
         <BookingDetailsEditor
           key={editingBooking.id}
@@ -624,7 +656,7 @@ export default function OwnerSchedulePage() {
               );
             const refreshed = await response.json();
             setBookings(Array.isArray(refreshed) ? refreshed : []);
-            setMessage("Booking and service address updated.");
+            setMessage("Calendar updated.");
           }}
         />
       )}
@@ -777,8 +809,7 @@ export default function OwnerSchedulePage() {
                     onClick={() => {
                       const task = tasks.find((item) => item.id === draft.id);
                       if (task) {
-                        setEditorOpen(false);
-                        deleteTask(task);
+                        void deleteTask(task);
                       }
                     }}
                     className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-medium text-[#c2bbb0] hover:border-[#d6b779]/50 hover:text-[#f4efe5] disabled:opacity-50"

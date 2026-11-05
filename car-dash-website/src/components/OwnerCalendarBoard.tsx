@@ -110,6 +110,7 @@ export default function OwnerCalendarBoard({
               return (
                 <div
                   key={date}
+                  onClick={event => { if (!(event.target as HTMLElement).closest("button,a")) { onSelectDay(date); onAddTask(date); } }}
                   className={[
                     "group relative min-w-0 border-r border-b border-white/[.08] p-2.5 transition-colors sm:p-3",
                     view === "month" ? "min-h-[136px] lg:min-h-[148px]" : "min-h-[320px]",
@@ -121,8 +122,8 @@ export default function OwnerCalendarBoard({
                   <div className="mb-2 flex items-center justify-between gap-1">
                     <button
                       type="button"
-                      onClick={() => onSelectDay(date)}
-                      aria-label={"Show " + day.toLocaleDateString("en-US", {month:"long", day:"numeric", year:"numeric"})}
+                      onClick={() => { onSelectDay(date); onAddTask(date); }}
+                      aria-label={"Add activity on " + day.toLocaleDateString("en-US", {month:"long", day:"numeric", year:"numeric"})}
                       aria-pressed={selected}
                       className={[
                         "grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold transition",
@@ -172,7 +173,7 @@ export default function OwnerCalendarBoard({
                     )}
                     {view === "week" && !items.length ? (
                       <button type="button" onClick={() => onAddTask(date)} className="w-full rounded-lg border border-dashed border-white/10 py-7 text-center text-xs text-[#88847e] hover:border-[#d6b779]/40 hover:text-[#d6b779]">
-                        + Add plan
+                        + Add activity
                       </button>
                     ) : null}
                   </div>
@@ -192,7 +193,7 @@ export default function OwnerCalendarBoard({
             </h4>
           </div>
           <button type="button" onClick={() => onAddTask(selectedDay)} className="rounded-xl border border-[#d6b779]/35 px-4 py-2.5 text-xs font-semibold text-[#e5c995] hover:bg-[#d6b779]/10">
-            + Add a plan
+            + Add activity
           </button>
         </div>
         {chosenItems.length ? (
