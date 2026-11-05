@@ -206,7 +206,7 @@
   .editorial-theme .owner-app .owner-mobile-section-layout [class*="border-[#365262]"] {
     border-color: #ffffff24 !important;
   }
-  .editorial-theme .owner-app .owner-mobile-section-layout [class*="bg-[#6EAEC6]"] {
+  .editorial-theme .owner-app .owner-mobile-section-layout [class~="bg-[#6EAEC6]"] {
     background-color: #d6b779 !important;
     color: #171613 !important;
   }
@@ -317,4 +317,15 @@
   .editorial-theme .console-shell.owner-app[data-appearance="light"] :is([class*="border-"],th,td,input,select,textarea) { border-color: #d5cfc3 !important; }
   .editorial-theme .console-shell.owner-app[data-appearance="light"] :is([aria-current="page"],.owner-nav-link-active,[class~="bg-[#d6b779]"],[class~="bg-[#6EAEC6]"]) { background-color: #ebd39e !important; color: #302511 !important; }
   .editorial-theme .console-shell.owner-app[data-appearance="light"] :is(input,textarea)::placeholder { color: #746d61 !important; }
+}
+
+@media screen and (max-width: 767px) {
+  .editorial-theme .console-shell.owner-app[data-appearance="dark"] .owner-mobile-section-layout :is(button,a)[class~="bg-[#6EAEC6]/10"] {
+    background-color: #302a20 !important;
+    color: #f0d399 !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-appearance="light"] .owner-mobile-section-layout :is(button,a)[class~="bg-[#6EAEC6]/10"] {
+    background-color: #f4ead4 !important;
+    color: #382a11 !important;
+  }
 }
