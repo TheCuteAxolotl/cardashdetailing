@@ -79,6 +79,7 @@ export default function OwnerScheduleOverview({
   for(const e of events)groups.set(e.date,[...(groups.get(e.date)||[]),e]);
   return groups;
  },[events]);
+ const createOn = (date:string) => window.location.assign("/owner/schedule?add=" + encodeURIComponent(date));
  const selectDate=(value:string)=>{setSelected(value);setAnchor(fromISO(value));};
  const step=(direction:number)=>{
   const next=new Date(anchor);
@@ -98,7 +99,7 @@ export default function OwnerScheduleOverview({
   : view==="week"?dateText(weekDays[6]):selected;
  const periodBookings = activeBookings.filter(b=>b.preferredDate!>=periodStart&&b.preferredDate!<=periodEnd);
  const periodValue = periodBookings.reduce((sum,b)=>sum+(Number(b.quotedPrice)||0),0);
- const open = (event:Event)=>{ if(event.booking)onEditBooking(event.booking); else if(event.task)window.location.assign("/owner/schedule"); };
+ const open = (event:Event)=>{ if(event.booking)onEditBooking(event.booking); else if(event.task)window.location.assign("/owner/schedule?editTask=" + encodeURIComponent(event.task.id)); };
  const title = view==="month"?monthTitle(anchor):view==="week"
   ? dayName(weekDays[0])+" – "+dayName(weekDays[6]) : view==="agenda" ? "Upcoming appointments" : view==="locations" ? "Service locations" : dayName(anchor);
  const views:ScheduleView[]=["month","week","day","agenda","locations"];
@@ -154,9 +155,9 @@ export default function OwnerScheduleOverview({
            const id=dateText(d),onMonth=d.getMonth()===anchor.getMonth(),current=id===today;
            const rows=indexed.get(id)||[];
            const selectedDay=id===selected;
-           return <div key={id}
+           return <div key={id} onClick={event => { if (!(event.target as HTMLElement).closest("button,a")) createOn(id); }}
              className={"min-h-[99px] min-w-0 border-b border-r border-white/[.09] px-1.5 py-1.5 text-left align-top transition sm:min-h-[124px] sm:px-2 sm:py-2 "+(selectedDay?"bg-[#d6b779]/10 ring-1 ring-inset ring-[#d6b779]/35":"hover:bg-white/[.035]")+" "+(!onMonth?"opacity-40":"")}>
-             <button type="button" onClick={()=>selectDate(id)} aria-pressed={selectedDay} aria-label={dayName(d)+", "+rows.length+" items"} className={"mb-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-semibold "+(current?"bg-[#d6b779] text-[#181715]":selectedDay?"text-[#f1d59e]":"text-[#c5bdb2]")}>{d.getDate()}</button>
+             <button type="button" onClick={()=>createOn(id)} aria-pressed={selectedDay} aria-label={dayName(d)+", "+rows.length+" items"} className={"mb-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-semibold "+(current?"bg-[#d6b779] text-[#181715]":selectedDay?"text-[#f1d59e]":"text-[#c5bdb2]")}>{d.getDate()}</button>
              <span className="block space-y-1">{rows.slice(0,3).map(e=>eventBadge(e,true))}</span>
              {rows.length>3&&<button type="button" onClick={()=>{selectDate(id);setView("day");}} className="mt-1 block text-[10px] font-semibold text-[#d6b779]">+{rows.length-3} more</button>}
            </div>;
@@ -168,7 +169,7 @@ export default function OwnerScheduleOverview({
    {view==="week"&&<div className="overflow-x-auto">
      <div className="grid min-w-[630px] grid-cols-7">
        {weekDays.map(d=>{const id=dateText(d),rows=indexed.get(id)||[];return <div key={id} className={"min-h-[320px] border-r border-white/10 p-2 "+(id===today?"bg-[#d6b779]/[.045]":"")}>
-        <button onClick={()=>{selectDate(id);setView("day");}} className={"mb-3 block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold "+(id===today?"bg-[#d6b779] text-[#191714]":"bg-[#282723] text-[#d8cfc0] hover:bg-[#39362e]")}>{d.toLocaleDateString("en-US",{weekday:"short"})}<span className="block text-xl">{d.getDate()}</span></button>
+        <button onClick={()=>createOn(id)} className={"mb-3 block w-full rounded-lg px-2 py-2 text-left text-xs font-semibold "+(id===today?"bg-[#d6b779] text-[#191714]":"bg-[#282723] text-[#d8cfc0] hover:bg-[#39362e]")}>{d.toLocaleDateString("en-US",{weekday:"short"})}<span className="block text-xl">{d.getDate()}</span></button>
         <div className="space-y-1.5">{rows.map(e=>eventBadge(e,false))}</div>
        </div>})}
      </div>
@@ -213,7 +214,7 @@ export default function OwnerScheduleOverview({
    {(view==="month"||view==="week")&&<div className="border-t border-white/10 bg-[#211f1d] px-4 py-4 sm:px-6">
      <div className="flex flex-wrap items-center justify-between gap-3">
        <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#d6b779]">Selected day</p><p className="mt-1 text-sm font-semibold text-[#efe6d9]">{dayName(fromISO(selected))} · {selectedEvents.length} items</p></div>
-       <a href="/owner/bookings?create=1" className="rounded-lg border border-[#d6b779]/35 px-3 py-2 text-xs font-semibold text-[#e5ce9f] hover:bg-[#d6b779]/10">Add booking</a>
+       <a href={"/owner/bookings?create=1&date="+selected} className="rounded-lg border border-[#d6b779]/35 px-3 py-2 text-xs font-semibold text-[#e5ce9f] hover:bg-[#d6b779]/10">Add booking</a>
      </div>
      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
        {selectedEvents.length ? selectedEvents.slice(0,6).map(e=><button key={e.id} onClick={()=>open(e)}

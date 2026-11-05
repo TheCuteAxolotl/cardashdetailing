@@ -183,7 +183,7 @@ export default function OwnerDashboard(){
              <a href="/owner/schedule" className="text-[11px] font-semibold text-[#d6b779]">Planner</a>
            </div>
            <div className="space-y-2 p-4">
-             {[...overdueTasks,...soonTasks].length?[...overdueTasks,...soonTasks].map(t=><a key={t.id} href="/owner/schedule"
+             {[...overdueTasks,...soonTasks].length?[...overdueTasks,...soonTasks].map(t=><a key={t.id} href={"/owner/schedule?editTask="+encodeURIComponent(t.id)}
                className="flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-[#2a2926] px-3 py-2.5 hover:border-[#d6b779]/40">
                <p className="text-xs font-medium text-[#e9ded0]">{t.title}</p>
                <time className={"shrink-0 text-[10px] "+(t.date<today?"text-[#f2b5a6]":"text-[#cbb58e]")}>{dateLabel(t.date)}</time>

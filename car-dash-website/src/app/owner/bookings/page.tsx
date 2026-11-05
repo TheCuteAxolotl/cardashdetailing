@@ -108,6 +108,10 @@ export default function OwnerBookings() {
     const fields = ["customerName","customerEmail","customerPhone","serviceName",
       "vehicleYear","vehicleMake","vehicleModel","serviceAddress"] as const;
     const draft:Partial<ManualBookingForm>={};
+    const date = params.get("date");
+    if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) draft.preferredDate = date;
+    const time = params.get("time");
+    if (time && /^([01]\d|2[0-3]):[0-5]\d$/.test(time)) draft.preferredTime = time;
     let stored:Record<string,unknown>={};
     if(params.get("from")==="crm"){
       try{
@@ -426,7 +430,7 @@ export default function OwnerBookings() {
       </main>
       {reminderBooking && <BookingReminderDialog key={reminderBooking.id} booking={reminderBooking} onClose={() => setReminderBooking(null)} />}
       {receiptBooking && <BookingPaidReceiptDialog key={receiptBooking.id} booking={receiptBooking} onClose={() => setReceiptBooking(null)} />}
-      {editingBooking && <BookingDetailsEditor key={editingBooking.id} booking={editingBooking} onClose={() => setEditingBooking(null)} onSaved={async () => { await load(); setMessage("Booking details and address saved."); }} />}
+      {editingBooking && <BookingDetailsEditor key={editingBooking.id} booking={editingBooking} onClose={() => setEditingBooking(null)} onSaved={async () => { await load(); setMessage("Bookings updated."); }} />}
     </div>
   );
 }

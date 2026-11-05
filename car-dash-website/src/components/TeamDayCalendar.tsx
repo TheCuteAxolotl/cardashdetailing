@@ -28,7 +28,7 @@ type Props = {
   tasks: OwnerScheduleTask[];
   onEditBooking: (b: EditableBooking) => void;
   onEditTask: (t: OwnerScheduleTask) => void;
-  onAddTask: (date: string) => void;
+  onAddTask: (date: string, time?: string) => void;
 };
 type Event = {
   id: string;
@@ -360,6 +360,13 @@ export default function TeamDayCalendar({
                       style={{ top: (h - startHour + 0.5) * hourHeight }}
                     />
                   ))}
+                  {hours.slice(0, -1).map(hour => (
+                    <button key={hour} type="button"
+                      aria-label={`Add activity on ${date} at ${minuteLabel(hour * 60)}`}
+                      onClick={() => onAddTask(date, String(hour).padStart(2, "0") + ":00")}
+                      className="absolute inset-x-0 hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-inset"
+                      style={{top:(hour - startHour) * hourHeight, height:hourHeight}} />
+                  ))}
                   {packed.map((event) => {
                     const pending = lane.id === "pending",
                       plan = lane.id === "plans";
@@ -469,7 +476,7 @@ export default function TeamDayCalendar({
           availability. Click an appointment to edit its details.
         </span>
         <button className="text-[#d6b779]" onClick={() => onAddTask(date)}>
-          + Add private plan
+          + Add activity
         </button>
       </div>
       {(unscheduled.length > 0 || anytime.length > 0) && (
