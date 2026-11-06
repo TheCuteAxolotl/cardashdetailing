@@ -44,7 +44,7 @@ export default function ProductEditor({
               disabled={selected === c}
               onClick={() => select(c)}
             >
-              {c}
+              {c}{rows.some(row=>row.color===c && row.published) ? "" : " (draft)"}
             </button>
           ))}{" "}
           <button
@@ -138,7 +138,7 @@ export default function ProductEditor({
           <input
             type="checkbox"
             name="published"
-            defaultChecked={current?.published ?? false}
+            defaultChecked={current?.published ?? true}
           />{" "}
           Show this color in shop
         </label>

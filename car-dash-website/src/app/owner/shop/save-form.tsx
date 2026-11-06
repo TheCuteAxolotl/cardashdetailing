@@ -32,7 +32,10 @@ export default function SaveForm({
         try {
           const result = await save(data);
           setMessage(result.message);
-          if (result.ok) onSaved?.();
+          if (result.ok) {
+            onSaved?.();
+            try { localStorage.setItem("merch-shop-updated", crypto.randomUUID()); } catch {}
+          }
           if (result.created) router.push("/owner/shop");
         } catch {
           setMessage(

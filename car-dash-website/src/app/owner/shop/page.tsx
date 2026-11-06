@@ -125,7 +125,7 @@ async function save(f: FormData) {
     });
     revalidatePath("/owner/shop");
     revalidatePath("/shop");
-    return { ok: true, created: !str("template"), message: "Saved." };
+    return { ok: true, created: !str("template"), message: f.has("published") ? "Saved and published to the shop." : "Saved as a draft. Select Show this color in shop to publish it." };
   } catch (error) {
     return {
       ok: false,

@@ -1,5 +1,6 @@
 import { readShop } from "@/lib/shop";
 import "./store.css";
+import StoreRefresh from "./store-refresh";
 import Catalog from "./catalog";
 export const dynamic = "force-dynamic";
 export default async function Shop({
@@ -10,6 +11,7 @@ export default async function Shop({
   const rows = (await readShop()).variants.filter((v) => v.published);
   return (
     <div className="merch-store">
+      <StoreRefresh/>
       <header>
         <a href="/" aria-label="Car Dash home">
           CAR DASH
