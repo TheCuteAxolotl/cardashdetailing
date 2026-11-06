@@ -1,3 +1,4 @@
+import Photo from "./photo";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
@@ -83,7 +84,6 @@ function Editor({ v }: { v?: Variant }) {
           "description",
           "guide",
           "eta",
-          "image",
         ] as const
       ).map((k, i) => (
         <label key={k}>
@@ -95,7 +95,6 @@ function Editor({ v }: { v?: Variant }) {
               "Description",
               "Size guide (include units)",
               "Restock estimate",
-              "Product photo URL",
             ][i]
           }
           <textarea
@@ -125,7 +124,7 @@ function Editor({ v }: { v?: Variant }) {
         <input type="checkbox" name="published" defaultChecked={v?.published} />{" "}
         Show in shop
       </label>
-      <button>Save variant</button>
+      <Photo initial={v?.image ?? ""} />
     </form>
   );
 }
