@@ -1,3 +1,5 @@
+import "./manager.css";
+import Link from "next/link";
 import { GuideEditor } from "../../shop/size-guide";
 import Photo from "./photo";
 import { revalidatePath } from "next/cache";
@@ -162,44 +164,35 @@ function Editor({ v }: { v?: Variant }) {
     </form>
   );
 }
-export default async function Manager() {
+export default async function Manager({searchParams}:{searchParams:Promise<{view?:string;q?:string}>}) {
   await owner();
   const shop = await readShop();
-  return (
-    <main className="mx-auto max-w-4xl space-y-5 p-6">
-      <h1 className="text-3xl font-bold">Merch shop</h1>
-      <details>
-        <summary>Add a size and color</summary>
-        <Editor />
-      </details>
-      {[
-        ...new Set(shop.variants.filter((v) => !v.deleted).map((v) => v.name)),
-      ].map((name) => {
-        const variants = shop.variants.filter(
-          (v) => !v.deleted && v.name === name,
-        );
-        return (
-          <section key={name} className="border-b py-4">
-            <h2 className="font-bold">{name}</h2>
-            {variants.map((v) => (
-              <details key={v.id}>
-                <summary>
-                  {v.name} · {v.color} · {v.size} · {v.stock} available
-                </summary>
-                <Editor v={v} />
-                <DeleteControl
-                  ids={[v.id]}
-                  label={"Delete " + v.color + " / " + v.size}
-                />
-              </details>
-            ))}
-            <DeleteControl
-              ids={variants.map((v) => v.id)}
-              label={"Delete entire product · " + name}
-            />
-          </section>
-        );
-      })}
+  const params=await searchParams;
+  const view=["inventory","orders","new"].includes(params.view??"")?params.view:"products";
+  const query=(params.q??"").trim().toLowerCase();
+  const active=shop.variants.filter(v=>!v.deleted);
+  const matches=active.filter(v=>[v.name,v.color,v.size].join(" ").toLowerCase().includes(query));
+  const names=[...new Set(matches.map(v=>v.name))];
+  return <main className="merch-manager">
+    <header><div><h1>Shop manager</h1><Link href="/shop">View storefront ↗</Link></div><Link className="mm-primary" href="?view=new">+ Add variant</Link></header>
+    <nav aria-label="Shop management">{["products","inventory","orders"].map(key=><Link key={key} href={"?view="+key} aria-current={view===key?"page":undefined}>{key}</Link>)}</nav>
+    {view==="new" && <section><h2>Add a product variant</h2><Editor/></section>}
+    {(view==="products"||view==="inventory") && <>
+      <form className="mm-search"><input type="hidden" name="view" value={view}/><input aria-label="Search by product, color or size" name="q" defaultValue={params.q} placeholder="Search product, color or size"/><button>Search</button></form>
+      {!matches.length && <p>{query?"No matching variants.":"Your catalog is empty. Add a variant to get started."}</p>}
+    </>}
+    {view==="products" && names.map(name=>{
+      const variants=matches.filter(v=>v.name===name);
+      const cover=variants.find(v=>v.image)?.image;
+      return <section className="mm-product" key={name}><div className="mm-title">{cover&&<img src={cover} alt=""/>}<h2>{name}</h2></div>
+        {variants.map(v=><details key={v.id} className="mm-variant"><summary><strong>{v.color} / {v.size}</strong><span>{v.published?"Published":"Draft"} · {v.stock} left</span></summary><Editor v={v}/><DeleteControl ids={[v.id]} label={"Delete "+v.color+" / "+v.size}/></details>)}
+        <DeleteControl ids={active.filter(v=>v.name===name).map(v=>v.id)} label={"Delete entire product · "+name}/></section>;
+    })}
+    {view==="inventory" && <>{matches.map(v=><form className="mm-stock" key={v.id} action={async(f)=>{
+      "use server";await owner();const raw=String(f.get("adjust")??"").trim();const n=Number(raw);
+      if(!raw||!Number.isSafeInteger(n)) throw Error("Enter a whole number.");
+      await changeShop(s=>{const item=s.variants.find(x=>x.id===v.id&&!x.deleted);if(!item||item.stock+n<0||!Number.isSafeInteger(item.stock+n))throw Error("Invalid stock adjustment.");item.stock+=n;allocate(s,item);});revalidatePath("/owner/shop");revalidatePath("/shop");
+    }}><div><strong>{v.name}</strong><p>{v.color} / {v.size} · {v.stock} available</p></div><label>Adjust by<input name="adjust" type="number" step="1" required placeholder="+ / −"/></label><button>Update</button></form>)}
       {shop.variants
         .filter(
           (v) =>
@@ -235,7 +228,9 @@ export default async function Manager() {
             <button>Allocate stock</button>
           </form>
         ))}
-      <h2>Merch orders</h2>
+      </>}
+      {view==="orders" && <><h2>Merch orders</h2>
+      {!shop.orders.some(o=>["reserved","ready","shipped"].includes(o.status)) && <p>No paid orders yet.</p>}
       <form
         action={async () => {
           "use server";
@@ -291,6 +286,6 @@ export default async function Manager() {
             </form>
           </article>
         ))}
-    </main>
+    </>}</main>
   );
 }
