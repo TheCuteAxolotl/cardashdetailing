@@ -164,128 +164,257 @@ function Editor({ v }: { v?: Variant }) {
     </form>
   );
 }
-export default async function Manager({searchParams}:{searchParams:Promise<{view?:string;q?:string}>}) {
+export default async function Manager({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string; q?: string }>;
+}) {
   await owner();
   const shop = await readShop();
-  const params=await searchParams;
-  const view=["inventory","orders","new"].includes(params.view??"")?params.view:"products";
-  const query=(params.q??"").trim().toLowerCase();
-  const active=shop.variants.filter(v=>!v.deleted);
-  const matches=active.filter(v=>[v.name,v.color,v.size].join(" ").toLowerCase().includes(query));
-  const names=[...new Set(matches.map(v=>v.name))];
-  return <main className="merch-manager">
-    <header><div><h1>Shop manager</h1><Link href="/shop">View storefront ↗</Link></div><Link className="mm-primary" href="?view=new">+ Add variant</Link></header>
-    <nav aria-label="Shop management">{["products","inventory","orders"].map(key=><Link key={key} href={"?view="+key} aria-current={view===key?"page":undefined}>{key}</Link>)}</nav>
-    {view==="new" && <section><h2>Add a product variant</h2><Editor/></section>}
-    {(view==="products"||view==="inventory") && <>
-      <form className="mm-search"><input type="hidden" name="view" value={view}/><input aria-label="Search by product, color or size" name="q" defaultValue={params.q} placeholder="Search product, color or size"/><button>Search</button></form>
-      {!matches.length && <p>{query?"No matching variants.":"Your catalog is empty. Add a variant to get started."}</p>}
-    </>}
-    {view==="products" && names.map(name=>{
-      const variants=matches.filter(v=>v.name===name);
-      const cover=variants.find(v=>v.image)?.image;
-      return <section className="mm-product" key={name}><div className="mm-title">{cover&&<img src={cover} alt=""/>}<h2>{name}</h2></div>
-        {variants.map(v=><details key={v.id} className="mm-variant"><summary><strong>{v.color} / {v.size}</strong><span>{v.published?"Published":"Draft"} · {v.stock} left</span></summary><Editor v={v}/><DeleteControl ids={[v.id]} label={"Delete "+v.color+" / "+v.size}/></details>)}
-        <DeleteControl ids={active.filter(v=>v.name===name).map(v=>v.id)} label={"Delete entire product · "+name}/></section>;
-    })}
-    {view==="inventory" && <>{matches.map(v=><form className="mm-stock" key={v.id} action={async(f)=>{
-      "use server";await owner();const raw=String(f.get("adjust")??"").trim();const n=Number(raw);
-      if(!raw||!Number.isSafeInteger(n)) throw Error("Enter a whole number.");
-      await changeShop(s=>{const item=s.variants.find(x=>x.id===v.id&&!x.deleted);if(!item||item.stock+n<0||!Number.isSafeInteger(item.stock+n))throw Error("Invalid stock adjustment.");item.stock+=n;allocate(s,item);});revalidatePath("/owner/shop");revalidatePath("/shop");
-    }}><div><strong>{v.name}</strong><p>{v.color} / {v.size} · {v.stock} available</p></div><label>Adjust by<input name="adjust" type="number" step="1" required placeholder="+ / −"/></label><button>Update</button></form>)}
-      {shop.variants
-        .filter(
-          (v) =>
-            v.deleted &&
-            shop.orders.some(
-              (o) => o.variant === v.id && o.status === "reserved",
-            ),
-        )
-        .map((v) => (
-          <form
-            key={v.id}
-            action={async (f) => {
-              "use server";
-              await owner();
-              const qty = Number(f.get("qty"));
-              if (!Number.isSafeInteger(qty) || qty < 1)
-                throw Error("Enter a positive quantity.");
-              await changeShop((s) => {
-                const item = s.variants.find((x) => x.id === v.id && x.deleted);
-                if (item) {
-                  item.stock += qty;
-                  allocate(s, item);
-                }
-              });
-              revalidatePath("/owner/shop");
-            }}
+  const params = await searchParams;
+  const view = ["inventory", "orders", "new"].includes(params.view ?? "")
+    ? params.view
+    : "products";
+  const query = (params.q ?? "").trim().toLowerCase();
+  const active = shop.variants.filter((v) => !v.deleted);
+  const matches = active.filter((v) =>
+    [v.name, v.color, v.size].join(" ").toLowerCase().includes(query),
+  );
+  const names = [...new Set(matches.map((v) => v.name))];
+  return (
+    <main className="merch-manager">
+      <header>
+        <div>
+          <h1>Shop manager</h1>
+          <Link href="/shop">View storefront ↗</Link>
+        </div>
+        <Link className="mm-primary" href="?view=new">
+          + Add variant
+        </Link>
+      </header>
+      <nav aria-label="Shop management">
+        {["products", "inventory", "orders"].map((key) => (
+          <Link
+            key={key}
+            href={"?view=" + key}
+            aria-current={view === key ? "page" : undefined}
           >
-            <label>
-              Restock deleted listing for paid reservations · {v.name} /{" "}
-              {v.color} / {v.size}{" "}
-              <input name="qty" type="number" min="1" required />
-            </label>
-            <button>Allocate stock</button>
-          </form>
+            {key}
+          </Link>
         ))}
-      </>}
-      {view==="orders" && <><h2>Merch orders</h2>
-      {!shop.orders.some(o=>["reserved","ready","shipped"].includes(o.status)) && <p>No paid orders yet.</p>}
-      <form
-        action={async () => {
-          "use server";
-          await owner();
-          await reconcile();
-          revalidatePath("/owner/shop");
-        }}
-      >
-        <button>Sync payments and expired checkouts</button>
-      </form>
-      {shop.orders
-        .filter((o) => ["reserved", "ready", "shipped"].includes(o.status))
-        .reverse()
-        .map((o) => (
-          <article className="rounded border p-3" key={o.id}>
-            <strong>{o.item}</strong>
+      </nav>
+      {view === "new" && (
+        <section>
+          <h2>Add a product variant</h2>
+          <Editor />
+        </section>
+      )}
+      {(view === "products" || view === "inventory") && (
+        <>
+          <form className="mm-search">
+            <input type="hidden" name="view" value={view} />
+            <input
+              aria-label="Search by product, color or size"
+              name="q"
+              defaultValue={params.q}
+              placeholder="Search product, color or size"
+            />
+            <button>Search</button>
+          </form>
+          {!matches.length && (
             <p>
-              {o.status === "ready"
-                ? "Ready to ship"
-                : o.status === "reserved"
-                  ? "Paid · awaiting restock"
-                  : "Shipped"}{" "}
-              · ${(o.cents / 100).toFixed(2)}
+              {query
+                ? "No matching variants."
+                : "Your catalog is empty. Add a variant to get started."}
             </p>
-            <p>{o.recipient}</p>
-            {o.tracking}
+          )}
+        </>
+      )}
+      {view === "products" &&
+        names.map((name) => {
+          const variants = matches.filter((v) => v.name === name);
+          const cover = variants.find((v) => v.image)?.image;
+          return (
+            <section className="mm-product" key={name}>
+              <div className="mm-title">
+                {cover && <img src={cover} alt="" />}
+                <h2>{name}</h2>
+              </div>
+              {variants.map((v) => (
+                <details key={v.id} className="mm-variant">
+                  <summary>
+                    <strong>
+                      {v.color} / {v.size}
+                    </strong>
+                    <span>
+                      {v.published ? "Published" : "Draft"} · {v.stock} left
+                    </span>
+                  </summary>
+                  <Editor v={v} />
+                  <DeleteControl
+                    ids={[v.id]}
+                    label={"Delete " + v.color + " / " + v.size}
+                  />
+                </details>
+              ))}
+              <DeleteControl
+                ids={active.filter((v) => v.name === name).map((v) => v.id)}
+                label={"Delete entire product · " + name}
+              />
+            </section>
+          );
+        })}
+      {view === "inventory" && (
+        <>
+          {matches.map((v) => (
             <form
+              className="mm-stock"
+              key={v.id}
               action={async (f) => {
                 "use server";
                 await owner();
-                const tracking = String(f.get("tracking") ?? "").trim();
-                if (!tracking) throw Error("Enter tracking.");
+                const raw = String(f.get("adjust") ?? "").trim();
+                const n = Number(raw);
+                if (!raw || !Number.isSafeInteger(n))
+                  throw Error("Enter a whole number.");
                 await changeShop((s) => {
-                  const order = s.orders.find((x) => x.id === o.id);
-                  if (order?.status === "ready") {
-                    order.tracking = tracking;
-                    order.status = "shipped";
-                  }
+                  const item = s.variants.find(
+                    (x) => x.id === v.id && !x.deleted,
+                  );
+                  if (
+                    !item ||
+                    item.stock + n < 0 ||
+                    !Number.isSafeInteger(item.stock + n)
+                  )
+                    throw Error("Invalid stock adjustment.");
+                  item.stock += n;
+                  allocate(s, item);
                 });
                 revalidatePath("/owner/shop");
+                revalidatePath("/shop");
               }}
             >
-              {o.status === "ready" && (
-                <>
-                  <input
-                    name="tracking"
-                    placeholder="Carrier and tracking number"
-                    required
-                  />
-                  <button>Mark shipped</button>
-                </>
-              )}
+              <div>
+                <strong>{v.name}</strong>
+                <p>
+                  {v.color} / {v.size} · {v.stock} available
+                </p>
+              </div>
+              <label>
+                Adjust by
+                <input
+                  name="adjust"
+                  type="number"
+                  step="1"
+                  required
+                  placeholder="+ / −"
+                />
+              </label>
+              <button>Update</button>
             </form>
-          </article>
-        ))}
-    </>}</main>
+          ))}
+          {shop.variants
+            .filter(
+              (v) =>
+                v.deleted &&
+                shop.orders.some(
+                  (o) => o.variant === v.id && o.status === "reserved",
+                ),
+            )
+            .map((v) => (
+              <form
+                key={v.id}
+                action={async (f) => {
+                  "use server";
+                  await owner();
+                  const qty = Number(f.get("qty"));
+                  if (!Number.isSafeInteger(qty) || qty < 1)
+                    throw Error("Enter a positive quantity.");
+                  await changeShop((s) => {
+                    const item = s.variants.find(
+                      (x) => x.id === v.id && x.deleted,
+                    );
+                    if (item) {
+                      item.stock += qty;
+                      allocate(s, item);
+                    }
+                  });
+                  revalidatePath("/owner/shop");
+                }}
+              >
+                <label>
+                  Restock deleted listing for paid reservations · {v.name} /{" "}
+                  {v.color} / {v.size}{" "}
+                  <input name="qty" type="number" min="1" required />
+                </label>
+                <button>Allocate stock</button>
+              </form>
+            ))}
+        </>
+      )}
+      {view === "orders" && (
+        <>
+          <h2>Merch orders</h2>
+          {!shop.orders.some((o) =>
+            ["reserved", "ready", "shipped"].includes(o.status),
+          ) && <p>No paid orders yet.</p>}
+          <form
+            action={async () => {
+              "use server";
+              await owner();
+              await reconcile();
+              revalidatePath("/owner/shop");
+            }}
+          >
+            <button>Sync payments and expired checkouts</button>
+          </form>
+          {shop.orders
+            .filter((o) => ["reserved", "ready", "shipped"].includes(o.status))
+            .reverse()
+            .map((o) => (
+              <article className="rounded border p-3" key={o.id}>
+                <strong>{o.item}</strong>
+                <p>
+                  {o.status === "ready"
+                    ? "Ready to ship"
+                    : o.status === "reserved"
+                      ? "Paid · awaiting restock"
+                      : "Shipped"}{" "}
+                  · ${(o.cents / 100).toFixed(2)}
+                </p>
+                <p>{o.recipient}</p>
+                {o.tracking}
+                <form
+                  action={async (f) => {
+                    "use server";
+                    await owner();
+                    const tracking = String(f.get("tracking") ?? "").trim();
+                    if (!tracking) throw Error("Enter tracking.");
+                    await changeShop((s) => {
+                      const order = s.orders.find((x) => x.id === o.id);
+                      if (order?.status === "ready") {
+                        order.tracking = tracking;
+                        order.status = "shipped";
+                      }
+                    });
+                    revalidatePath("/owner/shop");
+                  }}
+                >
+                  {o.status === "ready" && (
+                    <>
+                      <input
+                        name="tracking"
+                        placeholder="Carrier and tracking number"
+                        required
+                      />
+                      <button>Mark shipped</button>
+                    </>
+                  )}
+                </form>
+              </article>
+            ))}
+        </>
+      )}
+    </main>
   );
 }
