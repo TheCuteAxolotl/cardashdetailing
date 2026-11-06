@@ -37,6 +37,8 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
   const customerPortal = CUSTOMER_PORTAL_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
   const quietCustomer = QUIET_CUSTOMER_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 
+  if (pathname === "/shop") return <>{children}</>;
+
   if (staffInternal) {
     return <div className="min-h-screen bg-[#0d0d0d] text-[#f5f3ef]">{children}</div>;
   }

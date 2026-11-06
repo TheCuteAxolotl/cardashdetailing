@@ -1,62 +1,148 @@
 "use client";
-import {SizeGuide} from "./size-guide";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import type { Variant } from "@/lib/shop";
 import { checkout } from "./actions";
-export default function Catalog({ rows }: { rows: Variant[] }) {
+import { SizeGuide } from "./size-guide";
+
+function Gallery({ photos, name }: { photos: string[]; name: string }) {
+  const track = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+  const go = (i: number) =>
+    track.current?.scrollTo({
+      left: i * track.current.clientWidth,
+      behavior: "smooth",
+    });
+  if (!photos.length) return <div className="store-placeholder">Car Dash</div>;
   return (
-    <div className="grid gap-10 md:grid-cols-2">
-      {[...new Set(rows.map((v) => v.name))].map((name) => (
-        <Product key={name} rows={rows.filter((v) => v.name === name)} />
-      ))}
-    </div>
+    <section aria-label={name + " photos"}>
+      <div
+        className="store-track"
+        ref={track}
+        onScroll={(e) =>
+          setActive(
+            Math.round(
+              e.currentTarget.scrollLeft / e.currentTarget.clientWidth,
+            ),
+          )
+        }
+      >
+        {photos.map((url, i) => (
+          <img
+            key={url}
+            src={url}
+            alt={name + ", view " + (i + 1)}
+            loading={i ? "lazy" : "eager"}
+          />
+        ))}
+      </div>
+      {photos.length > 1 && (
+        <div className="store-thumbs">
+          {photos.map((url, i) => (
+            <button
+              type="button"
+              aria-label={"Show photo " + (i + 1)}
+              aria-pressed={i === active}
+              key={url}
+              onClick={() => go(i)}
+            >
+              <img src={url} alt="" />
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+function Buy({ stock }: { stock: number }) {
+  const { pending } = useFormStatus();
+  return (
+    <button className="store-buy" disabled={pending}>
+      {pending ? "Opening checkout…" : stock ? "Buy now" : "Reserve and pay"}
+      <span aria-hidden>↗</span>
+    </button>
   );
 }
 function Product({ rows }: { rows: Variant[] }) {
   const [id, select] = useState(rows[0].id);
-  const v = rows.find((v) => v.id === id) ?? rows[0];
+  const v = rows.find((row) => row.id === id) ?? rows[0];
+  const colors = [...new Set(rows.map((row) => row.color))];
+  const variants = rows.filter((row) => row.color === v.color);
+  const photos = v.images ?? (v.image ? [v.image] : []);
   return (
-    <article className="space-y-4 rounded-xl border border-neutral-500/40 p-5">
-      {v.image && (
-        <img
-          src={v.image}
-          alt={v.name + " in " + v.color}
-          className="max-h-96 w-full object-contain"
-        />
-      )}
-      <h2 className="text-2xl font-bold">{v.name}</h2>
-      <p>{v.description}</p>
-      <strong>${(v.cents / 100).toFixed(2)}</strong>
-      <label className="block">
-        Color and size{" "}
-        <select
-          className="bg-white text-black p-2"
-          value={v.id}
-          onChange={(e) => select(e.target.value)}
-        >
-          {rows.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.color} · {r.size} · {r.stock} left
-            </option>
+    <article className="store-product">
+      <Gallery
+        key={photos.join("|")}
+        photos={photos}
+        name={v.name + " in " + v.color}
+      />
+      <div className="store-info">
+        <h2>{v.name}</h2>
+        <p className="store-price">
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(v.cents / 100)}
+        </p>
+        <p>{v.description}</p>
+        <fieldset>
+          <legend>Color</legend>
+          {colors.map((color) => (
+            <button
+              type="button"
+              key={color}
+              aria-pressed={color === v.color}
+              onClick={() =>
+                select(
+                  (
+                    rows.find(
+                      (row) => row.color === color && row.size === v.size,
+                    ) ?? rows.find((row) => row.color === color)!
+                  ).id,
+                )
+              }
+            >
+              {color}
+            </button>
           ))}
-        </select>
-      </label>
-      <details>
-        <summary>Size guide</summary>
-        <SizeGuide guide={v.guide}/>
-      </details>
-      <p>
-        {v.stock
-          ? v.stock + " left in " + v.color + ", " + v.size
-          : "Pay now to reserve. Ships after restock. " + v.eta}
-      </p>
-      <form action={checkout}>
-        <input type="hidden" name="variant" value={v.id} />
-        <input type="hidden" name="reserve" value={v.stock ? "no" : "yes"} />
-        <button className="rounded bg-amber-300 px-6 py-3 font-bold text-black">
-          {v.stock ? "Buy now" : "Reserve and pay"}
-        </button>
-      </form>
+        </fieldset>
+        <fieldset>
+          <legend>Size</legend>
+          {variants.map((row) => (
+            <button
+              type="button"
+              key={row.id}
+              aria-pressed={row.id === v.id}
+              onClick={() => select(row.id)}
+            >
+              {row.size}
+            </button>
+          ))}
+        </fieldset>
+        <p className="store-stock" aria-live="polite">
+          {v.stock
+            ? v.stock + " left in " + v.color + " / " + v.size
+            : "Pay now to reserve. Ships after restock. " + v.eta}
+        </p>
+        <form action={checkout}>
+          <input type="hidden" name="variant" value={v.id} />
+          <input type="hidden" name="reserve" value={v.stock ? "no" : "yes"} />
+          <Buy stock={v.stock} />
+        </form>
+        <details>
+          <summary>Size guide</summary>
+          <SizeGuide guide={v.guide} />
+        </details>
+      </div>
     </article>
+  );
+}
+export default function Catalog({ rows }: { rows: Variant[] }) {
+  return (
+    <>
+      {[...new Set(rows.map((v) => v.name))].map((name) => (
+        <Product key={name} rows={rows.filter((v) => v.name === name)} />
+      ))}
+    </>
   );
 }

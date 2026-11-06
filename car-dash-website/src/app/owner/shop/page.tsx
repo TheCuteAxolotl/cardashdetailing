@@ -30,8 +30,8 @@ async function save(f: FormData) {
     !Number.isSafeInteger(delta)
   )
     throw Error("Check required fields and price.");
-  if (str("image") && !/^https:\/\//i.test(str("image")))
-    throw Error("Use an HTTPS photo URL.");
+  const images = [...new Set(f.getAll("image").map(String).filter(Boolean))];
+  if (images.length > 12 || images.some(url => !/^https:\/\//i.test(url))) throw Error("Choose up to 12 HTTPS photos.");
   await changeShop((shop) => {
     const old = shop.variants.find((v) => v.id === str("id"));
     if (
@@ -61,7 +61,8 @@ async function save(f: FormData) {
       size: str("size"),
       guide: str("guide"),
       eta: str("eta"),
-      image: str("image"),
+      image: images[0] ?? "",
+      images,
       published: f.has("published"),
       cents,
       stock,
@@ -124,7 +125,7 @@ function Editor({ v }: { v?: Variant }) {
         Show in shop
       </label>
       <GuideEditor initial={v?.guide ?? ""} />
-      <Photo initial={v?.image ?? ""} />
+      <Photo initial={v?.images ?? (v?.image ? [v.image] : [])} />
     </form>
   );
 }

@@ -1,4 +1,5 @@
 import { readShop } from "@/lib/shop";
+import "./store.css";
 import Catalog from "./catalog";
 export const dynamic = "force-dynamic";
 export default async function Shop({
@@ -8,18 +9,30 @@ export default async function Shop({
 }) {
   const rows = (await readShop()).variants.filter((v) => v.published);
   return (
-    <main className="mx-auto max-w-6xl px-6 py-20">
-      <h1 className="mb-8 text-5xl font-bold">Car Dash apparel</h1>
-      {(await searchParams).received && (
-        <p>
-          Thanks for checking out. Keep your Stripe receipt for your records.
-        </p>
-      )}
-      {rows.length ? (
-        <Catalog rows={rows} />
-      ) : (
-        <p>The first drop is on its way. Check back for sizes and colors.</p>
-      )}
-    </main>
+    <div className="merch-store">
+      <header>
+        <a href="/" aria-label="Car Dash home">
+          CAR DASH
+        </a>
+        <a href="/">Detailing site ↗</a>
+      </header>
+      <main>
+        <h1>Apparel</h1>
+        {(await searchParams).received && (
+          <p>
+            Thanks for checking out. Keep your Stripe receipt for your records.
+          </p>
+        )}
+        {rows.length ? (
+          <Catalog rows={rows} />
+        ) : (
+          <p>The first drop is on its way. Check back for sizes and colors.</p>
+        )}
+      </main>
+      <footer>
+        <a href="/">Car Dash Detailing</a>
+        <a href="/contact">Contact</a>
+      </footer>
+    </div>
   );
 }

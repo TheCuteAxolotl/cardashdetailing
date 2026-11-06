@@ -12,6 +12,7 @@ export type Variant = {
   color: string;
   guide: string;
   image: string;
+  images?: string[];
   cents: number;
   stock: number;
   eta: string;
