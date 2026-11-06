@@ -47,6 +47,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/service-guides", label: "Training Guides", icon: "book", ownerOnly: true },
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", ownerOnly: true },
       { href: "/owner/gift-cards", label: "Gift cards", icon: "price", ownerOnly: true },
+      { href: "/owner/shop", label: "Merch shop", icon: "price", ownerOnly: true },
       { href: "/owner/loyalty", label: "Loyalty cards", icon: "shield", ownerOnly: true },
       { href: "/owner/maintenance", label: "Subscriptions & maintenance", icon: "price", ownerOnly: true },
       { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },

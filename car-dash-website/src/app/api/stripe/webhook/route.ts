@@ -1,3 +1,4 @@
+import { syncShopSession } from "@/lib/shop";
 import { fulfillGiftCheckout } from "@/lib/gift-card-checkout";
 import { NextResponse } from "next/server";
 import { getInvoice, saveInvoice } from "@/lib/invoices";
@@ -106,6 +107,10 @@ export async function POST(request: Request) {
   try {
     const event = verifyStripeWebhook(rawBody, request.headers.get("stripe-signature"));
     const session = event.data?.object;
+    if (session?.metadata?.merch_order && event.type.startsWith("checkout.session.")) {
+      await syncShopSession(session);
+      return NextResponse.json({received:true});
+    }
 
     if (
       session &&

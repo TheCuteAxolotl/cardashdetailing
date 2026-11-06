@@ -9,6 +9,7 @@ type User = { id: string; name: string; email: string; role: string };
 const mainLinks = [
   ["/#prices", "Pricing"],
   ["/gallery", "Gallery"],
+  ["/shop", "Shop"],
   ["/reviews", "Reviews"],
 ] as const;
 
