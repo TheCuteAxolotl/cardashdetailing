@@ -175,3 +175,16 @@
   }
 }
 .store-info fieldset button:disabled, .merch-manager select:disabled {opacity:.55;cursor:default;}
+
+.merch-store .store-info table caption,
+.merch-store .store-info table tbody th,
+.merch-store .store-info table tbody td {
+  background: #fff !important;
+  color: #202020 !important;
+  opacity: 1;
+}
+.merch-store .store-info table caption { padding: 8px 0; }
+.merch-store .store-info table thead th {
+  background: #202020 !important;
+  color: #fff !important;
+}
