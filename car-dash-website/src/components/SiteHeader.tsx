@@ -106,7 +106,7 @@ export default function SiteHeader() {
       </div>
 
       <header className="mobile-site-header sticky top-0 z-50 border-b border-black/[.07] bg-[#faf9f7]/92 text-[#111] shadow-[0_10px_30px_rgba(23,20,17,.035)] backdrop-blur-2xl">
-        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-6 px-5 sm:px-8">
+        <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-2 px-5 sm:px-8 lg:gap-6">
           <a href="/" aria-label="Car Dash Detailing home" className="group flex shrink-0 items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full border border-black/[.08] bg-white shadow-[0_6px_18px_rgba(23,20,17,.06)] transition-transform duration-300 group-hover:scale-[1.03]"><img src={HOME_LOGO} alt="" width={40} height={40} className="h-9 w-9 rounded-full object-contain" /></span>
             <div className="leading-none">
@@ -167,6 +167,7 @@ export default function SiteHeader() {
             <a href="/#book" className="rounded-full bg-[#111] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(23,20,17,.12)] hover:bg-black">Book a detail</a>
           </div>
 
+          <a href="/shop" className="ml-auto inline-flex min-h-11 items-center rounded-full border border-current px-4 text-sm font-semibold lg:hidden">Shop</a>
           <button type="button" onClick={() => setMenuOpen(!menuOpen)} className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm lg:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"}>
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
           </button>
@@ -176,9 +177,9 @@ export default function SiteHeader() {
           <div className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
             <div className="mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
               <nav className="mobile-menu-nav divide-y divide-black/[.07] border-y border-black/[.07]">
-                <a href="/#prices" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Pricing</a>
-                <a href="/gallery" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Gallery</a>
-                <a href="/reviews" className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>Reviews</a>
+                {mainLinks.map(([href, label]) => (
+                  <a key={href} href={href} className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>{label}</a>
+                ))}
                 <button onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><span>{mobileServiceOpen ? "−" : "+"}</span></button>
                 {mobileServiceOpen && <div className="pb-4 pl-4">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}</div>}
                 <button onClick={() => { setMobileMoreOpen(!mobileMoreOpen); setMobileServiceOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>More</span><span>{mobileMoreOpen ? "−" : "+"}</span></button>
