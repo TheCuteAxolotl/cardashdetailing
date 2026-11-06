@@ -1,4 +1,4 @@
-import {GuideEditor} from "../../shop/size-guide";
+import { GuideEditor } from "../../shop/size-guide";
 import Photo from "./photo";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -31,12 +31,16 @@ async function save(f: FormData) {
   )
     throw Error("Check required fields and price.");
   const images = [...new Set(f.getAll("image").map(String).filter(Boolean))];
-  if (images.length > 12 || images.some(url => !/^https:\/\//i.test(url))) throw Error("Choose up to 12 HTTPS photos.");
+  if (images.length > 12 || images.some((url) => !/^https:\/\//i.test(url)))
+    throw Error("Choose up to 12 HTTPS photos.");
   await changeShop((shop) => {
     const old = shop.variants.find((v) => v.id === str("id"));
+    if (str("id") && (!old || old.deleted))
+      throw Error("This listing was deleted. Refresh the editor.");
     if (
       shop.variants.some(
         (v) =>
+          !v.deleted &&
           v.id !== old?.id &&
           [v.name, v.color, v.size].join("|").toLowerCase() ===
             [str("name"), str("color"), str("size")].join("|").toLowerCase(),
@@ -74,37 +78,66 @@ async function save(f: FormData) {
   revalidatePath("/owner/shop");
   revalidatePath("/shop");
 }
+async function remove(ids: string[]) {
+  "use server";
+  await owner();
+  await changeShop((shop) => {
+    const selected = new Set(ids);
+    shop.variants = shop.variants.filter((v) => {
+      if (!selected.has(v.id)) return true;
+      if (
+        !shop.orders.some(
+          (o) =>
+            o.variant === v.id && ["checkout", "reserved"].includes(o.status),
+        )
+      )
+        return false;
+      v.published = false;
+      v.deleted = true;
+      return true;
+    });
+  });
+  revalidatePath("/shop");
+  revalidatePath("/owner/shop");
+}
+function DeleteControl({ ids, label }: { ids: string[]; label: string }) {
+  return (
+    <details className="my-3">
+      <summary className="cursor-pointer text-red-400">{label}</summary>
+      <form action={remove.bind(null, ids)} className="mt-2">
+        <p>Remove this from the shop? Existing orders stay in Merch orders.</p>
+        <button className="mt-2 rounded bg-red-700 px-4 py-2 text-white">
+          Confirm deletion
+        </button>
+      </form>
+    </details>
+  );
+}
 function Editor({ v }: { v?: Variant }) {
   return (
     <form action={save} className="grid gap-3 rounded border p-4">
       <input type="hidden" name="id" value={v?.id ?? ""} />
-      {(
-        [
-          "name",
-          "color",
-          "size",
-          "description",
-          "eta",
-        ] as const
-      ).map((k, i) => (
-        <label key={k}>
-          {
-            [
-              "Product name",
-              "Color",
-              "Size",
-              "Description",
-              "Restock estimate",
-            ][i]
-          }
-          <textarea
-            className="block w-full rounded border p-2"
-            name={k}
-            defaultValue={v?.[k]}
-            required={["name", "color", "size", "guide"].includes(k)}
-          />
-        </label>
-      ))}
+      {(["name", "color", "size", "description", "eta"] as const).map(
+        (k, i) => (
+          <label key={k}>
+            {
+              [
+                "Product name",
+                "Color",
+                "Size",
+                "Description",
+                "Restock estimate",
+              ][i]
+            }
+            <textarea
+              className="block w-full rounded border p-2"
+              name={k}
+              defaultValue={v?.[k]}
+              required={["name", "color", "size", "guide"].includes(k)}
+            />
+          </label>
+        ),
+      )}
       <label>
         Price including US shipping ($){" "}
         <input
@@ -139,14 +172,69 @@ export default async function Manager() {
         <summary>Add a size and color</summary>
         <Editor />
       </details>
-      {shop.variants.map((v) => (
-        <details key={v.id}>
-          <summary>
-            {v.name} · {v.color} · {v.size} · {v.stock} available
-          </summary>
-          <Editor v={v} />
-        </details>
-      ))}
+      {[
+        ...new Set(shop.variants.filter((v) => !v.deleted).map((v) => v.name)),
+      ].map((name) => {
+        const variants = shop.variants.filter(
+          (v) => !v.deleted && v.name === name,
+        );
+        return (
+          <section key={name} className="border-b py-4">
+            <h2 className="font-bold">{name}</h2>
+            {variants.map((v) => (
+              <details key={v.id}>
+                <summary>
+                  {v.name} · {v.color} · {v.size} · {v.stock} available
+                </summary>
+                <Editor v={v} />
+                <DeleteControl
+                  ids={[v.id]}
+                  label={"Delete " + v.color + " / " + v.size}
+                />
+              </details>
+            ))}
+            <DeleteControl
+              ids={variants.map((v) => v.id)}
+              label={"Delete entire product · " + name}
+            />
+          </section>
+        );
+      })}
+      {shop.variants
+        .filter(
+          (v) =>
+            v.deleted &&
+            shop.orders.some(
+              (o) => o.variant === v.id && o.status === "reserved",
+            ),
+        )
+        .map((v) => (
+          <form
+            key={v.id}
+            action={async (f) => {
+              "use server";
+              await owner();
+              const qty = Number(f.get("qty"));
+              if (!Number.isSafeInteger(qty) || qty < 1)
+                throw Error("Enter a positive quantity.");
+              await changeShop((s) => {
+                const item = s.variants.find((x) => x.id === v.id && x.deleted);
+                if (item) {
+                  item.stock += qty;
+                  allocate(s, item);
+                }
+              });
+              revalidatePath("/owner/shop");
+            }}
+          >
+            <label>
+              Restock deleted listing for paid reservations · {v.name} /{" "}
+              {v.color} / {v.size}{" "}
+              <input name="qty" type="number" min="1" required />
+            </label>
+            <button>Allocate stock</button>
+          </form>
+        ))}
       <h2>Merch orders</h2>
       <form
         action={async () => {

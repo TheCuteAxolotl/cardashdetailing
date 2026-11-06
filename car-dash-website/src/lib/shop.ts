@@ -17,6 +17,7 @@ export type Variant = {
   stock: number;
   eta: string;
   published: boolean;
+  deleted?: boolean;
 };
 export type Order = {
   id: string;
