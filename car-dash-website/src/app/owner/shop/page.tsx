@@ -1,10 +1,6 @@
-import { ColorChoice, StockGrid } from "./stock-grid";
-import SizePicker from "./size-picker";
+import ProductEditor from "./product-editor";
 import "./manager.css";
 import Link from "next/link";
-import { GuideEditor } from "../../shop/size-guide";
-import SaveForm from "./save-form";
-import Photo from "./photo";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
@@ -26,164 +22,110 @@ async function save(f: FormData) {
   try {
     const str = (key: string) => String(f.get(key) ?? "").trim();
     const cents = Math.round(Number(str("price")) * 100);
-    const bulk = f.has("matrix");
     const sizes = [...new Set(f.getAll("sizes").map(String))];
-    const delta = Number(str("delta"));
     if (!str("color")) throw new ShopInputError("Enter a color name.");
-    if (bulk && !sizes.length)
+    if (!sizes.length)
       throw new ShopInputError(
         "Choose at least one size for this color. Enter 0 for sizes available by reservation.",
       );
     if (
       !str("name") ||
       !str("color") ||
-      (bulk ? !sizes.length : !str("size")) ||
       !str("guide") ||
       !Number.isSafeInteger(cents) ||
-      cents < 50 ||
-      !Number.isSafeInteger(delta)
+      cents < 50
     )
       throw new ShopInputError("Check required fields and price.");
     const images = [...new Set(f.getAll("image").map(String).filter(Boolean))];
     if (images.length > 12 || images.some((url) => !/^https:\/\//i.test(url)))
       throw new ShopInputError("Choose up to 12 HTTPS photos.");
     await changeShop((shop) => {
-      if (bulk) {
-        const templateId = str("template");
-        const template = shop.variants.find(
-          (v) => v.id === templateId && !v.deleted,
-        );
-        if (templateId && !template)
-          throw new ShopInputError("Product changed. Refresh and try again.");
-        const name = template?.name ?? str("name");
-        if (
-          !template &&
-          shop.variants.some(
-            (v) => !v.deleted && v.name.toLowerCase() === name.toLowerCase(),
-          )
-        )
-          throw new ShopInputError(
-            "Product already exists. Open its Sizes and colors editor.",
-          );
-        const color =
-          shop.variants.find(
-            (v) =>
-              !v.deleted &&
-              v.color.toLowerCase() === str("color").toLowerCase(),
-          )?.color ?? str("color");
-        const source =
-          shop.variants.find(
-            (v) => !v.deleted && v.name === name && v.color === color,
-          ) ?? template;
-        for (const size of sizes) {
-          const item = shop.variants.find(
-            (v) =>
-              !v.deleted &&
-              v.name === name &&
-              v.color === color &&
-              v.size === size,
-          );
-          const raw = str("qty:" + size),
-            qty = Number(raw),
-            previous = str("previous:" + size);
-          if (!raw || !Number.isSafeInteger(qty) || qty < 0)
-            throw new ShopInputError(
-              "Enter a nonnegative quantity for each selected size.",
-            );
-          if (item && previous === item.id + "@" + qty) continue;
-          if (previous !== (item ? item.id + "@" + item.stock : ""))
-            throw new ShopInputError(
-              "Inventory changed. Refresh before setting new quantities.",
-            );
-          if (item) {
-            item.stock = qty;
-            allocate(shop, item);
-            continue;
-          }
-          const variant = {
-            ...(source ?? {
-              description: str("description"),
-              guide: str("guide"),
-              eta: str("eta"),
-              image: images[0] ?? "",
-              images,
-              published: f.has("published"),
-              cents,
-            }),
-            ...(source && source.color !== color
-              ? { image: "", images: [] }
-              : {}),
-            id: crypto.randomUUID(),
-            name,
-            color,
-            size,
-            stock: qty,
-          };
-          shop.variants.push(variant);
-          allocate(shop, variant);
-        }
-        return;
-      }
-      const old = shop.variants.find((v) => v.id === str("id"));
-      if (str("id") && (!old || old.deleted))
-        throw new ShopInputError(
-          "This listing was deleted. Refresh the editor.",
-        );
+      const templateId = str("template");
+      const template = shop.variants.find(
+        (v) => v.id === templateId && !v.deleted,
+      );
+      if (templateId && !template)
+        throw new ShopInputError("Product changed. Refresh and try again.");
+      const name = template?.name ?? str("name");
       if (
+        !template &&
         shop.variants.some(
-          (v) =>
-            !v.deleted &&
-            v.id !== old?.id &&
-            [v.name, v.color, v.size].join("|").toLowerCase() ===
-              [str("name"), str("color"), str("size")].join("|").toLowerCase(),
+          (v) => !v.deleted && v.name.toLowerCase() === name.toLowerCase(),
         )
       )
-        throw new ShopInputError("This variant already exists.");
-      if (
-        old &&
-        shop.orders.some((o) => o.variant === old.id) &&
-        (old.color !== str("color") || old.size !== str("size"))
-      )
         throw new ShopInputError(
-          "Create a new variant to change the size or color after checkout.",
+          "Product already exists. Open its Sizes and colors editor.",
         );
-      const stock = (old?.stock ?? 0) + delta;
-      if (stock < 0)
-        throw new ShopInputError("Stock adjustment exceeds available stock.");
-      const v = {
-        id: old?.id ?? crypto.randomUUID(),
-        name: str("name"),
+      const color =
+        shop.variants.find(
+          (v) =>
+            !v.deleted && v.color.toLowerCase() === str("color").toLowerCase(),
+        )?.color ?? str("color");
+      const details = {
         description: str("description"),
-        color: str("color"),
-        size: str("size"),
-        guide: str("guide"),
         eta: str("eta"),
+        guide: str("guide"),
+        cents,
         image: images[0] ?? "",
         images,
         published: f.has("published"),
-        cents,
-        stock,
       };
-      const previousImages = old?.images ?? (old?.image ? [old.image] : []);
-      if (JSON.stringify(previousImages) !== JSON.stringify(images)) {
-        for (const sibling of shop.variants) {
-          if (
-            !sibling.deleted &&
-            sibling.name === v.name &&
-            sibling.color === v.color
-          ) {
-            sibling.image = v.image;
-            sibling.images = images;
-          }
+      if (
+        f.has("newColor") &&
+        shop.variants.some(
+          (v) =>
+            !v.deleted &&
+            v.name === name &&
+            v.color.toLowerCase() === color.toLowerCase(),
+        )
+      )
+        throw new ShopInputError(
+          "That color already exists. Select it to edit its photos and quantities.",
+        );
+      for (const size of sizes) {
+        const item = shop.variants.find(
+          (v) =>
+            !v.deleted &&
+            v.name === name &&
+            v.color === color &&
+            v.size === size,
+        );
+        const raw = str("qty:" + size),
+          qty = Number(raw),
+          previous = str("previous:" + size);
+        if (!raw || !Number.isSafeInteger(qty) || qty < 0)
+          throw new ShopInputError(
+            "Enter a nonnegative quantity for each selected size.",
+          );
+        if (item && previous === item.id + "@" + qty) {
+          Object.assign(item, details);
+          continue;
         }
+        if (previous !== (item ? item.id + "@" + item.stock : ""))
+          throw new ShopInputError(
+            "Inventory changed. Refresh before setting new quantities.",
+          );
+        if (item) {
+          Object.assign(item, details);
+          item.stock = qty;
+          allocate(shop, item);
+          continue;
+        }
+        const variant = {
+          ...details,
+          id: crypto.randomUUID(),
+          name,
+          color,
+          size,
+          stock: qty,
+        };
+        shop.variants.push(variant);
+        allocate(shop, variant);
       }
-      if (old) Object.assign(old, v);
-      else shop.variants.push(v);
-      allocate(shop, old ?? v);
     });
     revalidatePath("/owner/shop");
     revalidatePath("/shop");
-    return { ok: true, created: bulk && !str("template"), message: "Saved." };
+    return { ok: true, created: !str("template"), message: "Saved." };
   } catch (error) {
     return {
       ok: false,
@@ -230,89 +172,6 @@ function DeleteControl({ ids, label }: { ids: string[]; label: string }) {
     </details>
   );
 }
-function Editor({ v, colors }: { v?: Variant; colors: string[] }) {
-  return (
-    <SaveForm save={save} className="grid gap-3 rounded border p-4">
-      <input type="hidden" name="id" value={v?.id ?? ""} />
-      {!v && (
-        <>
-          <input type="hidden" name="matrix" value="1" />
-          <StockGrid rows={[]} colors={colors} />
-        </>
-      )}
-      {(["name", "color", "size", "description", "eta"] as const).map((k, i) =>
-        k === "color" ? (
-          v ? (
-            <ColorChoice key={k} colors={colors} initial={v.color} />
-          ) : null
-        ) : k === "size" && !v ? null : k === "size" ? (
-          <SizePicker key={k} initial={v?.size} />
-        ) : (
-          <label key={k}>
-            {
-              [
-                "Product name",
-                "Color",
-                "Size",
-                "Description",
-                "Restock estimate",
-              ][i]
-            }
-            <textarea
-              className="block w-full rounded border p-2"
-              name={k}
-              defaultValue={v?.[k]}
-              required={["name", "color", "size", "guide"].includes(k)}
-            />
-          </label>
-        ),
-      )}
-      <label>
-        Price including US shipping ($){" "}
-        <input
-          name="price"
-          type="number"
-          step=".01"
-          min=".50"
-          defaultValue={v ? v.cents / 100 : undefined}
-          required
-        />
-      </label>
-      {v && (
-        <label>
-          Adjust inventory ({v?.stock ?? 0} available){" "}
-          <input name="delta" type="number" defaultValue={0} required />
-        </label>
-      )}
-      <label>
-        <input type="checkbox" name="published" defaultChecked={v?.published} />{" "}
-        Show in shop
-      </label>
-      <GuideEditor initial={v?.guide ?? ""} />
-      <Photo
-        saveLabel={v ? "Save variant" : "Create product"}
-        initial={v?.images ?? (v?.image ? [v.image] : [])}
-      />
-    </SaveForm>
-  );
-}
-function ProductStock({ rows, colors }: { rows: Variant[]; colors: string[] }) {
-  return (
-    <SaveForm save={save} className="grid gap-3 p-4">
-      <input type="hidden" name="matrix" value="1" />
-      <input type="hidden" name="template" value={rows[0].id} />
-      <input type="hidden" name="name" value={rows[0].name} />
-      <input type="hidden" name="price" value={rows[0].cents / 100} />
-      <input type="hidden" name="guide" value={rows[0].guide} />
-      <StockGrid
-        key={JSON.stringify(rows.map((v) => [v.id, v.stock, v.color, v.size]))}
-        rows={rows}
-        colors={colors}
-      />
-      <button>Save sizes and quantities</button>
-    </SaveForm>
-  );
-}
 export default async function Manager({
   searchParams,
 }: {
@@ -326,7 +185,6 @@ export default async function Manager({
     : "products";
   const query = (params.q ?? "").trim().toLowerCase();
   const active = shop.variants.filter((v) => !v.deleted);
-  const colors = [...new Set(active.map((v) => v.color))];
   const matches = active.filter((v) =>
     [v.name, v.color, v.size].join(" ").toLowerCase().includes(query),
   );
@@ -356,7 +214,7 @@ export default async function Manager({
       {view === "new" && (
         <section>
           <h2>Add a product</h2>
-          <Editor colors={colors} />
+          <ProductEditor rows={[]} save={save} />
         </section>
       )}
       {(view === "products" || view === "inventory") && (
@@ -391,29 +249,22 @@ export default async function Manager({
                 <h2>{name}</h2>
               </div>
               <details>
-                <summary>Sizes and colors</summary>
-                <ProductStock
+                <summary>Edit product</summary>
+                <ProductEditor
+                  save={save}
                   rows={active.filter((v) => v.name === name)}
-                  colors={colors}
                 />
               </details>
-              {variants.map((v) => (
-                <details key={v.id} className="mm-variant">
-                  <summary>
-                    <strong>
-                      {v.color} / {v.size}
-                    </strong>
-                    <span>
-                      {v.published ? "Published" : "Draft"} · {v.stock} left
-                    </span>
-                  </summary>
-                  <Editor v={v} colors={colors} />
+              <details>
+                <summary>Remove a size</summary>
+                {variants.map((v) => (
                   <DeleteControl
+                    key={v.id}
                     ids={[v.id]}
-                    label={"Delete " + v.color + " / " + v.size}
+                    label={v.color + " / " + v.size}
                   />
-                </details>
-              ))}
+                ))}
+              </details>
               <DeleteControl
                 ids={active.filter((v) => v.name === name).map((v) => v.id)}
                 label={"Delete entire product · " + name}
@@ -426,9 +277,9 @@ export default async function Manager({
           {names.map((name) => (
             <section key={name} className="mm-product">
               <h2>{name}</h2>
-              <ProductStock
+              <ProductEditor
+                save={save}
                 rows={active.filter((v) => v.name === name)}
-                colors={colors}
               />
             </section>
           ))}

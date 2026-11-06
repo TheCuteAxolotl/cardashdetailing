@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 type SaveResult = { ok: boolean; created: boolean; message: string };
 export default function SaveForm({
   save,
+  onSaved,
   children,
   className,
 }: {
   save: (data: FormData) => Promise<SaveResult>;
+  onSaved?: () => void;
   children: ReactNode;
   className: string;
 }) {
@@ -30,6 +32,7 @@ export default function SaveForm({
         try {
           const result = await save(data);
           setMessage(result.message);
+          if (result.ok) onSaved?.();
           if (result.created) router.push("/owner/shop");
         } catch {
           setMessage(
