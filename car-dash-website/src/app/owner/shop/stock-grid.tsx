@@ -22,7 +22,7 @@ export function ColorChoice({
   return (
     <fieldset>
       <legend>Color</legend>
-      <input type="hidden" name="color" value={color} />
+      <input type="hidden" name="color" value={adding ? draft.trim() : color} />
       <select
         aria-label="Color"
         disabled={options.length < 2}
@@ -38,7 +38,10 @@ export function ColorChoice({
           New color
           <input
             value={draft}
-            onChange={(e) => type(e.target.value)}
+            onChange={(e) => {
+              type(e.target.value);
+              onColor?.(e.target.value.trim());
+            }}
             maxLength={60}
           />
           <button
@@ -59,7 +62,13 @@ export function ColorChoice({
           </button>
         </label>
       ) : (
-        <button type="button" onClick={() => add(true)}>
+        <button
+          type="button"
+          onClick={() => {
+            add(true);
+            onColor?.("");
+          }}
+        >
           Create color
         </button>
       )}
@@ -89,11 +98,18 @@ export function StockGrid({
   return (
     <>
       <ColorChoice colors={colors} initial={initial} onColor={select} />
-      <fieldset key={color}>
+      <fieldset
+        key={
+          rows.find((row) => row.color.toLowerCase() === color.toLowerCase())
+            ?.color ?? "new-color"
+        }
+      >
         <legend>Sizes and available quantities</legend>
         {sizes.map((size) => {
           const v = rows.find(
-            (row) => row.color === color && row.size === size,
+            (row) =>
+              row.color.toLowerCase() === color.toLowerCase() &&
+              row.size === size,
           );
           return (
             <label
