@@ -91,6 +91,7 @@ function Product({ rows }: { rows: Variant[] }) {
             <button
               type="button"
               key={color}
+              disabled={colors.length === 1}
               aria-pressed={color === v.color}
               onClick={() =>
                 select(

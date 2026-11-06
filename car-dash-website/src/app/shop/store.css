@@ -174,3 +174,4 @@
     margin-bottom: 20px;
   }
 }
+.store-info fieldset button:disabled, .merch-manager select:disabled {opacity:.55;cursor:default;}

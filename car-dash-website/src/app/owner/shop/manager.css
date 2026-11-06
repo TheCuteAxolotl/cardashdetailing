@@ -158,3 +158,4 @@
     margin: 4px 0 0 16px;
   }
 }
+.merch-manager select:disabled {opacity:.55;cursor:default;}

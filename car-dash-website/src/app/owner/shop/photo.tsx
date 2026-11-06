@@ -2,7 +2,7 @@
 import { upload } from "@vercel/blob/client";
 import { useState } from "react";
 
-export default function Photo({ initial }: { initial: string[] }) {
+export default function Photo({ initial, saveLabel }: { initial: string[]; saveLabel: string }) {
   const [photos, setPhotos] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -148,7 +148,7 @@ export default function Photo({ initial }: { initial: string[] }) {
       </details>
       <p role="status">{message}</p>
       <button disabled={busy} type="submit">
-        Save variant
+        {saveLabel}
       </button>
     </div>
   );
