@@ -57,17 +57,29 @@ export default function Photo({ initial }: { initial: string[] }) {
               className="h-24 w-24 object-contain"
             />
             <input type="hidden" name="image" value={url} />
-            {index > 0 && (
-              <button
-                type="button"
+            <label>
+              Position
+              <select
+                aria-label={"Position of photo " + (index + 1)}
+                value={index}
                 disabled={busy}
-                onClick={() =>
-                  setPhotos([url, ...photos.filter((p) => p !== url)])
-                }
+                onChange={(event) => {
+                  const position = Number(event.target.value);
+                  setPhotos(current => {
+                    const ordered = current.filter(photo => photo !== url);
+                    ordered.splice(position, 0, url);
+                    return ordered;
+                  });
+                  setMessage("Photo order updated. Save the variant to apply it.");
+                }}
               >
-                Make cover
-              </button>
-            )}
+                {photos.map((photo, position) => (
+                  <option key={photo} value={position}>
+                    {position === 0 ? "1 · Cover" : position + 1}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               type="button"
               disabled={busy}
