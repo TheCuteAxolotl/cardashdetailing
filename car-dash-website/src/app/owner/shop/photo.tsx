@@ -7,6 +7,44 @@ export default function Photo({ initial }: { initial: string[] }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [link, setLink] = useState("");
+  const [dragging, setDragging] = useState(false);
+  async function uploadFiles(files: File[]) {
+    if (busy || !files.length) return;
+    if (files.length + photos.length > 12) {
+      setMessage("Choose up to 12 photos per variant.");
+      return;
+    }
+    setBusy(true);
+    try {
+      for (const [i, file] of files.entries()) {
+        const ext = (
+          {
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/webp": "webp",
+          } as Record<string, string>
+        )[file.type];
+        if (!ext || file.size > 20 * 1024 * 1024)
+          throw Error("Choose JPG, PNG or WebP photos up to 20 MB each.");
+        setMessage("Uploading " + (i + 1) + " of " + files.length + "…");
+        const blob = await upload(
+          "merch/" + crypto.randomUUID() + "." + ext,
+          file,
+          {
+            access: "public",
+            handleUploadUrl: "/api/shop-photo",
+            contentType: file.type,
+          },
+        );
+        setPhotos((current) => [...current, blob.url]);
+      }
+      setMessage("Photos uploaded. Save the variant to publish your changes.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
     <div className="space-y-3">
       <p>Product photos · first photo is the cover</p>
@@ -40,56 +78,37 @@ export default function Photo({ initial }: { initial: string[] }) {
           </div>
         ))}
       </div>
-      <label>
-        Add photos (up to 12)
+      <label
+        className={
+          "block cursor-pointer rounded-xl border-2 border-dashed p-5 " +
+          (dragging ? "border-amber-400 bg-amber-400/10" : "border-neutral-500")
+        }
+        onDragOver={(event) => {
+          if (!event.dataTransfer.types.includes("Files")) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = busy ? "none" : "copy";
+          setDragging(!busy);
+        }}
+        onDragLeave={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+            setDragging(false);
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          setDragging(false);
+          void uploadFiles(Array.from(event.dataTransfer.files));
+        }}
+      >
+        {dragging ? "Drop photos here" : "Drag photos here or choose files"}
         <input
           type="file"
           multiple
           accept="image/jpeg,image/png,image/webp"
           disabled={busy}
-          onChange={async (e) => {
+          onChange={(e) => {
             const files = Array.from(e.target.files ?? []);
             e.target.value = "";
-            if (files.length + photos.length > 12) {
-              setMessage("Choose up to 12 photos per variant.");
-              return;
-            }
-            setBusy(true);
-            try {
-              for (const [i, file] of files.entries()) {
-                const ext = (
-                  {
-                    "image/jpeg": "jpg",
-                    "image/png": "png",
-                    "image/webp": "webp",
-                  } as Record<string, string>
-                )[file.type];
-                if (!ext || file.size > 20 * 1024 * 1024)
-                  throw Error(
-                    "Choose JPG, PNG or WebP photos up to 20 MB each.",
-                  );
-                setMessage(
-                  "Uploading " + (i + 1) + " of " + files.length + "…",
-                );
-                const blob = await upload(
-                  "merch/" + crypto.randomUUID() + "." + ext,
-                  file,
-                  {
-                    access: "public",
-                    handleUploadUrl: "/api/shop-photo",
-                    contentType: file.type,
-                  },
-                );
-                setPhotos((current) => [...current, blob.url]);
-              }
-              setMessage(
-                "Photos uploaded. Save the variant to publish your changes.",
-              );
-            } catch (err) {
-              setMessage(err instanceof Error ? err.message : "Upload failed.");
-            } finally {
-              setBusy(false);
-            }
+            void uploadFiles(files);
           }}
         />
       </label>
