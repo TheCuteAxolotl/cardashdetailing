@@ -1,3 +1,4 @@
+import SizePicker from "./size-picker";
 import "./manager.css";
 import Link from "next/link";
 import { GuideEditor } from "../../shop/size-guide";
@@ -120,7 +121,7 @@ function Editor({ v }: { v?: Variant }) {
     <form action={save} className="grid gap-3 rounded border p-4">
       <input type="hidden" name="id" value={v?.id ?? ""} />
       {(["name", "color", "size", "description", "eta"] as const).map(
-        (k, i) => (
+        (k, i) => k === "size" ? <SizePicker key={k} initial={v?.size} /> : (
           <label key={k}>
             {
               [
