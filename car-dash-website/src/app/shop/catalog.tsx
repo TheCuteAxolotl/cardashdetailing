@@ -124,7 +124,7 @@ function Product({ rows }: { rows: Variant[] }) {
         <p className="store-stock" aria-live="polite">
           {v.stock
             ? v.stock + " left in " + v.color + " / " + v.size
-            : "Pay now to reserve. Ships after restock. " + v.eta}
+            : "Out of stock. Pay now to reserve for the next restock. " + v.eta}
         </p>
         <form action={checkout}>
           <input type="hidden" name="variant" value={v.id} />

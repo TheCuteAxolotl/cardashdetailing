@@ -85,15 +85,7 @@ export function StockGrid({
   const initial = rows[0]?.color ?? colors[0] ?? "";
   const [color, select] = useState(initial);
   const sizes = [
-    ...new Set([
-      "S",
-      "M",
-      "L",
-      "XL",
-      "2XL",
-      "One size",
-      ...rows.map((v) => v.size),
-    ]),
+    ...new Set(["S", "M", "L", "XL", "2XL", ...rows.map((v) => v.size)]),
   ];
   return (
     <>
@@ -104,7 +96,8 @@ export function StockGrid({
             ?.color ?? "new-color"
         }
       >
-        <legend>Sizes and available quantities</legend>
+        <legend>Available quantity by size</legend>
+        <p>Enter the number on hand. Set a size to 0 for paid reservations.</p>
         {sizes.map((size) => {
           const v = rows.find(
             (row) =>
@@ -121,14 +114,7 @@ export function StockGrid({
                 marginBottom: 8,
               }}
             >
-              <input
-                type="checkbox"
-                name="sizes"
-                value={size}
-                defaultChecked={!!v}
-                disabled={!!v}
-              />
-              {v && <input type="hidden" name="sizes" value={size} />}
+              <input type="hidden" name="sizes" value={size} />
               <span style={{ minWidth: 60 }}>{size}</span>
               <input
                 type="number"
@@ -138,12 +124,7 @@ export function StockGrid({
                 step="1"
                 defaultValue={v?.stock ?? 0}
                 style={{ maxWidth: 100 }}
-                onChange={(e) => {
-                  const box = e.currentTarget
-                    .closest("label")
-                    ?.querySelector<HTMLInputElement>("[type=checkbox]");
-                  if (box) box.checked = true;
-                }}
+                required
               />
               <input
                 type="hidden"

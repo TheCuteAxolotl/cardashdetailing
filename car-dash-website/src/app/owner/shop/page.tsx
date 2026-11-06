@@ -296,6 +296,23 @@ function Editor({ v, colors }: { v?: Variant; colors: string[] }) {
     </SaveForm>
   );
 }
+function ProductStock({ rows, colors }: { rows: Variant[]; colors: string[] }) {
+  return (
+    <SaveForm save={save} className="grid gap-3 p-4">
+      <input type="hidden" name="matrix" value="1" />
+      <input type="hidden" name="template" value={rows[0].id} />
+      <input type="hidden" name="name" value={rows[0].name} />
+      <input type="hidden" name="price" value={rows[0].cents / 100} />
+      <input type="hidden" name="guide" value={rows[0].guide} />
+      <StockGrid
+        key={JSON.stringify(rows.map((v) => [v.id, v.stock, v.color, v.size]))}
+        rows={rows}
+        colors={colors}
+      />
+      <button>Save sizes and quantities</button>
+    </SaveForm>
+  );
+}
 export default async function Manager({
   searchParams,
 }: {
@@ -375,27 +392,10 @@ export default async function Manager({
               </div>
               <details>
                 <summary>Sizes and colors</summary>
-                <SaveForm save={save} className="grid gap-3 p-4">
-                  <input type="hidden" name="matrix" value="1" />
-                  <input type="hidden" name="template" value={variants[0].id} />
-                  <input type="hidden" name="name" value={name} />
-                  <input
-                    type="hidden"
-                    name="price"
-                    value={variants[0].cents / 100}
-                  />
-                  <input type="hidden" name="guide" value={variants[0].guide} />
-                  <StockGrid
-                    key={JSON.stringify(
-                      active
-                        .filter((v) => v.name === name)
-                        .map((v) => [v.id, v.stock, v.color, v.size]),
-                    )}
-                    rows={active.filter((v) => v.name === name)}
-                    colors={colors}
-                  />
-                  <button>Save sizes and quantities</button>
-                </SaveForm>
+                <ProductStock
+                  rows={active.filter((v) => v.name === name)}
+                  colors={colors}
+                />
               </details>
               {variants.map((v) => (
                 <details key={v.id} className="mm-variant">
@@ -423,52 +423,14 @@ export default async function Manager({
         })}
       {view === "inventory" && (
         <>
-          {matches.map((v) => (
-            <form
-              className="mm-stock"
-              key={v.id}
-              action={async (f) => {
-                "use server";
-                await owner();
-                const raw = String(f.get("adjust") ?? "").trim();
-                const n = Number(raw);
-                if (!raw || !Number.isSafeInteger(n))
-                  throw Error("Enter a whole number.");
-                await changeShop((s) => {
-                  const item = s.variants.find(
-                    (x) => x.id === v.id && !x.deleted,
-                  );
-                  if (
-                    !item ||
-                    item.stock + n < 0 ||
-                    !Number.isSafeInteger(item.stock + n)
-                  )
-                    throw Error("Invalid stock adjustment.");
-                  item.stock += n;
-                  allocate(s, item);
-                });
-                revalidatePath("/owner/shop");
-                revalidatePath("/shop");
-              }}
-            >
-              <div>
-                <strong>{v.name}</strong>
-                <p>
-                  {v.color} / {v.size} · {v.stock} available
-                </p>
-              </div>
-              <label>
-                Adjust by
-                <input
-                  name="adjust"
-                  type="number"
-                  step="1"
-                  required
-                  placeholder="+ / −"
-                />
-              </label>
-              <button>Update</button>
-            </form>
+          {names.map((name) => (
+            <section key={name} className="mm-product">
+              <h2>{name}</h2>
+              <ProductStock
+                rows={active.filter((v) => v.name === name)}
+                colors={colors}
+              />
+            </section>
           ))}
           {shop.variants
             .filter(
