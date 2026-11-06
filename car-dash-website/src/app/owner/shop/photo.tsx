@@ -2,7 +2,13 @@
 import { upload } from "@vercel/blob/client";
 import { useState } from "react";
 
-export default function Photo({ initial, saveLabel }: { initial: string[]; saveLabel: string }) {
+export default function Photo({
+  initial,
+  saveLabel,
+}: {
+  initial: string[];
+  saveLabel: string;
+}) {
   const [photos, setPhotos] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -11,34 +17,58 @@ export default function Photo({ initial, saveLabel }: { initial: string[]; saveL
   async function uploadFiles(files: File[]) {
     if (busy || !files.length) return;
     if (files.length + photos.length > 12) {
-      setMessage("Choose up to 12 photos per variant.");
+      setMessage(
+        "This color holds 12 photos total. Remove a photo or choose a smaller batch.",
+      );
       return;
     }
     setBusy(true);
     try {
-      for (const [i, file] of files.entries()) {
-        const ext = (
-          {
-            "image/jpeg": "jpg",
-            "image/png": "png",
-            "image/webp": "webp",
-          } as Record<string, string>
-        )[file.type];
-        if (!ext || file.size > 20 * 1024 * 1024)
-          throw Error("Choose JPG, PNG or WebP photos up to 20 MB each.");
-        setMessage("Uploading " + (i + 1) + " of " + files.length + "…");
-        const blob = await upload(
-          "merch/" + crypto.randomUUID() + "." + ext,
-          file,
-          {
-            access: "public",
-            handleUploadUrl: "/api/shop-photo",
-            contentType: file.type,
-          },
+      const failed: string[] = [];
+      let completed = 0;
+      setMessage(`Uploading 0 of ${files.length}…`);
+      for (let start = 0; start < files.length; start += 4) {
+        const group = files.slice(start, start + 4);
+        const results = await Promise.allSettled(
+          group.map(async (file) => {
+            const ext = (
+              {
+                "image/jpeg": "jpg",
+                "image/png": "png",
+                "image/webp": "webp",
+              } as Record<string, string>
+            )[file.type];
+            try {
+              if (!ext || file.size > 20 * 1024 * 1024)
+                throw Error("Use JPG, PNG or WebP under 20 MB.");
+              const blob = await upload(
+                "merch/" + crypto.randomUUID() + "." + ext,
+                file,
+                {
+                  access: "public",
+                  handleUploadUrl: "/api/shop-photo",
+                  contentType: file.type,
+                },
+              );
+              return blob.url;
+            } finally {
+              setMessage(`Processed ${++completed} of ${files.length} photos…`);
+            }
+          }),
         );
-        setPhotos((current) => [...current, blob.url]);
+        const urls: string[] = [];
+        results.forEach((result, i) => {
+          if (result.status === "fulfilled") urls.push(result.value);
+          else failed.push(group[i].name);
+        });
+        setPhotos((current) => [...current, ...urls]);
       }
-      setMessage("Photos uploaded. Save the variant to publish your changes.");
+      const count = files.length - failed.length;
+      setMessage(
+        failed.length
+          ? `${count} uploaded. Retry: ${failed.join(", ")}. Use JPG, PNG or WebP up to 20 MB each.`
+          : `${count} photos uploaded. Save to apply them.`,
+      );
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Upload failed.");
     } finally {
@@ -47,7 +77,9 @@ export default function Photo({ initial, saveLabel }: { initial: string[]; saveL
   }
   return (
     <div className="space-y-3">
-      <p>Photos for this color · first photo is the cover</p>
+      <p>
+        Photos for this color · first photo is the cover · {photos.length}/12
+      </p>
       <div className="flex flex-wrap gap-3">
         {photos.map((url, index) => (
           <div key={url}>
@@ -65,12 +97,14 @@ export default function Photo({ initial, saveLabel }: { initial: string[]; saveL
                 disabled={busy}
                 onChange={(event) => {
                   const position = Number(event.target.value);
-                  setPhotos(current => {
-                    const ordered = current.filter(photo => photo !== url);
+                  setPhotos((current) => {
+                    const ordered = current.filter((photo) => photo !== url);
                     ordered.splice(position, 0, url);
                     return ordered;
                   });
-                  setMessage("Photo order updated. Save the variant to apply it.");
+                  setMessage(
+                    "Photo order updated. Save the variant to apply it.",
+                  );
                 }}
               >
                 {photos.map((photo, position) => (
@@ -111,7 +145,9 @@ export default function Photo({ initial, saveLabel }: { initial: string[]; saveL
           void uploadFiles(Array.from(event.dataTransfer.files));
         }}
       >
-        {dragging ? "Drop photos here" : "Drag photos here or choose files"}
+        {dragging
+          ? "Drop photos here"
+          : "Drop multiple photos here or choose files"}
         <input
           type="file"
           multiple
