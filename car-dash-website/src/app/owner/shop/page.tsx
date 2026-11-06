@@ -1,3 +1,4 @@
+import {GuideEditor} from "../../shop/size-guide";
 import Photo from "./photo";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -82,7 +83,6 @@ function Editor({ v }: { v?: Variant }) {
           "color",
           "size",
           "description",
-          "guide",
           "eta",
         ] as const
       ).map((k, i) => (
@@ -93,7 +93,6 @@ function Editor({ v }: { v?: Variant }) {
               "Color",
               "Size",
               "Description",
-              "Size guide (include units)",
               "Restock estimate",
             ][i]
           }
@@ -124,6 +123,7 @@ function Editor({ v }: { v?: Variant }) {
         <input type="checkbox" name="published" defaultChecked={v?.published} />{" "}
         Show in shop
       </label>
+      <GuideEditor initial={v?.guide ?? ""} />
       <Photo initial={v?.image ?? ""} />
     </form>
   );

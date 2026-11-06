@@ -1,4 +1,5 @@
 "use client";
+import {SizeGuide} from "./size-guide";
 import { useState } from "react";
 import type { Variant } from "@/lib/shop";
 import { checkout } from "./actions";
@@ -42,7 +43,7 @@ function Product({ rows }: { rows: Variant[] }) {
       </label>
       <details>
         <summary>Size guide</summary>
-        <p className="whitespace-pre-line">{v.guide}</p>
+        <SizeGuide guide={v.guide}/>
       </details>
       <p>
         {v.stock
