@@ -68,11 +68,12 @@ function Product({ rows }: { rows: Variant[] }) {
   const v = rows.find((row) => row.id === id) ?? rows[0];
   const colors = [...new Set(rows.map((row) => row.color))];
   const variants = rows.filter((row) => row.color === v.color);
-  const photos = v.images ?? (v.image ? [v.image] : []);
+  const gallery = (v.images?.length || v.image) ? v : variants.find(row => row.images?.length || row.image);
+  const photos = gallery?.images?.length ? gallery.images : gallery?.image ? [gallery.image] : [];
   return (
     <article className="store-product">
       <Gallery
-        key={photos.join("|")}
+        key={JSON.stringify([v.color, photos])}
         photos={photos}
         name={v.name + " in " + v.color}
       />

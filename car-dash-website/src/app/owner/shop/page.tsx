@@ -99,6 +99,7 @@ async function save(f: FormData) {
             published: f.has("published"),
             cents,
           }),
+          ...(source && source.color !== color ? { image: "", images: [] } : {}),
           id: crypto.randomUUID(),
           name,
           color,
@@ -147,6 +148,15 @@ async function save(f: FormData) {
       cents,
       stock,
     };
+    const previousImages = old?.images ?? (old?.image ? [old.image] : []);
+    if (JSON.stringify(previousImages) !== JSON.stringify(images)) {
+      for (const sibling of shop.variants) {
+        if (!sibling.deleted && sibling.name === v.name && sibling.color === v.color) {
+          sibling.image = v.image;
+          sibling.images = images;
+        }
+      }
+    }
     if (old) Object.assign(old, v);
     else shop.variants.push(v);
     allocate(shop, old ?? v);

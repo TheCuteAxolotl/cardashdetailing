@@ -47,7 +47,7 @@ export default function Photo({ initial, saveLabel }: { initial: string[]; saveL
   }
   return (
     <div className="space-y-3">
-      <p>Product photos · first photo is the cover</p>
+      <p>Photos for this color · first photo is the cover</p>
       <div className="flex flex-wrap gap-3">
         {photos.map((url, index) => (
           <div key={url}>
