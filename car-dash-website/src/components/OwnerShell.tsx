@@ -1,5 +1,6 @@
 "use client";
 
+import WorkboardHome from "./WorkboardHome";
 import { appearanceFor, employeePreview, savePreference, type Appearance } from "@/lib/workspace-preferences";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -158,6 +159,7 @@ function NotificationBadge({count=0}:{count?:number}) {
 
 export default function OwnerShell({ children, user, permissions = [] }: { children: ReactNode; user: OwnerUser; permissions?: string[] }) {
   const pathname = usePathname();
+  const [fullWorkspace, setFullWorkspace] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [phoneViewport,setPhoneViewport] = useState(false);
   useEffect(()=>{
@@ -320,6 +322,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     </div>
   );
 
+  if ((isOwnerHome || isStaffHome) && !fullWorkspace) {
+    return <WorkboardHome owner={owner} light={appearance === "light"} permissions={permissions}
+      recording={recording} onMore={() => setFullWorkspace(true)} />;
+  }
+
   return (
     <div data-appearance={appearance} className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
       <aside aria-label={owner ? "Owner workspace sidebar" : "Staff workspace sidebar"} className="owner-workspace-sidebar fixed inset-y-0 left-0 z-50 hidden w-[248px] flex-col border-r border-white/10 bg-[#1b1b1a] text-[#f4eee5] xl:flex">
@@ -479,25 +486,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         </div>}
         {preferenceError && <p role="alert" className="p-3">{preferenceError}</p>}
         <main className="owner-shell-content owner-mobile-section-layout min-h-[calc(100vh-112px)]">
-          {(pathname === "/owner/dashboard" || pathname === "/admin/dashboard") && (
-            <section aria-label="Detailing workboard" className="mx-auto w-full max-w-7xl px-4 pt-4 md:px-6 md:pt-6">
-              <div className="flex flex-col gap-4 rounded-2xl border border-[#d6b779]/40 bg-gradient-to-br from-[#272823] to-[#191a18] p-5 text-[#f6efe3] sm:flex-row sm:items-center sm:justify-between md:p-7">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[.14em] text-[#dfba71]">{owner ? "Owner workspace" : "Employee workspace"}</p>
-                  <h2 className="mt-1 text-3xl font-semibold tracking-tight">Job workboard</h2>
-                </div>
-                <nav aria-label="Workboard shortcuts" className="flex flex-wrap gap-2">
-                  {[
-                    { href: owner ? "/owner/bookings" : "/admin/bookings", label: "Bookings" },
-                    { href: "/owner/jobs", label: "Active jobs" },
-                    { href: owner ? "/owner/messages" : "/admin/messages", label: "Messages" },
-                  ].filter(action => owner || allVisibleItems.some(item => item.resolvedHref === action.href)).map(action => (
-                    <a key={action.href} href={action.href} className="inline-flex min-h-11 items-center rounded-xl border border-[#d6b779]/45 px-4 text-sm font-semibold text-[#efd6a7] hover:bg-[#d6b779]/15">{action.label}</a>
-                  ))}
-                </nav>
-              </div>
-            </section>
-          )}
+          {(isOwnerHome || isStaffHome) && <button type="button" className="m-4 rounded-xl border border-[#d6b779]/40 px-4 py-3" onClick={() => setFullWorkspace(false)}>Back to Workboard</button>}
           {(pathname === "/owner/settings" || pathname === "/admin/settings") && <section aria-label="Workspace preferences" className="mx-auto max-w-2xl space-y-5 px-6 py-6">
             <h2 className="text-xl font-semibold">Workspace preferences</h2>
             <fieldset><legend className="mb-2 font-semibold">Appearance</legend>
