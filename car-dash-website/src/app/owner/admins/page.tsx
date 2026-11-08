@@ -1,5 +1,6 @@
 "use client";
 
+import { ALL_STAFF_PERMISSION_KEYS } from "@/lib/access-control";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type PermissionDef = { key: string; label: string; description: string };
@@ -29,7 +30,7 @@ const ROLE_TEMPLATES = [
   { name: "Detailer", description: "Assigned vehicles, private before/after photos, and owner quality review. No booking or pricing changes.", permissions: ["staffGuide", "assignedJobs"] },
   { name: "Support Agent", description: "Customer support and text-message assistance without pricing or website access.", permissions: ["staffGuide", "support", "smsInbox"] },
   { name: "Quote Specialist", description: "Review quote requests, customer photos, and send exact quotes.", permissions: ["staffGuide", "quoteChats", "smsInbox"] },
-  { name: "Manager", description: "Operational access across bookings, support, phone, warranties, quotes, and analytics.", permissions: ["staffGuide", "bookings", "smsInbox", "quoteChats", "support", "businessPhone", "warranties", "analytics"] },
+  { name: "Manager", description: "All staff operational permissions, including loyalty cards, invoices, inventory, maintenance and estimates.", permissions: [...ALL_STAFF_PERMISSION_KEYS] },
   { name: "Content Manager", description: "Maintain services, website content, media, package pricing, and discounts.", permissions: ["staffGuide", "services", "gallery", "website", "pricing"] },
 ] as const;
 

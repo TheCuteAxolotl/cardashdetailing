@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import { NextRequest, NextResponse } from "next/server";
 import {
   calculateInvoiceTotals,
   deleteInvoice,
   getInvoice,
-  requireOwner,
   sanitizeInvoiceInput,
   saveInvoice,
 } from "@/lib/invoices";
@@ -11,10 +11,10 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
     const { id } = await context.params;
@@ -28,10 +28,10 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   }
 }
 
-export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
     const { id } = await context.params;
@@ -55,10 +55,10 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   }
 }
 
-export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
     const { id } = await context.params;
     await deleteInvoice(id);

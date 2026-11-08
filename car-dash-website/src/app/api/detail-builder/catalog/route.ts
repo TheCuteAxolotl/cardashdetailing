@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireOwner } from "@/lib/invoices";
+
 import {
   DEFAULT_DETAIL_BUILDER_CATALOG,
   parseDetailBuilderCatalog,
@@ -12,10 +13,10 @@ export const dynamic = "force-dynamic";
 
 const KEY = "owner:detail-builder-catalog";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "estimateTools"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
     const row = await prisma.siteContent.findUnique({ where: { key: KEY } });
     const catalog = row ? parseDetailBuilderCatalog(row.value) : DEFAULT_DETAIL_BUILDER_CATALOG;
@@ -26,10 +27,10 @@ export async function GET() {
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "estimateTools"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
     const body = await request.json().catch(() => ({}));
     const catalog = sanitizeDetailBuilderCatalog(body?.catalog);

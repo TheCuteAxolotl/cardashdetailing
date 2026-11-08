@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { appendLoyaltyEvent, type LoyaltyCard, type LoyaltyEvent } from "@/lib/loyalty";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ function date(value: unknown) {
 export async function GET(request: NextRequest) {
   try {
     const account = await getCurrentAccountFromRequest(request);
-    if (!isOwnerAccount(account)) return reply({ error: "Owner access required" }, 403);
+    if (!hasStaffPermission(account, "loyalty")) return reply({ error: "Loyalty card permission required" }, 403);
     const rows = await prisma.siteContent.findMany({ where: { key: { startsWith: PREFIX } }, orderBy: { updatedAt: "desc" } });
     return reply({ cards: rows.map(row => JSON.parse(row.value) as LoyaltyCard) });
   } catch { return reply({ error: "Could not load loyalty records. Please try again." }, 500); }
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const account = await getCurrentAccountFromRequest(request);
-    if (!account || !isOwnerAccount(account)) return reply({ error: "Owner access required" }, 403);
+    if (!account || !hasStaffPermission(account, "loyalty")) return reply({ error: "Loyalty card permission required" }, 403);
     if (request.headers.get("sec-fetch-site") === "cross-site") return reply({ error: "Invalid request origin" }, 403);
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object") return reply({ error: "Invalid request" }, 400);

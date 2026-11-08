@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import { NextRequest, NextResponse } from "next/server";
 import {
   calculateInvoiceTotals,
   listInvoices,
   nextInvoiceNumber,
-  requireOwner,
   sanitizeInvoiceInput,
   saveInvoice,
 } from "@/lib/invoices";
@@ -11,10 +11,10 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
     const invoices = await listInvoices();
@@ -27,10 +27,10 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
     const body = await request.json().catch(() => ({}));

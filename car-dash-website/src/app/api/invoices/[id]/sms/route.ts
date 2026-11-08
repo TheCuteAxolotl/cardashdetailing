@@ -1,18 +1,19 @@
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { invoiceSmsText, isInvoiceFullyPaid } from "@/lib/paid-receipt";
 import { ensureBookingConversation } from "@/lib/booking-chat";
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
-import { getInvoice, requireOwner, saveInvoice } from "@/lib/invoices";
+import { NextRequest, NextResponse } from "next/server";
+import { getInvoice, saveInvoice } from "@/lib/invoices";
 import { getPublicSiteUrl } from "@/lib/twilio-sms";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    if (!(await requireOwner())) {
-      return NextResponse.json({ error: "Owner access required" }, { status: 403 });
+    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+      return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
     const { id } = await context.params;

@@ -1,6 +1,7 @@
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireOwner } from "@/lib/invoices";
+
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,8 +34,8 @@ function validate(body:unknown):Entry[]|null {
  }
  return items;
 }
-export async function GET(){
- if(!(await requireOwner()))return NextResponse.json({error:"Owner access required"},{status:403});
+export async function GET(request: NextRequest){
+ if(!(hasStaffPermission(await getCurrentAccountFromRequest(request), "inventory")))return NextResponse.json({error:"Permission required"},{status:403});
  const row=await prisma.siteContent.findUnique({where:{key:KEY},select:{value:true,updatedAt:true}});
  if(!row)return NextResponse.json({items:[],version:null},{headers:{"Cache-Control":"private, no-store"}});
  let items:unknown;
@@ -43,7 +44,7 @@ export async function GET(){
   {headers:{"Cache-Control":"private, no-store"}});
 }
 export async function PUT(request:NextRequest){
- if(!(await requireOwner()))return NextResponse.json({error:"Owner access required"},{status:403});
+ if(!(hasStaffPermission(await getCurrentAccountFromRequest(request), "inventory")))return NextResponse.json({error:"Permission required"},{status:403});
  const origin=request.headers.get("origin");
  if(origin && origin!==request.nextUrl.origin)return NextResponse.json({error:"Invalid origin"},{status:403});
  const body=await request.json().catch(()=>null);

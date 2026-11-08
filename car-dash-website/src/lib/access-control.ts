@@ -12,6 +12,11 @@ export const STAFF_PERMISSIONS = [
   { key: "gallery", label: "Photos & Media", description: "Upload, relabel, and remove website gallery/media assets." },
   { key: "website", label: "Website Editor", description: "Edit public website copy and homepage content." },
   { key: "pricing", label: "Pricing & Discounts", description: "Edit package pricing, booking add-ons, and discount codes." },
+  { key: "loyalty", label: "Loyalty cards", description: "Create cards, record visits, redeem rewards and correct entries." },
+  { key: "inventory", label: "Inventory", description: "Manage supply inventory." },
+  { key: "invoices", label: "Invoices", description: "Create and manage invoices and send them to customers." },
+  { key: "maintenance", label: "Maintenance plans", description: "Manage subscriptions and maintenance plans." },
+  { key: "estimateTools", label: "Detail estimator", description: "Use the detail builder and manage its pricing catalog." },
 ] as const;
 
 export type StaffPermission = (typeof STAFF_PERMISSIONS)[number]["key"];
@@ -36,6 +41,11 @@ export function sanitizePermissions(values: unknown): StaffPermission[] {
 }
 
 export const PERMISSION_ROUTES: Record<StaffPermission, string> = {
+  loyalty: "/owner/loyalty",
+  inventory: "/owner/inventory",
+  invoices: "/owner/invoices",
+  maintenance: "/owner/maintenance",
+  estimateTools: "/owner/detail-builder",
   assignedJobs: "/owner/jobs",
   staffGuide: "/staff-guide",
   bookings: "/admin/bookings",

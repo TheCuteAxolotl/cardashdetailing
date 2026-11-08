@@ -52,7 +52,11 @@ export function resolvePermissionSnapshot(input: {
   }
 
   for (const assignment of input.assignments || []) {
-    parseRolePermissions(assignment.role.permissionsJson).forEach((permission) => granted.add(permission));
+    const saved = parseRolePermissions(assignment.role.permissionsJson);
+    const originalManagerKeys: StaffPermission[] = ["staffGuide", "bookings", "smsInbox", "quoteChats", "support", "businessPhone", "warranties", "analytics"];
+    const legacyManager = assignment.role.name.trim().toLowerCase() === "manager"
+      && saved.length === originalManagerKeys.length && originalManagerKeys.every(key => saved.includes(key));
+    (legacyManager ? ALL_STAFF_PERMISSION_KEYS : saved).forEach(permission => granted.add(permission));
   }
 
   for (const override of input.overrides || []) {

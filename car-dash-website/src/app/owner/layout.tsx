@@ -10,6 +10,11 @@ type AccessState = "checking" | "allowed" | "redirecting";
 type User = { id: string; name?: string | null; email?: string | null; role?: string | null };
 
 const SHARED_OWNER_ROUTES: Array<{ prefix: string; permissions: string[] }> = [
+  { prefix: "/owner/loyalty", permissions: ["loyalty"] },
+  { prefix: "/owner/inventory", permissions: ["inventory"] },
+  { prefix: "/owner/invoices", permissions: ["invoices"] },
+  { prefix: "/owner/maintenance", permissions: ["maintenance"] },
+  { prefix: "/owner/detail-builder", permissions: ["estimateTools"] },
   { prefix: "/owner/jobs", permissions: ["assignedJobs"] },
   { prefix: "/owner/inspection", permissions: ["assignedJobs"] },
   { prefix: "/owner/calls", permissions: ["businessPhone"] },

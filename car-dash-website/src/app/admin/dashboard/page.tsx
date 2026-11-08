@@ -60,6 +60,11 @@ export default function AdminDashboard() {
   }, [user, permissions]);
 
   const tools = useMemo<Tool[]>(() => [
+    { permission: "loyalty", href: "/owner/loyalty", title: "Loyalty cards", description: "Manage visits and rewards", kind: "detail" },
+    { permission: "inventory", href: "/owner/inventory", title: "Supply inventory", description: "Track supplies and stock", kind: "detail" },
+    { permission: "invoices", href: "/owner/invoices", title: "Invoices", description: "Manage customer invoices", kind: "detail" },
+    { permission: "maintenance", href: "/owner/maintenance", title: "Maintenance plans", description: "Manage recurring services", kind: "detail" },
+    { permission: "estimateTools", href: "/owner/detail-builder", title: "Build a detail", description: "Estimate service price and time", kind: "detail" },
     { permission: "assignedJobs", href: "/owner/jobs", title: "My assigned jobs", description: "Vehicle details, before / after photos and quality review", kind: "photo" },
     { permission: "bookings", href: "/admin/bookings", title: "Bookings", description: "Appointments, status changes and arrival updates", kind: "booking" },
     { permission: "smsInbox", href: "/admin/messages", title: "Messages", description: "Customer SMS conversations", kind: "message", badge: smsUnread },

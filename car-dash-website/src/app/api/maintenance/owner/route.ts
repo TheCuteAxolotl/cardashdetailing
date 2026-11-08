@@ -1,6 +1,6 @@
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
+import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import {
   STANDARD_MAINTENANCE_PLAN,
   createMaintenanceOffer,
@@ -21,15 +21,15 @@ import { stripeInvoiceRuntimeInfo } from "@/lib/stripe-invoice";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-async function requireOwner(request: NextRequest) {
+async function requireMaintenanceAccess(request: NextRequest) {
   const account = await getCurrentAccountFromRequest(request);
-  return isOwnerAccount(account) ? account : null;
+  return hasStaffPermission(account, "maintenance") ? account : null;
 }
 
 export async function GET(request: NextRequest) {
   try {
-    if (!(await requireOwner(request))) {
-      return NextResponse.json({ error: "Owner access required." }, { status: 403 });
+    if (!(await requireMaintenanceAccess(request))) {
+      return NextResponse.json({ error: "Maintenance permission required." }, { status: 403 });
     }
 
     const [offers, storedSubscriptions] = await Promise.all([
@@ -72,8 +72,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!(await requireOwner(request))) {
-      return NextResponse.json({ error: "Owner access required." }, { status: 403 });
+    if (!(await requireMaintenanceAccess(request))) {
+      return NextResponse.json({ error: "Maintenance permission required." }, { status: 403 });
     }
 
     const body = await request.json().catch(() => ({}));
