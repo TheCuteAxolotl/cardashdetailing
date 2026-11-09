@@ -1,3 +1,4 @@
+import {syncPlanBookings} from "@/lib/cash-bookings";
 import {NextRequest, NextResponse} from "next/server";
 import {getCurrentAccountFromRequest, hasStaffPermission} from "@/lib/permissions";
 import {prisma} from "@/lib/prisma";
@@ -9,9 +10,12 @@ function readSchedule(raw:Record<string,unknown>):ServiceSchedule|null {
   const phone=normalizePhoneNumber(String(raw.phone||""));
   const ordinal=Number(raw.ordinal),weekday=Number(raw.weekday),lead=Number(raw.lead);
   if(!phone||raw.consent!==true||!Number.isInteger(ordinal)||ordinal<1||ordinal>5||!Number.isInteger(weekday)||weekday<0||weekday>6||![1,2].includes(lead)||!/^20\d{2}-(0[1-9]|1[0-2])$/.test(String(raw.startMonth)))return null;
-  return {phone,ordinal,weekday,lead,startMonth:String(raw.startMonth),enabledAt:new Date().toISOString()};
+  const make=String(raw.make||"").trim().slice(0,80),model=String(raw.model||"").trim().slice(0,80),year=String(raw.year||"").trim();
+  if(!make||!model||!/^\d{4}$/.test(year))return null;
+  return {make,model,year,phone,ordinal,weekday,lead,startMonth:String(raw.startMonth),enabledAt:new Date().toISOString()};
 }
 async function activate(plan:CashPlan){
+  await syncPlanBookings(plan.id,true);
   if(!plan.schedule||plan.ended)return reply({ok:true});
   try{
     const state=await notifyPlan(plan,"activation",nextService(plan.schedule,chicagoDay()));
@@ -54,7 +58,7 @@ export async function POST(request:NextRequest){
   if(b.action==="schedule"){
     const schedule=b.schedule&&readSchedule(b.schedule);
     if(!schedule||plan.ended)return reply({error:"An active plan and valid recurring schedule are required."},400);
-    if(!plan.schedule||["ordinal","weekday","lead","phone","startMonth"].some(key=>schedule[key as keyof ServiceSchedule]!==plan.schedule?.[key as keyof ServiceSchedule]))plan.schedule=schedule;
+    if(!plan.schedule||["ordinal","weekday","lead","phone","startMonth","make","model","year"].some(key=>schedule[key as keyof ServiceSchedule]!==plan.schedule?.[key as keyof ServiceSchedule]))plan.schedule=schedule;
   }else if(b.action==="end")plan.ended=true;
   else if(b.action==="receive"){
     if(plan.payments.some(p=>p.month===b.month))return reply({ok:true});
@@ -62,5 +66,5 @@ export async function POST(request:NextRequest){
     plan.payments.push({month:b.month,received:b.received,cents:plan.cents,staffId:account.id});
   }else return reply({error:"Unknown action."},400);
   const update=await prisma.siteContent.updateMany({where:{key,value:row.value},data:{value:JSON.stringify(plan)}});
-  return update.count?(b.action==="schedule"?activate(plan):reply({ok:true})):reply({error:"Plan changed. Refresh and try again."},409);
+  return update.count?((b.action==="schedule"||b.action==="end")?activate(plan):reply({ok:true})):reply({error:"Plan changed. Refresh and try again."},409);
 }

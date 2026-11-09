@@ -13,14 +13,14 @@ function ScheduleFields({existing}:{existing?:ServiceSchedule}){
     <label>Day of week<select className={field} name="weekday" value={weekday} onChange={e=>setWeekday(+e.target.value)}>{weekdays.map((v,i)=><option key={v} value={i}>{v}</option>)}</select></label>
     <label>Starting month<input className={field} name="startMonth" type="month" required value={startMonth} onChange={e=>setMonth(e.target.value)}/></label>
     <label>Reminder<select className={field} name="lead" defaultValue={existing?.lead||2}><option value={2}>2 days before</option><option value={1}>1 day before</option></select></label>
-    <label>Customer mobile number<input className={field} type="tel" name="phone" defaultValue={existing?.phone} autoComplete="tel" required/></label></div>
+    {(["year","make","model"] as const).map(key=><label key={key}>Vehicle {key}<input className={field} name={key} required defaultValue={existing?.[key]} maxLength={key==="year"?4:80} pattern={key==="year"?"[0-9]{4}":undefined}/></label>)}<label>Customer mobile number<input className={field} type="tel" name="phone" defaultValue={existing?.phone} autoComplete="tel" required/></label></div>
     {/^\d{4}-(0[1-9]|1[0-2])$/.test(startMonth)&&<p>Next detail: <strong>{prettyDay(nextService({ordinal,weekday,startMonth},chicagoDay()))}</strong></p>}
     <label className="flex items-start gap-2"><input type="checkbox" name="consent" required className="mt-1"/>Customer agreed to receive plan and appointment texts at this number.</label>
   </fieldset>
 }
 function scheduleFrom(form:HTMLFormElement){
   const data=new FormData(form);
-  return {ordinal:data.get("ordinal"),weekday:data.get("weekday"),startMonth:data.get("startMonth"),lead:data.get("lead"),phone:data.get("phone"),consent:data.has("consent")};
+  return {make:data.get("make"),model:data.get("model"),year:data.get("year"),ordinal:data.get("ordinal"),weekday:data.get("weekday"),startMonth:data.get("startMonth"),lead:data.get("lead"),phone:data.get("phone"),consent:data.has("consent")};
 }
 export default function MonthlyCash(){
   const [plans,setPlans]=useState<DisplayPlan[]>([]),[ready,setReady]=useState(false),[busy,setBusy]=useState(false),[notice,setNotice]=useState("");
@@ -46,7 +46,7 @@ export default function MonthlyCash(){
     {ready&&!plans.length&&<p>No cash plans yet.</p>}
     {[...plans].sort((a,b)=>Number(a.ended)-Number(b.ended)||nextCashDue(a).localeCompare(nextCashDue(b))).map(plan=>{const due=nextCashDue(plan);return <article key={plan.id} className="mt-4 space-y-3 rounded-xl border border-black/15 p-4">
       <h3 className="font-bold">{plan.customer} · {usd(plan.cents)} / month</h3>
-      {plan.schedule&&!plan.ended&&<p>{ordinals[plan.schedule.ordinal-1]} {weekdays[plan.schedule.weekday]} each month · Next detail <strong>{prettyDay(nextService(plan.schedule,chicagoDay()))}</strong><br/><small>{plan.schedule.phone} · Reminder {plan.schedule.lead} day{plan.schedule.lead===1?"":"s"} before · Activation SMS: {plan.activationStatus}</small></p>}
+      {plan.schedule&&!plan.ended&&<p>{ordinals[plan.schedule.ordinal-1]} {weekdays[plan.schedule.weekday]} each month · Next detail <strong>{prettyDay(nextService(plan.schedule,chicagoDay()))}</strong><br/><small>{[plan.schedule.year,plan.schedule.make,plan.schedule.model].filter(Boolean).join(" ")} · {plan.schedule.phone} · Reminder {plan.schedule.lead} day{plan.schedule.lead===1?"":"s"} before · Activation SMS: {plan.activationStatus}</small></p>}
       <p>{plan.ended?"Plan ended":(due<chicagoDay()?"Overdue since ":due===chicagoDay()?"Due today · ": "Next cash payment ")+due}</p>
       {!plan.ended&&<details><summary className="cursor-pointer font-semibold">Record cash payment</summary><form className="flex flex-wrap items-end gap-3" onSubmit={e=>{e.preventDefault();void write({id:plan.id,action:"receive",month:due.slice(0,7),received:new FormData(e.currentTarget).get("received")},"Cash payment recorded.")}}>
         <label>Cash received date<input className={field} name="received" type="date" required defaultValue={chicagoDay()} max={chicagoDay()}/></label>

@@ -1,3 +1,4 @@
+import {syncPlanBookings} from "@/lib/cash-bookings";
 import {prisma} from "@/lib/prisma";
 import {sendCustomerSmsWithHistory} from "@/lib/customer-sms-history";
 import {bookingPhoneWasReleased} from "@/lib/phone-release";
@@ -41,8 +42,10 @@ export async function runCashNotifications(){
   const rows=await prisma.siteContent.findMany({where:{key:{startsWith:cashPrefix}}});
   let failed=0;
   for(const row of rows){
-    const plan:CashPlan=JSON.parse(row.value);if(!plan.schedule||plan.ended)continue;
+    const plan:CashPlan=JSON.parse(row.value);if(!plan.schedule)continue;
     try{
+      await syncPlanBookings(plan.id);
+      if(plan.ended)continue;
       const date=nextService(plan.schedule,today);
       const activation=await notifyPlan(plan,"activation",date);
       const days=Math.round((Date.parse(date)-Date.parse(today))/86400000);

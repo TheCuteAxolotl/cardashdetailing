@@ -1,5 +1,5 @@
 export type CashPayment = { month: string; received: string; cents: number; staffId: string };
-export type ServiceSchedule = { ordinal: number; weekday: number; startMonth: string; phone: string; lead: number; enabledAt: string };
+export type ServiceSchedule = { make?: string; model?: string; year?: string; ordinal: number; weekday: number; startMonth: string; phone: string; lead: number; enabledAt: string };
 export type CashPlan = { schedule?: ServiceSchedule; id: string; customer: string; cents: number; firstDue: string; ended: boolean; payments: CashPayment[] };
 export function nextCashDue(plan: CashPlan) {
   const [year, month, day] = plan.firstDue.split("-").map(Number);
