@@ -5,16 +5,17 @@ import SmsAttachments from "@/components/SmsAttachments";
 import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 import DeleteMessageButton from "@/components/DeleteMessageButton";
 import MessageBookingForm from "@/components/MessageBookingForm";
+import BusinessCallButton from "@/components/BusinessCallButton";
 import { DELETED_MESSAGE } from "@/lib/deleted-message";
 
 type Conversation = { kind: "quote" | "booking" | "sms"; id: string; name: string; phone: string; subject: string; status: string; body: string; updatedAt: string };
 type Message = { id: string; originalId?: string; source?: "sms" | "booking" | "quote"; sourceId?: string; context?: string; sender: string; body: string; attachmentsJson?: string | null; externalSid?: string | null; createdAt: string };
-type Inbox = { conversations: Conversation[]; owner: boolean; canSms: boolean; canBook: boolean };
+type Inbox = { conversations: Conversation[]; owner: boolean; canSms: boolean; canBook: boolean; canCall: boolean };
 const field = "min-w-0 max-w-full text-base w-full rounded-xl border border-white/20 bg-[#202020] px-4 py-3 text-[#f4efe5]";
 const button = "rounded-xl border border-[#d6b779]/50 px-4 py-2 text-sm font-semibold disabled:opacity-50";
 const keyOf = (row: Conversation) => `${row.kind}:${row.id}`;
 
-function ConversationView({ conversation, owner, canBook, role, onChanged, onBack }: { conversation: Conversation; owner: boolean; canBook: boolean; role: "owner" | "admin"; onChanged: () => void; onBack: () => void }) {
+function ConversationView({ conversation, owner, canBook, canCall, role, onChanged, onBack }: { conversation: Conversation; owner: boolean; canBook: boolean; canCall: boolean; role: "owner" | "admin"; onChanged: () => void; onBack: () => void }) {
   const historyRef = useRef<HTMLDivElement>(null);
   const followLatest = useRef(true);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -72,6 +73,7 @@ function ConversationView({ conversation, owner, canBook, role, onChanged, onBac
       {kind === "quote" && <a className="underline" href={`/${role}/quotes?thread=${encodeURIComponent(id)}`}>Manage quote / booking</a>}
       {kind === "booking" && <a className="underline" href={`/${role}/bookings`}>Manage booking</a>}
       {kind === "sms" && conversation.phone && <span className="text-white/60">{conversation.phone} · Booking, quote and SMS history</span>}
+      {canCall && conversation.phone && <BusinessCallButton phoneNumber={conversation.phone} customerName={conversation.name} label="Call from Car Dash" className="rounded-xl border border-[#d6b779]/50 px-3 py-1.5 text-xs font-semibold text-[#f1d59d] disabled:opacity-40" />}
     </div>
     {canBook && sourceMessage && kind !== "quote" && <details className="mt-2 text-sm"><summary className="cursor-pointer">Booking actions</summary><div className="max-h-48 overflow-y-auto"><MessageBookingForm source={{
       type: (sourceMessage.source || kind) === "sms" ? "sms" : "booking-message",
@@ -206,7 +208,7 @@ export default function UnifiedMessages({ role }: { role: "owner" | "admin" }) {
           {inbox && !rows.length && <p className="text-sm text-white/60">No conversations match.</p>}
           </div>
         </aside>
-        <div className={`h-full min-h-0 min-w-0 ${selected ? "block" : "hidden lg:block"}`}>{selected && inbox ? <ConversationView key={keyOf(selected)} conversation={selected} role={role} owner={inbox.owner} canBook={inbox.canBook} onChanged={() => void load()} onBack={() => setSelected(null)} /> : <p className="rounded-2xl border border-white/15 p-8 text-white/60">Choose a conversation to read and reply.</p>}</div>
+        <div className={`h-full min-h-0 min-w-0 ${selected ? "block" : "hidden lg:block"}`}>{selected && inbox ? <ConversationView key={keyOf(selected)} conversation={selected} role={role} owner={inbox.owner} canBook={inbox.canBook} canCall={inbox.canCall} onChanged={() => void load()} onBack={() => setSelected(null)} /> : <p className="rounded-2xl border border-white/15 p-8 text-white/60">Choose a conversation to read and reply.</p>}</div>
       </div>
     </div>
   </main>;
