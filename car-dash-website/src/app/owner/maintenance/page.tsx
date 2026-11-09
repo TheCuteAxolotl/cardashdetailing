@@ -1,5 +1,6 @@
 "use client";
 
+import MonthlyCash from "@/components/MonthlyCash";
 import NumberInput from "@/components/NumberInput";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -142,7 +143,7 @@ export default function OwnerMaintenancePage() {
   };
 
   if (loading || !data) {
-    return <main className="grid min-h-[70vh] place-items-center bg-[#f2f2f0] text-black/40">Loading maintenance subscriptions…</main>;
+    return <main className="mx-auto max-w-7xl p-5"><MonthlyCash/><p>{message || "Loading maintenance subscriptions…"}</p></main>;
   }
 
   const standardLink = `${origin}/maintenance`;
@@ -163,9 +164,10 @@ export default function OwnerMaintenancePage() {
           </div>
         </div>
 
+        <MonthlyCash/>
         {!data.stripeConfigured && (
           <div className="mt-6 rounded-2xl border border-amber-500/25 bg-amber-500/[.08] p-4 text-sm text-amber-800">
-            Stripe isn’t configured in this deployment, so customers can’t start recurring payments yet.
+            Stripe isn’t configured in this deployment, so online card subscriptions are unavailable.
           </div>
         )}
 
