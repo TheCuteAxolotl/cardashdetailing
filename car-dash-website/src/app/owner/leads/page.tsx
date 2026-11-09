@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import OwnerAppIcon from "@/components/OwnerAppIcon";
+import BusinessCallButton from "@/components/BusinessCallButton";
 import { useOwnerScreenPrivacy } from "@/lib/owner-screen-privacy";
 
 type Quote = {id:string;subject?:string;status:string;guestVehicle?:string;quotedPrice?:number|null;createdAt?:string};
@@ -135,7 +136,7 @@ export default function OwnerLeadsPage(){
           {c.profile.source&&<span className="mt-2 inline-block rounded-full bg-[#39362f] px-3 py-1 text-[11px] text-[#d6c5aa]">{recording?"Source hidden":c.profile.source}</span>}
           {!recording&&c.profile.followUp&&<p className="mt-2 text-xs text-[#e1bd8e]">Follow up: {c.profile.followUp}</p>}
           <div className="mt-4 grid grid-cols-2 gap-2">
-           {phone?<a href={"tel:"+phone.replace(/[^+\d]/g,"")} className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-[#2b2926] px-2 text-xs font-semibold text-[#f1e8db]"><OwnerAppIcon name="phone" className="h-4 w-4"/> Call</a>
+           {phone?<BusinessCallButton phoneNumber={phone} customerName={customerName} label="Call via Car Dash" className="flex min-h-11 items-center justify-center rounded-xl border border-white/20 bg-[#2b2926] px-2 text-xs font-semibold text-[#f1e8db] disabled:opacity-40" />
             :<span className="grid min-h-11 place-items-center rounded-xl border border-white/10 px-2 text-xs text-[#9c9285]">Contact unavailable</span>}
            <Link href={recording?"/owner/crm":"/owner/bookings?create=1&from=crm"}
              onClick={()=>{if(!recording){try{window.sessionStorage.setItem("car-dash-crm-booking-draft",JSON.stringify(bookingDraft(c)));}catch{}}}}
