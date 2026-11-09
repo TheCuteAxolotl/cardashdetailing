@@ -119,5 +119,6 @@ export async function GET(request: NextRequest) {
     owner: isOwnerAccount(auth),
     canSms: sms,
     canBook: bookings,
+    canCall: hasStaffPermission(auth, "businessPhone"),
   }, { headers: { "Cache-Control": "private, no-store" } });
 }

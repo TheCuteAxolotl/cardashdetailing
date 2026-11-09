@@ -4,6 +4,7 @@ import { employeePreview } from "@/lib/workspace-preferences";
 import { useEffect, useState } from "react";
 import BookingCertificateButton from "@/components/BookingCertificateButton";
 import BookingPhotoEvidence from "@/components/BookingPhotoEvidence";
+import BusinessCallButton from "@/components/BusinessCallButton";
 
 type Booking = {
   bookingNumber?: string;
@@ -30,6 +31,7 @@ export default function AdminBookings() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [message, setMessage] = useState("");
+  const [canCall, setCanCall] = useState(false);
   const [arrivalSendingId, setArrivalSendingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +41,7 @@ export default function AdminBookings() {
       const data = await response.json();
       if (data.user.role === "owner" && !employeePreview(data.user)) return window.location.assign("/owner/bookings");
       if (!data.permissions?.includes("bookings")) return window.location.assign(data.staffAccess ? "/admin/dashboard" : "/dashboard");
+      setCanCall(data.user.role === "owner" || Boolean(data.permissions?.includes("businessPhone")));
     })();
   }, []);
 
@@ -110,7 +113,7 @@ export default function AdminBookings() {
                   <div className="flex flex-wrap items-center gap-3"><h2 className="text-xl font-semibold">{b.serviceName}</h2><span className="rounded-full border border-[#365262] px-3 py-1 text-xs uppercase text-white/72">{b.status}</span></div>
                   <div className="mt-4 grid gap-2 text-sm text-white/72 sm:grid-cols-2">
                     <p><strong className="text-white">Customer:</strong> {b.customerName}</p>
-                    <p><strong className="text-white">Phone:</strong> <a href={`tel:${b.customerPhone}`} className="underline">{b.customerPhone}</a></p>
+                    <p><strong className="text-white">Phone:</strong> {b.customerPhone || "Not provided"}</p>
                     <p><strong className="text-white">Email:</strong> <a href={`mailto:${b.customerEmail}`} className="underline">{b.customerEmail}</a></p>
                     <p><strong className="text-white">Vehicle:</strong> {b.vehicleYear} {b.vehicleMake} {b.vehicleModel} {b.vehicleTrim || ""}</p>
                     <p><strong className="text-white">Method:</strong> {b.serviceMethod}</p>
@@ -127,6 +130,7 @@ export default function AdminBookings() {
                   >
                     Text customer · Full history
                   </a> : <span className="rounded-lg border border-amber-400/25 px-4 py-3 text-center text-sm text-amber-200">Add a customer phone number before texting</span>}
+                  {canCall && b.customerPhone && <BusinessCallButton phoneNumber={b.customerPhone} customerName={b.customerName} className="rounded-lg border border-[#d6b779]/50 bg-[#d6b779]/10 px-4 py-2.5 text-sm font-semibold text-[#ead09c] disabled:opacity-40" />}
                   {!['completed', 'cancelled'].includes(b.status) && (
                     <>
                       <button

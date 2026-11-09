@@ -1,6 +1,7 @@
 "use client";
 import SendPhotos from "@/components/SendPhotos";
 import MessageBookingForm from "@/components/MessageBookingForm";
+import BusinessCallButton from "@/components/BusinessCallButton";
 
 import SmsAttachments from "@/components/SmsAttachments";
 import MessagePhotoGallery from "@/components/MessagePhotoGallery";
@@ -94,6 +95,17 @@ export default function StaffSmsInbox({
   const [newMessage, setNewMessage] = useState("");
   const [newTextSending, setNewTextSending] = useState(false);
   const [newTextNote, setNewTextNote] = useState("");
+  const [canCall, setCanCall] = useState(role === "owner");
+
+  useEffect(() => {
+    if (role === "owner") return;
+    const controller = new AbortController();
+    void fetch("/api/auth/me", { cache: "no-store", signal: controller.signal })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => { if (!controller.signal.aborted) setCanCall(Boolean(data?.permissions?.includes("businessPhone"))); })
+      .catch(() => { if (!controller.signal.aborted) setCanCall(false); });
+    return () => controller.abort();
+  }, [role]);
 
   const load = useCallback(async (quiet = false) => {
     if (!quiet) setLoading(true);
@@ -485,12 +497,13 @@ export default function StaffSmsInbox({
                 <article key={thread.phone} className="overflow-hidden rounded-3xl border border-amber-500/20 bg-amber-500/[.035]">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-5 py-4">
                     <div>
-                      <a href={`tel:${thread.phone}`} className="font-semibold text-white hover:text-[#6EAEC6]">
-                        {thread.phone}
-                      </a>
+                      <span className="font-semibold text-white">{thread.phone}</span>
                       <p className="mt-1 text-xs text-white/35">Direct SMS · not linked to a booking</p>
                     </div>
-                    <time className="text-xs text-white/30">{new Date(thread.latestAt).toLocaleString()}</time>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {canCall && <BusinessCallButton phoneNumber={thread.phone} customerName={thread.phone} label="Call from Car Dash" className="rounded-xl border border-[#d6b779]/50 px-3 py-2 text-xs font-semibold text-[#e8d2a1] disabled:opacity-40" />}
+                      <time className="text-xs text-white/30">{new Date(thread.latestAt).toLocaleString()}</time>
+                    </div>
                   </div>
 
                   <div className="px-5 py-3"><MessageBookingForm key={[...thread.messages].reverse().find(message=>message.direction!=="outbound")?.id||thread.messages[0]?.id} source={{type:"sms",id:[...thread.messages].reverse().find(message=>message.direction!=="outbound")?.id||thread.messages[0]?.id}} /></div>

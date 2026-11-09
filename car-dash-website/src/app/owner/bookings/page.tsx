@@ -11,6 +11,7 @@ import BookingDetailsEditor from "@/components/BookingDetailsEditor";
 import OwnerBookingModal from "@/components/OwnerBookingModal";
 import BookingPaidReceiptDialog from "@/components/BookingPaidReceiptDialog";
 import BookingReminderDialog from "@/components/BookingReminderDialog";
+import BusinessCallButton from "@/components/BusinessCallButton";
 import { bookingServiceAddress } from "@/lib/booking-owner-details";
 
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#6EAEC6]/60";
@@ -363,7 +364,7 @@ export default function OwnerBookings() {
 
                     <div className="mt-4 grid gap-2 text-sm text-white/72 sm:grid-cols-2">
                       <p><strong className="text-white">Customer:</strong> {booking.customerName}</p>
-                      <p><strong className="text-white">Phone:</strong> {booking.customerPhone ? <a href={`tel:${booking.customerPhone}`} className="underline">{booking.customerPhone}</a> : "Not provided"}</p>
+                      <p><strong className="text-white">Phone:</strong> {booking.customerPhone || "Not provided"}</p>
                       <p><strong className="text-white">Email:</strong> {booking.customerEmail ? <a href={`mailto:${booking.customerEmail}`} className="underline">{booking.customerEmail}</a> : "Not provided"}</p>
                       <p><strong className="text-white">Vehicle:</strong> {booking.vehicleYear} {booking.vehicleMake} {booking.vehicleModel} {booking.vehicleTrim || ""}</p>
                       <p><strong className="text-white">Method:</strong> {booking.serviceMethod}</p>
@@ -393,6 +394,7 @@ export default function OwnerBookings() {
                     <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg bg-[#d6b779] px-4 py-3 text-sm font-bold text-[#101010]">Edit booking / address</button>
                     <button type="button" onClick={() => startScheduleEdit(booking)} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80">Quick edit date / time</button>
                     {booking.customerPhone ? <a href={`/owner/messages?phone=${encodeURIComponent(booking.customerPhone)}&name=${encodeURIComponent(booking.customerName || "Customer")}`} className="rounded-lg border border-white/20 bg-[#292723] px-4 py-2 text-center text-sm font-semibold text-[#f4efe5]">Text customer · Full history</a> : <button type="button" onClick={() => setEditingBooking(booking)} className="rounded-lg border border-amber-400/30 px-4 py-2 text-sm font-semibold text-amber-200">Add customer phone to text</button>}
+                    {booking.customerPhone && <BusinessCallButton phoneNumber={booking.customerPhone} customerName={booking.customerName} className="rounded-lg border border-[#d6b779]/45 bg-[#d6b779]/10 px-4 py-2.5 text-sm font-semibold text-[#e9d29e] disabled:opacity-40" />}
                     {booking.status === "confirmed" && (
                       <button
                         type="button"
