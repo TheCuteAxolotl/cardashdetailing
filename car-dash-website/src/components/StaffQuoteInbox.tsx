@@ -1,5 +1,6 @@
 "use client";
 import DeleteMessageButton from "@/components/DeleteMessageButton";
+import BusinessCallButton from "@/components/BusinessCallButton";
 import { DELETED_MESSAGE } from "@/lib/deleted-message";
 import SendPhotos from "@/components/SendPhotos";
 
@@ -41,6 +42,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
   const [deleting, setDeleting] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [denied,setDenied]=useState(false);
+  const [canCall, setCanCall] = useState(false);
 
   const load = async () => {
     const response = await fetch("/api/quotes", { cache: "no-store" });
@@ -71,6 +73,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
         if(category==="messages"){setDenied(true);return;}
         return window.location.assign(payload.staffAccess ? "/admin/dashboard" : "/dashboard");
       }
+      setCanCall(payload.user?.role === "owner" || Boolean(payload.permissions?.includes("businessPhone")));
       setAuthorized(true);
     })();
   }, []);
@@ -212,7 +215,7 @@ export default function StaffQuoteInbox({ backHref, canDelete = false, category=
                         </p>
                         {!active.user && (active.guestPhone || active.guestEmail) && (
                           <div className="mt-3 flex flex-wrap gap-2">
-                            {active.guestPhone && <a href={`tel:${active.guestPhone}`} className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-white/60 hover:border-[#6EAEC6]/40 hover:text-white">Call</a>}
+                            {canCall && active.guestPhone && <BusinessCallButton phoneNumber={active.guestPhone} customerName={active.guestName || "Guest customer"} label="Call from Car Dash" className="rounded-full border border-[#d6b779]/50 px-3 py-1.5 text-xs text-[#e8d2a1] disabled:opacity-40" />}
                             {active.guestPhone && <a href={`sms:${active.guestPhone}`} className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-white/60 hover:border-[#6EAEC6]/40 hover:text-white">Text</a>}
                             {active.guestEmail && <a href={`mailto:${active.guestEmail}`} className="rounded-full border border-white/12 px-3 py-1.5 text-xs text-white/60 hover:border-[#6EAEC6]/40 hover:text-white">Email</a>}
                           </div>
