@@ -228,7 +228,8 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     })();
     const timer=setInterval(refresh,30000);
     window.addEventListener("focus",refresh);
-    return()=>{disposed=true;clearInterval(timer);window.removeEventListener("focus",refresh);};
+    window.addEventListener("car-dash-notifications-refresh",refresh);
+    return()=>{disposed=true;clearInterval(timer);window.removeEventListener("focus",refresh);window.removeEventListener("car-dash-notifications-refresh",refresh);};
   },[pathname]);
 
 
