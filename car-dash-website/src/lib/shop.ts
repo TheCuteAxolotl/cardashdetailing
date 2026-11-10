@@ -26,8 +26,21 @@ export type Order = {
   cents: number;
   session: string;
   held: boolean;
-  status: "checkout" | "reserved" | "ready" | "shipped" | "expired";
-  recipient?: string;
+  status: "checkout" | "reserved" | "ready" | "ordered" | "shipped" | "expired";
+  recipient?: string; // Legacy one-line shipping detail
+  shipping?: {
+    name: string;
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  customerEmail?: string;
+  customerPhone?: string;
+  supplierOrderId?: string;
+  orderedAt?: number;
   tracking?: string;
   paidAt?: number;
 };
@@ -77,49 +90,88 @@ export function allocate(shop: Shop, v: Variant) {
     order.status = "ready";
   }
 }
-export async function syncShopSession(session: StripeCheckoutSession) {
-  await changeShop((shop) => {
-    const order = shop.orders.find((o) => o.session === session.id);
-    if (!order || order.status !== "checkout") return;
-    const v = shop.variants.find((v) => v.id === order.variant)!;
+type Ship = {
+  name?: string | null;
+  address?: {
+    line1?: string | null;
+    line2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postal_code?: string | null;
+    country?: string | null;
+  } | null;
+  phone?: string | null;
+};
+
+/** Only transition an unpaid order once. Webhook retries cannot create duplicate paid orders. */
+export async function syncShopSession(session: StripeCheckoutSession): Promise<Order | null> {
+  // Stripe's complete Session includes shipping details across supported API versions.
+  const details = session.payment_status === "paid"
+    ? (await stripeRequest("/v1/checkout/sessions/" + encodeURIComponent(session.id)) as StripeCheckoutSession & {
+        collected_information?: { shipping_details?: Ship | null };
+        shipping_details?: Ship | null;
+        customer_details?: { email?: string | null; phone?: string | null };
+      })
+    : session;
+  return changeShop((shop) => {
+    const order = shop.orders.find((o) => o.session === details.id);
+    if (!order || order.status !== "checkout") return null;
+    const variant = shop.variants.find((v) => v.id === order.variant);
+    if (!variant) throw Error("Merch variant missing for checkout.");
     if (
-      session.payment_status === "paid" &&
-      session.amount_total === order.cents &&
-      session.currency === "usd"
+      details.payment_status === "paid" &&
+      details.amount_total === order.cents &&
+      details.currency?.toLowerCase() === "usd"
     ) {
-      const details = session as StripeCheckoutSession & {
-        shipping_details?: Ship;
-        collected_information?: { shipping_details?: Ship };
-        customer_details?: { email?: string };
+      const paid = details as typeof details & {
+        collected_information?: { shipping_details?: Ship | null };
+        shipping_details?: Ship | null;
+        customer_details?: { email?: string | null; phone?: string | null };
       };
-      const ship =
-        details.collected_information?.shipping_details ??
-        details.shipping_details;
-      order.recipient = [
-        ship?.name,
-        ...Object.values(ship?.address ?? {}),
-        details.customer_details?.email,
-      ]
-        .filter(Boolean)
-        .join(", ");
+      const ship = paid.collected_information?.shipping_details ?? paid.shipping_details;
+      const address = ship?.address;
+      if (address) {
+        order.shipping = {
+          name: String(ship?.name || "").trim(),
+          line1: String(address.line1 || "").trim(),
+          line2: String(address.line2 || "").trim(),
+          city: String(address.city || "").trim(),
+          state: String(address.state || "").trim(),
+          postalCode: String(address.postal_code || "").trim(),
+          country: String(address.country || "").trim(),
+        };
+        order.recipient = [
+          order.shipping.name,
+          order.shipping.line1,
+          order.shipping.line2,
+          [order.shipping.city, order.shipping.state, order.shipping.postalCode].filter(Boolean).join(" "),
+          order.shipping.country,
+        ].filter(Boolean).join("\n");
+      }
+      order.customerEmail = String(paid.customer_details?.email || "").trim();
+      order.customerPhone = String(paid.customer_details?.phone || ship?.phone || "").trim();
       order.status = order.held ? "ready" : "reserved";
       order.paidAt = Date.now();
-    } else if (session.status === "expired") {
-      if (order.held) v.stock++;
+      allocate(shop, variant);
+      return { ...order };
+    }
+    if (details.status === "expired") {
+      if (order.held) variant.stock++;
       order.status = "expired";
     }
-    allocate(shop, v);
+    return null;
   });
 }
-type Ship = { name: string; address: Record<string, string> };
-export async function reconcile() {
-  const pending = (await readShop()).orders.filter(
-    (o) => o.status === "checkout",
-  );
-  for (const o of pending)
-    await syncShopSession(
-      await stripeRequest(
-        "/v1/checkout/sessions/" + encodeURIComponent(o.session),
-      ),
+
+export async function reconcile(): Promise<void> {
+  const pending = (await readShop()).orders.filter((o) => o.status === "checkout");
+  for (const order of pending) {
+    const paid = await syncShopSession(
+      await stripeRequest("/v1/checkout/sessions/" + encodeURIComponent(order.session)),
     );
+    if (paid) {
+      const { notifyMerchDiscord } = await import("@/lib/shop-notifications");
+      await notifyMerchDiscord(paid);
+    }
+  }
 }
