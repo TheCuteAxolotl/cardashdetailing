@@ -3,8 +3,9 @@ import {prisma} from "@/lib/prisma";
 import {getCurrentAccountFromRequest,hasStaffPermission,isOwnerAccount} from "@/lib/permissions";
 import {ensureJobs} from "@/lib/jobs";
 import {emailConfig,withMailbox} from "@/lib/owner-email";
+import {readShop} from "@/lib/shop";
 
-type Section="sms"|"quotes"|"support"|"calls";
+type Section="sms"|"quotes"|"support"|"calls"|"shop";
 const permissions={sms:"smsInbox",quotes:"quoteChats",support:"support",calls:"businessPhone"} as const;
 export const maxDuration=60;
 export async function GET(request:NextRequest){
@@ -31,6 +32,7 @@ export async function GET(request:NextRequest){
  if(hasStaffPermission(auth,"quoteChats"))jobs["/owner/quotes"]=prisma.quoteMessage.count({where:{sender:"customer",createdAt:{gt:seen("quotes")},thread:{status:{not:"closed"}}}});
  if(hasStaffPermission(auth,"support"))jobs["/owner/support"]=prisma.supportMessage.count({where:{sender:"visitor",createdAt:{gt:seen("support")},ticket:{status:{not:"closed"}}}});
  if(hasStaffPermission(auth,"businessPhone"))jobs["/owner/calls"]=prisma.callLog.count({where:{blocked:false,OR:[{voicemailAt:{gt:seen("calls")}},{startedAt:{gt:seen("calls")},status:{in:["missed","no-answer","busy","failed"]}}]}});
+ if(isOwnerAccount(auth))jobs["/owner/shop"]=readShop().then(shop=>shop.orders.filter(o=>o.paidAt&&o.paidAt>seen("shop").getTime()).length);
  if(isOwnerAccount(auth))jobs["/owner/email"]=(async()=>{
   if(!await emailConfig())return 0;
   return withMailbox("inbox",async client=>{const status=await client.status("INBOX",{unseen:true});return status ? status.unseen||0 : 0;});
@@ -44,7 +46,8 @@ export async function POST(request:NextRequest){
  const auth=await getCurrentAccountFromRequest(request);if(!auth)return NextResponse.json({error:"Login required"},{status:401});
  if(request.headers.get("sec-fetch-site")==="cross-site"||(request.headers.get("origin")&&request.headers.get("origin")!==request.nextUrl.origin))return NextResponse.json({error:"Invalid origin"},{status:403});
  const body=await request.json();const section=body.section as Section;
- if(!Object.hasOwn(permissions,section)||!hasStaffPermission(auth,permissions[section]))return NextResponse.json({error:"Section access required"},{status:403});
+ if(section==="shop"){if(!isOwnerAccount(auth))return NextResponse.json({error:"Owner access required"},{status:403});}
+ else if(!Object.hasOwn(permissions,section)||!hasStaffPermission(auth,permissions[section]))return NextResponse.json({error:"Section access required"},{status:403});
  const key=`notification_seen_${auth.id}_${section}`,value=new Date().toISOString();
  await prisma.siteContent.upsert({where:{key},create:{key,value},update:{value}});
  return NextResponse.json({ok:true});
