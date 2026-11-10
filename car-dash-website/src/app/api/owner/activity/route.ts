@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { readShop } from "@/lib/shop";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 
 type Alert = {
   id: string;
-  kind: "booking" | "quote" | "message" | "call" | "support";
+  kind: "booking" | "quote" | "message" | "call" | "support" | "merch";
   title: string;
   detail: string;
   href: string;
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (!auth) return NextResponse.json({error:"Sign in required"}, {status:401});
   const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
   const seenKey = "owner_activity_seen_" + auth.id;
-  const [seenRow, bookings, quotes, sms, bookingMessages, quoteMessages, calls, tickets] = await Promise.all([
+  const [seenRow, bookings, quotes, sms, bookingMessages, quoteMessages, calls, tickets, merch] = await Promise.all([
     prisma.siteContent.findUnique({where:{key:seenKey},select:{value:true}}),
     hasStaffPermission(auth,"bookings") ? prisma.booking.findMany({
       where:{createdAt:{gte:cutoff}}, orderBy:{createdAt:"desc"},take:35,
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
       where:{createdAt:{gte:cutoff}},orderBy:{createdAt:"desc"},take:20,
       select:{id:true,createdAt:true,name:true,subject:true},
     }) : Promise.resolve([]),
+    auth.role === "owner" ? readShop().then(shop => shop.orders.filter(order => order.paidAt)) : Promise.resolve([]),
   ]);
   const ownerPath = auth.role === "owner" ? "/owner" : "/admin";
   const alerts:Alert[] = [];
@@ -70,6 +72,17 @@ export async function GET(request: NextRequest) {
     title:"Missed business call",detail:x.fromPhone,href:ownerPath+"/calls",time:x.startedAt.toISOString()});
   for (const x of tickets) alerts.push({id:"support:"+x.id,kind:"support",
     title:"New support request",detail:x.name+" · "+x.subject,href:ownerPath+"/support",time:x.createdAt.toISOString()});
+  for (const order of merch) {
+    if (!order.paidAt || order.paidAt < cutoff.getTime()) continue;
+    alerts.push({
+      id: "merch:" + order.id,
+      kind: "merch",
+      title: "New paid merchandise order",
+      detail: order.item + " · $" + (order.cents / 100).toFixed(2),
+      href: "/owner/shop?view=orders",
+      time: new Date(order.paidAt).toISOString(),
+    });
+  }
   alerts.sort((a,b)=>b.time.localeCompare(a.time));
   const seenAt = seenRow?.value && !Number.isNaN(Date.parse(seenRow.value)) ? seenRow.value : null;
   return NextResponse.json({alerts:alerts.slice(0,55),seenAt,unread:seenAt?alerts.filter(x=>x.time>seenAt).length:alerts.length},
