@@ -1,4 +1,5 @@
 import ProductEditor from "./product-editor";
+import { CopyShippingAddress, OrdersOpened } from "./order-actions";
 import "./manager.css";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
@@ -159,6 +160,38 @@ async function remove(ids: string[]) {
   revalidatePath("/shop");
   revalidatePath("/owner/shop");
 }
+async function markSupplierOrdered(orderId: string, form: FormData) {
+  "use server";
+  await owner();
+  const supplierOrderId = String(form.get("supplierOrderId") ?? "").trim().slice(0, 100);
+  await changeShop(shop => {
+    const order = shop.orders.find(o => o.id === orderId);
+    if (!order || !["ready", "reserved"].includes(order.status)) {
+      throw new Error("This paid order has already changed. Refresh Orders.");
+    }
+    order.supplierOrderId = supplierOrderId || undefined;
+    order.orderedAt = Date.now();
+    order.status = "ordered";
+  });
+  revalidatePath("/owner/shop");
+}
+
+async function markMerchShipped(orderId: string, form: FormData) {
+  "use server";
+  await owner();
+  const tracking = String(form.get("tracking") ?? "").trim().slice(0, 160);
+  if (!tracking) throw new Error("Enter the shipping carrier and tracking number.");
+  await changeShop(shop => {
+    const order = shop.orders.find(o => o.id === orderId);
+    if (!order || order.status !== "ordered") {
+      throw new Error("Mark the order placed with TapStitch before recording shipment.");
+    }
+    order.tracking = tracking;
+    order.status = "shipped";
+  });
+  revalidatePath("/owner/shop");
+}
+
 function DeleteControl({ ids, label }: { ids: string[]; label: string }) {
   return (
     <details className="my-3">
@@ -324,63 +357,83 @@ export default async function Manager({
       )}
       {view === "orders" && (
         <>
+          <OrdersOpened />
           <h2>Merch orders</h2>
-          {!shop.orders.some((o) =>
-            ["reserved", "ready", "shipped"].includes(o.status),
-          ) && <p>No paid orders yet.</p>}
-          <form
-            action={async () => {
-              "use server";
-              await owner();
-              await reconcile();
-              revalidatePath("/owner/shop");
-            }}
-          >
-            <button>Sync payments and expired checkouts</button>
+          <p className="mb-4 text-sm opacity-75">
+            Customers pay on Car Dash and enter their address at secure checkout.
+            Copy the address, buy the exact item from TapStitch, and enter the customer's
+            address for direct delivery. Car Dash does not automatically place supplier orders.
+          </p>
+          {!shop.orders.some(o => ["reserved", "ready", "ordered", "shipped"].includes(o.status)) && (
+            <p>No paid orders yet.</p>
+          )}
+          <form action={async () => {
+            "use server";
+            await owner();
+            await reconcile();
+            revalidatePath("/owner/shop");
+          }}>
+            <button type="submit">Sync payments and expired checkouts</button>
           </form>
           {shop.orders
-            .filter((o) => ["reserved", "ready", "shipped"].includes(o.status))
+            .filter(o => ["reserved", "ready", "ordered", "shipped"].includes(o.status))
             .reverse()
-            .map((o) => (
-              <article className="rounded border p-3" key={o.id}>
-                <strong>{o.item}</strong>
-                <p>
-                  {o.status === "ready"
-                    ? "Ready to ship"
-                    : o.status === "reserved"
-                      ? "Paid · awaiting restock"
-                      : "Shipped"}{" "}
-                  · ${(o.cents / 100).toFixed(2)}
-                </p>
-                <p>{o.recipient}</p>
-                {o.tracking}
-                <form
-                  action={async (f) => {
-                    "use server";
-                    await owner();
-                    const tracking = String(f.get("tracking") ?? "").trim();
-                    if (!tracking) throw Error("Enter tracking.");
-                    await changeShop((s) => {
-                      const order = s.orders.find((x) => x.id === o.id);
-                      if (order?.status === "ready") {
-                        order.tracking = tracking;
-                        order.status = "shipped";
-                      }
-                    });
-                    revalidatePath("/owner/shop");
-                  }}
-                >
-                  {o.status === "ready" && (
-                    <>
-                      <input
-                        name="tracking"
-                        placeholder="Carrier and tracking number"
-                        required
-                      />
-                      <button>Mark shipped</button>
-                    </>
+            .map(o => (
+              <article className="mm-order" key={o.id}>
+                <div className="mm-order-header">
+                  <div>
+                    <p className="text-xs opacity-70">Order #{o.id.slice(0, 8).toUpperCase()}</p>
+                    <h3 className="text-lg font-semibold">{o.item}</h3>
+                    <p className="text-sm">
+                      {o.status === "ready" ? "Paid · place TapStitch order"
+                        : o.status === "reserved" ? "Paid reservation · check supplier stock"
+                        : o.status === "ordered" ? "Ordered from TapStitch · waiting for shipment"
+                        : "Shipped"}
+                    </p>
+                  </div>
+                  <strong>{"$" + (o.cents / 100).toFixed(2)}</strong>
+                </div>
+                {o.paidAt && (
+                  <p className="mt-2 text-xs opacity-70">
+                    Paid {new Date(o.paidAt).toLocaleString("en-US", {
+                      timeZone: "America/Chicago", month: "short", day: "numeric",
+                      year: "numeric", hour: "numeric", minute: "2-digit",
+                    })} CT
+                  </p>
+                )}
+                <div className="mm-shipping">
+                  <h4 className="font-semibold">Customer shipping address</h4>
+                  {o.recipient ? (
+                    <address className="mt-2 whitespace-pre-line not-italic">{o.recipient}</address>
+                  ) : (
+                    <p className="mt-2 text-sm font-semibold text-red-500">
+                      Shipping details missing. Verify the address in Stripe before ordering.
+                    </p>
                   )}
-                </form>
+                  {o.customerEmail && <p className="mt-2 break-all text-sm">Email: {o.customerEmail}</p>}
+                  {o.customerPhone && <p className="text-sm">Phone: {o.customerPhone}</p>}
+                  {o.recipient && <CopyShippingAddress value={o.recipient} />}
+                </div>
+                {o.supplierOrderId && <p className="mt-3 text-sm">TapStitch order: {o.supplierOrderId}</p>}
+                {o.tracking && <p className="mt-2 break-words text-sm">Tracking: {o.tracking}</p>}
+                {["ready", "reserved"].includes(o.status) && (
+                  <form action={markSupplierOrdered.bind(null, o.id)} className="mm-order-form">
+                    <label>
+                      TapStitch order number (optional)
+                      <input name="supplierOrderId" placeholder="Supplier order number" maxLength={100} />
+                    </label>
+                    <button type="submit">Mark ordered from TapStitch</button>
+                  </form>
+                )}
+                {o.status === "ordered" && (
+                  <form action={markMerchShipped.bind(null, o.id)} className="mm-order-form">
+                    <label>
+                      Shipping carrier and tracking number
+                      <input name="tracking" placeholder="Example: USPS 9400..." maxLength={160} required />
+                    </label>
+                    <button type="submit">Mark shipped</button>
+                  </form>
+                )}
               </article>
             ))}
         </>

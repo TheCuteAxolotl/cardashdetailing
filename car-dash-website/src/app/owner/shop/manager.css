@@ -159,3 +159,26 @@
   }
 }
 .merch-manager select:disabled {opacity:.55;cursor:default;}
+
+
+.mm-order { display: grid; gap: 10px; }
+.mm-order-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.mm-order-header strong { white-space: nowrap; }
+.mm-shipping {
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--soft);
+  overflow-wrap: anywhere;
+}
+.mm-shipping address { font-size: 14px; line-height: 1.65; }
+.mm-shipping button { margin-top: 12px; }
+.mm-order-form {
+  display: flex; align-items: end; gap: 12px; flex-wrap: wrap;
+  border-top: 1px solid var(--line); padding-top: 14px;
+}
+.mm-order-form label { flex: 1 1 220px; font-size: 13px; }
+.mm-order-form button { flex: 0 0 auto; }
+@media (max-width: 540px) {
+  .mm-order-form button { width: 100%; }
+}

@@ -131,6 +131,7 @@ function Product({ rows }: { rows: Variant[] }) {
           <input type="hidden" name="reserve" value={v.stock ? "no" : "yes"} />
           <Buy stock={v.stock} />
         </form>
+        <p className="store-shipping-note">At secure checkout, enter your full delivery address, apartment or unit number if applicable, email, and phone number. Car Dash arranges shipping directly to you after payment.</p>
         <details>
           <summary>Size guide</summary>
           <SizeGuide guide={v.guide} />

@@ -22,6 +22,7 @@ export async function checkout(form: FormData) {
       "payment_method_types[0]": "card",
       "metadata[merch_order]": id,
       "shipping_address_collection[allowed_countries][0]": "US",
+      "phone_number_collection[enabled]": "true",
       "line_items[0][quantity]": "1",
       "line_items[0][price_data][currency]": "usd",
       "line_items[0][price_data][unit_amount]": String(v.cents),
