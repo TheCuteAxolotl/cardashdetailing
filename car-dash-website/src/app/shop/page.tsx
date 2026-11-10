@@ -22,7 +22,7 @@ export default async function Shop({
         <h1>Apparel</h1>
         {(await searchParams).received && (
           <p>
-            Thanks for checking out. Keep your Stripe receipt for your records.
+            Thanks for your order! Once Stripe confirms payment, Car Dash will prepare it for shipping to the address you provided. Keep your payment receipt.
           </p>
         )}
         {rows.length ? (
