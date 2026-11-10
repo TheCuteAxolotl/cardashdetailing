@@ -3,13 +3,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
 import { useOwnerScreenPrivacy, safeCustomerText } from "@/lib/owner-screen-privacy";
 
-type Alert = {id:string;kind:"booking"|"quote"|"message"|"call"|"support";title:string;detail:string;href:string;time:string};
+type Alert = {id:string;kind:"booking"|"quote"|"message"|"call"|"support"|"merch";title:string;detail:string;href:string;time:string};
 type Payload = {alerts:Alert[];unread:number;seenAt:string|null};
 const age = (value:string) => {
   const minutes=Math.max(0,Math.floor((Date.now()-Date.parse(value))/60000));
   return minutes<1?"Just now":minutes<60?minutes+"m ago":minutes<1440?Math.floor(minutes/60)+"h ago":new Date(value).toLocaleDateString("en-US",{month:"short",day:"numeric"});
 };
-const icon:Record<Alert["kind"],OwnerIconName>={booking:"calendar",quote:"quote",message:"message",call:"phone",support:"support"};
+const icon:Record<Alert["kind"],OwnerIconName>={booking:"calendar",quote:"quote",message:"message",call:"phone",support:"support",merch:"receipt"};
 
 export default function OwnerActivityBell({ privacyScope="owner" }: { privacyScope?:"owner"|"staff" }) {
   const [payload,setPayload]=useState<Payload|null>(null);
@@ -22,7 +22,7 @@ export default function OwnerActivityBell({ privacyScope="owner" }: { privacySco
   privacy.current={recording,aliases};
   const showTitle=(alert:Alert)=>recording?({
     booking:"New booking activity",quote:"New quote activity",message:"New customer message",
-    call:"New call activity",support:"New support activity",
+    call:"New call activity",support:"New support activity",merch:"New merchandise order",
   }[alert.kind]):safeCustomerText(alert.title,aliases);
   const showDetail=(alert:Alert)=>recording?"Customer details hidden during recording.":safeCustomerText(alert.detail,aliases);
   const ready=useRef(false);
