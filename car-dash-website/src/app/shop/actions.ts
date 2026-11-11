@@ -41,7 +41,6 @@ export async function checkout(_previous: ShopCheckoutState, form: FormData): Pr
       const id = crypto.randomUUID();
       const body = new URLSearchParams({
         mode: "payment",
-        "payment_method_types[0]": "card",
         "metadata[merch_order]": id,
         "shipping_address_collection[allowed_countries][0]": "US",
         "phone_number_collection[enabled]": "true",
