@@ -227,7 +227,7 @@ export default async function Manager({
       <header>
         <div>
           <h1>Shop manager</h1>
-          <Link href="/shop">View storefront ↗</Link>
+          <Link href="/shop">View storefront</Link>
         </div>
         <Link className="mm-primary" href="?view=new">
           + Add product
