@@ -9,6 +9,7 @@ function sanitizeDiscounts(value: unknown): DiscountCode[] {
   return value
     .map((item: any, index) => {
       const type: DiscountType = item?.type === "fixed" ? "fixed" : item?.type === "set_service_price" ? "set_service_price" : "percent";
+      const scope: DiscountCode["scope"] = item?.scope === "shop" ? "shop" : "booking";
       const rawAmount = Number(item?.amount || 0);
       const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? (type === "percent" ? Math.min(rawAmount, 100) : rawAmount) : 0;
       const rawUsageLimit = Number(item?.usageLimit);
@@ -20,7 +21,7 @@ function sanitizeDiscounts(value: unknown): DiscountCode[] {
         code: normalizeDiscountCode(String(item?.code || "")),
         label: String(item?.label || "").trim().slice(0, 120),
         type,
-        scope: item?.scope === "shop" ? "shop" : "booking",
+        scope,
         amount,
         active: item?.active !== false,
         usageLimit,
