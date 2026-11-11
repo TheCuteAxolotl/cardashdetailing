@@ -32,13 +32,13 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Home",
     icon: "home",
     items: [{ href: "/owner/dashboard", adminHref: "/admin/dashboard", label: "Home", icon: "home" },
+      { href: "/owner/workspace", label: "Command center", icon: "grid", ownerOnly: true },
       { href: "/owner/profile", adminHref: "/admin/profile", label: "My Profile", icon: "people" }],
   },
   {
     label: "Customers",
     icon: "people",
     items: [
-      { href: "/owner/workspace", label: "CRM workspace", icon: "grid", ownerOnly: true },
       { href: "/owner/leads", label: "New leads", icon: "quote", ownerOnly: true },
       { href: "/owner/crm", label: "Customers", icon: "people", ownerOnly: true },
       { href: "/owner/bookings", adminHref: "/admin/bookings", label: "Bookings", icon: "calendar", permissions: ["bookings"] },
@@ -451,6 +451,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
           </div>
           <nav aria-label="Business workspace tabs" className="owner-topnav hidden max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none] md:flex">
             {(owner ? [
+              {label:"Command center",href:"/owner/workspace"},
               {label:"Calendar",href:"/owner/dashboard"},
               {label:"Jobs",href:"/owner/jobs"},
               {label:"Quotes",href:"/owner/quotes"},
