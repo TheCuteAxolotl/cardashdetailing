@@ -88,7 +88,7 @@ export default function HomeExperience({
               <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
               <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
             </div>
-            <a href="/reviews" className="hidden text-sm font-semibold text-black/50 hover:text-black sm:block">All reviews →</a>
+            <a href="/reviews" className="hidden text-sm font-semibold text-black/50 hover:text-black sm:block">All reviews</a>
           </div>
           <ReviewCards />
         </div>
@@ -158,7 +158,7 @@ export default function HomeExperience({
             </div>
             <div className="flex items-end justify-between gap-5">
               <p className="max-w-xl text-sm leading-7 text-black/48">Interiors, exterior details, paint correction, coatings — real jobs we’ve finished for customers.</p>
-              <a href="/gallery" className="hidden shrink-0 text-sm font-semibold text-black/55 hover:text-black sm:block">View full gallery →</a>
+              <a href="/gallery" className="hidden shrink-0 text-sm font-semibold text-black/55 hover:text-black sm:block">View full gallery</a>
             </div>
           </div>
           <div className="home-gallery mt-10"><DynamicGallery limit={6} cinematic /></div>
@@ -176,11 +176,11 @@ export default function HomeExperience({
           </div>
           <HomePackagePricing config={pricingConfig} mediaItems={pricingMedia} promotions={promotions} />
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-black/[.08] pt-6 text-sm font-medium text-black/52">
-            <a href="/interior-detailing" className="hover:text-black">Interior only →</a>
-            <a href="/exterior-detailing" className="hover:text-black">Exterior only →</a>
-            <a href="/paint-correction" className="hover:text-black">Paint correction →</a>
-            <a href="/ceramic-coatings" className="hover:text-black">Ceramic coating →</a>
-            <a href="/maintenance" className="hover:text-black">Monthly maintenance →</a>
+            <a href="/interior-detailing" className="hover:text-black">Interior only</a>
+            <a href="/exterior-detailing" className="hover:text-black">Exterior only</a>
+            <a href="/paint-correction" className="hover:text-black">Paint correction</a>
+            <a href="/ceramic-coatings" className="hover:text-black">Ceramic coating</a>
+            <a href="/maintenance" className="hover:text-black">Monthly maintenance</a>
           </div>
         </div>
       </section>
