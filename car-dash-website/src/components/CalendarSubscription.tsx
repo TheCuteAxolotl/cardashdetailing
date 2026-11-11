@@ -43,7 +43,7 @@ export default function CalendarSubscription() {
       {url && (
         <div className="mt-4 rounded-xl border border-[#d6b779]/25 bg-[#29261f] p-4">
           <a href={url.replace(/^https?:/, "webcal:")} className="text-sm font-semibold text-[#e5c995] underline">Open in Apple Calendar</a>
-          <label className="mt-3 block text-xs text-[#cec8bf]">Or copy into Calendar → Add Calendar → Add Subscription Calendar
+          <label className="mt-3 block text-xs text-[#cec8bf]">Or copy into Calendar, then Add Calendar, then Add Subscription Calendar
             <input readOnly value={url} onFocus={event => event.target.select()} className="mt-2 w-full rounded-xl border border-white/15 bg-[#191919] p-3 text-sm text-[#f4efe5]" />
           </label>
           <p className="mt-2 text-xs leading-5 text-[#aaa49b]">Keep this URL private. It grants access to your appointment names and times and is shown only now.</p>
