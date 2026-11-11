@@ -94,7 +94,7 @@ export default function MessagePhotoGallery({
           className="group relative inline-flex min-w-0 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-black/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e5c995]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} alt={altPrefix + " " + (i + 1)} loading="lazy" className={thumbnailClassName + " transition-transform group-hover:scale-[1.03]"} />
-          <span aria-hidden="true" className="pointer-events-none absolute bottom-1 right-1 rounded bg-black/75 px-2 py-1 text-[10px] text-white">Expand ↗</span>
+          <span aria-hidden="true" className="pointer-events-none absolute bottom-1 right-1 rounded bg-black/75 px-2 py-1 text-[10px] text-white">Expand</span>
         </button>
       ))}
     </div>
