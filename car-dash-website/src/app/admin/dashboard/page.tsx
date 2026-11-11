@@ -113,7 +113,7 @@ export default function AdminDashboard() {
                     <p className="text-[10px] font-semibold uppercase tracking-[.13em] text-black/28">{tool.title}</p>
                     <p className="mt-1 text-sm font-medium">{tool.badge} unread customer message{tool.badge === 1 ? "" : "s"}</p>
                   </div>
-                  <span className="text-xs text-black/30 group-hover:text-black/55">Open →</span>
+                  <span className="text-xs text-black/30 group-hover:text-black/55">Open</span>
                 </a>
               ))
             ) : (
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
         <section className="mt-9 pb-10">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-[13px] font-medium text-black/38">Your tools</p>
-            <a href="/account" className="text-xs font-medium text-black/30 hover:text-black">Account →</a>
+            <a href="/account" className="text-xs font-medium text-black/30 hover:text-black">Account</a>
           </div>
 
           {visible.length ? (
