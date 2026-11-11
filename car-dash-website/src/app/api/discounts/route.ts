@@ -20,12 +20,13 @@ function sanitizeDiscounts(value: unknown): DiscountCode[] {
         code: normalizeDiscountCode(String(item?.code || "")),
         label: String(item?.label || "").trim().slice(0, 120),
         type,
+        scope: item?.scope === "shop" ? "shop" : "booking",
         amount,
         active: item?.active !== false,
         usageLimit,
         onePerCustomer: item?.onePerCustomer === true,
         expiresAt,
-        appliesTo: normalizeDiscountTarget(item?.appliesTo),
+        appliesTo: item?.scope === "shop" ? null : normalizeDiscountTarget(item?.appliesTo),
       };
     })
     .filter((item) => item.code && item.amount > 0)
@@ -52,6 +53,9 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const discounts = sanitizeDiscounts(body?.discounts);
+    if (discounts.some((item) => item.scope === "shop" && item.type === "set_service_price")) {
+      return NextResponse.json({ error: "Merch promo codes must use a percentage or fixed dollar discount." }, { status: 400 });
+    }
     if (discounts.some((item) => item.type === "set_service_price" && !item.appliesTo)) {
       return NextResponse.json({ error: "Exact promo-price codes must be restricted to one service or package." }, { status: 400 });
     }
