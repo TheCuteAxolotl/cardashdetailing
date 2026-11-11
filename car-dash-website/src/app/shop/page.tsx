@@ -16,7 +16,7 @@ export default async function Shop({
         <a href="/" aria-label="Car Dash home">
           CAR DASH
         </a>
-        <a href="/">Detailing site ↗</a>
+        <a href="/">Detailing site</a>
       </header>
       <main>
         <h1>Apparel</h1>
