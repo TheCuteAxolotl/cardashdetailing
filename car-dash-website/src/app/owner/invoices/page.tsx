@@ -286,7 +286,7 @@ export default function OwnerInvoicesPage() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <a href="/owner/dashboard" className="text-sm text-[#8EC5D8] hover:text-white">← Owner Dashboard</a>
+            <a href="/owner/dashboard" className="text-sm text-[#8EC5D8] hover:text-white">Owner Dashboard</a>
             <p className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#6EAEC6]">Car Dash Billing</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Invoices</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">Create fully custom invoices, text a secure link to customers, accept whichever payment methods you choose, and record checks or other payments without forcing the transaction through a processor.</p>

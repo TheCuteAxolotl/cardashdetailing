@@ -8,7 +8,7 @@ export default function GalleryPage() {
       <main className="full-gallery mx-auto max-w-[1320px] px-5 py-14 sm:px-8 sm:py-24">
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">Recent work</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">Before, after, and the finished result.</h2></div>
-          <a href="/#prices" className="text-sm font-semibold text-black/48">See prices →</a>
+          <a href="/#prices" className="text-sm font-semibold text-black/48">See prices</a>
         </div>
         <DynamicGallery />
       </main>

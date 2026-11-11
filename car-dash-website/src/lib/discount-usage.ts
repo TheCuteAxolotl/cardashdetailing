@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { readShop } from "@/lib/shop";
 import {
   DiscountCode,
   extractDiscountCodeFromBookingNotes,
@@ -31,6 +32,13 @@ export async function getDiscountUsageCounts(codes: string[]) {
   for (const booking of bookings) {
     const code = extractDiscountCodeFromBookingNotes(booking.notes);
     if (code && Object.prototype.hasOwnProperty.call(counts, code)) counts[code] += 1;
+  }
+
+  const orders = (await readShop()).orders;
+  for (const order of orders) {
+    if (order.discountCode && order.paidAt && Object.prototype.hasOwnProperty.call(counts, order.discountCode)) {
+      counts[order.discountCode] += 1;
+    }
   }
 
   return counts;

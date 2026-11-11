@@ -40,7 +40,7 @@ export default function GalleryMediaCard({
     <div className="space-y-3 p-4">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[.17em] text-[#d6b779]">{current?.group || "Legacy / custom"}</p>
-        <p className="mt-1 break-words text-sm font-semibold leading-6 text-[#f4eee5]">{current?.label.split("→").slice(1).join(" / ").trim() || item.category}</p>
+        <p className="mt-1 break-words text-sm font-semibold leading-6 text-[#f4eee5]">{current?.label.split(" / ").slice(1).join(" / ").trim() || item.category}</p>
         {currentPath && <a href={currentPath} target="_blank" rel="noreferrer" className="mt-1 inline-block text-[11px] text-[#d6b779] underline">View public page</a>}
         {!current && <p className="mt-2 text-xs text-amber-200">This placement is not in the current page list. Move it to an active slot.</p>}
         {current?.photoOnly && !isImage && <p className="mt-2 text-xs text-amber-200">This slot requires a photo. Move the video elsewhere.</p>}
@@ -72,7 +72,7 @@ export default function GalleryMediaCard({
             onClick={()=>void move(p.value)}
             className={"w-full rounded-lg px-3 py-2.5 text-left text-xs leading-5 disabled:opacity-50 " +
               (p.value===item.category?"bg-[#d6b779]/20 text-[#f0d7a6]":"text-[#ddd5ca] hover:bg-white/10")}>
-            {p.label.split("→").slice(1).join(" / ").trim() || p.label}
+            {p.label.split(" / ").slice(1).join(" / ").trim() || p.label}
             {p.value===item.category?" · Current":""}
           </button>)}
         </div>

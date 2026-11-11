@@ -15,12 +15,14 @@ export type BookingPricingConfig = {
 };
 
 export type DiscountType = "percent" | "fixed" | "set_service_price";
+export type DiscountScope = "booking" | "shop";
 
 export type DiscountCode = {
   id: string;
   code: string;
   label: string;
   type: DiscountType;
+  scope: DiscountScope;
   amount: number;
   active: boolean;
   usageLimit: number | null;
@@ -138,6 +140,7 @@ export function parseDiscountCodes(value: string | null | undefined): DiscountCo
           code: normalizeDiscountCode(String(item?.code || "")),
           label: String(item?.label || "").trim().slice(0, 120),
           type,
+          scope: item?.scope === "shop" ? "shop" : "booking",
           amount: type === "percent" ? Math.min(amount, 100) : amount,
           active: item?.active !== false,
           usageLimit: Number.isFinite(Number(item?.usageLimit)) && Number(item?.usageLimit) > 0 ? Math.floor(Number(item.usageLimit)) : null,
@@ -153,9 +156,10 @@ export function parseDiscountCodes(value: string | null | undefined): DiscountCo
 }
 
 export function discountAppliesToTarget(
-  discount: Pick<DiscountCode, "appliesTo"> | null | undefined,
+  discount: Pick<DiscountCode, "appliesTo" | "scope"> | null | undefined,
   target: string | null | undefined,
 ) {
+  if (discount?.scope === "shop") return false;
   if (!discount?.appliesTo) return true;
   return Boolean(target && discount.appliesTo === target);
 }

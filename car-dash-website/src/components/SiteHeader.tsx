@@ -167,7 +167,6 @@ export default function SiteHeader() {
             <a href="/#book" className="rounded-full bg-[#111] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(23,20,17,.12)] hover:bg-black">Book a detail</a>
           </div>
 
-          <a href="/shop" className="ml-auto inline-flex min-h-11 items-center rounded-full border border-current px-4 text-sm font-semibold lg:hidden">Shop</a>
           <button type="button" onClick={() => setMenuOpen(!menuOpen)} className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm lg:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"}>
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
           </button>

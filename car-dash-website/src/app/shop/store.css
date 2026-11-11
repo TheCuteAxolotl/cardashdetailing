@@ -190,3 +190,35 @@
 }
 
 .merch-store .store-shipping-note { font-size: 13px; line-height: 1.5; color: #555; margin: 12px 0 0; }
+
+/* Shop coupon controls reuse the store's clean editorial styling. */
+.store-promo { margin: 22px 0 16px; display: grid; gap: 10px; }
+.store-promo label { color: #404040; font-size: 13px; line-height: 1.4; }
+.store-promo input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #bfbfba;
+  border-radius: 7px;
+  padding: 12px 14px;
+  background: white;
+  color: #181818;
+  font: inherit;
+  font-size: 14px;
+}
+.store-promo input:focus { outline: 2px solid #242424; outline-offset: 1px; }
+.store-promo-row { display: flex; gap: 9px; }
+.store-promo-row button {
+  flex: none;
+  min-width: 82px;
+  padding: 10px 16px;
+  border: 1px solid #191919;
+  border-radius: 7px;
+  color: #191919;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+.store-promo-row button:disabled { opacity: 0.45; }
+.store-promo .store-promo-message { font-size: 13px; color: #525252; margin: 0; }
+.store-promo .store-promo-saving { font-size: 14px; color: #155832; font-weight: 600; margin: 0; }
+.store-promo .store-promo-error { font-size: 13px; color: #a11919; margin: 0; }

@@ -54,12 +54,12 @@ function dynamicPackagePlacements(configs: PricingConfigs): Placement[] {
     configs[key].packages.flatMap((pkg) => [
       {
         value: `pricing-${slug}-pkg-${pkg.id}`,
-        label: `${label} → ${pkg.name} → Before/After + Package Media`,
+        label: `${label} / ${pkg.name} / Before/After + Package Media`,
         group: label,
       },
       {
         value: `pricing-${slug}-pkg-${pkg.id}-condition`,
-        label: `${label} → ${pkg.name} → When Should I Get This? → Dirty Before Examples`,
+        label: `${label} / ${pkg.name} / When Should I Get This? / Dirty Before Examples`,
         group: label,
       },
     ])
@@ -247,7 +247,7 @@ export default function OwnerGallery() {
                   {selectedPhotos.length ? selectedPhotos.length + " photo(s) added" : "Missing photo"}
                 </span>
               </div>
-              <p className="mt-2 text-sm font-semibold leading-6">{selectedPlacement?.label || "Public Gallery → Main Gallery"}</p>
+              <p className="mt-2 text-sm font-semibold leading-6">{selectedPlacement?.label || "Public Gallery / Main Gallery"}</p>
               {selectedVideos.length > 0 && selectedPhotos.length === 0 && <p className="mt-2 text-xs text-[#d8bb95]">This location has video, but no photo assigned.</p>}
               {getMediaPlacementPath(category) && <a href={getMediaPlacementPath(category) || "#"} target="_blank" rel="noreferrer"
                 className="mt-2 inline-block text-xs font-semibold text-[#d6b779] underline">View this page</a>}

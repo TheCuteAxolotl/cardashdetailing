@@ -150,7 +150,7 @@ export default function CeramicCoatingsPage() {
           </div>
           <div>
             <p className="text-sm leading-7 text-white/48">A ceramic coating won’t make the paint scratch-proof, and you’ll still need to wash the car. The finish underneath matters, which is why we handle correction and prep before the coating goes on.</p>
-            <a href="/paint-correction" className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold">Learn about paint correction →</a>
+            <a href="/paint-correction" className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold">Learn about paint correction</a>
           </div>
         </div>
       </section>

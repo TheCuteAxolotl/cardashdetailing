@@ -254,7 +254,7 @@ export default function TeamDayCalendar({
               ))}
               {!team?.employees.length && (
                 <p className="text-xs text-white/60">
-                  Add employees in Jobs & Quality → Team setup.
+                  Add employees in Jobs & Quality, then Team setup.
                 </p>
               )}
             </div>

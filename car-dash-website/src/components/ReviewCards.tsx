@@ -161,7 +161,7 @@ export default function ReviewCards() {
               rel="noreferrer"
               className="mt-6 inline-flex w-fit text-sm font-semibold text-black/48 transition group-hover:text-black"
             >
-              View this review on Google Maps →
+              View this review on Google Maps
             </a>
           </article>
         ))}

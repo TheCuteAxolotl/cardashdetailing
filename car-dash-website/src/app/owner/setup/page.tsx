@@ -83,7 +83,7 @@ export default function OwnerSetup() {
               href="/owner/dashboard"
               className="inline-flex items-center justify-center rounded-full bg-[#6EAEC6] px-8 py-4 text-base font-semibold text-[#0B1822] transition duration-200 hover:bg-[#6EAEC6]"
             >
-              Go to Dashboard →
+              Go to Dashboard
             </a>
           </div>
         </div>

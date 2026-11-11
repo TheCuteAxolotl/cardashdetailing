@@ -24,6 +24,9 @@ export type Order = {
   variant: string;
   item: string;
   cents: number;
+  originalCents?: number;
+  discountCode?: string;
+  checkoutCreatedAt?: number;
   session: string;
   held: boolean;
   status: "checkout" | "reserved" | "ready" | "ordered" | "shipped" | "expired";
@@ -106,7 +109,7 @@ type Ship = {
 /** Only transition an unpaid order once. Webhook retries cannot create duplicate paid orders. */
 export async function syncShopSession(session: StripeCheckoutSession): Promise<Order | null> {
   // Stripe's complete Session includes shipping details across supported API versions.
-  const details = session.payment_status === "paid"
+  const details = (session.payment_status === "paid" || session.payment_status === "no_payment_required")
     ? (await stripeRequest("/v1/checkout/sessions/" + encodeURIComponent(session.id)) as StripeCheckoutSession & {
         collected_information?: { shipping_details?: Ship | null };
         shipping_details?: Ship | null;
@@ -119,7 +122,7 @@ export async function syncShopSession(session: StripeCheckoutSession): Promise<O
     const variant = shop.variants.find((v) => v.id === order.variant);
     if (!variant) throw Error("Merch variant missing for checkout.");
     if (
-      details.payment_status === "paid" &&
+      (details.payment_status === "paid" || (order.cents === 0 && details.payment_status === "no_payment_required" && details.status === "complete")) &&
       details.amount_total === order.cents &&
       details.currency?.toLowerCase() === "usd"
     ) {
@@ -148,7 +151,7 @@ export async function syncShopSession(session: StripeCheckoutSession): Promise<O
           order.shipping.country,
         ].filter(Boolean).join("\n");
       }
-      order.customerEmail = String(paid.customer_details?.email || "").trim();
+      order.customerEmail = String(paid.customer_details?.email || order.customerEmail || "").trim();
       order.customerPhone = String(paid.customer_details?.phone || ship?.phone || "").trim();
       order.status = order.held ? "ready" : "reserved";
       order.paidAt = Date.now();
