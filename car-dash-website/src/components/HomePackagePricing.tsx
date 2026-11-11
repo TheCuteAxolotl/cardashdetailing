@@ -50,7 +50,7 @@ export default function HomePackagePricing({ config, mediaItems = [], promotions
                   <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
                   <span className="flex items-center gap-3">
                     {(() => { const original=Number(pkg.prices[vehicleClass] || 0); const sale=promotions?matchingPromotion(promotions,"packages",pkg.id,"package"):null; const final=promotionalPrice(original,sale); return <span className="flex flex-wrap items-baseline gap-2">{final<original&&<span className="text-xs text-black/40 line-through">${original.toFixed(2)}</span>}<strong className={`text-lg font-semibold ${final<original?"text-red-700":"text-[#111]"}`}>${final.toFixed(2)}</strong></span>; })()}
-                    <span className="text-xs font-semibold text-black/36 transition group-hover:translate-x-0.5 group-hover:text-black">Book →</span>
+                    <span className="text-xs font-semibold text-black/36 transition group-hover:translate-x-0.5 group-hover:text-black">Book</span>
                   </span>
                 </a>
               ))}
