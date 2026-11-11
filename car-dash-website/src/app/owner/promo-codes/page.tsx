@@ -95,6 +95,7 @@ export default function PromoCodesPage() {
       code,
       label: "",
       type: "percent",
+      scope: "booking",
       amount: 10,
       active: true,
       usageLimit: null,
@@ -119,7 +120,8 @@ export default function PromoCodesPage() {
       amount: Number(item.amount),
       usageLimit: item.usageLimit && item.usageLimit > 0 ? Math.floor(item.usageLimit) : null,
       expiresAt: item.expiresAt || null,
-      appliesTo: item.appliesTo || null,
+      scope: item.scope === "shop" ? "shop" : "booking",
+      appliesTo: item.scope === "shop" ? null : (item.appliesTo || null),
     }));
     if (cleaned.some(item => !item.code || !Number.isFinite(item.amount) || item.amount <= 0 || (item.type === "percent" && item.amount > 100))) {
       setMessage("Every code needs a unique name and a valid discount amount (percentages must be 100 or less).");
@@ -127,6 +129,10 @@ export default function PromoCodesPage() {
     }
     if (new Set(cleaned.map(item => item.code)).size !== cleaned.length) {
       setMessage("Each promo code must be unique.");
+      return;
+    }
+    if (cleaned.some(item => item.scope === "shop" && item.type === "set_service_price")) {
+      setMessage("Merch discounts must use a percentage or fixed dollars off.");
       return;
     }
     if (cleaned.some(item => item.type === "set_service_price" && !item.appliesTo)) {
@@ -158,7 +164,7 @@ export default function PromoCodesPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.28em] text-[#6EAEC6]">Owner / Marketing</p>
             <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Promo Codes</h1>
-            <p className="mt-2 max-w-3xl text-sm text-white/60">Create and manage customer-entered booking discount codes separately from booking hours and add-on pricing. Your existing codes, usage counts, restrictions and expiration dates are kept.</p>
+            <p className="mt-2 max-w-3xl text-sm text-white/60">Create promo codes for detailing bookings or merch purchases in one place. Existing booking codes, redemption counts, limits, and expiration dates are preserved.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/owner/promotions" className="rounded-full border border-white/15 px-4 py-3 text-sm text-white/80">Automatic Promotions</a>
@@ -173,21 +179,22 @@ export default function PromoCodesPage() {
               <div>
                 <p className="text-xs font-bold uppercase tracking-[.22em] text-[#6EAEC6]">Discount Codes</p>
                 <h2 className="mt-2 text-2xl font-semibold">Promo code controls</h2>
-                <p className="mt-2 max-w-3xl text-sm text-white/40">Choose whether a code works everywhere or only on one service/package. You can discount by percent, dollars off, or set that service to an exact promo price. Usage limits, one-per-customer rules, and expiration dates still work too.</p>
+                <p className="mt-2 max-w-3xl text-sm text-white/40">Choose Detailing or Merch Shop for each code. Detailing discounts can target one package, while merch discounts work on shop purchases. Set a percentage or dollar amount, expiration date, and usage limits.</p>
               </div>
               <div className="mt-6 grid gap-4">
                 {discounts.map((item, index) => {
                   const usageCount = Number(item.usageCount || 0);
                   const limitReached = item.usageLimit !== null && usageCount >= item.usageLimit;
                   const expired = isDiscountExpired(item);
-                  const targetLabel = item.appliesTo ? discountTargets.find((option) => option.value === item.appliesTo)?.label || "Specific service" : "All services";
+                  const targetLabel = item.appliesTo ? discountTargets.find((option) => option.value === item.appliesTo)?.label || "Specific service" : "All detailing services";
                   return (
                     <article key={item.id} className="rounded-2xl border border-white/10 bg-black/25 p-4">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex flex-wrap items-center gap-2 text-xs">
                           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/60">Used {usageCount}{item.usageLimit !== null ? ` / ${item.usageLimit}` : " times"}</span>
+                          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/70">{item.scope === "shop" ? "Merch Shop" : "Detailing"}</span>
                           {item.onePerCustomer && <span className="rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-blue-200">1 per customer</span>}
-                          {item.appliesTo && <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-emerald-200">Only: {targetLabel}</span>}
+                          {item.scope !== "shop" && item.appliesTo && <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-emerald-200">Only: {targetLabel}</span>}
                           {item.expiresAt && <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-white/55">Expires {item.expiresAt}</span>}
                           {expired && <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1.5 text-amber-200">Expired</span>}
                           {limitReached && <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1.5 text-amber-200">Limit reached</span>}
@@ -197,17 +204,18 @@ export default function PromoCodesPage() {
 
                       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                         <label className="text-sm text-white/55">Code<input className={`${input} mt-2 uppercase`} value={item.code} onChange={(e) => updateDiscount(index, { code: normalizeDiscountCode(e.target.value) })} placeholder="SAVE10" /></label>
+                        <label className="text-sm text-white/55">Works on<select className={`${input} mt-2`} value={item.scope || "booking"} onChange={(e) => { const scope = e.target.value === "shop" ? "shop" : "booking"; updateDiscount(index, { scope, appliesTo: null, type: scope === "shop" && item.type === "set_service_price" ? "percent" : item.type }); }}><option value="booking">Detailing bookings</option><option value="shop">Merch Shop</option></select></label>
                         <label className="text-sm text-white/55">Customer label<input className={`${input} mt-2`} value={item.label} onChange={(e) => updateDiscount(index, { label: e.target.value })} placeholder="10% off detailing" /></label>
-                        <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as DiscountCode["type"] })}><option value="percent">Percent off %</option><option value="fixed">Fixed dollars off $</option><option value="set_service_price">Set service price to $</option></select></label>
+                        <label className="text-sm text-white/55">Discount type<select className={`${input} mt-2`} value={item.type} onChange={(e) => updateDiscount(index, { type: e.target.value as DiscountCode["type"] })}><option value="percent">Percent off %</option><option value="fixed">Fixed dollars off $</option>{item.scope !== "shop" && <option value="set_service_price">Set service price to $</option>}</select></label>
                         <label className="text-sm text-white/55">{item.type === "set_service_price" ? "Promo service price" : "Amount"}<NumberInput type="number" min="0" step="0.01" className={`${input} mt-2`} value={item.amount} onChange={(e) => updateDiscount(index, { amount: Number(e.target.value) })} placeholder={item.type === "set_service_price" ? "40" : undefined} /></label>
-                        <label className="text-sm text-white/55 md:col-span-2">Applies to<select className={`${input} mt-2`} value={item.appliesTo || ""} onChange={(e) => updateDiscount(index, { appliesTo: e.target.value || null })}><option value="">All services and packages</option>{["Full Detailing", "Interior Only", "Exterior Only", "Standalone", "Other Services"].map((group) => { const options = discountTargets.filter((option) => option.group === group); return options.length ? <optgroup key={group} label={group}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</optgroup> : null; })}</select><span className="mt-2 block text-xs leading-5 text-white/32">Pick one service/package to prevent this code from working anywhere else.</span></label>
+                        {item.scope !== "shop" && <label className="text-sm text-white/55 md:col-span-2">Applies to<select className={`${input} mt-2`} value={item.appliesTo || ""} onChange={(e) => updateDiscount(index, { appliesTo: e.target.value || null })}><option value="">All services and packages</option>{["Full Detailing", "Interior Only", "Exterior Only", "Standalone", "Other Services"].map((group) => { const options = discountTargets.filter((option) => option.group === group); return options.length ? <optgroup key={group} label={group}>{options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</optgroup> : null; })}</select><span className="mt-2 block text-xs leading-5 text-white/32">Pick one service/package to prevent this code from working anywhere else.</span></label>}
                         <label className="text-sm text-white/55">Total usage limit<NumberInput type="number" min="1" step="1" className={`${input} mt-2`} value={item.usageLimit ?? ""} onChange={(e) => updateDiscount(index, { usageLimit: e.target.value ? Math.max(1, Math.floor(Number(e.target.value))) : null })} placeholder="Unlimited" /></label>
                         <label className="text-sm text-white/55">Expiration date<input type="date" className={`${input} mt-2`} value={item.expiresAt || ""} onChange={(e) => updateDiscount(index, { expiresAt: e.target.value || null })} /></label>
                         <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.onePerCustomer} onChange={(e) => updateDiscount(index, { onePerCustomer: e.target.checked })} /> One use per customer</label>
                         <label className="flex min-h-12 items-center gap-2 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white/60"><input type="checkbox" checked={item.active} onChange={(e) => updateDiscount(index, { active: e.target.checked })} /> Active</label>
                       </div>
-                      {item.type === "set_service_price" && item.appliesTo && <p className="mt-3 rounded-xl border border-emerald-400/15 bg-emerald-400/[.06] px-4 py-3 text-xs leading-5 text-emerald-100/80">This sets only the selected service price to ${Number(item.amount || 0).toFixed(2)}. Any customer-selected add-ons stay at their normal price.</p>}
-                      {item.type === "set_service_price" && !item.appliesTo && <p className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[.07] px-4 py-3 text-xs leading-5 text-amber-100">Choose a specific service/package above. Exact promo-price codes cannot be saved as an all-services discount.</p>}
+                      {item.scope !== "shop" && item.type === "set_service_price" && item.appliesTo && <p className="mt-3 rounded-xl border border-emerald-400/15 bg-emerald-400/[.06] px-4 py-3 text-xs leading-5 text-emerald-100/80">This sets only the selected service price to ${Number(item.amount || 0).toFixed(2)}. Any customer-selected add-ons stay at their normal price.</p>}
+                      {item.scope !== "shop" && item.type === "set_service_price" && !item.appliesTo && <p className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[.07] px-4 py-3 text-xs leading-5 text-amber-100">Choose a specific service/package above. Exact promo-price codes cannot be saved as an all-services discount.</p>}
                     </article>
                   );
                 })}
