@@ -20,7 +20,7 @@ export default function PackageMediaEvidence({ packageMedia, features }: { packa
         <div className="package-detail-panel mt-4 border border-black/[.08] bg-white p-3">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-xs font-semibold text-black/62">See this package</p>
-            <button type="button" onClick={() => open(packageMedia, 0)} className="text-[11px] font-bold text-[#6EAEC6]">View all →</button>
+            <button type="button" onClick={() => open(packageMedia, 0)} className="text-[11px] font-bold text-[#6EAEC6]">View all</button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {packageMedia.slice(0, 4).map((item, index) => (
