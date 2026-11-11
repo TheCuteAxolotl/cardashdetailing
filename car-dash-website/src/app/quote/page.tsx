@@ -261,7 +261,7 @@ export default function QuotePage() {
                 <a href={`/login?claimQuoteId=${claim}&email=${email}`} className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold">Already have an account?</a>
               </div>
             </div>
-            <a href="/" className="mt-6 inline-flex text-sm text-white/45 hover:text-white">← Back to home</a>
+            <a href="/" className="mt-6 inline-flex text-sm text-white/45 hover:text-white">Back to home</a>
           </div>
         </main>
       );
