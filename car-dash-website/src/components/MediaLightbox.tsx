@@ -140,8 +140,8 @@ export default function MediaLightbox({ items, openIndex, onClose }: { items: Me
 
         {items.length > 1 && (
           <div className="flex shrink-0 items-center justify-between gap-3 border-t border-white/8 bg-[#171411] px-4 py-3 sm:hidden">
-            <button type="button" onClick={previous} className="rounded-full border border-[#F7F5F2]/15 px-4 py-2 text-sm font-semibold text-[#F7F5F2]/75">← Previous</button>
-            <button type="button" onClick={next} className="rounded-full border border-[#F7F5F2]/15 px-4 py-2 text-sm font-semibold text-[#F7F5F2]">Next →</button>
+            <button type="button" onClick={previous} className="rounded-full border border-[#F7F5F2]/15 px-4 py-2 text-sm font-semibold text-[#F7F5F2]/75">Previous</button>
+            <button type="button" onClick={next} className="rounded-full border border-[#F7F5F2]/15 px-4 py-2 text-sm font-semibold text-[#F7F5F2]">Next</button>
           </div>
         )}
       </div>
