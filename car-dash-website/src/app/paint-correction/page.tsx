@@ -27,7 +27,7 @@ export default function PaintCorrectionPage() {
       <section className="border-y border-black/8 bg-[#111] text-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 lg:grid-cols-2 lg:items-start">
           <div><p className="text-xs font-bold uppercase tracking-[.2em] text-[#6EAEC6]">What it can improve</p><h2 className="mt-3 text-3xl font-semibold tracking-[-.04em]">Swirls, haze, oxidation, light scratches, water spots, and dull paint.</h2></div>
-          <div><p className="text-sm leading-7 text-white/48">Some defects are just too deep to safely polish out. Chips, deep scratches, failing clear coat, and certain paint damage can still remain. We’d rather leave a deeper mark than remove too much clear coat trying to chase it.</p><a href="/ceramic-coatings" className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold">Ceramic protection after correction →</a></div>
+          <div><p className="text-sm leading-7 text-white/48">Some defects are just too deep to safely polish out. Chips, deep scratches, failing clear coat, and certain paint damage can still remain. We’d rather leave a deeper mark than remove too much clear coat trying to chase it.</p><a href="/ceramic-coatings" className="mt-5 inline-flex rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold">Ceramic protection after correction</a></div>
         </div>
       </section>
 
