@@ -132,7 +132,7 @@ export default function GalleryPlacementChecklist({
             {match.map(row => {
               const {placement,photoCount,videoCount,preview}=row;
               const active=selected === placement.value;
-              const subLabel=placement.label.split("→").slice(1).join(" / ").trim() || placement.label;
+              const subLabel=placement.label.split(" / ").slice(1).join(" / ").trim() || placement.label;
               const path=getMediaPlacementPath(placement.value);
               return <div key={placement.value} className={"flex items-center gap-3 px-3 py-3 sm:px-4 " +
                 (active?"bg-[#d6b779]/10":"hover:bg-white/[.025]")}>
