@@ -33,7 +33,7 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#pricing" className="rounded-full bg-[#111] px-5 py-3 text-sm font-semibold text-white">View pricing</a>
               <a href="/#book" className="rounded-full border border-black/12 bg-white px-5 py-3 text-sm font-semibold">Book now</a>
-              <a href="/quote" className="rounded-md px-2 py-3 text-sm font-semibold text-black/52 hover:text-black">Exact quote →</a>
+              <a href="/quote" className="rounded-md px-2 py-3 text-sm font-semibold text-black/52 hover:text-black">Exact quote</a>
             </div>
           </div>
           <div className="public-hero-media relative min-h-[380px] bg-[#111] lg:min-h-[610px]">
@@ -53,7 +53,7 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
             <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-black/36">Standard pricing</p>
             <h2 className="mt-2 text-4xl font-semibold tracking-[-.05em]">Choose your vehicle size.</h2>
           </div>
-          <a href="/#prices" className="text-sm font-semibold text-black/42 hover:text-black">All services + pricing →</a>
+          <a href="/#prices" className="text-sm font-semibold text-black/42 hover:text-black">All services + pricing</a>
         </div>
 
         <div className="pricing-package-grid grid gap-4 lg:grid-cols-3 lg:items-stretch">
@@ -72,7 +72,7 @@ export default function PricingPageExperience({ kind, initialConfig: config, med
                 {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
                   <a key={vehicleClass} href={bookingHref(kind, pkg.id, vehicleClass)} className={`group flex min-h-14 items-center justify-between gap-4 px-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}>
                     <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
-                    <span className="flex items-center gap-3">{(() => { const original=Number(pkg.prices[vehicleClass]||0); const sale=promotions?matchingPromotion(promotions,kind,pkg.id,"package"):null; const final=promotionalPrice(original,sale); return <span className="flex flex-wrap items-baseline gap-2">{final<original&&<span className="text-xs text-black/40 line-through">${original.toFixed(2)}</span>}<strong className={`text-lg font-semibold ${final<original?"text-red-700":""}`}>${final.toFixed(2)}</strong></span>; })()}<span className="text-xs font-semibold text-black/34 group-hover:text-black">Book →</span></span>
+                    <span className="flex items-center gap-3">{(() => { const original=Number(pkg.prices[vehicleClass]||0); const sale=promotions?matchingPromotion(promotions,kind,pkg.id,"package"):null; const final=promotionalPrice(original,sale); return <span className="flex flex-wrap items-baseline gap-2">{final<original&&<span className="text-xs text-black/40 line-through">${original.toFixed(2)}</span>}<strong className={`text-lg font-semibold ${final<original?"text-red-700":""}`}>${final.toFixed(2)}</strong></span>; })()}<span className="text-xs font-semibold text-black/34 group-hover:text-black">Book</span></span>
                   </a>
                 ))}
               </div>
