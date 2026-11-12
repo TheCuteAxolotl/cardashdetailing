@@ -15,7 +15,6 @@ import {
 import {
   canAccessJob,
   isEditable,
-  PHOTO_AREAS,
   type JobRow,
 } from "@/lib/job-workflow";
 export const runtime = "nodejs";
@@ -50,7 +49,12 @@ export async function GET(req: NextRequest, ctx: Context) {
       });
     }
     return NextResponse.json(
-      { photos: await photoMetadata(prisma, id) },
+      {
+        photos: await photoMetadata(prisma, id),
+        state: job.state,
+        startedAt: job.data.startedAt || job.data.history.find((entry) => entry.action === "start")?.at || null,
+        finishedAt: job.data.finishedAt || [...job.data.history].reverse().find((entry) => entry.action === "submit")?.at || null,
+      },
       { headers: noStore },
     );
   } catch (e) {
@@ -64,13 +68,9 @@ export async function POST(req: NextRequest, ctx: Context) {
     if (Number(req.headers.get("content-length") || 0) > 1600000)
       throw new JobError("Photo too large. Maximum 1 MB.", 413);
     const b = await req.json();
-    const phase = String(b.phase || "");
-    const area = String(b.area || "");
-    if (
-      !["before", "after"].includes(phase) ||
-      !PHOTO_AREAS.some((a) => a === area)
-    )
-      throw new JobError("Choose a photo phase and area.");
+    // Keep legacy photo fields for existing records, but never require a category.
+    const phase = "general";
+    const area = "General";
     if (
       typeof b.image !== "string" ||
       b.image.length > 1400000 ||
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest, ctx: Context) {
     )
       throw new JobError("Invalid JPEG photo.");
     await ensureJobs();
-    await prisma.$transaction(async (tx) => {
+    const nextVersion = await prisma.$transaction(async (tx) => {
       const job = await lockedJob(tx, id, account, b.version);
       if (!isEditable(job.state))
         throw new JobError(
@@ -100,8 +100,6 @@ export async function POST(req: NextRequest, ctx: Context) {
       });
       if (!booking || !["confirmed", "completed"].includes(booking.status))
         throw new JobError("Booking is not confirmed for work.");
-      if (phase === "after" && job.state === "assigned")
-        throw new JobError("Start the job before adding after photos.");
       const photos = await photoMetadata(tx, id);
       if (photos.length >= 60)
         throw new JobError("This job has reached its 60-photo limit.");
@@ -112,11 +110,12 @@ export async function POST(req: NextRequest, ctx: Context) {
         job,
         account.name,
         "Uploaded photo",
-        `${phase}: ${area}`,
+        "Photo added to job gallery",
       );
+      return job.version + 1;
     });
     return NextResponse.json(
-      { success: true },
+      { success: true, version: nextVersion },
       { status: 201, headers: noStore },
     );
   } catch (e) {
