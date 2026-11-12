@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 }
 export async function PUT(request: NextRequest) {
  const account = await getCurrentAccountFromRequest(request);
- if (!hasStaffPermission(account, "inventory") || !account)
+ if (!(hasStaffPermission(account, "inventory") || hasStaffPermission(account, "assignedJobs")) || !account)
    return NextResponse.json({ error: "Permission required" }, { status: 403 });
  const origin = request.headers.get("origin");
  if (origin && origin !== request.nextUrl.origin)
