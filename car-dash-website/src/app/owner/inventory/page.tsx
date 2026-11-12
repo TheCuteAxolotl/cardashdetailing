@@ -99,7 +99,7 @@ export default function OwnerInventory(){
     </div>
     <div className="flex flex-wrap gap-2">
       {isOwner&&<a href="/owner/deleted-history" className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold">Deleted history</a>}
-      {isOwner&&<a href="/owner/admins?tab=teams" className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold">Manage teams</a>}
+      {isOwner&&<a href="/owner/teams" className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold">Manage teams</a>}
       <button type="button" onClick={()=>edit(fresh())} className="rounded-xl bg-[#d6b779] px-5 py-3 text-sm font-bold text-[#171715]">Add inventory item</button>
     </div>
    </header>
