@@ -21,7 +21,7 @@ export const JOB_CHECKS = [
   "All assigned services completed",
   "Surfaces inspected under good lighting",
   "Customer belongings returned and work area cleaned",
-  "Final photos accurately show the finished work",
+  "Final condition checked and ready for the customer",
 ] as const;
 export type JobData = {
   instructions: string;
@@ -30,6 +30,8 @@ export type JobData = {
   feedback: string;
   checks: string[];
   requiredAreas: string[];
+  startedAt?: string | null;
+  finishedAt?: string | null;
   history: { at: string; actor: string; action: string; note?: string }[];
 };
 export type JobRow = {
@@ -54,7 +56,9 @@ export function emptyJobData(): JobData {
     workNotes: "",
     feedback: "",
     checks: [],
-    requiredAreas: ["Other / service detail"],
+    requiredAreas: [],
+    startedAt: null,
+    finishedAt: null,
     history: [],
   };
 }
@@ -85,39 +89,15 @@ export function transitionError(
   state: JobState,
   action: string,
   owner: boolean,
-  data: JobData,
-  photos: PhotoMeta[],
+  _data: JobData,
+  _photos: PhotoMeta[],
 ): string | null {
   if (action === "start") {
     if (state !== "assigned") return "Only assigned jobs can be started.";
-    if (!data.damageNotes.trim())
-      return "Record existing damage, or explicitly state no damage observed.";
-    if (missingEvidence(data.requiredAreas, photos, ["before"]).length)
-      return "Upload a before photo for each required area first.";
   } else if (action === "submit") {
     if (!["in_progress", "needs_touch_up"].includes(state))
-      return "Start the job before submitting it.";
-    if (
-      !data.damageNotes.trim() ||
-      JOB_CHECKS.some((c) => !data.checks.includes(c))
-    )
-      return "Complete condition notes and every checklist item first.";
-    if (state === "needs_touch_up") {
-      const review = [...data.history]
-        .reverse()
-        .find((h) => h.action === "return" || h.action === "reopen");
-      if (
-        review &&
-        !photos.some(
-          (p) =>
-            p.phase === "after" &&
-            new Date(p.createdAt).getTime() > new Date(review.at).getTime(),
-        )
-      )
-        return "Upload a new after photo showing the touch-up before resubmitting.";
-    }
-    if (missingEvidence(data.requiredAreas, photos).length)
-      return "Upload matching before and after photos for every required area.";
+      return "Start the job before marking it complete.";
+    // Photos, condition notes and checklist entries are optional.
   } else if (action === "approve" || action === "return") {
     if (!owner) return "Only the owner can review work.";
     if (state !== "awaiting_review") return "This job is not awaiting review.";
