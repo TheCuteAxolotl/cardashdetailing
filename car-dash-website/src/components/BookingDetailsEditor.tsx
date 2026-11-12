@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
+import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 import { bookingOwnerNotes, bookingServiceAddress } from "@/lib/booking-owner-details";
 
 export type EditableBooking = {
@@ -22,6 +23,20 @@ export type EditableBooking = {
   status?: string;
 };
 
+type DetailPhoto = { id: string; createdAt: string; uploadedBy: string };
+type DetailPhotoData = {
+  photos: DetailPhoto[];
+  state: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+};
+function workStamp(date: string) {
+  return new Date(date).toLocaleString("en-US", {
+    timeZone: "America/Chicago",
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
 type FormFields = {
   serviceAddress: string;
   ownerNotes: string;
@@ -69,9 +84,27 @@ export default function BookingDetailsEditor({
   const [revision, setRevision] = useState(booking.updatedAt);
   const [error, setError] = useState("");
   const [eventColor, setEventColor] = useState(calendarColor || "#6ea58d");
+  const [detailPhotos, setDetailPhotos] = useState<DetailPhotoData | null>(null);
+  const [detailPhotosError, setDetailPhotosError] = useState("");
+  const [photosReload, setPhotosReload] = useState(0);
   const update = (key: keyof FormFields, value: string) => setDraft(current => ({ ...current, [key]: value }));
   const address = draft.serviceAddress.trim();
   const maps = address ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address) : "";
+  useEffect(() => {
+    let active = true;
+    setDetailPhotos(null);
+    setDetailPhotosError("");
+    fetch("/api/jobs/" + encodeURIComponent(booking.id) + "/photos", { cache: "no-store" })
+      .then(async (response) => {
+        if (response.status === 404) return { photos: [], state: "", startedAt: null, finishedAt: null };
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Could not load detailer photos.");
+        return result as DetailPhotoData;
+      })
+      .then((result) => { if (active) setDetailPhotos(result); })
+      .catch((cause) => { if (active) setDetailPhotosError(cause instanceof Error ? cause.message : "Could not load detailer photos."); });
+    return () => { active = false; };
+  }, [booking.id, photosReload]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !saving) onClose();
@@ -146,6 +179,38 @@ export default function BookingDetailsEditor({
             <p className="mt-2 text-xs leading-5 text-[#ccc1aa]">The location where you’ll detail the vehicle. Edit it here any time, including for existing bookings.</p>
             <input id="edit-service-address" autoComplete="street-address" maxLength={500} value={draft.serviceAddress} onChange={event => update("serviceAddress", event.target.value)} placeholder="Street address, city, state, ZIP" className={field} />
             {!address && <p className="mt-2 text-xs text-amber-200">No service address saved yet.</p>}
+          </section>
+          <section className="rounded-2xl border border-white/15 bg-[#21211f] p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-base font-semibold text-[#f4efe5]">Detailer photos & work time</h3>
+              <button type="button" className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold"
+                onClick={() => setPhotosReload((v) => v + 1)}>Refresh</button>
+            </div>
+            <p className="mt-2 text-xs text-[#aaa49b]">Private pictures uploaded by your assigned detailer, saved to this appointment.</p>
+            {detailPhotosError ? <p role="alert" className="mt-3 text-xs text-red-200">{detailPhotosError}</p>
+              : !detailPhotos ? <p className="mt-3 text-xs text-[#aaa49b]">Loading job records…</p>
+              : <>
+                {detailPhotos.state && <p className="mt-3 text-xs font-semibold text-[#d6b779]">Work status: {detailPhotos.state.replaceAll("_", " ")}</p>}
+                {(detailPhotos.startedAt || detailPhotos.finishedAt) && <div className="mt-3 grid grid-cols-2 gap-3 rounded-xl border border-white/10 p-3">
+                  <div><p className="text-xs text-[#aaa49b]">Started</p>
+                    <p className="mt-1 text-xs font-medium">{detailPhotos.startedAt ? workStamp(detailPhotos.startedAt) : "—"}</p></div>
+                  <div><p className="text-xs text-[#aaa49b]">Finished</p>
+                    <p className="mt-1 text-xs font-medium">{detailPhotos.finishedAt ? workStamp(detailPhotos.finishedAt) : "—"}</p></div>
+                </div>}
+                {detailPhotos.photos.length ? <>
+                  <p className="mt-4 text-xs text-[#d6b779]">{detailPhotos.photos.length} job photos</p>
+                  <MessagePhotoGallery
+                    photos={detailPhotos.photos.map((p) => "/api/jobs/" + encodeURIComponent(booking.id) + "/photos?photo=" + encodeURIComponent(p.id))}
+                    altPrefix="Detailer job photo"
+                    thumbnailClassName="h-24 w-24 rounded-xl object-cover sm:h-32 sm:w-32"
+                  />
+                  <div className="mt-3 space-y-1">
+                    {detailPhotos.photos.map((p, i) => <p key={p.id} className="text-[11px] text-[#aaa49b]">
+                      Photo {i + 1} · {p.uploadedBy} · {workStamp(p.createdAt)}
+                    </p>)}
+                  </div>
+                </> : <p className="mt-3 text-sm text-[#aaa49b]">No job photos uploaded.</p>}
+              </>}
           </section>
           <section className="space-y-3">
             <label htmlFor="edit-owner-notes" className={label}>Private job notes</label>

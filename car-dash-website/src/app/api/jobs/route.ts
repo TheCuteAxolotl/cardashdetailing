@@ -16,9 +16,7 @@ import {
   noStore,
 } from "@/lib/jobs";
 import {
-  missingEvidence,
   emptyJobData,
-  PHOTO_AREAS,
   JOB_CHECKS,
   isEditable,
   transitionError,
@@ -81,9 +79,6 @@ export async function GET(req: NextRequest) {
     )
       .filter((u) => u.permissions.includes("assignedJobs"))
       .map(({ id, name, email, role }) => ({ id, name, email, role }));
-    const photoRows = await prisma.$queryRaw<
-      Array<{ jobId: string; phase: string; area: string }>
-    >`SELECT p."jobId",p."phase",p."area" FROM "DetailJobPhoto" p JOIN "DetailJob" j ON j."id"=p."jobId" WHERE ${owner} OR j."assigneeId"=${account.id}`;
     return NextResponse.json(
       {
         owner,
@@ -91,10 +86,7 @@ export async function GET(req: NextRequest) {
         employees,
         jobs: jobs.map((j) => ({
           ...j,
-          missingPhotos: missingEvidence(
-            j.data.requiredAreas,
-            photoRows.filter((p) => p.jobId === j.id),
-          ),
+          missingPhotos: [],
           assigneeName:
             users.find((u) => u.id === j.assigneeId)?.name ||
             (j.assigneeId === account.id
@@ -137,16 +129,10 @@ export async function POST(req: NextRequest) {
       )
     )
       throw new JobError("Choose an employee with Assigned jobs access.");
-    const areas = Array.isArray(b.requiredAreas)
-      ? PHOTO_AREAS.filter((a) => b.requiredAreas.includes(a))
-      : [];
-    if (!areas.length)
-      throw new JobError("Choose at least one required photo area.");
     const data = emptyJobData();
     data.instructions = String(b.instructions || "")
       .trim()
       .slice(0, 5000);
-    data.requiredAreas = areas;
     data.history.push({
       at: new Date().toISOString(),
       actor: account.name,
@@ -262,6 +248,14 @@ export async function PATCH(req: NextRequest) {
           user.name,
         );
       } else {
+        if (action === "start" || action === "submit") {
+          // Save any notes/checks entered just before the Start/Finish tap.
+          job.data.damageNotes = String(b.damageNotes ?? job.data.damageNotes).trim().slice(0, 5000);
+          job.data.workNotes = String(b.workNotes ?? job.data.workNotes).trim().slice(0, 5000);
+          job.data.checks = Array.isArray(b.checks)
+            ? JOB_CHECKS.filter((c) => b.checks.includes(c))
+            : job.data.checks;
+        }
         const error = transitionError(
           job.state,
           action,
@@ -275,11 +269,19 @@ export async function PATCH(req: NextRequest) {
           .slice(0, 5000);
         if ((action === "return" || action === "reopen") && !feedback)
           throw new JobError("Describe what needs attention.");
-        if (action === "start") job.state = "in_progress";
-        if (action === "submit") job.state = "awaiting_review";
+        if (action === "start") {
+          job.state = "in_progress";
+          job.data.startedAt = new Date().toISOString();
+          job.data.finishedAt = null;
+        }
+        if (action === "submit") {
+          job.state = "awaiting_review";
+          job.data.finishedAt = new Date().toISOString();
+        }
         if (action === "approve") job.state = "approved";
         if (action === "return" || action === "reopen") {
           job.state = "needs_touch_up";
+          job.data.finishedAt = null;
           job.data.checks = [];
           job.data.feedback = feedback;
         }
