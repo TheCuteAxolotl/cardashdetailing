@@ -29,80 +29,75 @@ type NavItem = {
 
 const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
   {
-    label: "Home",
-    icon: "home",
-    items: [{ href: "/owner/dashboard", adminHref: "/admin/dashboard", label: "Home", icon: "home" },
-      { href: "/owner/workspace", label: "Command center", icon: "grid", ownerOnly: true },
-      { href: "/owner/profile", adminHref: "/admin/profile", label: "My Profile", icon: "people" }],
-  },
-  {
-    label: "Customers",
-    icon: "people",
+    label: "Daily work", icon: "calendar",
     items: [
-      { href: "/owner/leads", label: "New leads", icon: "quote", ownerOnly: true },
-      { href: "/owner/crm", label: "Customers", icon: "people", ownerOnly: true },
+      { href: "/owner/dashboard", adminHref: "/admin/dashboard", label: "Home", icon: "home" },
+      { href: "/owner/schedule", label: "Schedule", icon: "calendar", ownerOnly: true },
       { href: "/owner/bookings", adminHref: "/admin/bookings", label: "Bookings", icon: "calendar", permissions: ["bookings"] },
-      { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
-      { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", permissions: ["estimateTools"] },
-      { href: "/owner/estimate-calculator", label: "Estimate Calculator", icon: "clock", ownerOnly: true },
-      { href: "/owner/service-guides", label: "Training Guides", icon: "book", ownerOnly: true },
-      { href: "/owner/invoices", label: "Invoices", icon: "invoice", permissions: ["invoices"] },
-      { href: "/owner/gift-cards", label: "Gift cards", icon: "price", ownerOnly: true },
-      { href: "/owner/shop", label: "Merch shop", icon: "price", ownerOnly: true },
-      { href: "/owner/loyalty", label: "Loyalty cards", icon: "shield", permissions: ["loyalty"] },
-      { href: "/owner/maintenance", label: "Subscriptions & maintenance", icon: "price", permissions: ["maintenance"] },
-      { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },
+      { href: "/owner/jobs", label: "Jobs & Quality", icon: "photo", permissions: ["assignedJobs"] },
+      { href: "/owner/inspection", label: "Final inspection", icon: "shield", permissions: ["assignedJobs"] },
+      { href: "/owner/workspace", label: "Command center", icon: "grid", ownerOnly: true },
     ],
   },
   {
-    label: "Messages",
-    icon: "message",
+    label: "Customers & estimates", icon: "people",
     items: [
-      { href: "/owner/email", label: "Email", icon: "message", ownerOnly: true },
+      { href: "/owner/leads", label: "New leads", icon: "quote", ownerOnly: true },
+      { href: "/owner/quotes", adminHref: "/admin/quotes", label: "Quote requests", icon: "quote", permissions: ["quoteChats"] },
+      { href: "/owner/detail-builder", label: "Build a Detail", icon: "service", permissions: ["estimateTools"] },
+      { href: "/owner/estimate-calculator", label: "Estimate Calculator", icon: "clock", ownerOnly: true },
+      { href: "/owner/crm", label: "Customers", icon: "people", ownerOnly: true },
+      { href: "/owner/loyalty", label: "Loyalty cards", icon: "shield", permissions: ["loyalty"] },
+      { href: "/owner/maintenance", label: "Subscriptions & maintenance", icon: "price", permissions: ["maintenance"] },
+      { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },
+    ],
+  },
+  {
+    label: "Communications", icon: "message",
+    items: [
       { href: "/owner/messages", adminHref: "/admin/messages", label: "Messages", icon: "message", permissions: ["smsInbox"] },
+      { href: "/owner/calls", label: "Business phone", icon: "phone", permissions: ["businessPhone"] },
+      { href: "/owner/email", label: "Email", icon: "message", ownerOnly: true },
       { href: "/owner/support", adminHref: "/admin/support", label: "Support inbox", icon: "support", permissions: ["support"] },
     ],
   },
   {
-    label: "Schedule",
-    icon: "calendar",
+    label: "Money & reports", icon: "chart",
     items: [
-      { href: "/owner/schedule", label: "Schedule", icon: "calendar", ownerOnly: true },
+      { href: "/owner/invoices", label: "Invoices", icon: "invoice", permissions: ["invoices"] },
       { href: "/owner/analytics", label: "Analytics", icon: "chart", permissions: ["analytics"] },
       { href: "/owner/revenue", label: "Revenue by service", icon: "chart", ownerOnly: true },
+      { href: "/owner/pay-tracking", label: "Pay tracking", icon: "price", ownerOnly: true },
     ],
   },
   {
-    label: "Website",
-    icon: "web",
+    label: "Shop & marketing", icon: "web",
     items: [
-      { href: "/owner/website", label: "Content", icon: "web", permissions: ["website"] },
-      { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
+      { href: "/owner/shop", label: "Merch shop", icon: "price", ownerOnly: true },
+      { href: "/owner/gift-cards", label: "Gift cards", icon: "price", ownerOnly: true },
       { href: "/owner/promotions", label: "Automatic Promotions", icon: "price", ownerOnly: true },
       { href: "/owner/promo-codes", label: "Promo Codes", icon: "price", permissions: ["pricing"] },
-      { href: "/owner/services", label: "Products & services", icon: "service", permissions: ["services"] },
+      { href: "/owner/website", label: "Content", icon: "web", permissions: ["website"] },
       { href: "/owner/gallery", label: "Photos & media", icon: "photo", permissions: ["gallery"] },
     ],
   },
   {
-    label: "Operations",
-    icon: "grid",
+    label: "Service operations", icon: "service",
     items: [
-      { href: "/owner/jobs", label: "Jobs & Quality", icon: "photo", permissions: ["assignedJobs"] },
-      { href: "/owner/inspection", label: "Final inspection", icon: "shield", permissions: ["assignedJobs"] },
+      { href: "/owner/services", label: "Products & services", icon: "service", permissions: ["services"] },
+      { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
+      { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
       { href: "/owner/inventory", label: "Supply inventory", icon: "grid", permissions: ["inventory"] },
-      { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
-      { href: "/owner/warranties", label: "Ceramic warranties", icon: "shield", permissions: ["warranties"] },
-      { href: "/staff-guide", adminHref: "/admin/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
     ],
   },
   {
-    label: "Admin",
-    icon: "settings",
+    label: "Team & settings", icon: "settings",
     items: [
       { href: "/owner/admins", label: "Employees & resources", icon: "people", ownerOnly: true },
-      { href: "/owner/pay-tracking", label: "Pay tracking", icon: "price", ownerOnly: true },
+      { href: "/staff-guide", adminHref: "/admin/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
+      { href: "/owner/service-guides", label: "Training Guides", icon: "book", ownerOnly: true },
+      { href: "/owner/profile", adminHref: "/admin/profile", label: "My Profile", icon: "people" },
       { href: "/owner/settings", adminHref: "/admin/settings", label: "Settings", icon: "settings" },
     ],
   },
@@ -238,7 +233,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     items: group.items.filter((item) => {
       if (owner) return true;
       if (item.ownerOnly) return false;
-      if (!item.permissions?.length) return group.label === "Home" || item.adminHref === "/admin/settings";
+      if (!item.permissions?.length) return Boolean(item.adminHref);
       return item.permissions.some((permission) => permissions.includes(permission));
     }),
   })).filter((group) => group.items.length), [owner, permissions]);
@@ -258,11 +253,10 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
       const href = owner ? item.href : (item.adminHref || item.href);
       return pathname === href || pathname.startsWith(`${href}/`);
     })
-  )?.label || "Home", [visibleGroups, pathname, owner]);
+  )?.label || "Daily work", [visibleGroups, pathname, owner]);
 
   const homeHref = owner ? "/owner/dashboard" : "/admin/dashboard";
   const profileHref = owner ? "/owner/profile" : "/admin/profile";
-  const quickHref = owner ? "/owner/detail-builder" : allVisibleItems.find((item) => item.label === "Bookings")?.resolvedHref || homeHref;
   const mobileQuickAction = owner ? {href:"/owner/bookings?create=1",icon:"plus" as IconName,label:"New booking"}
     : permissions.includes("bookings") ? {href:"/admin/bookings",icon:"calendar" as IconName,label:"Open bookings"}
     : permissions.includes("assignedJobs") ? {href:"/owner/jobs",icon:"photo" as IconName,label:"My jobs"}
@@ -287,12 +281,12 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
     const trigger = document.activeElement as HTMLElement | null;
     document.body.style.overflow = "hidden";
     const dialog = document.querySelector<HTMLElement>(".owner-mobile-drawer");
-    const focusable = () => Array.from(dialog?.querySelectorAll<HTMLElement>('a[href],button,input,[tabindex="0"]') || []);
+    const focusable = () => Array.from(dialog?.querySelectorAll<HTMLElement>('summary,a[href],button,input,[tabindex="0"]') || []);
     focusable()[0]?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobileOpen(false);
       if (event.key !== "Tab") return;
-      const items = focusable(), first = items[0], last = items[items.length - 1];
+      const items = focusable().filter(item => item.getClientRects().length), first = items[0], last = items[items.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
@@ -303,14 +297,14 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   const textualNav = (
     <div className="space-y-4">
       {visibleGroups.map((group) => (
-        <div key={group.label}>
-          <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-[#bdb4a7]">{group.label}</p>
+        <details key={group.label} open={group.label === activeGroup || group.label === "Daily work"}>
+          <summary className="cursor-pointer rounded-lg px-2 py-2 text-sm font-semibold text-[#ddc698]">{group.label}<span className="ml-2 text-xs opacity-70">{group.items.length}</span></summary>
           <div className="space-y-1">
             {group.items.map((item) => {
               const href = owner ? item.href : (item.adminHref || item.href);
               const active = pathname === href || pathname.startsWith(`${href}/`);
               return (
-                <a key={href} href={href} onClick={() => setMobileOpen(false)} className={`owner-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "owner-nav-link-active bg-[#d6b779] text-[#191714]" : "text-[#d1c8bc] hover:bg-white/[.07] hover:text-white"}`}>
+                <a key={href} href={href} aria-current={active ? "page" : undefined} onClick={() => setMobileOpen(false)} className={`owner-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium ${active ? "owner-nav-link-active bg-[#d6b779] text-[#191714]" : "text-[#d1c8bc] hover:bg-white/[.07] hover:text-white"}`}>
                   <Icon name={item.icon} className="h-[18px] w-[18px]" />
                   <span className="min-w-0 flex-1">{item.label}</span>
                   <NotificationBadge count={notificationCounts[item.href]} />
@@ -318,15 +312,12 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               );
             })}
           </div>
-        </div>
+        </details>
       ))}
     </div>
   );
 
-  if ((isOwnerHome || isStaffHome) && !fullWorkspace) {
-    return <WorkboardHome owner={owner} light={appearance === "light"} permissions={permissions}
-      recording={recording} onMore={() => setFullWorkspace(true)} />;
-  }
+  const showDailyBoard = (isOwnerHome || isStaffHome) && !fullWorkspace && (owner || permissions.includes("bookings"));
 
   return (
     <div data-appearance={appearance} className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
@@ -341,10 +332,10 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
             <Icon name="search" className="h-4 w-4 text-[#d6b779]"/> Search workspace
             <span className="ml-auto rounded-md border border-white/10 px-1.5 py-1 text-[10px] text-[#958d80]">Find</span>
           </button>
-          <a href={owner?"/owner/bookings?create=1":allVisibleItems.find(item=>item.label==="Bookings")?.resolvedHref||homeHref}
+          {mobileQuickAction && <a href={mobileQuickAction.href}
             className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-[#d6b779] px-3 py-3 text-xs font-bold text-[#181715] transition hover:bg-[#ead49f]">
-            <Icon name="plus" className="h-4 w-4"/> New booking
-          </a>
+            <Icon name={mobileQuickAction.icon} className="h-4 w-4"/> {mobileQuickAction.label}
+          </a>}
         </div>
         <nav aria-label="Workspace sections" className="owner-sidebar-nav min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-3 py-5">
           {textualNav}
@@ -449,27 +440,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               <a href="/" target="_blank" rel="noreferrer" className="rounded-xl border border-white/15 bg-[#272622] px-3.5 py-2.5 text-xs font-semibold text-[#ebe0ce] hover:border-[#d6b779]/60">View site</a>
             </div>
           </div>
-          <nav aria-label="Business workspace tabs" className="owner-topnav hidden max-w-full gap-1 overflow-x-auto overscroll-x-contain border-t border-white/[.065] py-2 [scrollbar-width:none] md:flex">
-            {(owner ? [
-              {label:"Command center",href:"/owner/workspace"},
-              {label:"Calendar",href:"/owner/dashboard"},
-              {label:"Jobs",href:"/owner/jobs"},
-              {label:"Quotes",href:"/owner/quotes"},
-              {label:"Customers",href:"/owner/crm"},
-              {label:"Orders",href:"/owner/bookings"},
-              {label:"Payments",href:"/owner/invoices"},
-              {label:"Subscriptions",href:"/owner/maintenance"},
-            ] : [
-              {label:"Home",href:"/admin/dashboard"},
-              {label:"Bookings",href:"/admin/bookings"},
-              {label:"Quotes",href:"/admin/quotes"},
-              {label:"Messages",href:"/admin/messages"},
-            ].filter(item=>allVisibleItems.some(v=>v.resolvedHref===item.href))).map(tab=>{
-              const active=pathname===tab.href||(tab.href!=="/owner/dashboard"&&pathname.startsWith(tab.href+"/"));
-              return <a key={tab.href} href={tab.href} aria-current={active?"page":undefined}
-                className={"shrink-0 rounded-lg px-3 py-2 text-[11px] font-semibold transition sm:px-4 sm:text-xs "+(active?"border border-[#d6b779]/35 bg-[#d6b779]/15 text-[#f1dab0]":"border border-transparent text-[#b4aa9d] hover:bg-white/10 hover:text-[#f3e9db]")}>{tab.label}</a>;
-            })}
-          </nav>
+
         </header>
         {privateWorkspacePage && <div className="owner-mobile-context-bar sticky top-[66px] z-30 flex items-center justify-between gap-3 border-b border-white/10 bg-[#1b1b1a]/95 px-4 py-3 text-[#f4eee5] backdrop-blur-lg md:hidden">
           <div className="min-w-0">
@@ -488,7 +459,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         </div>}
         {preferenceError && <p role="alert" className="p-3">{preferenceError}</p>}
         <main className="owner-shell-content owner-mobile-section-layout min-h-[calc(100vh-112px)]">
-          {(isOwnerHome || isStaffHome) && <button type="button" className="m-4 rounded-xl border border-[#d6b779]/40 px-4 py-3" onClick={() => setFullWorkspace(false)}>Back to Workboard</button>}
+          {(isOwnerHome || isStaffHome) && fullWorkspace && <button type="button" className="m-4 rounded-xl border border-[#d6b779]/40 px-4 py-3" onClick={() => setFullWorkspace(false)}>Back to daily overview</button>}
           {(pathname === "/owner/settings" || pathname === "/admin/settings") && <section aria-label="Workspace preferences" className="mx-auto max-w-2xl space-y-5 px-6 py-6">
             <h2 className="text-xl font-semibold">Workspace preferences</h2>
             <fieldset><legend className="mb-2 font-semibold">Appearance</legend>
@@ -504,7 +475,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
               </label>)}
             </fieldset>}
           </section>}
-          {privateWorkspacePage && recording ? <>
+          {showDailyBoard ? <WorkboardHome owner={owner} light={appearance === "light"} permissions={permissions} recording={recording} onMore={() => setFullWorkspace(true)} /> : privateWorkspacePage && recording ? <>
             <div className="owner-mobile-privacy-gate px-4 py-8 md:hidden">
               <div className="mx-auto max-w-lg rounded-2xl border border-[#d6b779]/25 bg-[#211f1b] p-6 text-center">
                 <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-[#d6b779]/30 bg-[#d6b779]/10 text-xl text-[#d6b779]" aria-hidden="true">•••</div>
