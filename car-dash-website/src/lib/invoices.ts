@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { archiveDeletion } from "@/lib/deletion-history";
 import { getCurrentUser, getRoleForEmail } from "@/lib/auth";
 
 const INVOICE_PREFIX = "invoice:";
@@ -63,6 +64,8 @@ export type InvoiceRecord = {
   createdAt: string;
   updatedAt: string;
   source?: string;
+  createdById?: string;
+  createdByName?: string;
   internalInspectionNotes?: string;
   internalBreakdown?: InvoiceInternalBreakdownItem[];
 };
@@ -202,6 +205,9 @@ export function sanitizeInvoiceInput(input: unknown, existing?: InvoiceRecord): 
     createdAt: existing?.createdAt || now,
     updatedAt: now,
     source: cleanString(body.source ?? existing?.source, 80) || undefined,
+    // Only the server may supply creation provenance. Never accept it from a client payload.
+    createdById: existing?.createdById,
+    createdByName: existing?.createdByName,
     internalInspectionNotes: cleanString(body.internalInspectionNotes ?? existing?.internalInspectionNotes, 4000) || undefined,
     internalBreakdown: cleanInternalBreakdown(body.internalBreakdown ?? existing?.internalBreakdown ?? []),
   };
@@ -260,8 +266,27 @@ export async function saveInvoice(invoice: InvoiceRecord) {
   return normalized;
 }
 
-export async function deleteInvoice(id: string) {
-  await prisma.siteContent.delete({ where: { key: `${INVOICE_PREFIX}${id}` } }).catch(() => null);
+export async function deleteInvoice(
+  id: string,
+  actor: { id: string; name: string; role: string },
+): Promise<"deleted" | "not-found" | "forbidden"> {
+  return prisma.$transaction(async (tx) => {
+    const key = `${INVOICE_PREFIX}${id}`;
+    const row = await tx.siteContent.findUnique({ where: { key } });
+    if (!row) return "not-found";
+    const invoice = JSON.parse(row.value) as InvoiceRecord;
+    if (actor.role !== "owner" && invoice.createdById !== actor.id) return "forbidden";
+    await archiveDeletion(tx, {
+      kind: "invoice",
+      entityId: id,
+      summary: `${invoice.invoiceNumber || id} · ${invoice.customerName}`,
+      scope: "company",
+      snapshot: invoice,
+      actor,
+    });
+    await tx.siteContent.delete({ where: { key } });
+    return "deleted";
+  });
 }
 
 export async function nextInvoiceNumber() {
