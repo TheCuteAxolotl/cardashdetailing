@@ -81,7 +81,7 @@ export default function AdminDashboard() {
     { permission: "staffGuide", href: "/staff-guide", title: "Staff guide", description: "Scripts, standards and playbooks", kind: "guide" },
   ], [smsUnread]);
 
-  const visible = tools.filter((tool) => permissions.includes(tool.permission));
+  const visible = tools.filter((tool) => permissions.includes(tool.permission) || (tool.permission === "inventory" && permissions.includes("assignedJobs")));
 
   if (!user) {
     return <div className="grid min-h-[60vh] place-items-center text-sm text-black/35">Loading staff workspace…</div>;

@@ -41,6 +41,8 @@ type Invoice = {
   createdAt: string;
   updatedAt: string;
   totals: Totals;
+  createdById?: string;
+  createdByName?: string;
 };
 
 type FormState = Omit<Invoice, "id" | "shareToken" | "createdAt" | "updatedAt" | "totals" | "sentAt" | "viewedAt"> & {
@@ -135,6 +137,8 @@ export default function OwnerInvoicesPage() {
   const [form, setForm] = useState<FormState>(blankForm());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
   const [message, setMessage] = useState("");
   const [paymentDraft, setPaymentDraft] = useState({ amount: "", method: "Check", reference: "" });
 
@@ -157,6 +161,12 @@ export default function OwnerInvoicesPage() {
 
   useEffect(() => {
     loadInvoices();
+    fetch("/api/auth/me", {cache:"no-store"})
+      .then(response => response.json())
+      .then(data => {
+        setCurrentUserId(data.user?.id || "");
+        setIsOwner(data.user?.role === "owner");
+      }).catch(() => {});
   }, []);
 
   function editInvoice(invoice: Invoice) {
@@ -244,14 +254,15 @@ export default function OwnerInvoicesPage() {
   }
 
   async function removeInvoice(invoice: Invoice) {
-    if (!window.confirm(`Delete ${invoice.invoiceNumber}? This cannot be undone.`)) return;
+    if (!window.confirm(`Move ${invoice.invoiceNumber} to Deleted History? Only the owner can restore it.`)) return;
     const response = await fetch(`/api/invoices/${invoice.id}`, { method: "DELETE" });
     if (response.ok) {
       if (form.id === invoice.id) setForm(blankForm());
-      setMessage("Invoice deleted.");
+      setMessage("Invoice moved to Deleted History. The owner can restore it.");
       await loadInvoices();
     } else {
-      setMessage("Could not delete invoice.");
+      const payload = await response.json().catch(() => ({}));
+      setMessage(payload.error || "Could not delete invoice.");
     }
   }
 
@@ -409,18 +420,21 @@ export default function OwnerInvoicesPage() {
             </div>
 
             <div className="rounded-3xl border border-[#27404F] bg-[#0B1822] p-5 sm:p-6">
+              {isOwner && <a href="/owner/deleted-history" className="mb-3 inline-block text-sm font-semibold text-[#6EAEC6] underline">Deleted history & restore</a>}
               <div className="flex items-center justify-between gap-4"><h2 className="text-lg font-semibold">Saved invoices</h2><button onClick={loadInvoices} className="text-xs text-white/45 hover:text-white">Refresh</button></div>
               {loading ? <p className="mt-4 text-sm text-white/40">Loading invoices…</p> : invoices.length === 0 ? <p className="mt-4 text-sm text-white/40">No invoices yet. Use the Steve 1 preset or create a new one.</p> : <div className="mt-4 space-y-3">{invoices.map((invoice) => (
                 <div key={invoice.id} className={`rounded-2xl border p-4 transition ${form.id === invoice.id ? "border-[#6EAEC6]/45 bg-[#6EAEC6]/5" : "border-white/7 bg-white/[0.02]"}`}>
                   <button onClick={() => editInvoice(invoice)} className="w-full text-left">
-                    <div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{invoice.customerName}</p><p className="mt-1 text-xs text-white/40">{invoice.invoiceNumber} · {invoice.assetType}{invoice.assetDescription ? ` · ${invoice.assetDescription}` : ""}</p></div><span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusClass(invoice.status)}`}>{statusLabel(invoice.status)}</span></div>
+                    <div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{invoice.customerName}</p><p className="mt-1 text-xs text-white/40">{invoice.invoiceNumber} · {invoice.createdByName ? "Created by " + invoice.createdByName + " · " : ""}{invoice.assetType}{invoice.assetDescription ? ` · ${invoice.assetDescription}` : ""}</p></div><span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusClass(invoice.status)}`}>{statusLabel(invoice.status)}</span></div>
                     <div className="mt-4 flex items-end justify-between"><span className="text-xs text-white/35">Balance</span><span className="text-lg font-bold">{currency.format(invoice.totals.balance)}</span></div>
                   </button>
                   <div className="mt-3 flex flex-wrap gap-2 border-t border-white/6 pt-3">
                     <button onClick={() => sendSms(invoice)} className="rounded-lg border border-[#6EAEC6]/20 px-2.5 py-1.5 text-xs text-[#B9E0EC]">SMS</button>
                     <button onClick={() => copyLink(invoice)} className="rounded-lg border border-white/8 px-2.5 py-1.5 text-xs text-white/55">Copy link</button>
                     <a href={`/invoice/${invoice.shareToken}`} target="_blank" rel="noreferrer" className="rounded-lg border border-white/8 px-2.5 py-1.5 text-xs text-white/55">Open</a>
-                    <button onClick={() => removeInvoice(invoice)} className="ml-auto rounded-lg border border-red-300/10 px-2.5 py-1.5 text-xs text-red-200/55 hover:text-red-200">Delete</button>
+                    {(isOwner || Boolean(currentUserId && invoice.createdById === currentUserId)) && (
+                      <button onClick={() => removeInvoice(invoice)} className="ml-auto rounded-lg border border-red-300/10 px-2.5 py-1.5 text-xs text-red-200/55 hover:text-red-200">Delete</button>
+                    )}
                   </div>
                 </div>
               ))}</div>}

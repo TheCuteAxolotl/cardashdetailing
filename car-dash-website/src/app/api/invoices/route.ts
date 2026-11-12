@@ -29,13 +29,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+    const actor = await getCurrentAccountFromRequest(request);
+    if (!hasStaffPermission(actor, "invoices") || !actor) {
       return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
     const body = await request.json().catch(() => ({}));
     const invoiceNumber = String(body?.invoiceNumber || "").trim() || (await nextInvoiceNumber());
-    const invoice = sanitizeInvoiceInput({ ...body, invoiceNumber, status: body?.status || "draft" });
+    const invoice = { ...sanitizeInvoiceInput({ ...body, id: undefined, invoiceNumber, status: body?.status || "draft" }), createdById: actor.id, createdByName: actor.name };
 
     if (!invoice.customerName) {
       return NextResponse.json({ error: "Customer name is required" }, { status: 400 });

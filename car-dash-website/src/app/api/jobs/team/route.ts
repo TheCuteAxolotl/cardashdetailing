@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
         permissionOverrides: {
           create: [
             { permission: "assignedJobs", allowed: true },
+            { permission: "inventory", allowed: true },
             { permission: "staffGuide", allowed: true },
           ],
         },
