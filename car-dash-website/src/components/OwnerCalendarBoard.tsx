@@ -102,7 +102,7 @@ export default function OwnerCalendarBoard({
             ))}
           </div>
 
-          <div className={"grid grid-cols-7 bg-[#161616] " + (view === "month" ? "" : "min-h-[360px]")}>
+          <div className={"grid grid-cols-7 bg-[#161616] " + (view === "month" ? "" : "sm:min-h-[360px]")}>
             {days.map((day, idx) => {
               const date = iso(day);
               const selected = date === selectedDay;
