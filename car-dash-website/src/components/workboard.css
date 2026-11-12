@@ -22,3 +22,17 @@
 
 :scope{min-height:100dvh}h1,h2,strong,b{font-weight:700}.rail{z-index:3}.bottom{z-index:4}.hero h1,.hero p{position:relative;z-index:1}.hero h1,.hero p,h2{font-family:inherit}header{position:sticky;top:0;background:var(--bg);z-index:2}
 }
+@scope (.cd-workboard) {
+  .daily-overview {max-width:1320px;margin:auto;padding:clamp(16px,3vw,40px);padding-bottom:96px}
+  .daily-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .daily-heading h2 {font-size:clamp(28px,4vw,44px);line-height:1.1;margin:6px 0}
+  .daily-switch {display:flex;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  .daily-switch button {border:0;font-weight:600;font-size:13px;background:transparent}
+  .daily-switch button[aria-pressed=true] {background:var(--gold);color:var(--bg)}
+  @media(max-width:640px) {
+    .daily-overview .stats {gap:6px}
+    .daily-overview .stat {padding:12px 8px;min-width:0}
+    .daily-overview .stat .cap {letter-spacing:.04em}
+    .daily-overview .stat b {font-size:clamp(17px,4vw,22px);overflow-wrap:anywhere}
+  }
+}
