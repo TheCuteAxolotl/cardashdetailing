@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     const invoiceNumber = String(body?.invoiceNumber || "").trim() || (await nextInvoiceNumber());
-    const invoice = { ...sanitizeInvoiceInput({ ...body, invoiceNumber, status: body?.status || "draft" }), createdById: actor.id, createdByName: actor.name };
+    const invoice = { ...sanitizeInvoiceInput({ ...body, id: undefined, invoiceNumber, status: body?.status || "draft" }), createdById: actor.id, createdByName: actor.name };
 
     if (!invoice.customerName) {
       return NextResponse.json({ error: "Customer name is required" }, { status: 400 });
