@@ -563,7 +563,7 @@ export default function TeamDayCalendar({
                 onClick={() => onEditTask(t)}
                 className="rounded-xl border border-white/20 px-4 py-3 text-xs"
               >
-                {t.title} · {t.completed ? "Completed" : t.type}
+                {t.title} · {t.completed ? "Completed" : t.type}{t.price != null ? " · $" + Number(t.price).toLocaleString("en-US", {maximumFractionDigits:2}) : ""}
               </button>
             ))}
           </div>
