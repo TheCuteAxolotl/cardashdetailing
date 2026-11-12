@@ -27,7 +27,7 @@ type Account = {
 const input = "w-full rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white outline-none transition focus:border-[#6EAEC6]/60";
 
 const ROLE_TEMPLATES = [
-  { name: "Detailer", description: "Assigned vehicles, private before/after photos, and owner quality review. No booking or pricing changes.", permissions: ["staffGuide", "assignedJobs"] },
+  { name: "Detailer", description: "Assigned vehicles, private before/after photos, and owner quality review. No booking or pricing changes.", permissions: ["staffGuide", "assignedJobs", "inventory"] },
   { name: "Support Agent", description: "Customer support and text-message assistance without pricing or website access.", permissions: ["staffGuide", "support", "smsInbox"] },
   { name: "Quote Specialist", description: "Review quote requests, customer photos, and send exact quotes.", permissions: ["staffGuide", "quoteChats", "smsInbox"] },
   { name: "Manager", description: "All staff operational permissions, including loyalty cards, invoices, inventory, maintenance and estimates.", permissions: [...ALL_STAFF_PERMISSION_KEYS] },
@@ -251,6 +251,7 @@ export default function StaffAccountsPage() {
             <h1 className="mt-2 text-4xl font-semibold tracking-[-.045em]">Staff & Accounts</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/42">View every account, promote or remove Admin access, create custom staff roles, assign dashboard permissions, contact customers, edit account information, or remove accounts.</p>
           </div>
+          <a href="/owner/teams" className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/65 hover:text-white">Detailer teams</a>
           <a href="/owner/dashboard" className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/65 hover:text-white">Back to dashboard</a>
         </div>
 
