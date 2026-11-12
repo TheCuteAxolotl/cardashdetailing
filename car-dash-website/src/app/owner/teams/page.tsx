@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 type Team = {
   id: string; name: string; description: string; memberIds: string[];
@@ -53,7 +53,7 @@ export default function DetailerTeamsPage() {
   function toggle(id: string, checked: boolean) {
     setMemberIds(existing => checked ? [...existing.filter(x => x !== id), id] : existing.filter(x => x !== id));
   }
-  async function save(event: React.FormEvent) {
+  async function save(event: FormEvent) {
     event.preventDefault();
     if (!name.trim() || busy) return;
     setBusy(true); setError(""); setMessage("");
