@@ -51,7 +51,7 @@ function validate(body:unknown):Entry[]|null {
 }
 export async function GET(request: NextRequest) {
  const account = await getCurrentAccountFromRequest(request);
- if (!hasStaffPermission(account, "inventory") || !account)
+ if (!(hasStaffPermission(account, "inventory") || hasStaffPermission(account, "assignedJobs")) || !account)
    return NextResponse.json({ error: "Permission required" }, { status: 403 });
  const selection = await resolveScope(account, request.nextUrl.searchParams.get("scope"));
  if (!selection) return NextResponse.json({ error: "Invalid inventory owner" }, { status: 400 });
