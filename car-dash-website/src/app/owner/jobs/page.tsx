@@ -2,9 +2,7 @@
 import { useEffect, useState } from "react";
 import {
   JOB_CHECKS,
-  PHOTO_AREAS,
   isEditable,
-  missingEvidence,
   type JobData,
   type JobState,
 } from "@/lib/job-workflow";
@@ -138,9 +136,7 @@ export default function JobsPage() {
   const [bookingId, setBookingId] = useState("");
   const [newAssignee, setNewAssignee] = useState("");
   const [newInstructions, setNewInstructions] = useState("");
-  const [areas, setAreas] = useState<string[]>(["Other / service detail"]);
-  const [phase, setPhase] = useState("before");
-  const [area, setArea] = useState<string>("Other / service detail");
+  const [uploadProgress, setUploadProgress] = useState("");
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     email: "",
@@ -170,8 +166,6 @@ export default function JobsPage() {
     setInstructions(job.data.instructions);
     setFeedback("");
     setDirty(false);
-    setArea(job.data.requiredAreas[0]);
-    setPhase(job.state === "assigned" ? "before" : "after");
     setPhotos(null);
     setPhotoError("");
     let alive = true;
@@ -228,10 +222,44 @@ export default function JobsPage() {
             instructions,
           }),
         ),
-      action === "save"
-        ? "Notes and checklist saved."
+      action === "save" ? "Notes and checklist saved."
+        : action === "start" ? "Work started. Start time recorded."
+        : action === "submit" ? "Work finished. Finish time recorded for owner review."
         : "Job updated. Booking status was not changed.",
     );
+  }
+  async function uploadPhotos(files: File[]) {
+    if (!job) return;
+    const room = 60 - (photos?.length || 0);
+    if (files.length > room) {
+      setError("You can add up to " + room + " more photos to this job.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setNotice("");
+    let uploaded = 0, version = job.version;
+    try {
+      for (const file of files) {
+        setUploadProgress("Uploading " + (uploaded + 1) + " of " + files.length + "…");
+        const image = await compress(file);
+        const result = await request(
+          "/api/jobs/" + encodeURIComponent(job.id) + "/photos",
+          json("POST", { version, image }),
+        );
+        version = result.version;
+        uploaded += 1;
+      }
+      setNotice(uploaded + " photo" + (uploaded === 1 ? "" : "s") + " added to this job.");
+    } catch (cause) {
+      setError(uploaded + " of " + files.length + " photos uploaded. " +
+        (cause instanceof Error ? cause.message : "Upload failed."));
+    } finally {
+      setUploadProgress("");
+      try { await load(); }
+      catch (cause) { setError(cause instanceof Error ? cause.message : "Could not refresh photos."); }
+      setBusy(false);
+    }
   }
   const assignable =
     data?.bookings.filter(
@@ -258,8 +286,11 @@ export default function JobsPage() {
     job &&
     isEditable(job.state) &&
     ["confirmed", "completed"].includes(booking?.status || "");
-  const missing =
-    job && photos ? missingEvidence(job.data.requiredAreas, photos) : [];
+  const startTime = job?.data.startedAt || job?.data.history.find((h) => h.action === "start")?.at;
+  const finishTime = job?.data.finishedAt || [...(job?.data.history || [])].reverse().find((h) => h.action === "submit")?.at;
+  const elapsedMinutes = startTime && finishTime
+    ? Math.round((new Date(finishTime).getTime() - new Date(startTime).getTime()) / 60000)
+    : null;
   return (
     <div className="min-h-screen bg-[#111110] p-4 text-[#f4efe5] sm:p-7">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -352,7 +383,6 @@ export default function JobsPage() {
                         bookingId,
                         assigneeId: newAssignee,
                         instructions: newInstructions,
-                        requiredAreas: areas,
                       }),
                     );
                     setSelected(bookingId);
@@ -406,37 +436,7 @@ export default function JobsPage() {
                     placeholder="Services, add-ons, access instructions, and areas needing attention"
                   />
                 </label>
-                <fieldset>
-                  <legend className="mb-2">
-                    Required matching photo areas
-                  </legend>
-                  <p className="mb-3 text-xs text-white/60">
-                    Choose areas relevant to this service. Each needs a before
-                    and an after photo.
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {PHOTO_AREAS.map((a) => (
-                      <label
-                        key={a}
-                        className="flex items-center gap-2 text-sm"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={areas.includes(a)}
-                          onChange={(e) =>
-                            setAreas(
-                              e.target.checked
-                                ? [...areas, a]
-                                : areas.filter((v) => v !== a),
-                            )
-                          }
-                        />
-                        {a}
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
-                <button disabled={busy || !areas.length} className={primary}>
+                <button disabled={busy} className={primary}>
                   Assign job
                 </button>
               </form>
@@ -542,11 +542,6 @@ export default function JobsPage() {
                     {b?.preferredTime || "Time missing"}
                   </p>
                   <p className="mt-1 text-xs text-white/65">{j.assigneeName}</p>
-                  {j.missingPhotos.length > 0 && (
-                    <p className="mt-2 text-xs text-amber-300">
-                      {j.missingPhotos.length} required photos missing
-                    </p>
-                  )}
                   {!b?.address && (
                     <p className="mt-2 text-xs text-amber-300">
                       Missing service address
@@ -621,6 +616,15 @@ export default function JobsPage() {
                     )}
                   </div>
                 </div>
+                <div className="mt-5 grid gap-3 rounded-xl border border-white/10 bg-black/20 p-4 sm:grid-cols-3">
+                  <div><p className="text-xs text-white/55">Started</p>
+                    <p className="mt-1 text-sm font-semibold">{startTime ? stamp(startTime) : "Not started"}</p></div>
+                  <div><p className="text-xs text-white/55">Finished</p>
+                    <p className="mt-1 text-sm font-semibold">{finishTime ? stamp(finishTime) : "Not finished"}</p></div>
+                  <div><p className="text-xs text-white/55">Elapsed time</p>
+                    <p className="mt-1 text-sm font-semibold">{elapsedMinutes !== null && elapsedMinutes >= 0
+                      ? Math.floor(elapsedMinutes / 60) + "h " + (elapsedMinutes % 60) + "m" : "—"}</p></div>
+                </div>
                 <p className="mt-5 whitespace-pre-wrap rounded-xl bg-black/25 p-4 text-sm">
                   {job.data.instructions ||
                     "No additional work instructions recorded."}
@@ -684,9 +688,7 @@ export default function JobsPage() {
                   Condition & completion
                 </h3>
                 <p className="mt-2 text-xs text-white/60">
-                  Save notes before starting or submitting. Record damage
-                  observed before work, or explicitly enter “No damage
-                  observed.”
+                  Notes and quality checks are optional. Any changes entered here save when you tap Start or Finish.
                 </p>
                 <label className="mt-4 block text-sm">
                   Existing damage / condition
@@ -752,163 +754,41 @@ export default function JobsPage() {
                 )}
               </section>
               <section className={panel}>
-                <h3 className="text-lg font-semibold">
-                  Before & after evidence
-                </h3>
-                <p className="mt-2 text-xs text-white/60">
-                  Private job photos. Upload times are recorded; capture time
-                  and image authenticity are not independently verified. Tap
-                  photos to enlarge and swipe.
+                <h3 className="text-lg font-semibold">Job photos</h3>
+                <p className="mt-2 text-xs leading-5 text-white/60">
+                  Photos are optional. Add any pictures, without choosing before/after or specific vehicle areas.
+                  They stay attached to this job and appear in the owner's booking details.
                 </p>
-                {photoError ? (
-                  <p role="alert" className="mt-4 text-red-300">
-                    {photoError} Refresh to retry.
-                  </p>
-                ) : !photos ? (
-                  <p className="mt-4 text-white/60">Loading photo records…</p>
-                ) : (
-                  <>
-                    {job.state === "needs_touch_up" && (
-                      <p className="mt-4 text-sm text-amber-200">
-                        Upload at least one new after photo showing the
-                        requested touch-up before resubmitting.
-                      </p>
-                    )}
-                    {missing.length > 0 ? (
-                      <p className="mt-4 text-sm text-amber-200">
-                        Missing required photos: {missing.join("; ")}
-                      </p>
-                    ) : (
-                      <p className="mt-4 text-sm text-[#d6b779]">
-                        Required photo pairs are uploaded. Quality still needs
-                        owner review.
-                      </p>
-                    )}
-                    {editable && (
-                      <div className="my-5 space-y-3 rounded-xl border border-white/15 p-4">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <label className="text-sm">
-                            Photo phase
-                            <select
-                              className={field + " mt-2"}
-                              value={phase}
-                              onChange={(e) => setPhase(e.target.value)}
-                            >
-                              <option value="before">Before</option>
-                              {job.state !== "assigned" && (
-                                <option value="after">After</option>
-                              )}
-                            </select>
-                          </label>
-                          <label className="text-sm">
-                            Area
-                            <select
-                              className={field + " mt-2"}
-                              value={area}
-                              onChange={(e) => setArea(e.target.value)}
-                            >
-                              {PHOTO_AREAS.map((a) => (
-                                <option key={a}>{a}</option>
-                              ))}
-                            </select>
-                          </label>
-                        </div>
-                        <label className="block text-sm">
-                          Add photo
-                          <input
-                            className={field + " mt-2"}
-                            disabled={busy || dirty}
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              e.target.value = "";
-                              if (file)
-                                void perform(async () => {
-                                  const image = await compress(file);
-                                  await request(
-                                    `/api/jobs/${encodeURIComponent(job.id)}/photos`,
-                                    json("POST", {
-                                      version: job.version,
-                                      phase,
-                                      area,
-                                      image,
-                                    }),
-                                  );
-                                }, "Photo saved privately to this job.");
-                            }}
-                          />
-                        </label>
-                        <p className="text-xs text-white/55">
-                          One photo at a time, up to 60 per job. Photos are
-                          resized to 1,600 px for upload. If HEIC is
-                          unsupported, select JPEG. Existing evidence is
-                          retained.
-                        </p>
-                      </div>
-                    )}
-                    {[
-                      ...new Set([
-                        ...job.data.requiredAreas,
-                        ...photos.map((p) => p.area),
-                      ]),
-                    ].map((a) => (
-                      <div
-                        key={a}
-                        className="mt-6 border-t border-white/10 pt-4"
-                      >
-                        <h4 className="mb-3 font-semibold">
-                          {a}
-                          {job.data.requiredAreas.includes(a) && (
-                            <span className="ml-2 text-xs font-normal text-white/50">
-                              Required pair
-                            </span>
-                          )}
-                        </h4>
-                        <div className="grid grid-cols-2 gap-3">
-                          {["before", "after"].map((p) => {
-                            const matching = photos.filter(
-                              (x) => x.area === a && x.phase === p,
-                            );
-                            return (
-                              <div
-                                key={p}
-                                className="min-w-0 rounded-xl bg-black/20 p-3"
-                              >
-                                <p className="mb-3 text-sm font-medium capitalize">
-                                  {p}
-                                </p>
-                                {matching.length ? (
-                                  <>
-                                    <MessagePhotoGallery
-                                      photos={matching.map(
-                                        (x) =>
-                                          `/api/jobs/${encodeURIComponent(job.id)}/photos?photo=${encodeURIComponent(x.id)}`,
-                                      )}
-                                      altPrefix={`${a} ${p}`}
-                                    />
-                                    {matching.map((x) => (
-                                      <p
-                                        key={x.id}
-                                        className="mt-2 text-[11px] text-white/55"
-                                      >
-                                        {x.uploadedBy} · {stamp(x.createdAt)}
-                                      </p>
-                                    ))}
-                                  </>
-                                ) : (
-                                  <p className="text-sm text-amber-200">
-                                    No {p} photo
-                                  </p>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </>
+                {editable && (
+                  <label className="mt-4 block text-sm font-semibold">
+                    Select one or multiple photos
+                    <input className={field + " mt-2"} disabled={busy}
+                      type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple
+                      onChange={(event) => {
+                        const files = Array.from(event.currentTarget.files || []);
+                        event.currentTarget.value = "";
+                        if (files.length) void uploadPhotos(files);
+                      }}
+                    />
+                  </label>
                 )}
+                <p className="mt-2 text-xs text-white/50">
+                  Up to 60 per job. Images are resized for upload. Convert unsupported HEIC photos to JPEG.
+                </p>
+                {uploadProgress && <p role="status" className="mt-3 text-sm text-[#d6b779]">{uploadProgress}</p>}
+                {photoError ? <p role="alert" className="mt-3 text-red-300">{photoError}</p>
+                  : !photos ? <p className="mt-4 text-sm text-white/60">Loading photos…</p>
+                  : photos.length ? <>
+                    <p className="mt-4 text-sm text-[#d6b779]">{photos.length} saved photos</p>
+                    <MessagePhotoGallery photos={photos.map((p) =>
+                      "/api/jobs/" + encodeURIComponent(job.id) + "/photos?photo=" + encodeURIComponent(p.id)
+                    )} altPrefix="Job photo" thumbnailClassName="h-28 w-28 max-w-full rounded-xl object-cover sm:h-36 sm:w-36" />
+                    <div className="mt-4 space-y-1">
+                      {photos.map((p, i) => <p key={p.id} className="text-[11px] text-white/55">
+                        Photo {i + 1} · {p.uploadedBy} · {stamp(p.createdAt)}
+                      </p>)}
+                    </div>
+                  </> : <p className="mt-4 text-sm text-white/60">No photos yet. Photos are not required to finish.</p>}
               </section>
               <section className={panel}>
                 <h3 className="mb-4 font-semibold">Next step</h3>
@@ -916,10 +796,10 @@ export default function JobsPage() {
                   {editable && job.state === "assigned" && (
                     <button
                       className={primary}
-                      disabled={busy || dirty || !photos}
+                      disabled={busy}
                       onClick={() => act("start")}
                     >
-                      Start job
+                      Start work
                     </button>
                   )}
                   {editable &&
@@ -927,11 +807,11 @@ export default function JobsPage() {
                       <button
                         className={primary}
                         disabled={
-                          busy || dirty || !photos || missing.length > 0
+                          busy
                         }
                         onClick={() => act("submit")}
                       >
-                        Submit for owner review
+                        Finish job · Mark complete
                       </button>
                     )}
                   {job.state === "awaiting_review" && !owner && (
@@ -942,7 +822,7 @@ export default function JobsPage() {
                   )}
                   {job.state === "approved" && (
                     <p className="text-sm text-[#d6b779]">
-                      Work approved. Evidence is locked.
+                      Work approved. Photos and notes are locked.
                     </p>
                   )}
                 </div>
