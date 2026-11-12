@@ -5,9 +5,9 @@ import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
 
 type Tab={label:string;href:string;icon:OwnerIconName;match:string[]};
 const tabs:Tab[]=[
- {label:"Home",href:"/owner/dashboard",icon:"activity",match:["/owner/dashboard","/owner/schedule"]},
+ {label:"Home",href:"/owner/dashboard",icon:"activity",match:["/owner/dashboard"]},
  {label:"Jobs",href:"/owner/jobs",icon:"calendar",match:["/owner/jobs","/owner/inspection"]},
- {label:"Team",href:"/owner/admins",icon:"users",match:["/owner/admins","/owner/pay-tracking"]},
+ {label:"Schedule",href:"/owner/schedule",icon:"calendar",match:["/owner/schedule","/owner/bookings"]},
  {label:"Chat",href:"/owner/messages",icon:"message",match:["/owner/messages","/owner/quotes"]},
  {label:"More",href:"/owner/workspace",icon:"menu",match:["/owner/workspace","/owner/crm","/owner/leads","/owner/revenue","/owner/inventory","/owner/detail-builder"]},
 ];
