@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deletedKey, listDeletionHistory, parseDeletedRecord } from "@/lib/deletion-history";
 import { getCurrentAccountFromRequest, isOwnerAccount } from "@/lib/permissions";
-import { parseTeams, TEAMS_KEY } from "@/lib/detailer-teams";
+import { parseTeams, TEAMS_KEY, type DetailerTeam } from "@/lib/detailer-teams";
 
 export const dynamic = "force-dynamic";
 
