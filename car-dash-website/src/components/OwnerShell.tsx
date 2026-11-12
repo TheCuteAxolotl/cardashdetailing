@@ -65,6 +65,7 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
     label: "Money & reports", icon: "chart",
     items: [
       { href: "/owner/invoices", label: "Invoices", icon: "invoice", permissions: ["invoices"] },
+      { href: "/owner/deleted-history", label: "Deleted history", icon: "invoice", ownerOnly: true },
       { href: "/owner/analytics", label: "Analytics", icon: "chart", permissions: ["analytics"] },
       { href: "/owner/revenue", label: "Revenue by service", icon: "chart", ownerOnly: true },
       { href: "/owner/pay-tracking", label: "Pay tracking", icon: "price", ownerOnly: true },
@@ -88,13 +89,14 @@ const groups: Array<{ label: string; icon: IconName; items: NavItem[] }> = [
       { href: "/owner/pricing-pages", label: "Pricing", icon: "price", permissions: ["pricing"] },
       { href: "/owner/service-durations", label: "Service Time Durations", icon: "clock", permissions: ["pricing"] },
       { href: "/owner/booking-settings", label: "Booking settings", icon: "clock", permissions: ["pricing", "bookings"] },
-      { href: "/owner/inventory", label: "Supply inventory", icon: "grid", permissions: ["inventory"] },
+      { href: "/owner/inventory", label: "Supply inventory", icon: "grid", permissions: ["inventory", "assignedJobs"] },
     ],
   },
   {
     label: "Team & settings", icon: "settings",
     items: [
       { href: "/owner/admins", label: "Employees & resources", icon: "people", ownerOnly: true },
+      { href: "/owner/teams", label: "Detailer teams", icon: "people", ownerOnly: true },
       { href: "/staff-guide", adminHref: "/admin/staff-guide", label: "Staff guide", icon: "book", permissions: ["staffGuide"] },
       { href: "/owner/service-guides", label: "Training Guides", icon: "book", ownerOnly: true },
       { href: "/owner/profile", adminHref: "/admin/profile", label: "My Profile", icon: "people" },
