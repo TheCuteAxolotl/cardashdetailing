@@ -513,7 +513,7 @@ export default function OwnerSchedulePage() {
         )}
 
         <section
-          className="mt-3 min-w-0 overflow-hidden rounded-[16px] border border-white/15 bg-[#1c1c1c] shadow-[0_22px_70px_rgba(0,0,0,.24)] sm:mt-5 sm:rounded-[20px]"
+          className="mt-3 min-w-0 overflow-visible rounded-[16px] border border-white/15 bg-[#1c1c1c] shadow-[0_22px_70px_rgba(0,0,0,.24)] sm:mt-5 sm:rounded-[20px]"
           aria-label="Business calendar"
         >
           <div className="flex flex-col gap-2 border-b border-white/10 bg-[#202020] px-2.5 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5">
@@ -667,8 +667,7 @@ export default function OwnerSchedulePage() {
               To-dos
             </span>
             <p className="w-full text-[11px] text-[#8f8980]">
-              Private tasks aren't visible to customers. Swipe the month grid
-              sideways on smaller screens.
+              Private tasks aren't visible to customers. On phones, tap any date to see its events.
             </p>
           </div>
         )}
