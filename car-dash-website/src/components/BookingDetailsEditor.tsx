@@ -41,11 +41,13 @@ const field = "mt-1.5 w-full rounded-xl border border-white/20 bg-[#252525] px-4
 const label = "block text-sm font-semibold text-[#d7d0c5]";
 
 export default function BookingDetailsEditor({
-  booking, onClose, onSaved,
+  booking, onClose, onSaved, calendarColor, onCalendarColorChange,
 }: {
   booking: EditableBooking;
   onClose: () => void;
   onSaved: () => Promise<void> | void;
+  calendarColor?: string;
+  onCalendarColorChange?: (color: string) => Promise<void> | void;
 }) {
   const [draft, setDraft] = useState<FormFields>({
     serviceAddress: bookingServiceAddress(booking.notes),
@@ -66,6 +68,7 @@ export default function BookingDetailsEditor({
   const [status, setStatus] = useState(booking.status);
   const [revision, setRevision] = useState(booking.updatedAt);
   const [error, setError] = useState("");
+  const [eventColor, setEventColor] = useState(calendarColor || "#6ea58d");
   const update = (key: keyof FormFields, value: string) => setDraft(current => ({ ...current, [key]: value }));
   const address = draft.serviceAddress.trim();
   const maps = address ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address) : "";
@@ -158,6 +161,20 @@ export default function BookingDetailsEditor({
               <label className={label}>Total price ($)<input type="number" min="0" max="100000" step="0.01" value={draft.quotedPrice} onChange={event => update("quotedPrice", event.target.value)} placeholder="No price set" className={field}/></label>
             </div>
           </section>
+          {onCalendarColorChange && (
+            <section className="border-t border-white/10 pt-5">
+              <h3 className="text-sm font-semibold">Calendar event color</h3>
+              <p className="mb-3 mt-1 text-xs text-[#aaa49b]">Choose a color for this appointment on your calendar. This does not change the booking price or status.</p>
+              <div className="flex items-center gap-3">
+                <input type="color" aria-label="Booking calendar color" value={eventColor}
+                  className="h-10 w-14 cursor-pointer rounded border border-white/20"
+                  onChange={e => { setEventColor(e.target.value); void onCalendarColorChange(e.target.value); }} />
+                <span className="text-xs text-white/65">{calendarColor ? "Custom event color" : "Default event color"}</span>
+                <button type="button" className="ml-auto rounded-lg border border-white/20 px-3 py-2 text-xs"
+                  onClick={() => { setEventColor("#6ea58d"); void onCalendarColorChange(""); }}>Reset</button>
+              </div>
+            </section>
+          )}
           <section className="border-t border-white/10 pt-5">
             <h3 className="mb-4 text-base font-semibold text-[#f4efe5]">Customer & vehicle</h3>
             <div className="grid gap-4 sm:grid-cols-2">

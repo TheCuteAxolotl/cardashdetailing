@@ -22,6 +22,8 @@ type TaskDraft = {
   time: string;
   endTime: string;
   notes: string;
+  price: string;
+  color: string;
   type: "todo" | "plan";
 };
 
@@ -31,6 +33,8 @@ const EMPTY_DRAFT: TaskDraft = {
   time: "",
   endTime: "",
   notes: "",
+  price: "",
+  color: "#4f8fa9",
   type: "todo",
 };
 
@@ -124,6 +128,8 @@ function bookingVehicle(booking: Booking) {
 export default function OwnerSchedulePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [tasks, setTasks] = useState<OwnerScheduleTask[]>([]);
+  const [bookingColors, setBookingColors] = useState<Record<string, string>>({});
+  const [accentColor, setAccentColor] = useState("#d6b779");
   const [view, setView] = useState<ViewMode>("day");
   const [selectedDay, setSelectedDay] = useState(() => chicagoClock().date);
   const [cursor, setCursor] = useState(() => {
@@ -164,6 +170,8 @@ export default function OwnerSchedulePage() {
         setBookings(Array.isArray(bookingData) ? bookingData : []);
         const loadedTasks: OwnerScheduleTask[] = Array.isArray(scheduleData?.tasks) ? scheduleData.tasks : [];
         setTasks(loadedTasks);
+        setBookingColors(scheduleData?.bookingColors || {});
+        setAccentColor(scheduleData?.accentColor || "#d6b779");
         const params = new URLSearchParams(window.location.search);
         const task = loadedTasks.find(item => item.id === params.get("editTask"));
         const date = task?.date || params.get("add");
@@ -282,7 +290,7 @@ export default function OwnerSchedulePage() {
   }
 
   function openNewTask(date = isoDate(cursor), type: "todo" | "plan" = "todo", time = "") {
-    setDraft({ ...EMPTY_DRAFT, date, type, time });
+    setDraft({ ...EMPTY_DRAFT, date, type, time, color: type === "plan" ? "#8d7ad6" : "#4f8fa9" });
     setEditorOpen(true);
     setMessage("");
   }
@@ -295,6 +303,8 @@ export default function OwnerSchedulePage() {
       time: task.time,
       endTime: task.endTime,
       notes: task.notes,
+      price: task.price == null ? "" : String(task.price),
+      color: task.color || (task.type === "plan" ? "#8d7ad6" : "#4f8fa9"),
       type: task.type,
     });
     setEditorOpen(true);
@@ -304,6 +314,7 @@ export default function OwnerSchedulePage() {
   async function persistTasks(
     nextTasks: OwnerScheduleTask[],
     successMessage?: string,
+    preferences?: { bookingColors?: Record<string, string>; accentColor?: string },
   ) {
     setSavingTask(true);
     setMessage("");
@@ -311,12 +322,19 @@ export default function OwnerSchedulePage() {
       const response = await fetch("/api/owner-schedule", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version: 1, tasks: nextTasks }),
+        body: JSON.stringify({
+          version: 1,
+          tasks: nextTasks,
+          bookingColors: preferences?.bookingColors ?? bookingColors,
+          accentColor: preferences?.accentColor ?? accentColor,
+        }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok)
         throw new Error(data.error || "Could not save planner.");
       setTasks(Array.isArray(data.tasks) ? data.tasks : nextTasks);
+      if (data.bookingColors) setBookingColors(data.bookingColors);
+      if (data.accentColor) setAccentColor(data.accentColor);
       if (successMessage) setMessage(successMessage);
       return true;
     } catch (error) {
@@ -327,6 +345,17 @@ export default function OwnerSchedulePage() {
     } finally {
       setSavingTask(false);
     }
+  }
+
+  async function saveBookingColor(id: string, color: string) {
+    const next = { ...bookingColors };
+    if (color) next[id] = color;
+    else delete next[id];
+    await persistTasks(tasks, "Booking color updated.", { bookingColors: next });
+  }
+
+  async function saveAccentColor(color: string) {
+    await persistTasks(tasks, "Calendar colors updated.", { accentColor: color });
   }
 
   async function saveDraft(event: React.FormEvent) {
@@ -345,6 +374,8 @@ export default function OwnerSchedulePage() {
       time: draft.time,
       endTime: draft.endTime,
       notes: draft.notes.trim(),
+      price: draft.price === "" ? null : Number(draft.price),
+      color: draft.color,
       completed: existing?.completed || false,
       type: draft.type,
       createdAt: existing?.createdAt || now,
@@ -394,17 +425,17 @@ export default function OwnerSchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#101010] px-3 py-5 text-[#f4efe5] sm:px-6 sm:py-7 xl:px-8">
+    <div className="min-h-screen min-w-0 bg-[#101010] px-2 py-3 text-[#f4efe5] sm:px-6 sm:py-7 xl:px-8">
       <div className="mx-auto max-w-[1600px]">
-        <header className="flex flex-wrap items-start justify-between gap-5 border-b border-white/10 pb-5">
+        <header className="flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-3 sm:gap-5 sm:pb-5">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[.22em] text-[#d6b779]">
               Car Dash / Business calendar
             </p>
-            <h1 className="mt-2 font-serif text-3xl tracking-tight text-[#f4efe5] sm:text-4xl">
+            <h1 className="mt-1 font-serif text-2xl tracking-tight text-[#f4efe5] sm:mt-2 sm:text-4xl">
               Team calendar.
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#b9b5ad]">
+            <p className="mt-2 hidden max-w-2xl text-sm leading-6 text-[#b9b5ad] sm:block">
               See who is detailing each car, when the work is scheduled, and
               where your day has gaps.
             </p>
@@ -412,20 +443,21 @@ export default function OwnerSchedulePage() {
           <div className="flex flex-wrap items-center gap-2">
             <a
               href="/owner/bookings"
-              className="rounded-xl border border-white/15 bg-[#202020] px-4 py-2.5 text-sm font-medium text-[#f4efe5] hover:border-[#d6b779]/40"
+              className="hidden rounded-xl border border-white/15 bg-[#202020] px-4 py-2.5 text-sm font-medium text-[#f4efe5] hover:border-[#d6b779]/40 sm:inline-flex"
             >
               Bookings
             </a>
             <a
               href="/owner/booking-settings"
-              className="rounded-xl border border-white/15 bg-[#202020] px-4 py-2.5 text-sm font-medium text-[#f4efe5] hover:border-[#d6b779]/40"
+              className="hidden rounded-xl border border-white/15 bg-[#202020] px-4 py-2.5 text-sm font-medium text-[#f4efe5] hover:border-[#d6b779]/40 sm:inline-flex"
             >
               Availability
             </a>
             <button
               type="button"
               onClick={() => chooseActivity(selectedDay)}
-              className="rounded-xl bg-[#d6b779] px-4 py-2.5 text-sm font-semibold text-[#101010] hover:bg-[#e5c995]"
+              className="rounded-xl px-3 py-2 text-xs font-semibold text-[#101010] hover:brightness-110 sm:px-4 sm:py-2.5 sm:text-sm"
+              style={{ backgroundColor: accentColor }}
             >
               + Add event
             </button>
@@ -481,23 +513,24 @@ export default function OwnerSchedulePage() {
         )}
 
         <section
-          className="mt-5 overflow-hidden rounded-[20px] border border-white/15 bg-[#1c1c1c] shadow-[0_22px_70px_rgba(0,0,0,.24)]"
+          className="mt-3 min-w-0 overflow-visible rounded-[16px] border border-white/15 bg-[#1c1c1c] shadow-[0_22px_70px_rgba(0,0,0,.24)] sm:mt-5 sm:rounded-[20px]"
           aria-label="Business calendar"
         >
-          <div className="flex flex-col gap-4 border-b border-white/10 bg-[#202020] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+          <div className="flex flex-col gap-2 border-b border-white/10 bg-[#202020] px-2.5 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5">
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => moveRange(-1)}
                 aria-label="Previous calendar period"
-                className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 text-xl text-[#f4efe5] hover:border-[#d6b779]/50"
+                className="grid h-8 w-8 place-items-center rounded-lg border border-white/15 text-xl text-[#f4efe5] hover:border-[#d6b779]/50 sm:h-10 sm:w-10"
               >
                 ‹
               </button>
               <button
                 type="button"
                 onClick={goToday}
-                className="rounded-xl border border-white/15 px-4 py-2.5 text-xs font-semibold text-[#d6b779] hover:border-[#d6b779]/50"
+                className="rounded-lg border border-white/15 px-2.5 py-2 text-[11px] font-semibold hover:border-white/40 sm:px-4 sm:py-2.5 sm:text-xs"
+                style={{ color: accentColor }}
               >
                 Today
               </button>
@@ -505,11 +538,11 @@ export default function OwnerSchedulePage() {
                 type="button"
                 onClick={() => moveRange(1)}
                 aria-label="Next calendar period"
-                className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 text-xl text-[#f4efe5] hover:border-[#d6b779]/50"
+                className="grid h-8 w-8 place-items-center rounded-lg border border-white/15 text-xl text-[#f4efe5] hover:border-[#d6b779]/50 sm:h-10 sm:w-10"
               >
                 ›
               </button>
-              <h2 className="ml-1 font-serif text-xl text-[#f4efe5] sm:ml-3 sm:text-2xl">
+              <h2 className="ml-1 min-w-0 flex-1 truncate font-serif text-[15px] text-[#f4efe5] sm:ml-3 sm:flex-none sm:text-2xl">
                 {view === "day"
                   ? cursor.toLocaleDateString("en-US", {
                       month: "long",
@@ -521,7 +554,7 @@ export default function OwnerSchedulePage() {
                     : monthTitle(cursor)}
               </h2>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex min-w-0 items-center justify-between gap-2 sm:shrink-0 sm:justify-start">
               <input
                 aria-label="Jump to date"
                 type="date"
@@ -530,10 +563,9 @@ export default function OwnerSchedulePage() {
                   if (e.target.value) {
                     setCursor(dateFromIso(e.target.value));
                     setSelectedDay(e.target.value);
-                    chooseActivity(e.target.value);
                   }
                 }}
-                className="min-w-0 rounded-xl border border-white/20 bg-[#161616] px-3 py-2.5 text-base text-[#eee] [color-scheme:dark]"
+                className="min-w-0 max-w-[164px] rounded-lg border border-white/20 bg-[#161616] px-2 py-2 text-xs text-[#eee] [color-scheme:dark] sm:max-w-none sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-base"
               />
               <button
                 type="button"
@@ -553,12 +585,31 @@ export default function OwnerSchedulePage() {
                   setView(e.target.value as ViewMode);
                   setSelectedDay(isoDate(cursor));
                 }}
-                className="rounded-xl border border-white/20 bg-[#161616] px-3 py-2.5 text-base text-[#eee]"
+                className="rounded-lg border border-white/20 bg-[#161616] px-2 py-2 text-xs text-[#eee] sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-base"
               >
-                <option value="day">Day · Team</option>
+                <option value="day">Day</option>
                 <option value="week">Week</option>
                 <option value="month">Month</option>
               </select>
+              <details className="relative">
+                <summary className="cursor-pointer rounded-lg border border-white/20 px-2.5 py-2 text-xs font-medium sm:px-3 sm:py-2.5">Colors</summary>
+                <div className="absolute right-0 top-10 z-50 w-56 rounded-xl border border-white/20 bg-[#272521] p-3 shadow-2xl">
+                  <p className="mb-2 text-xs text-[#cac1b2]">Calendar accent</p>
+                  <div className="flex flex-wrap gap-2">
+                    {["#d6b779", "#619eea", "#7bc59d", "#b393eb", "#e58d8d"].map(color => (
+                      <button type="button" key={color} aria-label={"Use calendar accent " + color}
+                        onClick={() => void saveAccentColor(color)}
+                        className="h-8 w-8 rounded-full border-2 border-white/20 focus-visible:outline-2 focus-visible:outline-white"
+                        style={{ backgroundColor: color, outlineColor: accentColor === color ? "#fff" : undefined }} />
+                    ))}
+                  </div>
+                  <label className="mt-3 flex items-center gap-2 text-xs">Custom color
+                    <input type="color" value={accentColor} aria-label="Custom calendar accent"
+                      onChange={event => void saveAccentColor(event.target.value)} className="h-8 w-12 cursor-pointer" />
+                  </label>
+                  <p className="mt-2 text-[11px] leading-4 text-white/55">Edit an event to set its own color. Colors save across your devices.</p>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -570,6 +621,8 @@ export default function OwnerSchedulePage() {
               onEditBooking={setEditingBooking}
               onEditTask={openEditTask}
               onAddTask={chooseActivity}
+              bookingColors={bookingColors}
+              accentColor={accentColor}
             />
           ) : (
             <OwnerCalendarBoard
@@ -585,6 +638,8 @@ export default function OwnerSchedulePage() {
               onAddTask={chooseActivity}
               onEditTask={openEditTask}
               onToggleTask={toggleTask}
+              bookingColors={bookingColors}
+              accentColor={accentColor}
             />
           )}
         </section>
@@ -612,8 +667,7 @@ export default function OwnerSchedulePage() {
               To-dos
             </span>
             <p className="w-full text-[11px] text-[#8f8980]">
-              Private tasks aren't visible to customers. Swipe the month grid
-              sideways on smaller screens.
+              Private tasks aren't visible to customers. On phones, tap any date to see its events.
             </p>
           </div>
         )}
@@ -646,6 +700,8 @@ export default function OwnerSchedulePage() {
           key={editingBooking.id}
           booking={editingBooking}
           onClose={() => setEditingBooking(null)}
+          calendarColor={bookingColors[editingBooking.id] || ""}
+          onCalendarColorChange={(color) => saveBookingColor(editingBooking.id, color)}
           onSaved={async () => {
             const response = await fetch("/api/bookings", {
               cache: "no-store",
@@ -675,7 +731,7 @@ export default function OwnerSchedulePage() {
           />
           <form
             onSubmit={saveDraft}
-            className="relative z-10 w-full max-w-xl rounded-2xl border border-white/15 bg-[#1c1c1c] p-5 text-[#f4efe5] shadow-2xl sm:p-6"
+            className="relative z-10 max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/15 bg-[#1c1c1c] p-4 text-[#f4efe5] shadow-2xl sm:p-6"
           >
             <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
               <div>
@@ -700,7 +756,7 @@ export default function OwnerSchedulePage() {
                 <button
                   type="button"
                   onClick={() =>
-                    setDraft((current) => ({ ...current, type: "todo" }))
+                    setDraft((current) => ({ ...current, type: "todo", color: current.color === "#8d7ad6" ? "#4f8fa9" : current.color }))
                   }
                   className={`rounded-xl border px-4 py-3 text-sm font-semibold ${draft.type === "todo" ? "border-[#111] bg-[#d6b779] text-[#101010]" : "border-white/15 text-[#c2bbb0]"}`}
                 >
@@ -709,7 +765,7 @@ export default function OwnerSchedulePage() {
                 <button
                   type="button"
                   onClick={() =>
-                    setDraft((current) => ({ ...current, type: "plan" }))
+                    setDraft((current) => ({ ...current, type: "plan", color: current.color === "#4f8fa9" ? "#8d7ad6" : current.color }))
                   }
                   className={`rounded-xl border px-4 py-3 text-sm font-semibold ${draft.type === "plan" ? "border-[#111] bg-[#d6b779] text-[#101010]" : "border-white/15 text-[#c2bbb0]"}`}
                 >
@@ -784,6 +840,22 @@ export default function OwnerSchedulePage() {
                 </label>
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <label className="text-xs font-medium text-[#c2bbb0]">Price ($) · optional
+                  <input type="number" min="0" max="1000000" step="0.01" inputMode="decimal"
+                    value={draft.price} onChange={e => setDraft(current => ({ ...current, price: e.target.value }))}
+                    placeholder="0.00"
+                    className="mt-2 w-full rounded-xl border border-white/15 bg-[#242424] px-3 py-3 text-base text-[#f4efe5]" />
+                </label>
+                <label className="text-xs font-medium text-[#c2bbb0]">Event color
+                  <div className="mt-2 flex items-center gap-2 rounded-xl border border-white/15 bg-[#242424] p-2">
+                    <input type="color" value={draft.color} aria-label="Choose event color"
+                      onChange={e => setDraft(current => ({ ...current, color: e.target.value }))}
+                      className="h-9 w-12 cursor-pointer" />
+                    <span className="truncate text-xs">{draft.color}</span>
+                  </div>
+                </label>
+              </div>
               <label className="text-xs font-medium text-[#c2bbb0]">
                 Notes
                 <textarea
