@@ -13,6 +13,9 @@ function fresh():Item{
 }
 export default function OwnerInventory(){
  const [items,setItems]=useState<Item[]>([]);
+ const [scope,setScope]=useState("owner");
+ const [scopes,setScopes]=useState<Array<{id:string;label:string}>>([{id:"owner",label:"My supplies (Owner)"}]);
+ const [isOwner,setIsOwner]=useState(false);
  const [version,setVersion]=useState<string|null>(null);
  const [draft,setDraft]=useState<Item|null>(null);
  const [loading,setLoading]=useState(true);
@@ -26,7 +29,7 @@ export default function OwnerInventory(){
  async function reload(){
   setLoading(true);setError("");
   try{
-   const response=await fetch("/api/owner/inventory",{cache:"no-store"});
+   const response=await fetch("/api/owner/inventory?scope="+encodeURIComponent(scope),{cache:"no-store"});
    if(!response.ok)throw Error("Could not read inventory.");
    const result=await response.json();
    setItems(Array.isArray(result.items)?result.items:[]);
@@ -34,7 +37,26 @@ export default function OwnerInventory(){
   }catch(e){setError(e instanceof Error?e.message:"Inventory unavailable.");}
   finally{setLoading(false);}
  }
- useEffect(()=>{void reload();},[]);
+ useEffect(()=>{void reload();},[scope]);
+ useEffect(()=>{
+  let live=true;
+  fetch("/api/auth/me",{cache:"no-store"}).then(r=>r.json())
+   .then(async auth=>{
+    if(!live||auth?.user?.role!=="owner")return;
+    setIsOwner(true);
+    const r=await fetch("/api/owner/accounts",{cache:"no-store"});
+    if(!r.ok)return;
+    const data=await r.json();
+    if(live)setScopes([
+     {id:"owner",label:"My supplies (Owner)"},
+     ...(Array.isArray(data.accounts)?data.accounts:[])
+      .filter((user:{id:string;name:string;role:string;effectivePermissions:string[]})=>
+        user.role!=="owner" && user.effectivePermissions?.includes("assignedJobs"))
+      .map((user:{id:string;name:string})=>({id:"staff:"+user.id,label:user.name+" · Detailer"})),
+    ]);
+   }).catch(()=>{});
+  return ()=>{live=false;};
+ },[]);
  const low=items.filter(x=>x.quantity<=x.reorderAt);
  const onOrder=items.filter(x=>(x.onOrder||0)>0);
  const inStock=items.filter(x=>x.quantity>x.reorderAt);
@@ -61,7 +83,7 @@ export default function OwnerInventory(){
   setSaving(true);setError("");setMessage("");
   try{
    const response=await fetch("/api/owner/inventory",{method:"PUT",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({items,version})});
+    body:JSON.stringify({items,version,scope})});
    const result=await response.json().catch(()=>({}));
    if(!response.ok)throw Error(result.error||"Inventory save failed.");
    setVersion(result.version||null);setDirty(false);setMessage("Inventory saved. Stock levels are now up to date.");
@@ -75,8 +97,21 @@ export default function OwnerInventory(){
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">Supply inventory</h1>
       <p className="mt-2 text-sm text-[#b4ab9e]">Keep track of cleaners, coatings, towels, tools, and low-stock supplies for your mobile setups.</p>
     </div>
-    <button type="button" onClick={()=>edit(fresh())} className="rounded-xl bg-[#d6b779] px-5 py-3 text-sm font-bold text-[#171715]">Add inventory item</button>
+    <div className="flex flex-wrap gap-2">
+      {isOwner&&<a href="/owner/deleted-history" className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold">Deleted history</a>}
+      {isOwner&&<a href="/owner/admins?tab=teams" className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold">Manage teams</a>}
+      <button type="button" onClick={()=>edit(fresh())} className="rounded-xl bg-[#d6b779] px-5 py-3 text-sm font-bold text-[#171715]">Add inventory item</button>
+    </div>
    </header>
+   {isOwner&&<section className="mt-5 rounded-2xl border border-[#d6b779]/25 bg-[#211f1e] p-4">
+     <label className="block text-sm font-semibold text-[#e8d1a2]">Whose supplies are you viewing?
+       <select className={INPUT+" mt-2"} value={scope} onChange={e=>{
+         if(dirty&&!window.confirm("Discard unsaved inventory changes before switching?"))return;
+         setItems([]);setDraft(null);setScope(e.target.value);
+       }}>{scopes.map(option=><option key={option.id} value={option.id}>{option.label}</option>)}</select>
+     </label>
+     <p className="mt-2 text-xs text-[#b4ab9e]">Each detailer has a separate supply list. Switching lists never mixes their supplies with yours.</p>
+   </section>}
    <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
     {[
       {label:"In stock",value:inStock.length},
@@ -145,7 +180,7 @@ export default function OwnerInventory(){
     </div>
    </section>
    <div className="crm-save-bar sticky bottom-3 mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#d6b779]/30 bg-[#1d1b18]/95 px-4 py-3 shadow-2xl backdrop-blur-xl">
-     <p className="text-xs text-[#d8c5a3]">{dirty?"Unsaved changes — save to keep your inventory.":"Inventory changes are stored in your owner workspace."}</p>
+     <p className="text-xs text-[#d8c5a3]">{dirty?"Unsaved changes — save to keep this inventory.":"This stock list belongs only to its selected detailer or the owner."}</p>
      <div className="flex gap-2">
        <button type="button" onClick={()=>void reload()} disabled={loading||saving} className="rounded-xl border border-white/20 px-4 py-2.5 text-xs font-semibold disabled:opacity-50">Reload</button>
        <button type="button" onClick={()=>void save()} disabled={!dirty||saving} className="rounded-xl bg-[#d6b779] px-5 py-2.5 text-xs font-bold text-[#171717] disabled:opacity-40">{saving?"Saving…":"Save inventory"}</button>
