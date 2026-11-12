@@ -1,11 +1,26 @@
-import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
+import {
+  getCurrentAccountFromRequest, hasStaffPermission, isOwnerAccount,
+  type CurrentAccount,
+} from "@/lib/permissions";
+import { archiveDeletion } from "@/lib/deletion-history";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-const KEY = "owner:supplies-inventory:v1";
+const OWNER_KEY = "owner:supplies-inventory:v1";
+export const inventoryKey = (scope: string) =>
+  scope === "owner" ? OWNER_KEY : "detailer:supplies-inventory:v1:" + scope.slice(6);
+
+async function resolveScope(account: CurrentAccount, requested: unknown) {
+  const value = String(requested || "").trim();
+  if (!isOwnerAccount(account)) return { scope: "staff:" + account.id, key: inventoryKey("staff:" + account.id) };
+  if (!value || value === "owner") return { scope: "owner", key: OWNER_KEY };
+  if (!/^staff:[a-zA-Z0-9_-]{4,100}$/.test(value)) return null;
+  const user = await prisma.user.findUnique({ where: { id: value.slice(6) }, select: { id: true } });
+  return user ? { scope: value, key: inventoryKey(value) } : null;
+}
 const CATEGORIES = new Set(["Chemicals","Equipment","Towels & pads","Consumables","Other"]);
 const UNITS = new Set(["each","bottles","liters","gallons","packs","pads","towels","ounces"]);
 type Entry = {
@@ -34,37 +49,64 @@ function validate(body:unknown):Entry[]|null {
  }
  return items;
 }
-export async function GET(request: NextRequest){
- if(!(hasStaffPermission(await getCurrentAccountFromRequest(request), "inventory")))return NextResponse.json({error:"Permission required"},{status:403});
- const row=await prisma.siteContent.findUnique({where:{key:KEY},select:{value:true,updatedAt:true}});
- if(!row)return NextResponse.json({items:[],version:null},{headers:{"Cache-Control":"private, no-store"}});
- let items:unknown;
- try{items=JSON.parse(row.value)}catch{items=[]}
- return NextResponse.json({items:validate(items)||[],version:row.updatedAt.toISOString()},
-  {headers:{"Cache-Control":"private, no-store"}});
+export async function GET(request: NextRequest) {
+ const account = await getCurrentAccountFromRequest(request);
+ if (!hasStaffPermission(account, "inventory") || !account)
+   return NextResponse.json({ error: "Permission required" }, { status: 403 });
+ const selection = await resolveScope(account, request.nextUrl.searchParams.get("scope"));
+ if (!selection) return NextResponse.json({ error: "Invalid inventory owner" }, { status: 400 });
+ const row = await prisma.siteContent.findUnique({
+   where: { key: selection.key }, select: { value: true, updatedAt: true },
+ });
+ if (!row) return NextResponse.json({ items: [], version: null, scope: selection.scope },
+   { headers: { "Cache-Control": "private, no-store" } });
+ let items: unknown;
+ try { items = JSON.parse(row.value); } catch { items = []; }
+ return NextResponse.json({
+   items: validate(items) || [],
+   version: row.updatedAt.toISOString(),
+   scope: selection.scope,
+ }, { headers: { "Cache-Control": "private, no-store" } });
 }
-export async function PUT(request:NextRequest){
- if(!(hasStaffPermission(await getCurrentAccountFromRequest(request), "inventory")))return NextResponse.json({error:"Permission required"},{status:403});
- const origin=request.headers.get("origin");
- if(origin && origin!==request.nextUrl.origin)return NextResponse.json({error:"Invalid origin"},{status:403});
- const body=await request.json().catch(()=>null);
- const items=validate(body?.items);
- if(!items)return NextResponse.json({error:"Invalid inventory data. Each item needs a name, valid quantity and unit."},{status:400});
- const version=body?.version==null?null:String(body.version);
- if(version!==null && Number.isNaN(Date.parse(version)))return NextResponse.json({error:"Invalid version"},{status:400});
- const result=await prisma.$transaction(async tx=>{
-   const current=await tx.siteContent.findUnique({where:{key:KEY},select:{updatedAt:true}});
-   if((current?.updatedAt.toISOString()||null)!==version)return {conflict:true};
-   if(!current){
-     const created=await tx.siteContent.create({data:{key:KEY,value:JSON.stringify(items)}});
-     return {version:created.updatedAt.toISOString()};
-   }
-   const updated=await tx.siteContent.update({
-     where:{key:KEY},data:{value:JSON.stringify(items)},
+export async function PUT(request: NextRequest) {
+ const account = await getCurrentAccountFromRequest(request);
+ if (!hasStaffPermission(account, "inventory") || !account)
+   return NextResponse.json({ error: "Permission required" }, { status: 403 });
+ const origin = request.headers.get("origin");
+ if (origin && origin !== request.nextUrl.origin)
+   return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+ const body = await request.json().catch(() => null);
+ const selection = await resolveScope(account, body?.scope);
+ if (!selection) return NextResponse.json({ error: "Invalid inventory owner" }, { status: 400 });
+ const items = validate(body?.items);
+ if (!items) return NextResponse.json({ error: "Invalid inventory data. Each item needs a name, valid quantity and unit." }, { status: 400 });
+ const version = body?.version == null ? null : String(body.version);
+ if (version !== null && Number.isNaN(Date.parse(version)))
+   return NextResponse.json({ error: "Invalid version" }, { status: 400 });
+ try {
+   const result = await prisma.$transaction(async tx => {
+     const current = await tx.siteContent.findUnique({
+       where: { key: selection.key }, select: { value: true, updatedAt: true },
+     });
+     if ((current?.updatedAt.toISOString() || null) !== version) return { conflict: true };
+     let previous: Entry[] = [];
+     try { previous = validate(current ? JSON.parse(current.value) : []) || []; } catch { previous = []; }
+     const nextIds = new Set(items.map(item => item.id));
+     for (const removed of previous.filter(item => !nextIds.has(item.id))) {
+       await archiveDeletion(tx, {
+         kind: "inventory", entityId: removed.id, summary: removed.name,
+         scope: selection.scope, snapshot: removed, actor: account,
+       });
+     }
+     const saved = current
+       ? await tx.siteContent.update({ where: { key: selection.key }, data: { value: JSON.stringify(items) } })
+       : await tx.siteContent.create({ data: { key: selection.key, value: JSON.stringify(items) } });
+     return { version: saved.updatedAt.toISOString() };
    });
-   return {version:updated.updatedAt.toISOString()};
- }).catch(error=>{console.error("Inventory save failed",error);return {error:true}});
- if("conflict" in result)return NextResponse.json({error:"Inventory changed in another tab. Refresh before saving."},{status:409});
- if("error" in result)return NextResponse.json({error:"Could not save inventory. Try again."},{status:500});
- return NextResponse.json({ok:true,version:result.version});
+   if ("conflict" in result) return NextResponse.json({ error: "Inventory changed in another tab. Refresh before saving." }, { status: 409 });
+   return NextResponse.json({ ok: true, version: result.version, scope: selection.scope });
+ } catch (error) {
+   console.error("Inventory save failed", error);
+   return NextResponse.json({ error: "Could not save inventory. Try again." }, { status: 500 });
+ }
 }
