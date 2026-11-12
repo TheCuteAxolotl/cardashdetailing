@@ -37,11 +37,10 @@ export async function POST(request: NextRequest) {
       where: { id: { in: memberIds } },
       select: { id: true, email: true, role: true, name: true },
     });
-    const eligible = await Promise.all(users.map(async (user) => ({
-      id: user.id,
-      permitted: (await getPermissionSnapshotForUser(user)).permissions.includes("assignedJobs") &&
-        (await getPermissionSnapshotForUser(user)).role !== "owner",
-    })));
+    const eligible = await Promise.all(users.map(async (user) => {
+      const permissions = await getPermissionSnapshotForUser(user);
+      return { id: user.id, permitted: permissions.permissions.includes("assignedJobs") && permissions.role !== "owner" };
+    }));
     if (eligible.length !== memberIds.length || eligible.some(item => !item.permitted))
       return NextResponse.json({ error: "Select only active accounts with Assigned Jobs permission." }, { status: 400 });
   }
