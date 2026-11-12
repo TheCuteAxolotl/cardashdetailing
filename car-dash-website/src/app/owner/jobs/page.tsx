@@ -152,6 +152,9 @@ export default function JobsPage() {
     return p;
   }
   useEffect(() => {
+    // Open the exact booking/job linked from a Discord alert.
+    const linkedJobId = new URLSearchParams(window.location.search).get("job");
+    if (linkedJobId) setSelected(linkedJobId);
     load().catch((e) => setError(e.message));
   }, []);
   useEffect(() => {
