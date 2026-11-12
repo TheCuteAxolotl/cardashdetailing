@@ -24,6 +24,8 @@ type Props = {
   onAddTask: (date: string) => void;
   onEditTask: (task: OwnerScheduleTask) => void;
   onToggleTask: (task: OwnerScheduleTask) => void;
+  bookingColors: Record<string, string>;
+  accentColor: string;
 };
 
 const iso = (day: Date) => {
@@ -61,6 +63,7 @@ function bookingColor(status?: string) {
       return "border-[#5b5678] bg-[#35314c] text-[#e5dcfc]";
   }
 }
+const customColor = (color?: string) => color ? { borderColor: color, backgroundColor: color + "24", color: "#f4efe5" } : undefined;
 const taskColor = (task: OwnerScheduleTask) =>
   task.completed ? "border-white/10 bg-[#262626] text-[#9c9c9c]" :
   task.type === "plan" ? "border-[#555177] bg-[#36324c] text-[#e8ddff]" :
@@ -68,7 +71,7 @@ const taskColor = (task: OwnerScheduleTask) =>
 
 export default function OwnerCalendarBoard({
   view, cursor, days, today, selectedDay, bookings, tasks,
-  onSelectDay, onAddTask, onEditTask, onToggleTask, onEditBooking,
+  onSelectDay, onAddTask, onEditTask, onToggleTask, onEditBooking, bookingColors, accentColor,
 }: Props) {
   const index = new Map<string, CalendarItem[]>();
   for (const booking of bookings) {
@@ -89,11 +92,11 @@ export default function OwnerCalendarBoard({
 
   return (
     <>
-      <div className="calendar-board-scroll overflow-x-auto overscroll-x-contain rounded-b-[20px]" aria-label={view === "month" ? "Month calendar. Scroll sideways on small screens to see all seven days." : "Weekly calendar"}>
-        <div className={"min-w-[850px] xl:min-w-0"}>
+      <div className="calendar-board-scroll overflow-x-auto overscroll-x-contain rounded-b-[20px]" aria-label={view === "month" ? "Month calendar" : "Weekly calendar"}>
+        <div className="min-w-0">
           <div className="grid grid-cols-7 border-b border-white/10 bg-[#202020]">
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
-              <div key={day} className={"py-3.5 text-center text-[11px] font-semibold uppercase tracking-[.13em] " + (i >= 5 ? "text-[#99958d]" : "text-[#d2cbc0]")}>
+              <div key={day} className={"py-2 text-center text-[9px] font-semibold uppercase tracking-[.04em] sm:py-3.5 sm:text-[11px] sm:tracking-[.13em] " + (i >= 5 ? "text-[#99958d]" : "text-[#d2cbc0]")}>
                 {day}
               </div>
             ))}
@@ -110,23 +113,23 @@ export default function OwnerCalendarBoard({
               return (
                 <div
                   key={date}
-                  onClick={event => { if (!(event.target as HTMLElement).closest("button,a")) { onSelectDay(date); onAddTask(date); } }}
+                  onClick={event => { if (!(event.target as HTMLElement).closest("button,a")) onSelectDay(date); }}
                   className={[
-                    "group relative min-w-0 border-r border-b border-white/[.08] p-2.5 transition-colors sm:p-3",
-                    view === "month" ? "min-h-[136px] lg:min-h-[148px]" : "min-h-[320px]",
+                    "group relative min-w-0 overflow-hidden border-r border-b border-white/[.08] px-0.5 py-1.5 transition-colors sm:p-3",
+                    view === "month" ? "min-h-[75px] sm:min-h-[136px] lg:min-h-[148px]" : "min-h-[85px] sm:min-h-[320px]",
                     withinMonth || view === "week" ? "bg-[#1c1c1c]" : "bg-[#171717]",
                     selected ? "ring-1 ring-inset ring-[#d6b779]/65" : "hover:bg-[#252525]",
                     idx % 7 === 6 ? "border-r-0" : "",
                   ].join(" ")}
                 >
-                  <div className="mb-2 flex items-center justify-between gap-1">
+                  <div className="mb-1 flex items-center justify-center gap-0 sm:mb-2 sm:justify-between sm:gap-1">
                     <button
                       type="button"
-                      onClick={() => { onSelectDay(date); onAddTask(date); }}
-                      aria-label={"Add activity on " + day.toLocaleDateString("en-US", {month:"long", day:"numeric", year:"numeric"})}
+                      onClick={() => onSelectDay(date)}
+                      aria-label={"Show events on " + day.toLocaleDateString("en-US", {month:"long", day:"numeric", year:"numeric"})}
                       aria-pressed={selected}
                       className={[
-                        "grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold transition",
+                        "grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition sm:h-8 sm:w-8 sm:text-xs",
                         current ? "bg-[#d6b779] text-[#101010]" :
                         selected ? "bg-[#3c3528] text-[#f4dfad]" :
                         withinMonth || view === "week" ? "text-[#ede6dc] hover:bg-white/10" : "text-[#77736c]",
@@ -134,15 +137,22 @@ export default function OwnerCalendarBoard({
                     >
                       {day.getDate()}
                     </button>
-                    {items.length > 0 ? <span className="text-[10px] tabular-nums text-[#a9a49b]">{items.length}</span> : null}
+                    {items.length > 0 ? <span className="hidden text-[10px] tabular-nums text-[#a9a49b] sm:inline">{items.length}</span> : null}
                     <button
                       type="button"
                       onClick={() => onAddTask(date)}
                       aria-label={"Add schedule item on " + date}
-                      className="grid h-7 w-7 place-items-center rounded-lg text-base leading-none text-[#999289] opacity-100 transition hover:bg-[#38332a] hover:text-[#e5c995] xl:opacity-0 xl:group-hover:opacity-100 focus:opacity-100"
+                      className="hidden h-7 w-7 place-items-center rounded-lg text-base leading-none text-[#999289] transition hover:bg-[#38332a] hover:text-[#e5c995] sm:grid xl:opacity-0 xl:group-hover:opacity-100 focus:opacity-100"
                     >+</button>
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="flex min-h-[19px] items-start justify-center gap-0.5 px-0.5 sm:hidden" aria-label={items.length + " events"}>
+                    {items.slice(0, 3).map(item => (
+                      <span key={item.kind + item.id} className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: item.kind === "booking" ? (bookingColors[item.booking.id] || "#6ea58d") : (item.task.color || accentColor) }} />
+                    ))}
+                    {items.length > 3 && <span className="text-[8px] text-white/65">+{items.length - 3}</span>}
+                  </div>
+                  <div className="hidden space-y-1.5 sm:block">
                     {visible.map(item => item.kind === "booking" ? (
                       <button
                         type="button"
@@ -150,6 +160,7 @@ export default function OwnerCalendarBoard({
                         onClick={() => onEditBooking(item.booking)}
                         title={prettyTime(item.booking.preferredTime) + " · " + (item.booking.customerName || "Customer") + " · " + (item.booking.serviceName || "Detailing")}
                         className={"block w-full rounded-md border-l-[3px] px-2 py-2 text-left transition hover:brightness-125 " + bookingColor(item.booking.status)}
+                        style={customColor(bookingColors[item.booking.id])}
                       >
                         <span className="block truncate text-[10px] font-bold leading-4">{compactTime(item.booking.preferredTime)}{item.booking.preferredTime ? " · " : ""}{item.booking.customerName || "Customer"}</span>
                         <span className="mt-0.5 block truncate text-[10px] leading-4 opacity-85">{item.booking.serviceName || "Detailing"}</span>
@@ -161,6 +172,7 @@ export default function OwnerCalendarBoard({
                         onClick={() => onEditTask(item.task)}
                         title={item.task.title}
                         className={"block w-full rounded-md border-l-[3px] px-2 py-2 text-left transition hover:brightness-125 " + taskColor(item.task)}
+                        style={customColor(item.task.color)}
                       >
                         <span className="block truncate text-[10px] font-bold leading-4">{compactTime(item.task.time)}{item.task.time ? " · " : ""}{item.task.title}</span>
                         <span className="mt-0.5 block truncate text-[10px] leading-4 opacity-80">{item.task.type === "todo" ? (item.task.completed ? "Completed" : "To-do") : "Plan"}</span>
@@ -184,7 +196,7 @@ export default function OwnerCalendarBoard({
         </div>
       </div>
 
-      <section className="border-t border-white/10 bg-[#1b1b1b] px-4 py-5 sm:px-6" aria-label="Selected day schedule">
+      <section className="border-t border-white/10 bg-[#1b1b1b] px-3 py-3 sm:px-6 sm:py-5" aria-label="Selected day schedule">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#d6b779]">Day details</p>
@@ -197,9 +209,9 @@ export default function OwnerCalendarBoard({
           </button>
         </div>
         {chosenItems.length ? (
-          <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-3 grid gap-2 sm:mt-4 md:grid-cols-2 xl:grid-cols-3">
             {chosenItems.map(item => item.kind === "booking" ? (
-              <div key={"day-booking-" + item.id} className={"min-w-0 rounded-xl border p-3.5 " + bookingColor(item.booking.status)}>
+              <div key={"day-booking-" + item.id} className={"min-w-0 rounded-xl border p-3 sm:p-3.5 " + bookingColor(item.booking.status)} style={customColor(bookingColors[item.booking.id])}>
                 <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold">
                   <span>{prettyTime(item.booking.preferredTime)}</span>
                   <span className="capitalize opacity-75">{item.booking.status || "Booking"}</span>
@@ -216,7 +228,7 @@ export default function OwnerCalendarBoard({
                 <button type="button" onClick={() => onEditBooking(item.booking)} className="mt-3 w-full rounded-lg border border-current/30 px-3 py-2 text-xs font-bold hover:brightness-125">Edit booking / address</button>
               </div>
             ) : (
-              <div key={"day-task-" + item.id} className={"min-w-0 rounded-xl border p-3.5 " + taskColor(item.task)}>
+              <div key={"day-task-" + item.id} className={"min-w-0 rounded-xl border p-3 sm:p-3.5 " + taskColor(item.task)} style={customColor(item.task.color)}>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[11px] font-semibold">{item.task.time ? prettyTime(item.task.time) : item.task.type === "plan" ? "Plan" : "To-do"}</span>
                   <span className="text-[10px] uppercase opacity-75">{item.task.type}</span>
@@ -228,6 +240,7 @@ export default function OwnerCalendarBoard({
                   <button type="button" onClick={() => onEditTask(item.task)} className="min-w-0 flex-1 text-left">
                     <span className={"block text-sm font-semibold " + (item.task.completed ? "line-through opacity-60" : "")}>{item.task.title}</span>
                     {item.task.notes ? <span className="mt-1 block line-clamp-2 text-xs opacity-75">{item.task.notes}</span> : null}
+                     {item.task.price != null && <span className="mt-1 block text-xs font-bold">{money(Number(item.task.price))}</span>}
                   </button>
                 </div>
               </div>
