@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyJobDiscord, type JobDiscordEvent } from "@/lib/discord-jobs";
 import {
   getPermissionSnapshotForUser,
   resolvePermissionSnapshot,
@@ -161,11 +162,19 @@ export async function PATCH(req: NextRequest) {
     const owner = isOwnerAccount(account);
     const b = await req.json();
     await ensureJobs();
-    await prisma.$transaction(async (tx) => {
+    const notification = await prisma.$transaction(async (tx): Promise<JobDiscordEvent | null> => {
       const job = await lockedJob(tx, String(b.id || ""), account, b.version);
       const booking = await tx.booking.findUnique({
         where: { id: job.id },
-        select: { status: true },
+        select: {
+          status: true,
+          customerName: true,
+          serviceName: true,
+          vehicleYear: true,
+          vehicleMake: true,
+          vehicleModel: true,
+          vehicleTrim: true,
+        },
       });
       if (!booking || !["confirmed", "completed"].includes(booking.status))
         throw new JobError(
@@ -287,7 +296,34 @@ export async function PATCH(req: NextRequest) {
         }
         await saveJob(tx, job, account.name, action, feedback);
       }
+      // Only successful Start/Finish transitions emit events. Other edits never notify.
+      if (action !== "start" && action !== "submit") return null;
+      const detailer = await tx.user.findUnique({
+        where: { id: job.assigneeId },
+        select: { name: true },
+      });
+      const occurredAt = action === "start" ? job.data.startedAt : job.data.finishedAt;
+      if (!occurredAt) return null;
+      return {
+        action,
+        jobId: job.id,
+        actorName: account.name,
+        detailerName: detailer?.name || account.name,
+        customerName: booking.customerName,
+        vehicle: [
+          booking.vehicleYear,
+          booking.vehicleMake,
+          booking.vehicleModel,
+          booking.vehicleTrim,
+        ].filter(Boolean).join(" "),
+        serviceName: booking.serviceName,
+        occurredAt,
+        startedAt: job.data.startedAt || null,
+      };
     });
+    // Send after commit so a failed or rolled-back job update cannot trigger Discord.
+    // Webhook errors are logged but must not undo the completed job action.
+    if (notification) await notifyJobDiscord(notification);
     return NextResponse.json({ success: true }, { headers: noStore });
   } catch (e) {
     return jobResponseError(e);
