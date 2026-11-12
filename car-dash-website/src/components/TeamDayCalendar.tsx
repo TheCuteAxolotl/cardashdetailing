@@ -29,6 +29,8 @@ type Props = {
   onEditBooking: (b: EditableBooking) => void;
   onEditTask: (t: OwnerScheduleTask) => void;
   onAddTask: (date: string, time?: string) => void;
+  bookingColors: Record<string, string>;
+  accentColor: string;
 };
 type Event = {
   id: string;
@@ -55,6 +57,8 @@ export default function TeamDayCalendar({
   onEditBooking,
   onEditTask,
   onAddTask,
+  bookingColors,
+  accentColor,
 }: Props) {
   const [team, setTeam] = useState<TeamData | null>(null),
     [error, setError] = useState("");
@@ -192,15 +196,24 @@ export default function TeamDayCalendar({
     24,
     Math.max(20, ...visibleEvents.map((e) => Math.ceil(e.end / 60))),
   );
-  const hourHeight = 96,
+  const mobileEvents = lanes.flatMap((lane, index) =>
+    (events.get(lane.id) || []).map(event => ({
+      ...event,
+      laneId: lane.id,
+      laneName: lane.name,
+      color: event.task?.color || (event.booking ? bookingColors[event.booking.id] : "") ||
+        (lane.id === "pending" ? "#b99454" : lane.id === "plans" ? "#8d7ad6" : palettes[index % palettes.length].border),
+    }))
+  ).sort((a, b) => a.start - b.start || a.title.localeCompare(b.title));
+  const hourHeight = 64,
     height = (endHour - startHour) * hourHeight;
   const hours = Array.from(
     { length: endHour - startHour + 1 },
     (_, i) => startHour + i,
   );
   const gridStyle = {
-    gridTemplateColumns: `64px repeat(${lanes.length},minmax(220px,1fr))`,
-    minWidth: 64 + lanes.length * 220,
+    gridTemplateColumns: `56px repeat(${lanes.length},minmax(190px,1fr))`,
+    minWidth: 56 + lanes.length * 190,
   };
   const conflicts = lanes
     .filter((l) => !["unassigned", "pending", "plans"].includes(l.id))
@@ -213,9 +226,10 @@ export default function TeamDayCalendar({
     );
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#202020] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-[#202020] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="text-xs leading-5 text-[#c9c1b5]">
-          America/Chicago · Block lengths use estimated service durations
+          <span className="sm:hidden">Chicago time · Team appointments</span>
+          <span className="hidden sm:inline">America/Chicago · Block lengths use estimated service durations</span>
           {conflicts > 0 && (
             <span className="ml-3 text-amber-200">
               {conflicts} appointments overlap for an employee
@@ -283,8 +297,56 @@ export default function TeamDayCalendar({
           assumed employee assignments.
         </p>
       )}
+      <div className="md:hidden" aria-label="Compact mobile day calendar">
+        <div className="flex items-center justify-between border-b border-white/10 px-3 py-3">
+          <div className="text-xs font-semibold text-[#e9dfd1]">
+            {new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
+          </div>
+          <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/75">
+            {mobileEvents.length} scheduled
+          </span>
+        </div>
+        {mobileEvents.length ? (
+          <div className="divide-y divide-white/[.07]">
+            {mobileEvents.map(event => (
+              <div key={event.laneId + event.id} className="flex items-start gap-2.5 px-2.5 py-2.5">
+                <div className="w-[58px] shrink-0 pt-1 text-right">
+                  <span className="block text-[11px] font-semibold leading-4 text-[#f0e7db]">{minuteLabel(event.start)}</span>
+                  <span className="mt-0.5 block text-[10px] leading-4 text-white/45">{minuteLabel(event.end)}</span>
+                </div>
+                <button type="button"
+                  onClick={() => event.booking ? onEditBooking(event.booking) : event.task && onEditTask(event.task)}
+                  className="min-w-0 flex-1 rounded-lg border-l-[4px] px-3 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-white"
+                  style={{ borderLeftColor: event.color, backgroundColor: event.color + "22" }}>
+                  <span className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 flex-1 truncate text-[12px] font-semibold text-white">{event.title}</span>
+                    {event.booking?.quotedPrice != null && Number(event.booking.quotedPrice) > 0 ? (
+                      <span className="shrink-0 text-[11px] font-bold text-white/85">${Number(event.booking.quotedPrice).toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
+                    ) : event.task?.price != null ? (
+                      <span className="shrink-0 text-[11px] font-bold text-white/85">${Number(event.task.price).toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
+                    ) : null}
+                  </span>
+                  <span className="mt-1 block truncate text-[11px] text-white/75">{event.booking?.serviceName || event.subtitle || event.laneName}</span>
+                  <span className="mt-1 block truncate text-[10px] text-white/50">{event.laneName}{event.booking?.status ? " · " + event.booking.status : ""}</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="px-4 py-10 text-center">
+            <p className="text-sm text-white/65">No timed events today</p>
+            <button type="button" onClick={() => onAddTask(date)} style={{ color: accentColor }}
+              className="mt-3 rounded-lg border border-white/20 px-4 py-2 text-xs font-semibold">Add an event</button>
+          </div>
+        )}
+        <div className="border-t border-white/10 px-3 py-3">
+          <button type="button" onClick={() => onAddTask(date)}
+            className="w-full rounded-lg border border-dashed border-white/25 py-2.5 text-xs font-semibold"
+            style={{ color: accentColor }}>+ Add to this day</button>
+        </div>
+      </div>
       <div
-        className="max-h-[75vh] overflow-auto overscroll-contain"
+        className="hidden max-h-[75vh] overflow-auto overscroll-contain md:block"
         aria-label="Employee day calendar. Scroll vertically for hours and horizontally for employees."
       >
         <div className="relative" style={{ minWidth: gridStyle.minWidth }}>
@@ -341,8 +403,6 @@ export default function TeamDayCalendar({
                   className="relative border-l border-white/10"
                   style={{
                     height,
-                    backgroundImage:
-                      "repeating-linear-gradient(135deg, transparent, transparent 7px, rgba(255,255,255,.018) 7px, rgba(255,255,255,.018) 9px)",
                     backgroundColor: "#191a19",
                   }}
                 >
@@ -396,18 +456,15 @@ export default function TeamDayCalendar({
                           ),
                           left: `calc(${(event.column * 100) / event.columns}% + 3px)`,
                           width: `calc(${100 / event.columns}% - 6px)`,
-                          background: plan
-                            ? "#353535"
-                            : pending
-                              ? "#4c3924"
-                              : palette.bg,
+                          background: event.task?.color
+                            ? event.task.color + "38"
+                            : event.booking && bookingColors[event.booking.id]
+                              ? bookingColors[event.booking.id] + "38"
+                              : plan ? "#353535" : pending ? "#4c3924" : palette.bg,
                           borderColor: overlap
                             ? "#ed9b65"
-                            : plan
-                              ? "#777"
-                              : pending
-                                ? "#b99454"
-                                : palette.border,
+                            : event.task?.color || (event.booking && bookingColors[event.booking.id]) ||
+                              (plan ? "#777" : pending ? "#b99454" : palette.border),
                           color: plan
                             ? "#eee"
                             : pending
@@ -442,6 +499,8 @@ export default function TeamDayCalendar({
                             )}
                           </>
                         )}
+                        {event.booking?.quotedPrice != null && Number(event.booking.quotedPrice) > 0 && <span className="mt-1 block text-xs font-bold">${Number(event.booking.quotedPrice).toLocaleString("en-US", {maximumFractionDigits:2})}</span>}
+                        {event.task?.price != null && <span className="mt-1 block text-xs font-bold">${Number(event.task.price).toLocaleString("en-US", {maximumFractionDigits:2})}</span>}
                         {overlap && (
                           <span className="mt-2 block text-[10px] font-bold text-amber-100">
                             Schedule overlap
@@ -472,8 +531,7 @@ export default function TeamDayCalendar({
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-3 text-[11px] text-white/55">
         <span>
-          Striped gaps mean no displayed event, not verified employee
-          availability. Click an appointment to edit its details.
+          Gaps are not verified employee availability. Tap an appointment to edit its details.
         </span>
         <button className="text-[#d6b779]" onClick={() => onAddTask(date)}>
           + Add activity
