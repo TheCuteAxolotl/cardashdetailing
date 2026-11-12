@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         else await tx.siteContent.create({ data: { key, value } });
       } else if (record.kind === "team") {
         const current = await tx.siteContent.findUnique({ where: { key: TEAMS_KEY } });
-        let teams = [];
+        let teams: DetailerTeam[] = [];
         try { teams = parseTeams(current ? JSON.parse(current.value) : []); } catch { teams = []; }
         const snapshot = record.snapshot as { id?: string; name?: string; memberIds?: string[] };
         if (snapshot?.id !== record.entityId || !snapshot.name || !Array.isArray(snapshot.memberIds) ||
