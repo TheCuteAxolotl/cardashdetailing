@@ -105,7 +105,9 @@ export default function HomeExperience({
                   (option.featured ? "border-[#a88b56] bg-[#1e1d1b] text-white shadow-[0_12px_35px_rgba(0,0,0,.12)]" : "border-black/[.1] bg-white text-[#171411] hover:border-[#b6985e]")}>
                 <div className="flex items-start justify-between">
                   <span className={"text-xs font-bold tracking-[.1em] " + (option.featured ? "text-[#d6b779]" : "text-black/35")}>{option.mark}</span>
-                  <span aria-hidden="true" className={"grid h-9 w-9 place-items-center rounded-full text-lg transition group-hover:translate-x-0.5 " + (option.featured ? "bg-[#d6b779] text-[#171411]" : "bg-[#f4f1eb] text-[#171411]")}>↗</span>
+                  <span aria-hidden="true" className={"grid h-9 w-9 place-items-center rounded-full transition group-hover:translate-x-0.5 " + (option.featured ? "bg-[#d6b779] text-[#171411]" : "bg-[#f4f1eb] text-[#171411]")}>
+                    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </span>
                 </div>
                 <div>
                   <h3 className="text-lg font-bold tracking-tight sm:text-xl">{option.title}</h3>
