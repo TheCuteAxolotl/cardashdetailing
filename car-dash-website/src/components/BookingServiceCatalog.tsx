@@ -17,8 +17,10 @@ type Props = {
   headlightPrice: number;
 };
 const kinds = [
-  { id: "packages", title: "Full Detail" }, { id: "interior", title: "Interior" },
-  { id: "exterior", title: "Exterior" }, { id: "other", title: "Other Services" },
+  { id: "packages", title: "Full car", description: "Inside + outside" },
+  { id: "interior", title: "Interior", description: "Inside only" },
+  { id: "exterior", title: "Exterior", description: "Outside only" },
+  { id: "other", title: "Other", description: "Specialty services" },
 ] as const;
 
 export default function BookingServiceCatalog({
@@ -26,12 +28,16 @@ export default function BookingServiceCatalog({
   otherServices,standaloneId,headlightPrice,
 }: Props) {
   return <div className="space-y-4">
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Detailing categories">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label="Choose what you need cleaned">
       {kinds.map(item => <button key={item.id} type="button" onClick={() => onCategoryChange(item.id)}
         aria-pressed={category === item.id}
-        className={"rounded-full border px-4 py-2.5 text-xs font-semibold transition sm:text-sm " +
-          (category === item.id ? "border-[#d6b779] bg-[#d6b779] text-[#171717]" : "border-white/15 bg-[#252525] text-[#ded6ca] hover:border-[#d6b779]/60")}>{item.title}</button>)}
+        className={"min-h-[82px] rounded-xl border px-3 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d6b779] " +
+          (category === item.id ? "border-[#d6b779] bg-[#d6b779] text-[#171717]" : "border-white/15 bg-[#252525] text-[#ded6ca] hover:border-[#d6b779]/60")}>
+          <span className="block text-sm font-bold">{item.title}</span>
+          <span className={"mt-1 block text-xs " + (category === item.id ? "text-[#171717]/70" : "text-white/50")}>{item.description}</span>
+        </button>)}
     </div>
+    <p className="text-sm font-medium text-white/80">Choose the package that looks right for your car.</p>
     {category === "other" ? (
       <div className="grid gap-3 sm:grid-cols-2">
         {[{id:standaloneId,title:"Headlight Restoration",price:headlightPrice,pricingType:"fixed"},...otherServices].map(service => {
