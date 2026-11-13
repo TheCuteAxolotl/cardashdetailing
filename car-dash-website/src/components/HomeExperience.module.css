@@ -122,3 +122,252 @@
 .experience .hero :global(.home-hero-actions) a { border-radius:2px; box-shadow:none; }
 .experience .sectionHeading h2,.experience .transformCopy h2,.portfolio h2 { font-family:Arial,Helvetica,sans-serif; font-weight:300; letter-spacing:-.055em; }
 @media(max-width:767px) { .experience .hero :global(.home-hero-content),.experience .hero :global(.home-hero-shell) { min-height:760px !important; } }
+
+
+/* Photo-backed booking chooser. Scoped classes avoid the global light/dark
+   utility remapping that made the heading nearly invisible on mobile. */
+.quickBook {
+  background: #151515;
+  color: #f7f3eb;
+  padding: clamp(40px, 5vw, 64px) 20px clamp(52px, 6vw, 80px);
+  border-top: 1px solid rgba(214, 183, 121, .18);
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  scroll-margin-top: 88px;
+}
+
+.quickBookInner {
+  width: min(100%, 1320px);
+  margin: 0 auto;
+}
+
+.quickBookIntro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 240px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid rgba(214, 183, 121, .38);
+  border-radius: 18px;
+  background: #202020;
+  padding: clamp(23px, 5vw, 48px);
+}
+
+.quickBookIntroPhoto {
+  z-index: 0;
+  filter: saturate(.75) brightness(.72);
+}
+
+.quickBookIntro::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(9, 9, 9, .94) 0%, rgba(12, 12, 12, .82) 48%, rgba(10, 10, 10, .35) 100%),
+              linear-gradient(0deg, rgba(0, 0, 0, .42), transparent 65%);
+  pointer-events: none;
+}
+
+.quickBookIntroContent,
+.quickBookIntroNote {
+  position: relative;
+  z-index: 2;
+}
+
+.quickBookEyebrow {
+  margin: 0 0 14px;
+  color: #dfbe7c;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.quickBookHeading {
+  max-width: 17ch;
+  margin: 0;
+  color: #fff9ef !important;
+  font-size: clamp(2.35rem, 5.3vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.05;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, .6);
+}
+
+.quickBookHeading span {
+  color: #e1c184 !important;
+}
+
+.quickBookHelp {
+  margin-top: 15px;
+  color: #f1eae0;
+  font-size: clamp(14px, 1.5vw, 16px);
+  line-height: 1.55;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .75);
+}
+
+.quickBookIntroNote {
+  max-width: 180px;
+  flex-shrink: 0;
+  margin: 0 0 4px;
+  color: #ede3d2;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.quickBookGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.quickBookCard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  min-width: 0;
+  min-height: 220px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(16px, 2.1vw, 26px);
+  border: 1px solid rgba(255, 255, 255, .26);
+  border-radius: 16px;
+  background: #202020;
+  color: #fff9f0;
+  text-decoration: none;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .2);
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+
+.quickBookCardFeatured {
+  border: 2px solid #d6b779;
+}
+
+.quickBookCardPhoto {
+  z-index: 0;
+  filter: saturate(.8) brightness(.92);
+  transition: transform .35s;
+}
+
+.quickBookCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .33), rgba(0, 0, 0, .15) 32%, rgba(0, 0, 0, .90) 100%);
+  pointer-events: none;
+}
+
+.quickBookCardTop,
+.quickBookCardBottom {
+  position: relative;
+  z-index: 2;
+}
+
+.quickBookCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.quickBookNumber {
+  color: #f0d59c;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-shadow: 0 2px 6px #000;
+}
+
+.quickBookArrow {
+  display: grid;
+  height: 38px;
+  width: 38px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: #e4c587;
+  color: #151515;
+  transition: transform .2s, background .2s;
+}
+
+.quickBookCardBottom h3 {
+  margin: 0;
+  color: #fffaf0 !important;
+  font-size: clamp(19px, 2vw, 25px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+  text-shadow: 0 2px 10px #000;
+}
+
+.quickBookCardBottom p {
+  margin-top: 9px;
+  color: #f1e8dc;
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.4;
+  text-shadow: 0 2px 7px #000;
+}
+
+.quickBookCard:hover {
+  transform: translateY(-3px);
+  border-color: #e4c587;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .36);
+}
+
+.quickBookCard:hover .quickBookCardPhoto {
+  transform: scale(1.045);
+}
+
+.quickBookCard:hover .quickBookArrow {
+  transform: translateX(3px);
+  background: #f1d8a4;
+}
+
+.quickBookCard:focus-visible {
+  outline: 3px solid #e4c587;
+  outline-offset: 4px;
+}
+
+.quickBookSteps {
+  margin-top: 22px;
+  color: #e8e1d5;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.quickBookSteps span {
+  padding: 0 5px;
+  color: #d6b779;
+}
+
+@media (min-width: 960px) {
+  .quickBookGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .quickBookCard { min-height: 260px; }
+}
+
+@media (max-width: 640px) {
+  .quickBook { padding: 28px 16px 54px; }
+  .quickBookIntro { min-height: 206px; padding: 24px 20px; border-radius: 14px; }
+  .quickBookIntro::after {
+    background: linear-gradient(90deg, rgba(7, 7, 7, .95) 0%, rgba(9, 9, 9, .85) 61%, rgba(8, 8, 8, .42) 100%);
+  }
+  .quickBookIntroNote { display: none; }
+  .quickBookHeading { font-size: clamp(2.2rem, 8.5vw, 3.15rem); }
+  .quickBookGrid { gap: 10px; margin-top: 12px; }
+  .quickBookCard { min-height: 194px; padding: 15px; border-radius: 12px; }
+  .quickBookArrow { width: 33px; height: 33px; }
+  .quickBookCardBottom h3 { font-size: clamp(17px, 4.7vw, 21px); }
+  .quickBookSteps { font-size: 12px; line-height: 1.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quickBookCard, .quickBookCardPhoto, .quickBookArrow { transition: none; }
+}
