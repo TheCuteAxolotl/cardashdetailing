@@ -83,40 +83,60 @@ export default function HomeExperience({
       </section>
 
 
-      <section id="choose-detail" aria-labelledby="quick-book-heading" className="scroll-mt-24 border-b border-black/10 bg-[#faf9f6] px-5 py-10 sm:px-8 sm:py-14">
-        <div className="mx-auto max-w-[1320px]">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[.12em] text-[#8b6b31]">Start here</p>
-              <h2 id="quick-book-heading" className="mt-2 text-3xl font-bold tracking-[-.045em] text-[#171411] sm:text-4xl">What do you need cleaned?</h2>
-              <p className="mt-2 text-sm text-black/55">Tap one option. We’ll guide you through the rest.</p>
+      <section id="choose-detail" aria-labelledby="quick-book-heading" className={styles.quickBook}>
+        <div className={styles.quickBookInner}>
+          <div className={styles.quickBookIntro}>
+            <SitePhoto
+              category="hero"
+              fallbackCategory="home-showcase-primary"
+              className={styles.quickBookIntroPhoto + " absolute inset-0 h-full w-full"}
+              alt="Car Dash Detailing vehicle finish"
+            />
+            <div className={styles.quickBookIntroContent}>
+              <p className={styles.quickBookEyebrow}>Start here</p>
+              <h2 id="quick-book-heading" className={styles.quickBookHeading}>
+                What do you <span>need cleaned?</span>
+              </h2>
+              <p className={styles.quickBookHelp}>Tap one option. We’ll guide you through the rest.</p>
             </div>
-            <p className="hidden text-xs font-medium text-black/45 md:block">No account needed to request an appointment</p>
+            <p className={styles.quickBookIntroNote}>Mobile detailing. We come to you.</p>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+          <div className={styles.quickBookGrid}>
             {[
-              { href: "/?pricingPage=packages#book", title: "Inside + outside", detail: "Full car detail", mark: "01", featured: true },
-              { href: "/?pricingPage=interior#book", title: "Interior only", detail: "Seats, carpets, dash", mark: "02" },
-              { href: "/?pricingPage=exterior#book", title: "Exterior only", detail: "Paint, wheels, glass", mark: "03" },
-              { href: "/quote", title: "Not sure?", detail: "Get a custom quote", mark: "04" },
+              { href: "/?pricingPage=packages#book", title: "Inside + outside", detail: "Full car detail", mark: "01", image: "pricing-car-packages-hero", fallback: "home-showcase-primary", featured: true },
+              { href: "/?pricingPage=interior#book", title: "Interior only", detail: "Seats, carpets, dash", mark: "02", image: "pricing-interior-hero", fallback: "home-showcase-secondary" },
+              { href: "/?pricingPage=exterior#book", title: "Exterior only", detail: "Paint, wheels, glass", mark: "03", image: "pricing-exterior-hero", fallback: "home-showcase-primary" },
+              { href: "/quote", title: "Not sure?", detail: "Get a custom quote", mark: "04", image: "home-showcase-primary", fallback: "hero" },
             ].map((option) => (
-              <a key={option.href} href={option.href}
-                className={"group flex min-h-[158px] flex-col justify-between rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a57f35] sm:min-h-[176px] sm:p-6 " +
-                  (option.featured ? "border-[#a88b56] bg-[#1e1d1b] text-white shadow-[0_12px_35px_rgba(0,0,0,.12)]" : "border-black/[.1] bg-white text-[#171411] hover:border-[#b6985e]")}>
-                <div className="flex items-start justify-between">
-                  <span className={"text-xs font-bold tracking-[.1em] " + (option.featured ? "text-[#d6b779]" : "text-black/35")}>{option.mark}</span>
-                  <span aria-hidden="true" className={"grid h-9 w-9 place-items-center rounded-full transition group-hover:translate-x-0.5 " + (option.featured ? "bg-[#d6b779] text-[#171411]" : "bg-[#f4f1eb] text-[#171411]")}>
-                    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <a
+                key={option.href}
+                href={option.href}
+                className={[styles.quickBookCard, option.featured && styles.quickBookCardFeatured].filter(Boolean).join(" ")}
+                aria-label={option.title + ": " + option.detail}
+              >
+                <SitePhoto
+                  category={option.image}
+                  fallbackCategory={option.fallback}
+                  className={styles.quickBookCardPhoto + " absolute inset-0 h-full w-full"}
+                  alt={option.title + " detailing"}
+                />
+                <div className={styles.quickBookCardTop}>
+                  <span className={styles.quickBookNumber}>{option.mark}</span>
+                  <span className={styles.quickBookArrow} aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" width="20" height="20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
                   </span>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold tracking-tight sm:text-xl">{option.title}</h3>
-                  <p className={"mt-1 text-xs sm:text-sm " + (option.featured ? "text-white/65" : "text-black/50")}>{option.detail}</p>
+                <div className={styles.quickBookCardBottom}>
+                  <h3>{option.title}</h3>
+                  <p>{option.detail}</p>
                 </div>
               </a>
             ))}
           </div>
-          <p className="mt-5 text-center text-xs font-medium text-black/55">Choose a detail → Pick a date → Enter your address → Send your request</p>
+          <p className={styles.quickBookSteps}>Choose a detail <span>›</span> Pick a date <span>›</span> Enter your address <span>›</span> Send your request</p>
         </div>
       </section>
 
