@@ -89,11 +89,11 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
       <SiteFooter blurb={footerBlurb} />
       <SupportWidget />
       <PublicBookingModal initialSiteContent={initialSiteContent} />
-      {showMobileActions && <a href="/quote" className="fixed bottom-6 left-6 z-[65] hidden rounded-full bg-[#d6b779] px-6 py-3.5 text-sm font-semibold text-[#101010] shadow-lg transition hover:bg-[#e5c995] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d6b779] sm:inline-flex">Get a Quote</a>}
+      
       {showMobileActions && (
         <div className="mobile-booking-bar fixed z-[65] sm:hidden">
-          <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-[1fr_.86fr] gap-2">
-            <a href="/#book" className="mobile-book-primary rounded-full px-4 py-3 text-center text-sm font-semibold">Book a detail</a>
+          <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-[1.4fr_1fr] gap-2">
+            <a href="/#book" className="mobile-book-primary rounded-full px-4 py-3 text-center text-sm font-semibold">Book now</a>
             <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Get a Quote</a>
           </div>
         </div>

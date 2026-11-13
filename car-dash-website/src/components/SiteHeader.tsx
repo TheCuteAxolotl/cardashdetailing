@@ -7,9 +7,8 @@ import { BUSINESS_PHONE, BUSINESS_PHONE_DISPLAY, OWNER_EMAIL } from "@/lib/const
 type User = { id: string; name: string; email: string; role: string };
 
 const mainLinks = [
-  ["/#prices", "Pricing"],
-  ["/gallery", "Gallery"],
-  ["/shop", "Shop"],
+  ["/#prices", "Prices"],
+  ["/gallery", "Our Work"],
   ["/reviews", "Reviews"],
 ] as const;
 
@@ -29,6 +28,7 @@ const specialtyLinks = [
 ] as const;
 
 const moreLinks = [
+  ["/shop", "Shop", "Car Dash merchandise and gifts."],
   ["/about", "About", "How Car Dash works."],
   ["/products-we-use", "Products", "Products and systems used on your vehicle."],
   ["/faq", "FAQ", "Answers before you book."],
@@ -115,7 +115,7 @@ export default function SiteHeader() {
             </div>
           </a>
 
-          <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-[.01em] text-black/58 lg:flex">
+          <nav className="hidden items-center gap-6 text-[12px] font-medium tracking-[.01em] text-black/65 lg:flex" aria-label="Main navigation">
             {mainLinks.map(([href, label]) => (
               <a key={href} href={href} className="border-b border-transparent py-2 hover:border-black hover:text-black">{label}</a>
             ))}
@@ -161,21 +161,37 @@ export default function SiteHeader() {
           </nav>
 
           <div className="hidden items-center gap-4 lg:flex">
-            {!user ? <a href="/login" className="text-xs font-medium text-black/48 hover:text-black">Login</a> : <a href="/account" className="text-xs font-medium text-black/48 hover:text-black">Account</a>}
+            <a href={user ? "/dashboard" : "/login"} className="text-xs font-medium text-black/55 hover:text-black">My bookings</a>
             {staff && <a href="/admin/dashboard" className="text-xs font-medium text-black/55 hover:text-black">Staff</a>}
             {owner && <a href="/owner/dashboard" className="text-xs font-medium text-black/55 hover:text-black">Owner</a>}
-            <a href="/#book" className="rounded-full bg-[#111] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(23,20,17,.12)] hover:bg-black">Book a detail</a>
+            <a href="/#book" className="rounded-full bg-[#111] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(23,20,17,.12)] hover:bg-black">Book now</a>
           </div>
 
-          <button type="button" onClick={() => setMenuOpen(!menuOpen)} className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm lg:hidden" aria-label={menuOpen ? "Close menu" : "Open menu"}>
+          <div className="flex items-center gap-2 lg:hidden">
+            <a href="/#book" className="rounded-full bg-[#171411] px-4 py-2.5 text-xs font-bold text-white">Book now</a>
+            <button type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="car-dash-mobile-menu" className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm" aria-label={menuOpen ? "Close menu" : "Open menu"}>
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
-          </button>
+            </button>
+          </div>
         </div>
 
         {menuOpen && (
-          <div className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
+          <div id="car-dash-mobile-menu" className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
             <div className="mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
-              <nav className="mobile-menu-nav divide-y divide-black/[.07] border-y border-black/[.07]">
+              <div className="mb-5">
+                <p className="mb-2 text-xs font-bold uppercase tracking-[.1em] text-black/45">Quick booking</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    ["/?pricingPage=packages#book", "Full detail"],
+                    ["/?pricingPage=interior#book", "Interior only"],
+                    ["/?pricingPage=exterior#book", "Exterior only"],
+                    ["/quote", "Get a quote"],
+                  ].map(([href, label]) => (
+                    <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-[#171411] hover:border-[#a9874f]">{label}</a>
+                  ))}
+                </div>
+              </div>
+              <nav className="mobile-menu-nav divide-y divide-black/[.07] border-y border-black/[.07]" aria-label="Mobile navigation">
                 {mainLinks.map(([href, label]) => (
                   <a key={href} href={href} className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>{label}</a>
                 ))}
@@ -185,7 +201,7 @@ export default function SiteHeader() {
                 {mobileMoreOpen && <div className="pb-4 pl-4">{moreLinks.map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}<button onClick={openSupport} className="block py-2.5 text-sm text-black/55">Support</button></div>}
               </nav>
               <div className="mt-5 grid grid-cols-2 gap-2">
-                <a href={user ? "/account" : "/login"} className="rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">{user ? "Account" : "Login"}</a>
+                <a href={user ? "/dashboard" : "/login"} className="rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">My bookings</a>
                 <a href="/#book" className="rounded-full bg-[#111] px-4 py-3 text-center text-sm font-semibold text-white" onClick={() => setMenuOpen(false)}>Book a detail</a>
               </div>
               {owner && <a href="/owner/dashboard" className="mt-2 block rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">Owner console</a>}

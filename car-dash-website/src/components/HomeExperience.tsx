@@ -34,7 +34,7 @@ export default function HomeExperience({
   return (
     <div className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
       <section className={styles.hero}>
-        <div className="home-hero-shell relative mx-auto min-h-[680px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
+        <div className="home-hero-shell relative mx-auto min-h-[520px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
           <div className="absolute inset-0">
             {hero360Frames.length > 0 ? (
               <Hero360Viewer
@@ -54,20 +54,21 @@ export default function HomeExperience({
             <div className={`home-hero-bottom-gradient pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.18),transparent_38%,rgba(0,0,0,.7))] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
           </div>
 
-          <div className={`home-hero-content relative z-10 flex min-h-[680px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
+          <div className={`home-hero-content relative z-10 flex min-h-[520px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
             <div className="flex items-start justify-between gap-5 text-white">
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
             </div>
 
             <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
               <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">We come to you. No shop drop-off.</p>
-              <h1 className="max-w-[12ch] text-[clamp(3.55rem,7.8vw,7.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
-                <>Clean.<br />Refined.<br />Protected.</>
+              <h1 className="max-w-[14ch] text-[clamp(3.2rem,7.2vw,6.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
+                <>Your car.<br />Cleaned at<br />your door.</>
               </h1>
-              <p className="mt-7 max-w-[650px] text-sm leading-7 text-white/68 sm:text-base sm:leading-8">{content.heroBody}</p>
+              <p className="mt-6 max-w-[540px] text-sm leading-6 text-white/80 sm:hidden">Choose your service. See the price. Pick a time. We come to you.</p>
+              <p className="mt-7 hidden max-w-[650px] text-sm leading-7 text-white/68 sm:block sm:text-base sm:leading-8">{content.heroBody}</p>
               <p className="mt-5 max-w-[650px] border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 tracking-[-.01em] text-white/90 sm:text-base">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>
               <div className="home-hero-actions mt-8 flex flex-wrap gap-3">
-                <a href="#book" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ece9e3]">Book a detail</a>
+                <a href="#choose-detail" className="rounded-full bg-[#d6b779] px-6 py-3.5 text-sm font-bold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ead09b]">Choose a detail</a>
                 <a href="/quote" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">Get a Quote</a>
                 <a href="#prices" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">View pricing</a>
               </div>
@@ -78,6 +79,44 @@ export default function HomeExperience({
               <span className="sm:hidden">Swipe</span><span className="hidden sm:inline">Drag to explore</span>
             </div>
           )}
+        </div>
+      </section>
+
+
+      <section id="choose-detail" aria-labelledby="quick-book-heading" className="scroll-mt-24 border-b border-black/10 bg-[#faf9f6] px-5 py-10 sm:px-8 sm:py-14">
+        <div className="mx-auto max-w-[1320px]">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.12em] text-[#8b6b31]">Start here</p>
+              <h2 id="quick-book-heading" className="mt-2 text-3xl font-bold tracking-[-.045em] text-[#171411] sm:text-4xl">What do you need cleaned?</h2>
+              <p className="mt-2 text-sm text-black/55">Tap one option. We’ll guide you through the rest.</p>
+            </div>
+            <p className="hidden text-xs font-medium text-black/45 md:block">No account needed to request an appointment</p>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[
+              { href: "/?pricingPage=packages#book", title: "Inside + outside", detail: "Full car detail", mark: "01", featured: true },
+              { href: "/?pricingPage=interior#book", title: "Interior only", detail: "Seats, carpets, dash", mark: "02" },
+              { href: "/?pricingPage=exterior#book", title: "Exterior only", detail: "Paint, wheels, glass", mark: "03" },
+              { href: "/quote", title: "Not sure?", detail: "Get a custom quote", mark: "04" },
+            ].map((option) => (
+              <a key={option.href} href={option.href}
+                className={"group flex min-h-[158px] flex-col justify-between rounded-2xl border p-4 transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a57f35] sm:min-h-[176px] sm:p-6 " +
+                  (option.featured ? "border-[#a88b56] bg-[#1e1d1b] text-white shadow-[0_12px_35px_rgba(0,0,0,.12)]" : "border-black/[.1] bg-white text-[#171411] hover:border-[#b6985e]")}>
+                <div className="flex items-start justify-between">
+                  <span className={"text-xs font-bold tracking-[.1em] " + (option.featured ? "text-[#d6b779]" : "text-black/35")}>{option.mark}</span>
+                  <span aria-hidden="true" className={"grid h-9 w-9 place-items-center rounded-full transition group-hover:translate-x-0.5 " + (option.featured ? "bg-[#d6b779] text-[#171411]" : "bg-[#f4f1eb] text-[#171411]")}>
+                    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold tracking-tight sm:text-xl">{option.title}</h3>
+                  <p className={"mt-1 text-xs sm:text-sm " + (option.featured ? "text-white/65" : "text-black/50")}>{option.detail}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+          <p className="mt-5 text-center text-xs font-medium text-black/55">Choose a detail → Pick a date → Enter your address → Send your request</p>
         </div>
       </section>
 

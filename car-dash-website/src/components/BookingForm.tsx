@@ -376,6 +376,9 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
       const pricingPage = params.get("pricingPage") as PricingKind | null;
       const packageId = params.get("packageId") || "";
       const vehicleClass = params.get("vehicleClass") as VehicleClass | null;
+      if (!quoteId && pricingPage && ["packages", "interior", "exterior"].includes(pricingPage) && !cancelled) {
+        setCategory(pricingPage);
+      }
 
       if (!quoteId && pricingPage && packageId && vehicleClass && ["packages", "exterior", "interior"].includes(pricingPage) && Object.prototype.hasOwnProperty.call(VEHICLE_LABELS, vehicleClass)) {
         const pkg = loadedPricing[pricingPage].packages.find((item) => item.id === packageId);
@@ -574,7 +577,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
   const databaseServices = services.filter((service) => service.active && service.title.trim().toLowerCase() !== "headlight restoration");
 
-  const stageNames = ["Service", "Date & time", "Your details", "Review"] as const;
+  const stageNames = ["Choose detail", "Pick a time", "Your details", "Review"] as const;
   const selectedName = packageSelection?.packageName || (quoteLocked ? form.selectedPackage : selectedService?.title || (isStandaloneHeadlight ? "Headlight Restoration" : ""));
   const selectedVehicleSize = packageSelection ? VEHICLE_LABELS[packageSelection.vehicleClass] : form.vehicleType;
   const serviceReady = Boolean(baseTotal != null && baseTotal > 0 && selectedName && !setupMessage && !needsOdorQuote);
@@ -632,7 +635,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
             <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{stageNames[step]}</h2>
-                <p className="mt-1.5 text-xs text-[#aaa399]">Step {step + 1} of 4 · Mobile detailing at your location</p>
+                <p className="mt-1.5 text-xs text-[#aaa399]">Step {step + 1} of 4 · {step === 0 ? "Start by picking your vehicle and service" : step === 1 ? "Choose an available appointment time" : step === 2 ? "Where should we meet you?" : "Check everything before sending"}</p>
               </div>
               <div className="rounded-xl border border-[#d6b779]/25 bg-[#d6b779]/10 px-3 py-2">
                 <p className="text-[10px] uppercase tracking-widest text-[#bdb3a0]">Est. total</p>
@@ -648,6 +651,21 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           </header>
           {setupMessage && <div role="alert" className="rounded-xl border border-amber-300/30 bg-amber-900/20 p-4 text-sm text-amber-100">{setupMessage} <a href="/quote" className="font-semibold text-[#e5c995] underline">Get a quote</a></div>}
           {step === 0 && <div className="space-y-6">
+            {!quoteLocked && (
+              <section className="rounded-2xl border border-white/10 bg-white/[.035] p-4 sm:p-5">
+                <p className="text-sm font-semibold text-white">1. What size is your vehicle?</p>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => (
+                    <button key={key} type="button" aria-pressed={vehicleTypeToClass(form.vehicleType) === key}
+                      onClick={() => { if (packageSelection) changePackageVehicleClass(key); else set("vehicleType", VEHICLE_LABELS[key]); }}
+                      className={"min-h-[54px] rounded-xl border px-2 py-3 text-xs font-semibold transition sm:text-sm " +
+                        (vehicleTypeToClass(form.vehicleType) === key ? "border-[#d6b779] bg-[#d6b779]/15 text-[#f6e1b6]" : "border-white/15 bg-[#222] text-white/65 hover:border-[#d6b779]/60")}>
+                      {VEHICLE_LABELS[key]}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
             {!quoteLocked && <BookingServiceCatalog
               category={category}
               onCategoryChange={setCategory}
@@ -660,7 +678,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
               headlightPrice={bookingPricing.headlightStandalonePrice}
             />}
       <section>
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">1</span><div><h3 className="font-semibold">Service</h3><p className="text-xs text-white/35">Choose a service, then choose your vehicle size.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">2</span><div><h3 className="font-semibold">Selected service</h3><p className="text-xs text-white/50">Pick a package above, then continue to the calendar.</p></div></div>
 
         {quoteLocked ? (
           <div className="rounded-2xl border border-[#d6b779]/25 bg-[#d6b779]/[.055] p-4">
@@ -687,14 +705,14 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         {packageSelection && !quoteLocked && (
           <div className="mt-3 rounded-2xl border border-white/10 bg-white/[.025] p-4">
             <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold">{packageSelection.packageName}</p><p className="mt-1 text-xs text-white/35">Choose vehicle size</p></div><p className="text-2xl font-semibold">${packageSelection.price.toFixed(0)}</p></div>
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">{(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((key) => <button key={key} type="button" onClick={() => changePackageVehicleClass(key)} className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${packageSelection.vehicleClass === key ? "border-[#d6b779]/55 bg-[#d6b779]/10 text-white" : "border-white/10 bg-[#07131B]/20 text-white/45"}`}>{VEHICLE_LABELS[key]} · ${Number(pricingConfigs[packageSelection.pricingPage].packages.find((item) => item.id === packageSelection.packageId)?.prices?.[key] || 0).toFixed(0)}</button>)}</div>
+            <p className="mt-3 rounded-lg bg-white/5 px-3 py-2 text-xs text-white/65">Vehicle: {VEHICLE_LABELS[packageSelection.vehicleClass]} · Change the size above to update the price.</p>
           </div>
         )}
       </section>
 
       {(allowCarAddOns || baseTotal != null) && (
         <section className="border-t border-white/8 pt-6">
-          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">4</span><div><h3 className="font-semibold">Optional</h3><p className="text-xs text-white/35">Personalize your detail with add-ons, photos or a discount code.</p></div></div>
+          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">+</span><div><h3 className="font-semibold">Optional extras</h3><p className="text-xs text-white/35">Personalize your detail with add-ons, photos or a discount code.</p></div></div>
 
           <div className="space-y-3">
             {allowCarAddOns && (
@@ -734,7 +752,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           </div>}
           {step === 1 && <div className="space-y-6">
       <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Unavailable dates and times are disabled.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">2</span><div><h3 className="font-semibold">Date + time</h3><p className="text-xs text-white/35">Unavailable dates and times are disabled.</p></div></div>
         <p className="mb-3 text-sm text-white/60">Estimated appointment: {Math.floor(estimatedDuration/60)}h {estimatedDuration%60 ? `${estimatedDuration%60}m` : ""}. Available start times automatically account for this.</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="text-sm text-white/55"><p>Day</p><BookingDatePicker duration={estimatedDuration} value={form.preferredDate} onChange={(value) => { set("preferredDate", value); set("preferredTime", ""); }} /></div>
@@ -746,7 +764,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           </div>}
           {step === 2 && <div className="space-y-6">
       <section className="border-t border-white/8 pt-6">
-        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">2</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Tell us about your car and where to meet you.</p></div></div>
+        <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Tell us about your car and where to meet you.</p></div></div>
 
         {vehicles.length > 0 && !quoteLocked && <label className="mb-4 block text-sm text-white/55">Saved vehicle<select className={input} value={form.vehicleId} onChange={(event) => chooseVehicle(event.target.value)}><option value="">Enter vehicle manually</option>{vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`}</option>)}</select></label>}
 
@@ -820,12 +838,12 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
             {step < 3 ? (
               <button type="button" onClick={advance} disabled={status === "submitting" || (step === 0 && !serviceReady) || (step === 1 && !scheduleReady) || (step === 2 && !detailsReady)}
                 className="ml-auto flex-1 rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e8cf9e] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-[245px]">
-                {step === 0 ? "Choose a time" : step === 1 ? "Enter your details" : "Review appointment"}
+                {step === 0 ? "Continue to calendar" : step === 1 ? "Continue to details" : "Review request"}
               </button>
             ) : (
               <button type="submit" disabled={status === "submitting" || !form.policyAgreed || !serviceReady || !scheduleReady || !detailsReady}
                 className="ml-auto flex-1 rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e8cf9e] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-[245px]">
-                {status === "submitting" ? "Submitting…" : "Request detail · $" + Number(bookingTotal || 0).toFixed(2)}
+                {status === "submitting" ? "Sending request…" : "Send booking request · $" + Number(bookingTotal || 0).toFixed(2)}
               </button>
             )}
           </nav>
