@@ -161,7 +161,7 @@ export default function SiteHeader() {
           </nav>
 
           <div className="hidden items-center gap-4 lg:flex">
-            {!user ? <a href="/login" className="text-xs font-medium text-black/48 hover:text-black">Login</a> : <a href="/account" className="text-xs font-medium text-black/48 hover:text-black">Account</a>}
+            <a href={user ? "/dashboard" : "/login"} className="text-xs font-medium text-black/55 hover:text-black">My bookings</a>
             {staff && <a href="/admin/dashboard" className="text-xs font-medium text-black/55 hover:text-black">Staff</a>}
             {owner && <a href="/owner/dashboard" className="text-xs font-medium text-black/55 hover:text-black">Owner</a>}
             <a href="/#book" className="rounded-full bg-[#111] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(23,20,17,.12)] hover:bg-black">Book now</a>
@@ -201,7 +201,7 @@ export default function SiteHeader() {
                 {mobileMoreOpen && <div className="pb-4 pl-4">{moreLinks.map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}<button onClick={openSupport} className="block py-2.5 text-sm text-black/55">Support</button></div>}
               </nav>
               <div className="mt-5 grid grid-cols-2 gap-2">
-                <a href={user ? "/account" : "/login"} className="rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">{user ? "Account" : "Login"}</a>
+                <a href={user ? "/dashboard" : "/login"} className="rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">My bookings</a>
                 <a href="/#book" className="rounded-full bg-[#111] px-4 py-3 text-center text-sm font-semibold text-white" onClick={() => setMenuOpen(false)}>Book a detail</a>
               </div>
               {owner && <a href="/owner/dashboard" className="mt-2 block rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">Owner console</a>}
