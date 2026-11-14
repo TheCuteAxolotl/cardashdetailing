@@ -1,4 +1,5 @@
 "use client";
+import ShiftClock from "@/components/ShiftClock";
 import { useEffect, useState } from "react";
 import {
   JOB_CHECKS,
@@ -124,7 +125,8 @@ export default function JobsPage() {
   const [selected, setSelected] = useState("");
   const [filter, setFilter] = useState("active");
   const [query, setQuery] = useState("");
-  const [photos, setPhotos] = useState<Photo[] | null>(null);
+  const [gallery, setGallery] = useState<{jobId: string; photos: Photo[]} | null>(null);
+  const photos = gallery?.jobId === selected ? gallery.photos : null;
   const [photoError, setPhotoError] = useState("");
   const [damage, setDamage] = useState("");
   const [work, setWork] = useState("");
@@ -159,7 +161,7 @@ export default function JobsPage() {
   }, []);
   useEffect(() => {
     if (!job) {
-      setPhotos(null);
+      setGallery(null);
       return;
     }
     setDamage(job.data.damageNotes);
@@ -169,12 +171,11 @@ export default function JobsPage() {
     setInstructions(job.data.instructions);
     setFeedback("");
     setDirty(false);
-    setPhotos(null);
     setPhotoError("");
     let alive = true;
     request(`/api/jobs/${encodeURIComponent(job.id)}/photos`)
       .then((p) => {
-        if (alive) setPhotos(p.photos);
+        if (alive) setGallery({jobId: job.id, photos: p.photos});
       })
       .catch((e) => {
         if (alive) setPhotoError(e.message);
@@ -297,6 +298,7 @@ export default function JobsPage() {
   return (
     <div className="min-h-screen bg-[#111110] p-4 text-[#f4efe5] sm:p-7">
       <div className="mx-auto max-w-7xl space-y-6">
+        {data && <ShiftClock />}
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-widest text-[#d6b779]">

@@ -1,4 +1,5 @@
 "use client";
+import ShiftClock from "@/components/ShiftClock";
 
 import { employeePreview, displayPermissions } from "@/lib/workspace-preferences";
 import { useEffect, useMemo, useState } from "react";
@@ -91,6 +92,7 @@ export default function AdminDashboard() {
 
   return (
     <>
+      {permissions.includes("assignedJobs") && <ShiftClock />}
       <StaffMobileHome name={user.name} permissions={permissions} tools={visible} smsUnread={smsUnread} />
       <div className="hidden md:block">
     <main className="console-home px-4 py-6 sm:px-7 lg:px-10 lg:py-9">
