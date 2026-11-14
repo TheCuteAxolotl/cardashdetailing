@@ -80,7 +80,7 @@ export async function getPermissionSnapshotForUser(user: {
   email: string;
   role: string;
   name?: string;
-}) {
+}, db: Pick<typeof prisma,"customRoleAssignment"|"userPermissionOverride"> = prisma) {
   const effectiveRole =
     user.email.toLowerCase() === OWNER_EMAIL.toLowerCase() ? "owner" : user.role;
 
@@ -88,15 +88,15 @@ export async function getPermissionSnapshotForUser(user: {
     return resolvePermissionSnapshot({ email: user.email, role: "owner" });
   }
 
-  await ensureAccessControlSchema();
+  if(db === prisma) await ensureAccessControlSchema();
 
   const [assignments, overrides] = await Promise.all([
-    prisma.customRoleAssignment.findMany({
+    db.customRoleAssignment.findMany({
       where: { userId: user.id },
       include: { role: true },
       orderBy: { createdAt: "asc" },
     }),
-    prisma.userPermissionOverride.findMany({
+    db.userPermissionOverride.findMany({
       where: { userId: user.id },
     }),
   ]);

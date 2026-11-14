@@ -48,6 +48,7 @@ type Invoice = {
 type FormState = Omit<Invoice, "id" | "shareToken" | "createdAt" | "updatedAt" | "totals" | "sentAt" | "viewedAt"> & {
   id?: string;
   shareToken?: string;
+  expectedUpdatedAt?: string;
 };
 
 const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
@@ -173,6 +174,7 @@ export default function OwnerInvoicesPage() {
     setForm({
       id: invoice.id,
       shareToken: invoice.shareToken,
+      expectedUpdatedAt: invoice.updatedAt,
       invoiceNumber: invoice.invoiceNumber,
       customerName: invoice.customerName,
       customerPhone: invoice.customerPhone,
@@ -323,6 +325,7 @@ export default function OwnerInvoicesPage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-white/35">{form.id ? "Edit invoice" : "New invoice"}</p>
                 <h2 className="mt-1 text-xl font-semibold">{form.invoiceNumber || "Invoice number assigned when saved"}</h2>
               </div>
+              {form.id?.startsWith("booking-paid-") && <a className="underline" href={"/owner/jobs?job="+encodeURIComponent(form.id.slice("booking-paid-".length))}>Open service record</a>}
               {form.id && <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusClass(form.status)}`}>{statusLabel(form.status)}</span>}
             </div>
 

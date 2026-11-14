@@ -224,7 +224,7 @@ export default function OwnerBookings() {
   };
 
   const deleteBooking = async (booking: Booking) => {
-    const okay = window.confirm(`Permanently delete this ${booking.status} booking from ${booking.customerName}? This cannot be undone.`);
+    const okay = window.confirm(`Archive this ${booking.status} booking from ${booking.customerName}? The owner can restore it from history.`);
     if (!okay) return;
 
     setMessage("");
@@ -236,7 +236,7 @@ export default function OwnerBookings() {
         setMessage(data.error || "Could not delete booking.");
         return;
       }
-      setMessage("Booking deleted permanently.");
+      setMessage("Booking archived.");
       await load();
     } catch {
       setMessage("Could not delete booking.");

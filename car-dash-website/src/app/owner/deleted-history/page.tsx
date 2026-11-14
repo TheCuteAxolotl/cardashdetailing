@@ -65,7 +65,7 @@ export default function DeletedHistoryPage() {
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#d6b779]">Car Dash · Owner audit</p>
-          <h1 className="mt-2 text-3xl font-semibold">Deleted history</h1>
+          <h1 className="mt-2 text-3xl font-semibold">Change & deletion history</h1>
           <p className="mt-2 max-w-2xl text-sm text-[#b7ad9f]">
             Review who deleted invoices, supply items, and teams. Restore the exact archived record.
             This history remains visible even after an item is restored.
@@ -75,7 +75,7 @@ export default function DeletedHistoryPage() {
           className="rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold disabled:opacity-40">Refresh</button>
       </header>
       <section className="flex flex-wrap gap-2">
-        {[["all","All"],["active","Not restored"],["restored","Restored"],["invoice","Invoices"],["inventory","Supplies"],["team","Teams"]].map(([key, label]) =>
+        {[["all","All"],["active","Not restored"],["restored","Restored"],["invoice","Invoices"],["inventory","Supplies"],["team","Teams"],["booking","Bookings"],["job-edit","Job edits"],["invoice-edit","Invoice & payment edits"],["photo","Photos"]].map(([key, label]) =>
           <button key={key} onClick={() => setFilter(key)}
             className={"rounded-full px-4 py-2 text-xs font-semibold " + (filter === key ? "bg-[#d6b779] text-[#181818]" : "border border-white/20 text-white/70")}>
             {label}</button>)}
@@ -91,7 +91,7 @@ export default function DeletedHistoryPage() {
                   <p className="text-[11px] font-bold uppercase tracking-wider text-[#d6b779]">{item.kind}</p>
                   <p className="break-words text-sm font-semibold">{item.summary}</p>
                   <p className="text-xs text-white/55">
-                    Deleted by {item.deletedByName || "Unknown"} · {date(item.deletedAt)}
+                    Recorded by {item.deletedByName || "Unknown"} · {date(item.deletedAt)}
                   </p>
                   {item.kind === "inventory" && <p className="text-xs text-white/55">Original inventory: {item.scope === "owner" ? "Owner" : "Assigned detailer"}</p>}
                   {item.restoredAt && <p className="text-xs text-emerald-300">
@@ -106,7 +106,7 @@ export default function DeletedHistoryPage() {
               </article>)}
             </div>}
       </section>
-      <p className="text-xs text-white/45">Currently tracks invoice deletions, supply removals, and deleted teams from this update onward. Earlier permanent deletions cannot be recovered automatically.</p>
+      <p className="text-xs text-white/45">Restores preserve newer changes. History begins when a record is first tracked.</p>
     </div>
   </main>;
 }

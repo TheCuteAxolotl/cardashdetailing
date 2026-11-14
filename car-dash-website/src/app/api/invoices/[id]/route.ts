@@ -1,3 +1,5 @@
+import { prisma } from "@/lib/prisma";
+import { archiveDeletion } from "@/lib/deletion-history";
 import { getCurrentAccountFromRequest, hasStaffPermission } from "@/lib/permissions";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -30,7 +32,8 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    if (!(hasStaffPermission(await getCurrentAccountFromRequest(request), "invoices"))) {
+    const actor=await getCurrentAccountFromRequest(request);
+    if (!actor || !hasStaffPermission(actor, "invoices")) {
       return NextResponse.json({ error: "Permission required" }, { status: 403 });
     }
 
@@ -39,6 +42,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     if (!existing) return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
 
     const body = await request.json().catch(() => ({}));
+    if(body.expectedUpdatedAt && body.expectedUpdatedAt !== existing.updatedAt)return NextResponse.json({error:"Invoice changed. Reopen it before saving."},{status:409});
     const invoice = sanitizeInvoiceInput(body, existing);
     if (!invoice.customerName) {
       return NextResponse.json({ error: "Customer name is required" }, { status: 400 });
@@ -47,7 +51,17 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       return NextResponse.json({ error: "Add at least one invoice item" }, { status: 400 });
     }
 
-    const saved = await saveInvoice(invoice);
+    const saved=await prisma.$transaction(async tx=>{
+      const key="invoice:"+id;
+      const row=await tx.siteContent.findUnique({where:{key}});
+      if (!row || JSON.parse(row.value).updatedAt !== existing.updatedAt) return null;
+      const value=JSON.stringify(invoice);
+      const updated=await tx.siteContent.updateMany({where:{key,value:row.value},data:{value}});
+      if(!updated.count)return null;
+      await archiveDeletion(tx,{kind:"invoice-edit",entityId:id,actor,scope:"invoice",summary:"Edited invoice "+invoice.invoiceNumber,snapshot:{before:row.value,after:value}});
+      return invoice;
+    });
+    if(!saved)return NextResponse.json({error:"Invoice changed. Refresh before saving."},{status:409});
     return NextResponse.json({ invoice: { ...saved, totals: calculateInvoiceTotals(saved) } });
   } catch (error) {
     console.error("Invoice update error:", error);

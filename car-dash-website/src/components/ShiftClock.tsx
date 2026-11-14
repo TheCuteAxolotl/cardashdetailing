@@ -29,6 +29,7 @@ export default function ShiftClock() {
       const data = await response.json();
       if (!response.ok) throw Error(data.error || "Could not save shift.");
       setStart(data.start);
+      window.dispatchEvent(new Event("field-shift"));
       setError("");
     } catch (cause) {
       setReady(false);

@@ -71,6 +71,7 @@ function ConversationView({ conversation, owner, canBook, canCall, role, onChang
     <p className="mt-1 truncate text-sm text-white/65">{conversation.subject} {status && `· ${status}`}</p>
     <div className="mt-3 flex flex-wrap gap-3 text-sm">
       {kind === "quote" && <a className="underline" href={`/${role}/quotes?thread=${encodeURIComponent(id)}`}>Manage quote / booking</a>}
+      {kind === "booking" && <a className="inline-block underline" href={"/owner/jobs?job=" + encodeURIComponent(id)}>Open service record</a>}
       {kind === "booking" && <a className="underline" href={`/${role}/bookings`}>Manage booking</a>}
       {kind === "sms" && conversation.phone && <span className="text-white/60">{conversation.phone} · Booking, quote and SMS history</span>}
       {canCall && conversation.phone && <BusinessCallButton phoneNumber={conversation.phone} customerName={conversation.name} label="Call from Car Dash" className="rounded-xl border border-[#d6b779]/50 px-3 py-1.5 text-xs font-semibold text-[#f1d59d] disabled:opacity-40" />}

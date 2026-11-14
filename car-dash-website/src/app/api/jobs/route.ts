@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { archiveDeletion } from "@/lib/deletion-history";
+import { readTeams } from "@/lib/detailer-teams";
 import { prisma } from "@/lib/prisma";
 import { notifyJobDiscord, type JobDiscordEvent } from "@/lib/discord-jobs";
 import {
@@ -29,13 +31,16 @@ export async function GET(req: NextRequest) {
     const account = await jobAccount(req);
     const owner = isOwnerAccount(account);
     await ensureJobs();
+    const roster = (await readTeams()).teams;
+    const teams = roster.filter(t => owner || t.memberIds.includes(account.id));
+    const teamIds = teams.map(t => t.id);
     const jobs = owner
       ? await prisma.$queryRaw<
           JobRow[]
         >`SELECT * FROM "DetailJob" ORDER BY "updatedAt" DESC`
       : await prisma.$queryRaw<
           JobRow[]
-        >`SELECT * FROM "DetailJob" WHERE "assigneeId"=${account.id} ORDER BY "updatedAt" DESC`;
+        >`SELECT * FROM "DetailJob" WHERE "assigneeId"=${account.id} OR data->>'teamId' = ANY(${teamIds}::text[]) ORDER BY "updatedAt" DESC`;
     const bookings = await prisma.booking.findMany({
       where: owner ? {} : { id: { in: jobs.map((j) => j.id) } },
       select: {
@@ -83,6 +88,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         owner,
+        teams: teams.map(({id,name}) => ({id,name})),
         employeeId: account.id,
         employees,
         jobs: jobs.map((j) => ({
@@ -92,7 +98,7 @@ export async function GET(req: NextRequest) {
             users.find((u) => u.id === j.assigneeId)?.name ||
             (j.assigneeId === account.id
               ? account.name
-              : "Former / unavailable employee"),
+              : "Assigned teammate"),
           assigneeActive: owner
             ? employees.some((u) => u.id === j.assigneeId)
             : true,
@@ -131,6 +137,8 @@ export async function POST(req: NextRequest) {
     )
       throw new JobError("Choose an employee with Assigned jobs access.");
     const data = emptyJobData();
+    if (b.teamId && !(await readTeams()).teams.some(t => t.id === b.teamId)) throw new JobError("Choose an existing team.");
+    data.teamId = String(b.teamId || "");
     data.instructions = String(b.instructions || "")
       .trim()
       .slice(0, 5000);
@@ -164,6 +172,7 @@ export async function PATCH(req: NextRequest) {
     await ensureJobs();
     const notification = await prisma.$transaction(async (tx): Promise<JobDiscordEvent | null> => {
       const job = await lockedJob(tx, String(b.id || ""), account, b.version);
+      const snapshot={version:job.version+1,state:job.state,assigneeId:job.assigneeId,data:structuredClone(job.data)};
       const booking = await tx.booking.findUnique({
         where: { id: job.id },
         select: {
@@ -181,6 +190,10 @@ export async function PATCH(req: NextRequest) {
           "Work is blocked while the booking is cancelled or awaiting confirmation.",
         );
       const action = String(b.action || "");
+      if (owner && ["manage","save"].includes(action) && typeof b.teamId === "string") {
+        if (b.teamId && !(await readTeams(tx)).teams.some(t => t.id === b.teamId)) throw new JobError("Choose an existing team.");
+        job.data.teamId = b.teamId;
+      }
       if (action === "save") {
         if (!isEditable(job.state))
           throw new JobError(
@@ -201,7 +214,7 @@ export async function PATCH(req: NextRequest) {
             const user = await tx.user.findUnique({ where: { id: targetId } });
             if (
               !user ||
-              !(await getPermissionSnapshotForUser(user)).permissions.includes(
+              !(await getPermissionSnapshotForUser(user,tx)).permissions.includes(
                 "assignedJobs",
               )
             )
@@ -240,7 +253,7 @@ export async function PATCH(req: NextRequest) {
         });
         if (
           !user ||
-          !(await getPermissionSnapshotForUser(user)).permissions.includes(
+          !(await getPermissionSnapshotForUser(user,tx)).permissions.includes(
             "assignedJobs",
           )
         )
@@ -280,12 +293,21 @@ export async function PATCH(req: NextRequest) {
           throw new JobError("Describe what needs attention.");
         if (action === "start") {
           job.state = "in_progress";
-          job.data.startedAt = new Date().toISOString();
+          const start = new Date().toISOString();
+          job.data.intervals ??= [];
+          if(!job.data.intervals.length && job.data.startedAt) {
+            const end=job.data.history.find(h=>h.action==="submit")?.at;
+            if(end)job.data.intervals.push({start:job.data.startedAt,end,startedBy:""});
+          }
+          job.data.intervals.push({start,end:null,startedBy:account.id});
+          job.data.startedAt ||= start;
           job.data.finishedAt = null;
         }
         if (action === "submit") {
           job.state = "awaiting_review";
           job.data.finishedAt = new Date().toISOString();
+          const interval=job.data.intervals?.at(-1);
+          if(interval && !interval.end){interval.end=job.data.finishedAt;interval.finishedBy=account.id;}
         }
         if (action === "approve") job.state = "approved";
         if (action === "return" || action === "reopen") {
@@ -297,6 +319,7 @@ export async function PATCH(req: NextRequest) {
         await saveJob(tx, job, account.name, action, feedback);
       }
       // Only successful Start/Finish transitions emit events. Other edits never notify.
+      await archiveDeletion(tx,{kind:"job-edit",entityId:job.id,actor:account,scope:"job",summary:booking.serviceName+" · "+action,snapshot});
       if (action !== "start" && action !== "submit") return null;
       const detailer = await tx.user.findUnique({
         where: { id: job.assigneeId },

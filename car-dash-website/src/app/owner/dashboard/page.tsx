@@ -1,4 +1,5 @@
 "use client";
+import FieldOverview from "@/components/FieldOverview";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
@@ -98,6 +99,8 @@ export default function OwnerDashboard(){
    {label:"Upcoming booked value",value:cash(scheduledValue),meta:"Estimated, not collected",icon:"chart" as OwnerIconName},
  ];
  return <>
+   <div className="flex flex-wrap gap-4 bg-neutral-900 px-4 py-3 text-sm text-white"><a href="/owner/inspection">{data.bookings.filter(b=>b.fieldWork?.state==="awaiting_review").length} awaiting review</a><a href="/owner/teams">Manage teams</a><a href="/owner/deleted-history">Change history</a></div>
+   <FieldOverview />
    <MobileOwnerDashboard
      bookings={data.bookings}
      activity={activity}
@@ -109,7 +112,7 @@ export default function OwnerDashboard(){
      onEdit={setEditor}
    />
    <div className="hidden md:block">
- return <div className="owner-calendar-home min-h-screen bg-[#141413] px-3 pb-14 pt-5 text-[#f3ece1] sm:px-6 sm:pt-7 2xl:px-8">
+ <div className="owner-calendar-home min-h-screen bg-[#141413] px-3 pb-14 pt-5 text-[#f3ece1] sm:px-6 sm:pt-7 2xl:px-8">
    <div className="mx-auto max-w-[1720px] space-y-5">
      <header className="flex flex-wrap items-end justify-between gap-4">
        <div>

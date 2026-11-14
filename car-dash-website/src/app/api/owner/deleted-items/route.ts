@@ -1,3 +1,4 @@
+import { restoreBooking } from "@/lib/field-history";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deletedKey, listDeletionHistory, parseDeletedRecord } from "@/lib/deletion-history";
@@ -27,12 +28,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid history record." }, { status: 400 });
   try {
     const result = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "SiteContent" WHERE key=${deletedKey(id)} FOR UPDATE`;
       const row = await tx.siteContent.findUnique({ where: { key: deletedKey(id) } });
       const record = row ? parseDeletedRecord(row.value) : null;
       if (!record) return { error: "Deletion record not found.", status: 404 };
       if (record.restoredAt) return { error: "This record was already restored.", status: 409 };
 
-      if (record.kind === "invoice") {
+      if (record.kind === "booking") {
+        if(await tx.booking.findUnique({where:{id:record.entityId}}))return {error:"Booking already exists.",status:409};
+        await restoreBooking(tx,record);
+      } else if(record.kind === "invoice-edit") {
+        const snap=record.snapshot as {before:string;after:string};
+        const restored=await tx.siteContent.updateMany({where:{key:"invoice:"+record.entityId,value:snap.after},data:{value:snap.before}});
+        if(!restored.count)return {error:"Invoice changed since this edit.",status:409};
+      } else if(record.kind === "job-edit") {
+        const snap=record.snapshot as {version:number;data:unknown;state:string;assigneeId:string};
+        const restored=await tx.$executeRaw`UPDATE "DetailJob" SET data=${JSON.stringify(snap.data)}::jsonb,state=${snap.state},"assigneeId"=${snap.assigneeId},version=version+1,"updatedAt"=NOW() WHERE id=${record.entityId} AND version=${snap.version}`;
+        if(!restored)return {error:"Job changed since this edit.",status:409};
+      } else if(record.kind === "photo") {
+        const p=record.snapshot as {id:string;jobId:string;phase:string;area:string;bytes:string;uploadedBy:string;createdAt:string};
+        if(await tx.detailJobPhoto.findUnique({where:{id:p.id}}))return {error:"Photo already exists.",status:409};
+        await tx.detailJob.update({where:{id:p.jobId},data:{version:{increment:1}}});
+        await tx.detailJobPhoto.create({data:{...p,bytes:Buffer.from(p.bytes,"base64")}});
+      } else if (record.kind === "invoice") {
         const key = "invoice:" + record.entityId;
         if (await tx.siteContent.findUnique({ where: { key } }))
           return { error: "An active invoice with this ID already exists.", status: 409 };

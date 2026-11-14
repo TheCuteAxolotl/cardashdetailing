@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 const PREFIX = "deleted-record:v1:";
-export type DeletedKind = "invoice" | "inventory" | "team";
+export type DeletedKind = "invoice" | "inventory" | "team" | "booking" | "invoice-edit" | "job-edit" | "photo";
 export type DeletedRecord = {
   id: string;
   kind: DeletedKind;
@@ -26,7 +26,7 @@ export function deletedKey(id: string) {
 export function parseDeletedRecord(value: string): DeletedRecord | null {
   try {
     const result = JSON.parse(value) as DeletedRecord;
-    if (!result || !["invoice", "inventory", "team"].includes(result.kind)) return null;
+    if (!result || !["invoice", "inventory", "team", "booking","invoice-edit","job-edit","photo"].includes(result.kind)) return null;
     if (!result.id || !result.entityId || !result.deletedById) return null;
     return result;
   } catch { return null; }
@@ -62,10 +62,7 @@ export async function archiveDeletion(
 }
 
 export async function listDeletionHistory() {
-  const rows = await prisma.siteContent.findMany({
-    where: { key: { startsWith: PREFIX } },
-    orderBy: { updatedAt: "desc" },
-  });
+  const rows = await prisma.$queryRaw<{value:string}[]>`SELECT ((value::jsonb - 'snapshot')::text) AS value FROM "SiteContent" WHERE key LIKE ${PREFIX+"%"} ORDER BY "updatedAt" DESC`;
   return rows.map((row) => parseDeletedRecord(row.value))
     .filter((record): record is DeletedRecord => Boolean(record))
     .sort((a, b) => b.deletedAt.localeCompare(a.deletedAt));

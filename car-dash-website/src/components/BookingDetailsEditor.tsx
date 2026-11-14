@@ -6,6 +6,7 @@ import MessagePhotoGallery from "@/components/MessagePhotoGallery";
 import { bookingOwnerNotes, bookingServiceAddress } from "@/lib/booking-owner-details";
 
 export type EditableBooking = {
+  fieldWork?: {state:string;lead:string;team:string};
   id: string;
   serviceName: string;
   customerName: string;
@@ -114,7 +115,7 @@ export default function BookingDetailsEditor({
   }, [onClose, saving]);
 
   async function changeBooking(remove: boolean) {
-    const prompt = remove ? "Permanently delete this booking? This cannot be undone." : "Cancel this booking and release its time slot? Customers who opted into texts may receive a cancellation message.";
+    const prompt = remove ? "Archive this booking? The owner can restore it from history." : "Cancel this booking and release its time slot? Customers who opted into texts may receive a cancellation message.";
     if (saving || !window.confirm(prompt)) return;
     setSaving(true);
     setError("");
@@ -186,7 +187,7 @@ export default function BookingDetailsEditor({
               <button type="button" className="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold"
                 onClick={() => setPhotosReload((v) => v + 1)}>Refresh</button>
             </div>
-            <p className="mt-2 text-xs text-[#aaa49b]">Private pictures uploaded by your assigned detailer, saved to this appointment.</p>
+            <a className="inline-block underline" href={"/owner/jobs?job=" + encodeURIComponent(booking.id)}>Open service record</a><p className="mt-2 text-xs text-[#aaa49b]">Private pictures uploaded by your assigned detailer, saved to this appointment.</p>
             {detailPhotosError ? <p role="alert" className="mt-3 text-xs text-red-200">{detailPhotosError}</p>
               : !detailPhotos ? <p className="mt-3 text-xs text-[#aaa49b]">Loading job records…</p>
               : <>
@@ -258,7 +259,7 @@ export default function BookingDetailsEditor({
           <p className="mb-3 text-xs leading-5 text-[#aaa49b]">Changing the appointment time checks for conflicts. A time change can notify customers who opted into SMS; private note and address edits do not send messages.</p>
           <div className="flex flex-wrap justify-end gap-2">
             <button type="button" disabled={saving} onClick={() => void changeBooking(status === "completed" || status === "cancelled")}
-              className="mr-auto rounded-xl border border-red-400/45 px-4 py-3 text-sm font-semibold text-red-200">{status === "completed" || status === "cancelled" ? "Delete permanently" : "Cancel booking"}</button>
+              className="mr-auto rounded-xl border border-red-400/45 px-4 py-3 text-sm font-semibold text-red-200">{status === "completed" || status === "cancelled" ? "Archive booking" : "Cancel booking"}</button>
             <button type="button" onClick={onClose} disabled={saving} className="rounded-xl border border-white/20 px-5 py-3 text-sm font-medium text-[#d3cec5]">Close</button>
             <button type="submit" disabled={saving} className="rounded-xl bg-[#d6b779] px-6 py-3 text-sm font-bold text-[#101010] disabled:opacity-50">{saving ? "Saving changes…" : "Save booking changes"}</button>
           </div>

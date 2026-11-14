@@ -1,8 +1,10 @@
+import {archiveDeletion} from "@/lib/deletion-history";
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isOwnerAccount } from "@/lib/permissions";
 import {
+  hasJobAccess,
   ensureJobs,
   jobAccount,
   JobError,
@@ -13,7 +15,7 @@ import {
   noStore,
 } from "@/lib/jobs";
 import {
-  canAccessJob,
+
   isEditable,
   type JobRow,
 } from "@/lib/job-workflow";
@@ -30,7 +32,7 @@ export async function GET(req: NextRequest, ctx: Context) {
     >`SELECT * FROM "DetailJob" WHERE "id"=${id}`;
     if (
       !job ||
-      !canAccessJob(isOwnerAccount(account), account.id, job.assigneeId)
+      !await hasJobAccess(prisma, account, job)
     )
       throw new JobError("Job not found.", 404);
     const photoId = req.nextUrl.searchParams.get("photo");
@@ -53,7 +55,7 @@ export async function GET(req: NextRequest, ctx: Context) {
         photos: await photoMetadata(prisma, id),
         state: job.state,
         startedAt: job.data.startedAt || job.data.history.find((entry) => entry.action === "start")?.at || null,
-        finishedAt: job.data.finishedAt || [...job.data.history].reverse().find((entry) => entry.action === "submit")?.at || null,
+        finishedAt: job.data.finishedAt === null ? null : job.data.finishedAt || [...job.data.history].reverse().find((entry) => entry.action === "submit")?.at || null,
       },
       { headers: noStore },
     );
@@ -121,4 +123,22 @@ export async function POST(req: NextRequest, ctx: Context) {
   } catch (e) {
     return jobResponseError(e);
   }
+}
+
+export async function DELETE(req:NextRequest,ctx:Context) {
+  try {
+    const actor=await jobAccount(req,true);
+    if(!isOwnerAccount(actor))throw new JobError("Owner access required.",403);
+    const {id}=await ctx.params;
+    const b=await req.json();
+    await prisma.$transaction(async tx=>{
+      const job=await lockedJob(tx,id,actor,b.version);
+      const photo=await tx.detailJobPhoto.findFirst({where:{id:String(b.photoId),jobId:id}});
+      if(!photo)throw new JobError("Photo unavailable.",404);
+      await archiveDeletion(tx,{kind:"photo",entityId:photo.id,actor,scope:id,summary:"Removed service photo",snapshot:{...photo,bytes:Buffer.from(photo.bytes).toString("base64")}});
+      await tx.detailJobPhoto.delete({where:{id:photo.id}});
+      await saveJob(tx,job,actor.name,"Removed photo",photo.id);
+    });
+    return NextResponse.json({ok:true});
+  }catch(e){return jobResponseError(e);}
 }

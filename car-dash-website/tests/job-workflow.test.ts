@@ -27,55 +27,13 @@ test("assignment access never grants another employee access", () => {
   assert.equal(canAccessJob(false, "employee-a", "employee-a"), true);
   assert.equal(canAccessJob(true, "owner", "employee-b"), true);
 });
-test("before evidence and condition report are mandatory to start", () => {
-  assert.match(
-    transitionError("assigned", "start", false, data(), [])!,
-    /before photo/,
-  );
-  assert.match(
-    transitionError("assigned", "start", false, emptyJobData(), photos())!,
-    /damage/,
-  );
-  assert.equal(
-    transitionError("assigned", "start", false, data(), photos()),
-    null,
-  );
+test("photos, condition notes and checklist are optional throughout work", () => {
+  for (const [state,action] of [["assigned","start"],["in_progress","submit"],["needs_touch_up","submit"]] as const)
+    assert.equal(transitionError(state,action,false,emptyJobData(),[]),null);
+  assert.match(transitionError("assigned","submit",false,data(),[])!,/Start/);
 });
-test("a photo of the wrong area or phase cannot satisfy required pairs", () => {
-  assert.deepEqual(missingEvidence(["Wheels"], photos()), [
-    "before: Wheels",
-    "after: Wheels",
-  ]);
-  assert.match(
-    transitionError(
-      "in_progress",
-      "submit",
-      false,
-      data(),
-      photos().slice(0, 1),
-    )!,
-    /matching/,
-  );
-});
-test("submission requires checklist and started state", () => {
-  assert.match(
-    transitionError("assigned", "submit", false, data(), photos())!,
-    /Start/,
-  );
-  assert.match(
-    transitionError(
-      "in_progress",
-      "submit",
-      false,
-      { ...data(), checks: [] },
-      photos(),
-    )!,
-    /checklist/,
-  );
-  assert.equal(
-    transitionError("in_progress", "submit", false, data(), photos()),
-    null,
-  );
+test("legacy area metadata remains readable",()=>{
+  assert.deepEqual(missingEvidence(["Wheels"],photos()),["before: Wheels","after: Wheels"]);
 });
 test("employees cannot approve, return, or reopen their own work", () => {
   for (const action of ["approve", "return"])
@@ -100,22 +58,4 @@ test("submitted evidence is locked; touch-up is editable", () => {
   assert.equal(isEditable("awaiting_review"), false);
   assert.equal(isEditable("approved"), false);
   assert.equal(isEditable("needs_touch_up"), true);
-});
-test("touch-up resubmission needs a newly uploaded after photo", () => {
-  const d = data();
-  d.history = [
-    {
-      at: "2026-11-02T13:00:00Z",
-      actor: "Owner",
-      action: "return",
-      note: "Clean wheels again",
-    },
-  ];
-  assert.match(
-    transitionError("needs_touch_up", "submit", false, d, photos())!,
-    /new after photo/,
-  );
-  const p = photos();
-  p[1].createdAt = new Date("2026-11-02T14:00:00Z");
-  assert.equal(transitionError("needs_touch_up", "submit", false, d, p), null);
 });

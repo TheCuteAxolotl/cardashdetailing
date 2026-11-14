@@ -24,6 +24,8 @@ export const JOB_CHECKS = [
   "Final condition checked and ready for the customer",
 ] as const;
 export type JobData = {
+  teamId?: string;
+  intervals?: {start:string;end:string|null;startedBy:string;finishedBy?:string}[];
   instructions: string;
   damageNotes: string;
   workNotes: string;
@@ -93,7 +95,7 @@ export function transitionError(
   _photos: PhotoMeta[],
 ): string | null {
   if (action === "start") {
-    if (state !== "assigned") return "Only assigned jobs can be started.";
+    if (state !== "assigned" && state !== "needs_touch_up") return "Only assigned jobs can be started.";
   } else if (action === "submit") {
     if (!["in_progress", "needs_touch_up"].includes(state))
       return "Start the job before marking it complete.";

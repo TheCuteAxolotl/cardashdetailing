@@ -1,3 +1,4 @@
+import { archiveBooking } from "@/lib/field-history";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { bookingPhoneWasReleased } from "@/lib/phone-release";
 import { NextRequest, NextResponse } from "next/server";
@@ -243,7 +244,7 @@ export async function DELETE(
     const auth = await getCurrentAccountFromRequest(request);
 
     // Only the owner can permanently delete bookings.
-    if (!isOwnerAccount(auth)) {
+    if (!auth || !isOwnerAccount(auth)) {
       return NextResponse.json(
         { error: "Owner access required" },
         { status: 403 }
@@ -272,13 +273,12 @@ export async function DELETE(
       );
     }
 
-    await prisma.booking.delete({
-      where: { id: params.id },
-    });
+    const archived=await prisma.$transaction(tx=>archiveBooking(tx,params.id,auth!));
+    if(!archived)return NextResponse.json({error:"Booking changed. Refresh before archiving."},{status:409});
 
     return NextResponse.json({
       success: true,
-      message: "Booking deleted permanently.",
+      message: "Booking moved to owner history.",
     });
   } catch (error) {
     console.error("Error deleting booking:", error);

@@ -1,5 +1,6 @@
 "use client";
 import ShiftClock from "@/components/ShiftClock";
+import JobCollections from "@/components/JobCollections";
 import { useEffect, useState } from "react";
 import {
   JOB_CHECKS,
@@ -42,6 +43,7 @@ type Photo = {
   uploadedBy: string;
 };
 type Payload = {
+  teams: {id:string;name:string}[];
   owner: boolean;
   employeeId: string;
   employees: Employee[];
@@ -52,7 +54,7 @@ type Payload = {
 const names: Record<JobState, string> = {
   assigned: "Assigned",
   in_progress: "In progress",
-  awaiting_review: "Awaiting review",
+  awaiting_review: "Work complete · awaiting review",
   needs_touch_up: "Needs touch-up",
   approved: "Approved",
 };
@@ -132,6 +134,8 @@ export default function JobsPage() {
   const [work, setWork] = useState("");
   const [checks, setChecks] = useState<string[]>([]);
   const [feedback, setFeedback] = useState("");
+  const [teamId,setTeamId] = useState("");
+  const [newTeam,setNewTeam] = useState("");
   const [assignee, setAssignee] = useState("");
   const [instructions, setInstructions] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -156,7 +160,7 @@ export default function JobsPage() {
   useEffect(() => {
     // Open the exact booking/job linked from a Discord alert.
     const linkedJobId = new URLSearchParams(window.location.search).get("job");
-    if (linkedJobId) setSelected(linkedJobId);
+    if (linkedJobId) {setSelected(linkedJobId);setBookingId(linkedJobId);}
     load().catch((e) => setError(e.message));
   }, []);
   useEffect(() => {
@@ -167,6 +171,7 @@ export default function JobsPage() {
     setDamage(job.data.damageNotes);
     setWork(job.data.workNotes);
     setChecks(job.data.checks);
+    setTeamId(job.data.teamId || "");
     setAssignee(job.assigneeId);
     setInstructions(job.data.instructions);
     setFeedback("");
@@ -222,7 +227,7 @@ export default function JobsPage() {
             workNotes: work,
             checks,
             feedback,
-            assigneeId: assignee,
+            assigneeId: assignee, teamId,
             instructions,
           }),
         ),
@@ -244,6 +249,10 @@ export default function JobsPage() {
     setNotice("");
     let uploaded = 0, version = job.version;
     try {
+      if (dirty) {
+        await request("/api/jobs",json("PATCH",{id:job.id,version,action:"save",damageNotes:damage,workNotes:work,checks,feedback,assigneeId:assignee,teamId,instructions}));
+        version += 1;
+      }
       for (const file of files) {
         setUploadProgress("Uploading " + (uploaded + 1) + " of " + files.length + "…");
         const image = await compress(file);
@@ -291,8 +300,8 @@ export default function JobsPage() {
     isEditable(job.state) &&
     ["confirmed", "completed"].includes(booking?.status || "");
   const startTime = job?.data.startedAt || job?.data.history.find((h) => h.action === "start")?.at;
-  const finishTime = job?.data.finishedAt || [...(job?.data.history || [])].reverse().find((h) => h.action === "submit")?.at;
-  const elapsedMinutes = startTime && finishTime
+  const finishTime = job?.data.finishedAt === null ? null : job?.data.finishedAt || [...(job?.data.history || [])].reverse().find((h) => h.action === "submit")?.at;
+  const elapsedMinutes = job?.data.intervals?.length ? Math.round(job.data.intervals.reduce((ms,i)=>ms+(i.end?Date.parse(i.end)-Date.parse(i.start):0),0)/60000) : startTime && finishTime
     ? Math.round((new Date(finishTime).getTime() - new Date(startTime).getTime()) / 60000)
     : null;
   return (
@@ -386,7 +395,7 @@ export default function JobsPage() {
                       "/api/jobs",
                       json("POST", {
                         bookingId,
-                        assigneeId: newAssignee,
+                        assigneeId: newAssignee, teamId: newTeam,
                         instructions: newInstructions,
                       }),
                     );
@@ -431,6 +440,7 @@ export default function JobsPage() {
                     </select>
                   </label>
                 </div>
+<label className="block">Assigned team<select className={field} value={newTeam} onChange={e=>{setNewTeam(e.target.value);}}><option value="">Solo assignment</option>{data?.teams.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
                 <label className="block">
                   Work instructions
                   <textarea
@@ -568,6 +578,7 @@ export default function JobsPage() {
           </section>
           {job && booking ? (
             <div className="space-y-5">
+              <JobCollections key={job.id} id={job.id} version={job.version} userId={data!.employeeId}/>
               <section className={panel}>
                 <div className="flex flex-wrap justify-between gap-3">
                   <div>
@@ -598,7 +609,7 @@ export default function JobsPage() {
                       {booking.preferredTime || "Time missing"}
                     </p>
                     <p className="mt-1 text-xs text-white/65">
-                      Booking: {booking.status} · Employee: {job.assigneeName}
+                      Booking: {booking.status} · Employee: {job.assigneeName} · {data?.teams.find(t=>t.id===job.data.teamId)?.name || "Solo assignment"}
                     </p>
                   </div>
                   <div>
@@ -650,6 +661,7 @@ export default function JobsPage() {
                       Change employee / instructions
                     </summary>
                     <div className="mt-3 space-y-3">
+<label className="block">Assigned team<select className={field} value={teamId} onChange={e=>{setTeamId(e.target.value);setDirty(true);}}><option value="">Solo assignment</option>{data?.teams.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
                       <select
                         aria-label="Reassign employee"
                         className={field}
@@ -757,16 +769,9 @@ export default function JobsPage() {
                     action.
                   </p>
                 )}
-              </section>
-              <section className={panel}>
-                <h3 className="text-lg font-semibold">Job photos</h3>
-                <p className="mt-2 text-xs leading-5 text-white/60">
-                  Photos are optional. Add any pictures, without choosing before/after or specific vehicle areas.
-                  They stay attached to this job and appear in the owner's booking details.
-                </p>
                 {editable && (
                   <label className="mt-4 block text-sm font-semibold">
-                    Select one or multiple photos
+                    Attach photos to this service (optional)
                     <input className={field + " mt-2"} disabled={busy}
                       type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple
                       onChange={(event) => {
@@ -790,7 +795,7 @@ export default function JobsPage() {
                     )} altPrefix="Job photo" thumbnailClassName="h-28 w-28 max-w-full rounded-xl object-cover sm:h-36 sm:w-36" />
                     <div className="mt-4 space-y-1">
                       {photos.map((p, i) => <p key={p.id} className="text-[11px] text-white/55">
-                        Photo {i + 1} · {p.uploadedBy} · {stamp(p.createdAt)}
+                        Photo {i + 1} · {p.uploadedBy} · {stamp(p.createdAt)} {owner && <button disabled={busy} onClick={()=>{if(window.confirm("Move this photo to owner history?"))void perform(()=>request("/api/jobs/"+encodeURIComponent(job.id)+"/photos",json("DELETE",{photoId:p.id,version:job.version})),"Photo archived.");}}>Remove photo</button>}
                       </p>)}
                     </div>
                   </> : <p className="mt-4 text-sm text-white/60">No photos yet. Photos are not required to finish.</p>}
@@ -798,7 +803,7 @@ export default function JobsPage() {
               <section className={panel}>
                 <h3 className="mb-4 font-semibold">Next step</h3>
                 <div className="flex flex-wrap gap-3">
-                  {editable && job.state === "assigned" && (
+                  {editable && ["assigned","needs_touch_up"].includes(job.state) && (
                     <button
                       className={primary}
                       disabled={busy}

@@ -1,3 +1,4 @@
+import { readTeams } from "@/lib/detailer-teams";
 import { ensureBookingReference } from "@/lib/booking-reference";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { discordIpLine } from "@/lib/discord-ip";
@@ -94,6 +95,9 @@ export async function GET(request: NextRequest) {
       select: { key: true, value: true },
     });
     const referenceMap = new Map(references.map(row => [row.key, row.value]));
+    const fieldRows = staff && auth.role === "owner" ? await prisma.$queryRaw<{id:string;state:string;teamId:string|null;lead:string}[]>`SELECT j.id,j.state,j.data->>'teamId' AS "teamId",u.name AS lead FROM "DetailJob" j JOIN "User" u ON u.id=j."assigneeId"` : [];
+    const roster = fieldRows.length ? (await readTeams()).teams : [];
+    const workByBooking = new Map(fieldRows.map(j=>[j.id,{state:j.state,lead:j.lead,team:roster.find(t=>t.id===j.teamId)?.name || ""}]));
     const numbered = [];
     for (const booking of bookings) {
       let bookingNumber = referenceMap.get(`booking-reference:${booking.id}`);
@@ -101,7 +105,7 @@ export async function GET(request: NextRequest) {
         try { bookingNumber = await ensureBookingReference(booking.id); }
         catch (error) { console.error("Could not assign booking reference:", booking.id, error); }
       }
-      numbered.push({ ...booking, bookingNumber });
+      numbered.push({ ...booking, bookingNumber, ...(workByBooking.has(booking.id) ? {fieldWork:workByBooking.get(booking.id)} : {}) });
     }
     return NextResponse.json(staff ? numbered : numbered.map(booking => ({ ...booking, notes: customerVisibleBookingNotes(booking.notes) })), { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {

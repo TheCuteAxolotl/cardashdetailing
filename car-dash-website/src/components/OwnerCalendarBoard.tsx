@@ -163,7 +163,7 @@ export default function OwnerCalendarBoard({
                         style={customColor(bookingColors[item.booking.id])}
                       >
                         <span className="block truncate text-[10px] font-bold leading-4">{compactTime(item.booking.preferredTime)}{item.booking.preferredTime ? " · " : ""}{item.booking.customerName || "Customer"}</span>
-                        <span className="mt-0.5 block truncate text-[10px] leading-4 opacity-85">{item.booking.serviceName || "Detailing"}</span>
+                        <span className="mt-0.5 block truncate text-[10px] leading-4 opacity-85">{item.booking.serviceName || "Detailing"}</span>{item.booking.fieldWork && <span className="block truncate text-[10px]">{item.booking.fieldWork.team || item.booking.fieldWork.lead} · {item.booking.fieldWork.state.replaceAll("_"," ")}</span>}
                       </button>
                     ) : (
                       <button
@@ -225,7 +225,7 @@ export default function OwnerCalendarBoard({
                     </p>
                   : <p className="mt-3 text-xs font-bold text-amber-200">Service address missing</p>}
                 {Number(item.booking.quotedPrice || 0) > 0 ? <p className="mt-2 text-sm font-semibold">{money(Number(item.booking.quotedPrice))}</p> : null}
-                <button type="button" onClick={() => onEditBooking(item.booking)} className="mt-3 w-full rounded-lg border border-current/30 px-3 py-2 text-xs font-bold hover:brightness-125">Edit booking / address</button>
+                <button type="button" onClick={() => onEditBooking(item.booking)} className="mt-3 w-full rounded-lg border border-current/30 px-3 py-2 text-xs font-bold hover:brightness-125">Edit booking / address</button>{item.booking.fieldWork && <a className="mt-2 block text-xs underline" href={"/owner/jobs?job="+encodeURIComponent(item.booking.id)}>Open {item.booking.fieldWork.team || item.booking.fieldWork.lead} service record</a>}
               </div>
             ) : (
               <div key={"day-task-" + item.id} className={"min-w-0 rounded-xl border p-3 sm:p-3.5 " + taskColor(item.task)} style={customColor(item.task.color)}>

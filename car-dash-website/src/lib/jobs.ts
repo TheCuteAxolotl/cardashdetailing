@@ -1,3 +1,4 @@
+import { readTeams } from "@/lib/detailer-teams";
 import { ensureAccessControlSchema } from "@/lib/access-schema";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
@@ -55,6 +56,11 @@ export function jobResponseError(e: unknown) {
     { status: 500 },
   );
 }
+export async function hasJobAccess(db: Prisma.TransactionClient, account: Awaited<ReturnType<typeof jobAccount>>, job: JobRow) {
+  if (canAccessJob(isOwnerAccount(account), account.id, job.assigneeId)) return true;
+  if (!job.data.teamId) return false;
+  return (await readTeams(db)).teams.some(team => team.id === job.data.teamId && team.memberIds.includes(account.id));
+}
 export async function lockedJob(
   tx: Prisma.TransactionClient,
   id: string,
@@ -66,7 +72,7 @@ export async function lockedJob(
   >`SELECT * FROM "DetailJob" WHERE "id"=${id} FOR UPDATE`;
   if (
     !job ||
-    !canAccessJob(isOwnerAccount(account), account.id, job.assigneeId)
+    !await hasJobAccess(tx, account, job)
   )
     throw new JobError("Job not found.", 404);
   if (job.version !== version)

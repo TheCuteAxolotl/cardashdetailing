@@ -22,8 +22,8 @@ export function parseTeams(input: unknown): DetailerTeam[] {
     }));
 }
 
-export async function readTeams() {
-  const row = await prisma.siteContent.findUnique({ where: { key: TEAMS_KEY } });
+export async function readTeams(db: Pick<typeof prisma, "siteContent"> = prisma) {
+  const row = await db.siteContent.findUnique({ where: { key: TEAMS_KEY } });
   let teams: DetailerTeam[] = [];
   if (row) {
     try { teams = parseTeams(JSON.parse(row.value)); } catch { teams = []; }
