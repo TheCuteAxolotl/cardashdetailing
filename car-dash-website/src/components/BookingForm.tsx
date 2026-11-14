@@ -18,6 +18,7 @@ import {
 } from "@/lib/booking-pricing";
 import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
 import type { SiteContent } from "@/lib/site-defaults";
+import SitePhoto from "@/components/SitePhoto";
 import BookingDatePicker from "@/components/BookingDatePicker";
 import BookingServiceCatalog from "@/components/BookingServiceCatalog";
 import { recommendedServiceMinutes, totalBookingMinutes } from "@/lib/booking-duration";
@@ -190,7 +191,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
   const [promotions, setPromotions] = useState<PromotionSettings>(DEFAULT_PROMOTIONS);
   const [bookingPhotos, setBookingPhotos] = useState<string[]>([]);
   const [photoMessage, setPhotoMessage] = useState("");
-  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+  const [step, setStep] = useState<0 | 1 | 2>(0);
   const [category, setCategory] = useState<PricingKind | "other">("packages");
   const [stepMessage, setStepMessage] = useState("");
 
@@ -531,7 +532,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (step !== 3 || status === "submitting" || status === "success") return;
+    if (step !== 2 || status === "submitting" || status === "success") return;
     setStatus("submitting");
     setMessage("");
     if (!form.serviceAddress.trim()) {
@@ -577,7 +578,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
   const databaseServices = services.filter((service) => service.active && service.title.trim().toLowerCase() !== "headlight restoration");
 
-  const stageNames = ["Choose detail", "Pick a time", "Your details", "Review"] as const;
+  const stageNames = ["Choose your detail", "Plan your visit", "Review"] as const;
   const selectedName = packageSelection?.packageName || (quoteLocked ? form.selectedPackage : selectedService?.title || (isStandaloneHeadlight ? "Headlight Restoration" : ""));
   const selectedVehicleSize = packageSelection ? VEHICLE_LABELS[packageSelection.vehicleClass] : form.vehicleType;
   const serviceReady = Boolean(baseTotal != null && baseTotal > 0 && selectedName && !setupMessage && !needsOdorQuote);
@@ -591,12 +592,12 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
     setStepMessage("");
     if (step === 0 && !serviceReady) { setStepMessage("Choose a fixed-price detail or an accepted quote first."); return; }
     if (step === 1 && !scheduleReady) { setStepMessage("Choose an available date and start time."); return; }
-    if (step === 2 && !detailsReady) { setStepMessage("Fill in your name, phone, valid email, service address, and vehicle details."); return; }
-    setStep(current => Math.min(3, current + 1) as 0 | 1 | 2 | 3);
+    if (step === 1 && !detailsReady) { setStepMessage("Fill in your name, phone, valid email, service address, and vehicle details."); return; }
+    setStep(current => Math.min(2, current + 1) as 0 | 1 | 2);
     window.requestAnimationFrame(() => document.getElementById("car-dash-booking-scroll")?.scrollTo({top:0,behavior:"smooth"}));
   };
   const previous = () => {
-    setStep(current => Math.max(0, current - 1) as 0 | 1 | 2 | 3);
+    setStep(current => Math.max(0, current - 1) as 0 | 1 | 2);
     setStepMessage("");
     window.requestAnimationFrame(() => document.getElementById("car-dash-booking-scroll")?.scrollTo({top:0,behavior:"smooth"}));
   };
@@ -630,19 +631,20 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         </section>
       ) : (
         <>
+          <div className="relative isolate overflow-hidden rounded-2xl bg-neutral-900 px-5 py-8"><SitePhoto category="home-360" fallbackCategory="hero" className="absolute inset-0 -z-20 h-full w-full object-cover" /><div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 to-black/25" /><div className="flex items-center gap-3"><img src="/favicon.png" width="44" height="44" alt="Car Dash Detailing" /><h2 className="text-3xl font-bold text-white">Book your detail.</h2></div></div>
           <header className="border-b border-white/10 pb-5">
             <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-[#d6b779]">Car Dash · Online booking</p>
             <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{stageNames[step]}</h2>
-                <p className="mt-1.5 text-xs text-[#aaa399]">Step {step + 1} of 4 · {step === 0 ? "Start by picking your vehicle and service" : step === 1 ? "Choose an available appointment time" : step === 2 ? "Where should we meet you?" : "Check everything before sending"}</p>
+                <p className="mt-1.5 text-xs text-[#aaa399]">Step {step + 1} of 3 · {step === 0 ? "Start by picking your vehicle and service" : step === 1 ? "Choose a time and tell us where to meet you" : "Check everything before sending"}</p>
               </div>
               <div className="rounded-xl border border-[#d6b779]/25 bg-[#d6b779]/10 px-3 py-2">
                 <p className="text-[10px] uppercase tracking-widest text-[#bdb3a0]">Est. total</p>
                 <p className="text-xl font-semibold tabular-nums text-[#ead5a8]">{bookingTotal != null ? "$" + bookingTotal.toFixed(2) : "—"}</p>
               </div>
             </div>
-            <ol className="mt-5 grid grid-cols-4 gap-2" aria-label="Booking progress">
+            <ol className="mt-5 grid grid-cols-3 gap-2" aria-label="Booking progress">
               {stageNames.map((title, index) => (
                 <li key={title} className="min-w-0"><div className={"h-1 rounded-full " + (index <= step ? "bg-[#d6b779]" : "bg-white/10")} />
                   <span className={"mt-2 block truncate text-[10px] font-semibold " + (index === step ? "text-[#f4efe5]" : "text-[#928b80]")}>{title}</span></li>
@@ -762,7 +764,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
 
           </div>}
-          {step === 2 && <div className="space-y-6">
+          {step === 1 && <div className="space-y-6">
       <section className="border-t border-white/8 pt-6">
         <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">3</span><div><h3 className="font-semibold">Your car + contact</h3><p className="text-xs text-white/35">Tell us about your car and where to meet you.</p></div></div>
 
@@ -797,7 +799,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
 
 
           </div>}
-          {step === 3 && <div className="space-y-6">
+          {step === 2 && <div className="space-y-6">
             <section className="rounded-2xl border border-[#d6b779]/25 bg-[#28251f] p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-[#d6b779]">Please review your request</p>
               <h3 className="mt-3 text-xl font-semibold">{selectedName}</h3>
@@ -808,7 +810,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
                 <div><dt className="text-xs text-[#aaa399]">Customer</dt><dd className="mt-1">{form.name}</dd></div>
                 <div><dt className="text-xs text-[#aaa399]">Est. duration</dt><dd className="mt-1">{Math.floor(estimatedDuration / 60)} hr {estimatedDuration % 60 ? estimatedDuration % 60 + " min" : ""}</dd></div>
               </dl>
-              <button type="button" onClick={() => setStep(2)} className="mt-4 text-xs font-semibold text-[#e5c995] underline">Edit your details</button>
+              <button type="button" onClick={() => setStep(1)} className="mt-4 text-xs font-semibold text-[#e5c995] underline">Edit your details</button>
             </section>
       {baseTotal != null && (
         <section className="booking-total-panel border border-white/10 bg-black/20 p-5">
@@ -835,10 +837,10 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           {status === "error" && <p role="alert" className="rounded-xl border border-red-400/30 bg-red-900/20 p-4 text-sm text-red-100">{message}</p>}
           <nav aria-label="Booking step navigation" className="sticky bottom-0 z-20 -mx-4 mt-6 flex items-center gap-3 border-t border-white/15 bg-[#161616]/95 px-4 py-4 shadow-[0_-12px_35px_#101010cc] backdrop-blur-xl sm:-mx-8 sm:px-8">
             {step > 0 && <button type="button" onClick={previous} disabled={status === "submitting"} className="rounded-xl border border-white/20 px-5 py-3.5 text-sm font-semibold">Back</button>}
-            {step < 3 ? (
-              <button type="button" onClick={advance} disabled={status === "submitting" || (step === 0 && !serviceReady) || (step === 1 && !scheduleReady) || (step === 2 && !detailsReady)}
+            {step < 2 ? (
+              <button type="button" onClick={advance} disabled={status === "submitting" || (step === 0 && !serviceReady) || (step === 1 && !scheduleReady) || (step === 1 && !detailsReady)}
                 className="ml-auto flex-1 rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e8cf9e] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-[245px]">
-                {step === 0 ? "Continue to calendar" : step === 1 ? "Continue to details" : "Review request"}
+                {step === 0 ? "Plan your visit" : "Review request"}
               </button>
             ) : (
               <button type="submit" disabled={status === "submitting" || !form.policyAgreed || !serviceReady || !scheduleReady || !detailsReady}
