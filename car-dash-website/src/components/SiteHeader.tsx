@@ -98,13 +98,6 @@ export default function SiteHeader() {
 
   return (
     <>
-      <div className="mobile-top-strip border-b border-white/8 bg-[#171411] text-white">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-2 text-[9px] font-medium uppercase tracking-[.18em] text-white/48 sm:px-8">
-          <span>South Elgin, Illinois · Mobile detailing</span>
-          <a href={`tel:${BUSINESS_PHONE}`} className="mobile-top-phone text-white/70 hover:text-white">{BUSINESS_PHONE_DISPLAY}</a>
-        </div>
-      </div>
-
       <header className="mobile-site-header sticky top-0 z-50 border-b border-black/[.07] bg-[#faf9f7]/92 text-[#111] shadow-[0_10px_30px_rgba(23,20,17,.035)] backdrop-blur-2xl">
         <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-2 px-5 sm:px-8 lg:gap-6">
           <a href="/" aria-label="Car Dash Detailing home" className="group flex shrink-0 items-center gap-3">
@@ -172,6 +165,19 @@ export default function SiteHeader() {
             <button type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="car-dash-mobile-menu" className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm" aria-label={menuOpen ? "Close menu" : "Open menu"}>
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
             </button>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 bg-neutral-950">
+          <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-2 px-3 sm:justify-between sm:px-8">
+            <span className="hidden text-xs tracking-wide text-neutral-400 sm:block">South Elgin, Illinois · Mobile detailing</span>
+            <div role="group" aria-label="Contact Car Dash Detailing" className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold">
+              <a href={`tel:${BUSINESS_PHONE}`} className="inline-flex min-h-11 items-center gap-2 px-2 text-[#e5c995] hover:underline">
+                Call <span className="text-base font-bold">{BUSINESS_PHONE_DISPLAY}</span>
+              </a>
+              <span aria-hidden="true" className="h-5 border-l border-white/25" />
+              <a href={`sms:${BUSINESS_PHONE}`} aria-label={`Text Car Dash at ${BUSINESS_PHONE_DISPLAY}`} className="inline-flex min-h-11 items-center px-3 text-[#e5c995] hover:underline">Text us</a>
+            </div>
           </div>
         </div>
 
