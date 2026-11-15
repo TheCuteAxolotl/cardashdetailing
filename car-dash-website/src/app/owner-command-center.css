@@ -329,3 +329,42 @@
     color: #382a11 !important;
   }
 }
+
+@media screen {
+  .owner-app[data-appearance="midnight"] {
+    --canvas: #080d1b; --surface: #101f38; --edge: #314865; --accent: #82ceff; --secondary: #a4bad6;
+  }
+  .owner-app[data-appearance="evergreen"] {
+    --canvas: #0b1714; --surface: #152b24; --edge: #36574b; --accent: #83ddba; --secondary: #acc7ba;
+  }
+  .owner-app[data-appearance="amethyst"] {
+    --canvas: #151020; --surface: #282035; --edge: #53415f; --accent: #cfafff; --secondary: #c9b8d8;
+  }
+  .editorial-theme .console-shell.owner-app[data-palette] {
+    color-scheme: dark;
+    --theme-ink: #f1f5fb;
+    --theme-muted: var(--secondary);
+    --theme-panel: var(--surface);
+    --theme-canvas: var(--canvas);
+    background: var(--canvas) !important;
+    color: var(--theme-ink) !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-palette] :is(.owner-shell-content, main, .owner-app-home, .console-home) {
+    background: var(--canvas) !important;
+    color: var(--theme-ink) !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-palette] :is(.console-topbar,.console-rail,.console-flyout,.owner-workspace-sidebar,.owner-mobile-bottom-nav,.owner-mobile-drawer,[class*="bg-[#"],[class*="bg-white"],input,select,textarea,thead) {
+    background-color: var(--surface) !important;
+    border-color: var(--edge) !important;
+    color: var(--theme-ink) !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-palette] :is(.owner-nav-link,[class*="text-black"],[class*="text-[#"]) { color: var(--secondary) !important; }
+  .editorial-theme .console-shell.owner-app[data-palette] .cd-workboard {
+    --bg: var(--canvas); --panel: var(--surface); --line: var(--edge); --ink: var(--theme-ink); --muted: var(--secondary); --gold: var(--accent);
+  }
+  .editorial-theme .console-shell.owner-app[data-palette] :is(.owner-nav-link-active,[aria-current="page"],.cd-workboard .on,[class~="bg-[#d6b779]"]) {
+    background: var(--accent) !important; color: var(--canvas) !important;
+  }
+  .editorial-theme .console-shell.owner-app[data-palette] :is(.owner-nav-link-active,[aria-current="page"],.cd-workboard .on) :is(span,svg,small) { color: var(--canvas) !important; }
+  .owner-app[data-palette] input[type="radio"] { accent-color: var(--accent); }
+}

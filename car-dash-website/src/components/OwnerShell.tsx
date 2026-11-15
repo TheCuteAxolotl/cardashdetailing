@@ -1,7 +1,7 @@
 "use client";
 
 import WorkboardHome from "./WorkboardHome";
-import { appearanceFor, employeePreview, savePreference, type Appearance } from "@/lib/workspace-preferences";
+import { appearances, appearanceFor, employeePreview, savePreference, type Appearance } from "@/lib/workspace-preferences";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -322,7 +322,7 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   const showDailyBoard = (isOwnerHome || isStaffHome) && !fullWorkspace && (owner || permissions.includes("bookings"));
 
   return (
-    <div data-appearance={appearance} className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
+    <div data-appearance={appearance} data-palette={appearances.slice(2).some(theme => theme.id === appearance) || undefined} className="console-shell owner-app min-h-screen bg-[#111110] text-[#f4efe5]">
       <aside aria-label={owner ? "Owner workspace sidebar" : "Staff workspace sidebar"} className="owner-workspace-sidebar fixed inset-y-0 left-0 z-50 hidden w-[248px] flex-col border-r border-white/10 bg-[#1b1b1a] text-[#f4eee5] xl:flex">
         <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
           <img src="/favicon.png" alt="Car Dash" className="h-10 w-10 rounded-xl border border-[#d6b779]/25 bg-[#25241f] p-1.5 object-contain" />
@@ -465,10 +465,11 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
           {(pathname === "/owner/settings" || pathname === "/admin/settings") && <section aria-label="Workspace preferences" className="mx-auto max-w-2xl space-y-5 px-6 py-6">
             <h2 className="text-xl font-semibold">Workspace preferences</h2>
             <fieldset><legend className="mb-2 font-semibold">Appearance</legend>
-              {(["light", "dark"] as const).map(mode => <label key={mode} className="mr-5 inline-flex min-h-11 items-center gap-2">
-                <input type="radio" name="appearance" checked={appearance === mode} onChange={() => choose("appearance", mode)} />
-                {mode === "light" ? "Light mode" : "Dark mode"}
-              </label>)}
+              <div className="grid gap-2 sm:grid-cols-2">{appearances.map(({ id, label, colors }) => <label key={id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3">
+                <input type="radio" name="appearance" checked={appearance === id} onChange={() => choose("appearance", id)} />
+                {label}
+                <span aria-hidden="true" className="ml-auto flex gap-1">{colors.map(color => <i key={color} className="h-3 w-3 rounded-full border border-gray-500" style={{ backgroundColor: color }} />)}</span>
+              </label>)}</div>
             </fieldset>
             {user.role === "owner" && <fieldset><legend className="mb-2 font-semibold">Workspace view</legend>
               {(["owner", "employee"] as const).map(view => <label key={view} className="mr-5 inline-flex min-h-11 items-center gap-2">
