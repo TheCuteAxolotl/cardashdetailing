@@ -1,3 +1,4 @@
+import AboutStory from "@/components/AboutStory";
 import PublicHero from "@/components/PublicHero";
 import SitePhoto from "@/components/SitePhoto";
 import PageMediaBand from "@/components/PageMediaBand";
@@ -5,35 +6,6 @@ import { getSiteContent } from "@/lib/site-content";
 
 export default async function AboutPage() {
   const content = await getSiteContent();
-  // Keep the owner-written biography intact, but don't force visitors to scroll
-  // through a single tall text column beside a disconnected photo.
-  const storyText = String(content.aboutStoryBody || "").trim();
-  const storyIsLong = storyText.length > 400;
-  const previewCut = storyText.lastIndexOf(" ", 360);
-  const storyPreview = storyIsLong && previewCut > 0
-    ? storyText.slice(0, previewCut).trim() + "…"
-    : storyText;
-  const explicitParagraphs = storyText.split(/\n\s*\n/).map((item) => item.trim()).filter(Boolean);
-  // Text entered as one enormous paragraph gets comfortable readable paragraphs,
-  // without changing or dropping any words from the full story.
-  const storyParagraphs = explicitParagraphs.flatMap((paragraph) => {
-    if (paragraph.length <= 540) return [paragraph];
-    const sentences = paragraph.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g) || [paragraph];
-    const result: string[] = [];
-    let segment = "";
-    for (const sentence of sentences) {
-      const next = sentence.trim();
-      if (segment.length > 360 && segment.length + next.length > 540) {
-        result.push(segment.trim());
-        segment = next;
-      } else {
-        segment = segment ? segment + " " + next : next;
-      }
-    }
-    if (segment.trim()) result.push(segment.trim());
-    return result;
-  });
-
   const values = [
     [content.aboutValue1Title, content.aboutValue1Body],
     [content.aboutValue2Title, content.aboutValue2Body],
@@ -79,39 +51,10 @@ export default async function AboutPage() {
                 {content.aboutStoryTitle}
               </h2>
               <div className="mt-6 h-px w-14 bg-[#d6b779]" />
-              <p className="mt-6 max-w-[60ch] text-base leading-8 text-[#d3cec5] sm:text-[17px]">
-                {storyPreview}
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a href="/gallery" className="inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-[#f4efe5] hover:border-[#d6b779]">See the work</a>
-              </div>
+              <AboutStory story={String(content.aboutStoryBody || "").trim()} />
             </div>
           </div>
 
-          {storyIsLong && (
-            <details id="full-story" className="group mt-10 scroll-mt-28 overflow-hidden rounded-[20px] border border-white/15 bg-[#1c1c1c] sm:mt-12">
-              <summary className="flex min-h-[72px] cursor-pointer list-none items-center justify-between gap-5 px-5 py-5 text-base font-semibold text-[#f4efe5] marker:content-none sm:px-8">
-                <span className="flex flex-col gap-1">
-                  <span className="text-xs font-medium uppercase tracking-[.18em] text-[#d6b779]">My journey</span>
-                  <span>Read the complete story</span>
-                </span>
-                <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 text-xl text-[#d6b779] transition-transform duration-200 group-open:rotate-45">+</span>
-              </summary>
-              <div className="border-t border-white/10 px-5 pb-8 pt-7 sm:px-8 sm:pb-10">
-                <div className="max-w-[72ch] space-y-5">
-                  {storyParagraphs.map((paragraph, index) => (
-                    <p key={index} className="text-[15px] leading-8 text-[#d6d1c8] sm:text-base">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-                <div className="mt-8 flex flex-wrap gap-3 border-t border-white/10 pt-6">
-                  <a href="/gallery" className="rounded-full border border-white/20 px-5 py-3 text-sm font-medium text-[#f4efe5]">See the work</a>
-                  <a href="/reviews" className="rounded-full border border-white/20 px-5 py-3 text-sm font-medium text-[#f4efe5]">Read reviews</a>
-                </div>
-              </div>
-            </details>
-          )}
         </div>
       </section>
 
