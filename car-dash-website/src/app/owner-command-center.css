@@ -337,6 +337,9 @@
   .owner-app[data-appearance="evergreen"] {
     --canvas: #0b1714; --surface: #152b24; --edge: #36574b; --accent: #83ddba; --secondary: #acc7ba;
   }
+  .owner-app[data-appearance="rose"] {
+    --canvas: #20131b; --surface: #35222e; --edge: #694357; --accent: #f5afca; --secondary: #d6bac8;
+  }
   .owner-app[data-appearance="amethyst"] {
     --canvas: #151020; --surface: #282035; --edge: #53415f; --accent: #cfafff; --secondary: #c9b8d8;
   }

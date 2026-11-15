@@ -6,6 +6,7 @@ export const appearances = [
   { id: "midnight", label: "Midnight Blue", colors: ["#080d1b", "#101f38", "#82ceff"] },
   { id: "evergreen", label: "Evergreen", colors: ["#0b1714", "#152b24", "#83ddba"] },
   { id: "amethyst", label: "Amethyst", colors: ["#151020", "#282035", "#cfafff"] },
+  { id: "rose", label: "Dusty Rose", colors: ["#20131b", "#35222e", "#f5afca"] },
 ] as const;
 export type Appearance = typeof appearances[number]["id"];
 export type WorkspaceAccount = { id: string; role?: string | null };
