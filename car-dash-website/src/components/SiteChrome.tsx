@@ -92,9 +92,8 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
       
       {showMobileActions && (
         <div className="mobile-booking-bar fixed z-[65] sm:hidden">
-          <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-[1.4fr_1fr] gap-2">
-            <a href="/#book" className="mobile-book-primary rounded-full px-4 py-3 text-center text-sm font-semibold">Book now</a>
-            <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Get a Quote</a>
+          <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-1">
+            <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Request a Quote</a>
           </div>
         </div>
       )}

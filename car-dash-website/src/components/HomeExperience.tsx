@@ -69,7 +69,7 @@ export default function HomeExperience({
               <p className="mt-5 max-w-[650px] border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 tracking-[-.01em] text-white/90 sm:text-base">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>
               <div className="home-hero-actions mt-8 flex flex-wrap gap-3">
                 <a href="#choose-detail" className="rounded-full bg-[#d6b779] px-6 py-3.5 text-sm font-bold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ead09b]">Choose a detail</a>
-                <a href="/quote" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">Get a Quote</a>
+                <a href="/quote" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">Request a Quote</a>
                 <a href="#prices" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">View pricing</a>
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function HomeExperience({
       <section className={styles.services} aria-labelledby="craft-heading">
         <div className={styles.sectionHeading} data-reveal>
           <div><p className={styles.eyebrow}>The Car Dash approach</p><h2 id="craft-heading">Every surface.<br /><span>Every detail.</span></h2></div>
-          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Get a Quote</a></div>
+          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Request a Quote</a></div>
         </div>
         <div className={styles.serviceGrid}>
           {[
@@ -275,7 +275,7 @@ export default function HomeExperience({
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
               <a href="/#book" className="inline-flex items-center justify-center rounded-full bg-[#d6b779] px-7 py-4 text-sm font-bold text-[#161616] transition hover:bg-[#e5c995]">Book an appointment</a>
-              <a href="/quote" className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-4 text-sm font-semibold text-[#f4efe5] transition hover:border-[#d6b779]/60">Get a quote</a>
+              <a href="/quote" className="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-4 text-sm font-semibold text-[#f4efe5] transition hover:border-[#d6b779]/60">Request a Quote</a>
             </div>
           </div>
           <div className="mx-auto w-full max-w-[480px] overflow-hidden rounded-[28px] border border-[#d6b779]/25 bg-[#232322] p-4 shadow-[0_36px_90px_rgba(0,0,0,.35)] sm:p-6">

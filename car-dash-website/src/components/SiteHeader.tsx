@@ -171,13 +171,9 @@ export default function SiteHeader() {
         <div className="border-t border-white/10 bg-neutral-950">
           <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-2 px-3 sm:justify-between sm:px-8">
             <span className="hidden text-xs tracking-wide text-neutral-400 sm:block">South Elgin, Illinois · Mobile detailing</span>
-            <div role="group" aria-label="Contact Car Dash Detailing" className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold">
-              <a href={`tel:${BUSINESS_PHONE}`} className="inline-flex min-h-11 items-center gap-2 px-2 text-[#e5c995] hover:underline">
-                Call <span className="text-base font-bold">{BUSINESS_PHONE_DISPLAY}</span>
-              </a>
-              <span aria-hidden="true" className="h-5 border-l border-white/25" />
-              <a href={`sms:${BUSINESS_PHONE}`} aria-label={`Text Car Dash at ${BUSINESS_PHONE_DISPLAY}`} className="inline-flex min-h-11 items-center px-3 text-[#e5c995] hover:underline">Text us</a>
-            </div>
+            <a href={`tel:${BUSINESS_PHONE}`} aria-label={`Call Car Dash at ${BUSINESS_PHONE_DISPLAY}`} className="inline-flex min-h-11 items-center px-3 text-base font-bold text-[#e5c995] hover:underline">
+              {BUSINESS_PHONE_DISPLAY}
+            </a>
           </div>
         </div>
 
@@ -191,7 +187,7 @@ export default function SiteHeader() {
                     ["/?pricingPage=packages#book", "Full detail"],
                     ["/?pricingPage=interior#book", "Interior only"],
                     ["/?pricingPage=exterior#book", "Exterior only"],
-                    ["/quote", "Get a quote"],
+                    ["/quote", "Request a Quote"],
                   ].map(([href, label]) => (
                     <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-[#171411] hover:border-[#a9874f]">{label}</a>
                   ))}

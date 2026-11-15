@@ -312,7 +312,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
       const service = services.find((item) => item.id === id);
       setForm((current) => ({ ...current, serviceId: id, quoteThreadId: "", selectedPackage: service?.title || "", addOns: [] }));
       if (service && (service.pricingType !== "fixed" || service.price <= 0)) {
-        setSetupMessage(`${service.title} needs an exact quote before booking. Use Get a Quote and then book after accepting the final price.`);
+        setSetupMessage(`${service.title} needs an exact quote before booking. Use Request a Quote and then book after accepting the final price.`);
       }
     }
   };
@@ -437,7 +437,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         if (!match) return;
         if (!cancelled) {
           setForm((current) => ({ ...current, serviceId: match.id, selectedPackage: match.title, addOns: [] }));
-          if (match.pricingType !== "fixed" || match.price <= 0) setSetupMessage(`${match.title} needs an exact quote before booking. Use Get a Quote, then book after accepting the final price.`);
+          if (match.pricingType !== "fixed" || match.price <= 0) setSetupMessage(`${match.title} needs an exact quote before booking. Use Request a Quote, then book after accepting the final price.`);
         }
       }
     })();
@@ -651,7 +651,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
               ))}
             </ol>
           </header>
-          {setupMessage && <div role="alert" className="rounded-xl border border-amber-300/30 bg-amber-900/20 p-4 text-sm text-amber-100">{setupMessage} <a href="/quote" className="font-semibold text-[#e5c995] underline">Get a quote</a></div>}
+          {setupMessage && <div role="alert" className="rounded-xl border border-amber-300/30 bg-amber-900/20 p-4 text-sm text-amber-100">{setupMessage} <a href="/quote" className="font-semibold text-[#e5c995] underline">Request a Quote</a></div>}
           {step === 0 && <div className="space-y-6">
             {!quoteLocked && (
               <section className="rounded-2xl border border-white/10 bg-white/[.035] p-4 sm:p-5">
