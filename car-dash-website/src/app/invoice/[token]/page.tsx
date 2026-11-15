@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 type LineItem = { id: string; description: string; quantity: number; rate: number };
-type Payment = { id: string; amount: number; method: string; reference?: string; paidAt: string };
+type Payment = { tipAmount?: number; id: string; amount: number; method: string; reference?: string; paidAt: string };
 type Invoice = {
   invoiceNumber: string;
   customerName: string;
@@ -45,6 +45,9 @@ function prettyDate(value: string) {
 export default function PublicInvoicePage({ params }: { params: Promise<{ token: string }> }) {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tip, setTip] = useState("");
+  const tipCents = Math.round(Number(tip) * 100);
+  const validTip = /^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})?$/.test(tip) && tipCents <= 99999999;
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [paymentMessage, setPaymentMessage] = useState("");
@@ -103,6 +106,7 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
       const { token } = await params;
       const response = await fetch(`/api/invoices/public/${encodeURIComponent(token)}/checkout`, {
         method: "POST",
+        body: JSON.stringify({ tipCents }),
         headers: { "Content-Type": "application/json" },
       });
       const data = await response.json().catch(() => ({}));
@@ -173,13 +177,18 @@ export default function PublicInvoicePage({ params }: { params: Promise<{ token:
             </div>
 
             {!paid && <section className="mt-9 rounded-2xl border border-[#6EAEC6]/18 bg-[#6EAEC6]/[0.055] p-5 sm:p-6 print:border-black/15 print:bg-transparent"><p className="text-xs font-semibold uppercase tracking-[.18em] text-[#8EC5D8] print:text-black/50">Payment options</p><div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {invoice.paymentOptions.online && <button onClick={startOnlinePayment} disabled={paying} className="flex min-h-28 flex-col justify-between rounded-2xl border border-[#6EAEC6]/35 bg-[#6EAEC6]/12 p-4 text-left transition hover:bg-[#6EAEC6]/18 disabled:cursor-wait disabled:opacity-55 print:hidden"><div><p className="font-semibold text-white">Pay online</p><p className="mt-1 text-sm leading-6 text-white/50">Secure Stripe checkout with card or U.S. bank account.</p></div><span className="mt-4 text-sm font-bold text-[#A9D6E5]">{paying ? "Opening secure checkout…" : `${invoice.paymentOptions.onlineLabel || "Pay online"} · ${currency.format(invoice.totals.balance)}`}</span></button>}
+              {invoice.paymentOptions.online && !invoice.paymentOptions.onlinePaymentUrl && <label className="grid gap-2 sm:col-span-2 print:hidden">
+                <span className="font-semibold">Tip for your detailer (optional)</span>
+                <input type="text" inputMode="decimal" placeholder="$0.00" value={tip} onChange={(event) => setTip(event.target.value)} disabled={paying} className="max-w-48 rounded-xl border border-white/20 bg-black/20 px-4 py-3" />
+                {!validTip && <span role="alert">Enter a dollar amount with up to two decimal places.</span>}
+              </label>}
+              {invoice.paymentOptions.online && <button onClick={startOnlinePayment} disabled={paying || !validTip} className="flex min-h-28 flex-col justify-between rounded-2xl border border-[#6EAEC6]/35 bg-[#6EAEC6]/12 p-4 text-left transition hover:bg-[#6EAEC6]/18 disabled:cursor-wait disabled:opacity-55 print:hidden"><div><p className="font-semibold text-white">Pay online</p><p className="mt-1 text-sm leading-6 text-white/50">Secure Stripe checkout with card or U.S. bank account.</p></div><span className="mt-4 text-sm font-bold text-[#A9D6E5]">{paying ? "Opening secure checkout…" : `${invoice.paymentOptions.onlineLabel || "Pay online"} · ${currency.format(invoice.totals.balance + (validTip ? tipCents / 100 : 0))}`}</span></button>}
               {invoice.paymentOptions.check && <PaymentCard title="Check"><p>Make check payable to <strong className="text-white print:text-black">{invoice.paymentOptions.checkPayableTo || "Car Dash Detailing"}</strong>.</p></PaymentCard>}
               {invoice.paymentOptions.cash && <PaymentCard title="Cash"><p>Cash payment accepted directly by Car Dash Detailing.</p></PaymentCard>}
               {invoice.paymentOptions.other && invoice.paymentOptions.otherInstructions && <PaymentCard title="Other"><p className="whitespace-pre-wrap">{invoice.paymentOptions.otherInstructions}</p></PaymentCard>}
             </div></section>}
 
-            {invoice.payments.length > 0 && <section className="mt-8"><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/35 print:text-black/45">Payments recorded</p><div className="mt-3 space-y-2">{invoice.payments.map((payment) => <div key={payment.id} className="flex items-center justify-between rounded-xl border border-white/7 px-4 py-3 text-sm print:border-black/10"><div><p className="font-medium">{payment.method}</p><p className="mt-1 text-xs text-white/35 print:text-black/45">{new Date(payment.paidAt).toLocaleDateString("en-US")}{payment.reference ? ` · Ref ${payment.reference}` : ""}</p></div><span className="font-semibold">{currency.format(payment.amount)}</span></div>)}</div></section>}
+            {invoice.payments.length > 0 && <section className="mt-8"><p className="text-xs font-semibold uppercase tracking-[.18em] text-white/35 print:text-black/45">Payments recorded</p><div className="mt-3 space-y-2">{invoice.payments.map((payment) => <div key={payment.id} className="flex items-center justify-between rounded-xl border border-white/7 px-4 py-3 text-sm print:border-black/10"><div><p className="font-medium">{payment.method}</p><p className="mt-1 text-xs text-white/35 print:text-black/45">{new Date(payment.paidAt).toLocaleDateString("en-US")}{payment.reference ? ` · Ref ${payment.reference}` : ""}</p></div><span className="font-semibold">{currency.format(payment.amount)}{payment.tipAmount ? ` + ${currency.format(payment.tipAmount)} tip` : ""}</span></div>)}</div></section>}
 
             {(invoice.notes || invoice.terms) && <div className="mt-9 grid gap-5 border-t border-white/8 pt-7 sm:grid-cols-2 print:border-black/10">{invoice.notes && <InfoBlock title="Notes"><p className="whitespace-pre-wrap">{invoice.notes}</p></InfoBlock>}{invoice.terms && <InfoBlock title="Terms"><p className="whitespace-pre-wrap">{invoice.terms}</p></InfoBlock>}</div>}
 

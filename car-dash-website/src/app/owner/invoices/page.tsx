@@ -5,7 +5,7 @@ import NumberInput from "@/components/NumberInput";
 import { useEffect, useMemo, useState } from "react";
 
 type LineItem = { id: string; description: string; quantity: number; rate: number };
-type Payment = { id: string; amount: number; method: string; reference?: string; note?: string; paidAt: string };
+type Payment = { tipAmount?: number; id: string; amount: number; method: string; reference?: string; note?: string; paidAt: string };
 type PaymentOptions = {
   check: boolean;
   cash: boolean;
@@ -403,7 +403,7 @@ export default function OwnerInvoicesPage() {
                   <input value={paymentDraft.reference} onChange={(e) => setPaymentDraft({ ...paymentDraft, reference: e.target.value })} className="input" placeholder="Check # / reference (optional)" />
                   <button disabled={saving} onClick={recordPayment} className="rounded-xl border border-[#6EAEC6]/30 px-4 py-2 text-sm font-semibold text-[#B9E0EC]">Record</button>
                 </div>
-                {form.payments.length > 0 && <div className="mt-4 space-y-2">{form.payments.map((payment) => <div key={payment.id} className="flex items-center justify-between rounded-xl bg-black/10 px-3 py-2 text-sm"><span className="text-white/65">{payment.method}{payment.reference ? ` · ${payment.reference}` : ""}</span><span className="font-semibold">{currency.format(payment.amount)}</span></div>)}</div>}
+                {form.payments.length > 0 && <div className="mt-4 space-y-2">{form.payments.map((payment) => <div key={payment.id} className="flex items-center justify-between rounded-xl bg-black/10 px-3 py-2 text-sm"><span className="text-white/65">{payment.method}{payment.reference ? ` · ${payment.reference}` : ""}</span><span className="font-semibold">{currency.format(payment.amount)}{payment.tipAmount ? ` + ${currency.format(payment.tipAmount)} tip` : ""}</span></div>)}</div>}
               </div>
             )}
           </section>

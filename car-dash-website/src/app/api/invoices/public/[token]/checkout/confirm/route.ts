@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getInvoiceByShareToken, saveInvoice } from "@/lib/invoices";
-import { retrieveInvoiceCheckoutSession, stripeInvoiceRuntimeInfo } from "@/lib/stripe-invoice";
+import { invoicePaymentAmounts, retrieveInvoiceCheckoutSession, stripeInvoiceRuntimeInfo } from "@/lib/stripe-invoice";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,14 +29,14 @@ export async function POST(request: Request, context: { params: Promise<{ token:
     if (session.payment_status === "paid") {
       const alreadyRecorded = invoice.payments.some((payment) => payment.reference === session.id);
       if (!alreadyRecorded) {
-        const amount = Math.max(0, Number(session.amount_total || 0) / 100);
+        const { amount, tipAmount } = invoicePaymentAmounts(session);
         await saveInvoice({
           ...invoice,
           payments: [
             ...invoice.payments,
             {
               id: `stripe-${session.id}`,
-              amount,
+              amount, tipAmount,
               method: "Stripe Online",
               reference: session.id,
               note: session.payment_intent ? `PaymentIntent ${session.payment_intent}` : undefined,

@@ -3,7 +3,7 @@ import { notifyMerchDiscord } from "@/lib/shop-notifications";
 import { fulfillGiftCheckout } from "@/lib/gift-card-checkout";
 import { NextResponse } from "next/server";
 import { getInvoice, saveInvoice } from "@/lib/invoices";
-import { verifyStripeWebhook } from "@/lib/stripe-invoice";
+import { invoicePaymentAmounts, verifyStripeWebhook } from "@/lib/stripe-invoice";
 import {
   getMaintenanceSubscriptionById,
   getMaintenanceSubscriptionByStripeId,
@@ -30,7 +30,7 @@ async function recordCheckoutPayment(session: {
   if (!invoice || invoice.status === "void") return;
   if (invoice.payments.some((payment) => payment.reference === session.id)) return;
 
-  const amount = Math.max(0, Number(session.amount_total || 0) / 100);
+  const { amount, tipAmount } = invoicePaymentAmounts(session);
   if (amount <= 0) return;
 
   await saveInvoice({
@@ -39,7 +39,7 @@ async function recordCheckoutPayment(session: {
       ...invoice.payments,
       {
         id: `stripe-${session.id}`,
-        amount,
+        amount, tipAmount,
         method: "Stripe Online",
         reference: session.id,
         note: session.payment_intent ? `PaymentIntent ${session.payment_intent}` : undefined,

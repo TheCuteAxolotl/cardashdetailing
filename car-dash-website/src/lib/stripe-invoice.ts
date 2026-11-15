@@ -75,7 +75,7 @@ function safeCheckoutDescription(invoice: InvoiceRecord) {
   return text || `${invoice.assetType || "Detailing"} service`;
 }
 
-function buildCheckoutForm(invoice: InvoiceRecord, amountCents: number, includeAch: boolean) {
+function buildCheckoutForm(invoice: InvoiceRecord, amountCents: number, includeAch: boolean, tipCents: number) {
   const site = publicSiteUrl();
   const form = new URLSearchParams();
   form.set("mode", "payment");
@@ -94,6 +94,13 @@ function buildCheckoutForm(invoice: InvoiceRecord, amountCents: number, includeA
   form.set("line_items[0][price_data][product_data][description]", safeCheckoutDescription(invoice));
   form.set("line_items[0][price_data][unit_amount]", String(amountCents));
   form.set("line_items[0][quantity]", "1");
+  if (tipCents > 0) {
+    form.set("metadata[tip_cents]", String(tipCents));
+    form.set("line_items[1][price_data][currency]", "usd");
+    form.set("line_items[1][price_data][product_data][name]", "Tip for your detailer");
+    form.set("line_items[1][price_data][unit_amount]", String(tipCents));
+    form.set("line_items[1][quantity]", "1");
+  }
   if (invoice.customerEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(invoice.customerEmail)) {
     form.set("customer_email", invoice.customerEmail);
   }
@@ -108,7 +115,7 @@ async function postCheckout(form: URLSearchParams) {
   })) as StripeCheckoutSession;
 }
 
-export async function createInvoiceCheckoutSession(invoice: InvoiceRecord) {
+export async function createInvoiceCheckoutSession(invoice: InvoiceRecord, tipCents = 0) {
   const totals = calculateInvoiceTotals(invoice);
   const amountCents = Math.round(totals.balance * 100);
 
@@ -117,16 +124,23 @@ export async function createInvoiceCheckoutSession(invoice: InvoiceRecord) {
 
   let session: StripeCheckoutSession;
   try {
-    session = await postCheckout(buildCheckoutForm(invoice, amountCents, true));
+    session = await postCheckout(buildCheckoutForm(invoice, amountCents, true, tipCents));
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
     if (!/us_bank_account|payment method type|activated/i.test(message)) throw error;
     console.warn("ACH is unavailable for Stripe Checkout; retrying with card only.");
-    session = await postCheckout(buildCheckoutForm(invoice, amountCents, false));
+    session = await postCheckout(buildCheckoutForm(invoice, amountCents, false, tipCents));
   }
 
   if (!session.id || !session.url) throw new Error("Stripe did not return a checkout URL.");
   return session;
+}
+
+export function invoicePaymentAmounts(session: Pick<StripeCheckoutSession, "amount_total" | "metadata">) {
+  const total = session.amount_total ?? 0;
+  const tip = Number(session.metadata?.tip_cents ?? 0);
+  if (!Number.isSafeInteger(tip) || tip < 0 || tip > total) throw new Error("Invalid checkout tip.");
+  return { amount: (total - tip) / 100, tipAmount: tip / 100 };
 }
 
 export async function retrieveInvoiceCheckoutSession(sessionId: string) {

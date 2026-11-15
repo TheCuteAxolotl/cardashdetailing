@@ -5,7 +5,7 @@ import { createInvoiceCheckoutSession, stripeInvoiceRuntimeInfo } from "@/lib/st
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(_request: Request, context: { params: Promise<{ token: string }> }) {
+export async function POST(request: Request, context: { params: Promise<{ token: string }> }) {
   try {
     if (!stripeInvoiceRuntimeInfo.checkoutConfigured) {
       return NextResponse.json({ error: "Online payments are not configured yet." }, { status: 503 });
@@ -17,7 +17,17 @@ export async function POST(_request: Request, context: { params: Promise<{ token
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const session = await createInvoiceCheckoutSession(invoice);
+    const raw = await request.text();
+    let tipCents = 0;
+    try {
+      if (raw) tipCents = JSON.parse(raw).tipCents ?? 0;
+    } catch {
+      return NextResponse.json({ error: "Invalid payment details." }, { status: 400 });
+    }
+    if (!Number.isSafeInteger(tipCents) || tipCents < 0 || tipCents > 99999999) {
+      return NextResponse.json({ error: "Enter a valid tip amount." }, { status: 400 });
+    }
+    const session = await createInvoiceCheckoutSession(invoice, tipCents);
     return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (error) {
     console.error("Invoice checkout error:", error);

@@ -21,6 +21,7 @@ export type InvoiceInternalBreakdownItem = {
 };
 
 export type InvoicePayment = {
+  tipAmount?: number;
   id: string;
   amount: number;
   method: string;
@@ -140,6 +141,7 @@ function cleanPayments(value: unknown): InvoicePayment[] {
   return value.slice(0, 100).map((payment, index) => ({
     id: cleanString(payment?.id, 80) || `payment-${index + 1}`,
     amount: Math.max(0, money(payment?.amount)),
+    tipAmount: Math.max(0, money(payment?.tipAmount || 0)),
     method: cleanString(payment?.method, 80) || "Other",
     reference: cleanString(payment?.reference, 120) || undefined,
     note: cleanString(payment?.note, 220) || undefined,
