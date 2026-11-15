@@ -74,11 +74,6 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
     );
   }
 
-  const showMobileActions =
-    pathname !== "/quote" &&
-    pathname !== "/contact" &&
-    !pathname.startsWith("/maintenance/manage/");
-
   return (
     <>
       <BrandIntro />
@@ -89,14 +84,6 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
       <SiteFooter blurb={footerBlurb} />
       <SupportWidget />
       <PublicBookingModal initialSiteContent={initialSiteContent} />
-      
-      {showMobileActions && (
-        <div className="mobile-booking-bar fixed z-[65] sm:hidden">
-          <div className="mobile-booking-inner mx-auto grid max-w-lg grid-cols-1">
-            <a href="/quote" className="mobile-book-secondary rounded-full px-4 py-3 text-center text-sm font-semibold">Request a Quote</a>
-          </div>
-        </div>
-      )}
     </>
   );
 }

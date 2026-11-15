@@ -102,7 +102,7 @@ export default function SiteHeader() {
         <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-2 px-5 sm:px-8 lg:gap-6">
           <a href="/" aria-label="Car Dash Detailing home" className="group flex shrink-0 items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full border border-black/[.08] bg-white shadow-[0_6px_18px_rgba(23,20,17,.06)] transition-transform duration-300 group-hover:scale-[1.03]"><img src={HOME_LOGO} alt="" width={40} height={40} className="h-9 w-9 rounded-full object-contain" /></span>
-            <div className="leading-none">
+            <div className="hidden min-[445px]:block leading-none">
               <span className="block text-[14px] font-bold tracking-[.1em]">CAR DASH</span>
               <span className="mt-1.5 block text-[8px] font-semibold uppercase tracking-[.22em] text-black/38">Mobile detailing</span>
             </div>
@@ -157,10 +157,12 @@ export default function SiteHeader() {
             <a href={user ? "/dashboard" : "/login"} className="text-xs font-medium text-black/55 hover:text-black">My bookings</a>
             {staff && <a href="/admin/dashboard" className="text-xs font-medium text-black/55 hover:text-black">Staff</a>}
             {owner && <a href="/owner/dashboard" className="text-xs font-medium text-black/55 hover:text-black">Owner</a>}
+            <a href="/quote" className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-[#d6b779]/60 px-3 text-xs font-semibold text-[#e5c995] hover:border-[#e5c995]">Request a Quote</a>
             <a href="/#book" className="rounded-full bg-[#111] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(23,20,17,.12)] hover:bg-black">Book now</a>
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
+            <a href="/quote" className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-[#d6b779]/60 px-3 text-xs font-semibold text-[#e5c995] hover:border-[#e5c995]">Request a Quote</a>
             <a href="/#book" className="rounded-full bg-[#171411] px-4 py-2.5 text-xs font-bold text-white">Book now</a>
             <button type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="car-dash-mobile-menu" className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm" aria-label={menuOpen ? "Close menu" : "Open menu"}>
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
