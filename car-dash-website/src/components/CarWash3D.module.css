@@ -1,6 +1,11 @@
 .wrap { width: 100%; max-width: 680px; margin: 0 auto; }
-.canvas { display: block; width: 100%; aspect-ratio: 16 / 10; }
-.steps { display: flex; justify-content: center; gap: 10px; margin: 6px 0 0; padding: 0; list-style: none; }
-.steps li { padding: 7px 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: #8f8b84; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; transition: color .5s, background .5s, border-color .5s; }
-.steps .stepActive { color: #151515; background: #d6b779; border-color: #d6b779; }
-@media (prefers-reduced-motion: reduce) { .steps li { transition: none; } }
+.canvas { display: block; width: 100%; aspect-ratio: 16 / 10; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.grabbing { cursor: grabbing; }
+.steps { display: flex; justify-content: center; gap: 10px; margin-top: 6px; }
+.step { min-height: 40px; padding: 8px 18px; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: transparent; color: #c9c4ba; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; cursor: pointer; transition: color .4s, background .4s, border-color .4s, scale .25s cubic-bezier(.16,1,.3,1); }
+.step:hover { border-color: rgba(214,183,121,.7); color: #f4efe5; }
+.step:active { scale: .95; }
+.stepActive, .stepActive:hover { color: #101010; background: #d6b779; border-color: #d6b779; }
+.step:focus-visible { outline: 2px solid #e5c995; outline-offset: 3px; }
+.hint { margin-top: 14px; color: #b9b5ad; font-size: 12px; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .step { transition: none; } }

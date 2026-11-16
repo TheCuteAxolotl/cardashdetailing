@@ -114,7 +114,19 @@ const BASE_COLORS: Record<Face["kind"], [number, number, number]> = {
   tail: [214, 52, 46],
 };
 
-export type CarWashScene = { start: () => void; stop: () => void; drawStill: () => void; drawAt: (seconds: number) => void; resize: () => void };
+export type CarWashScene = {
+  start: () => void;
+  stop: () => void;
+  drawStill: () => void;
+  drawAt: (seconds: number) => void;
+  resize: () => void;
+  /** Turn the car by hand (radians). */
+  rotateBy: (radians: number) => void;
+  /** Jump to a wash step: 0 foam, 1 rinse, 2 shine. */
+  jumpTo: (phase: number) => void;
+  /** Pop a burst of bubbles at a point on the canvas (CSS pixels). */
+  burst: (x: number, y: number) => void;
+};
 
 export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: number) => void): CarWashScene {
   const context = canvas.getContext("2d");
@@ -145,6 +157,10 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
   let running = false;
   let startedAt = 0;
   let lastPhase = -1;
+  let userTurn = 0;
+  let washOffset = 0;
+  let lastTime = CYCLE * 0.82;
+  let bursts: Array<{ x: number; y: number; born: number }> = [];
 
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
@@ -158,10 +174,11 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
 
   const draw = (time: number) => {
     if (!context || width < 2) return;
+    lastTime = time;
     const focal = Math.min(width * 1.2, height * 1.85);
     const centerX = width / 2;
     const centerY = height * 0.56;
-    const turn = (time / SPIN) * Math.PI * 2 + 0.7;
+    const turn = (time / SPIN) * Math.PI * 2 + 0.7 + userTurn;
     const cosTurn = Math.cos(turn);
     const sinTurn = Math.sin(turn);
     const cosPitch = Math.cos(PITCH);
@@ -175,7 +192,7 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
       return { x: centerX + (focal * p[0]) / depth, y: centerY - (focal * y) / depth, depth };
     };
 
-    const cycle = (time % CYCLE) / CYCLE;
+    const cycle = (((time + washOffset) % CYCLE) + CYCLE) % CYCLE / CYCLE;
     const phase = cycle < 0.42 ? 0 : cycle < 0.7 ? 1 : 2;
     if (phase !== lastPhase) { lastPhase = phase; onPhase?.(phase); }
     const foamLevel = (delay: number) => smooth((cycle - delay * 0.16) / 0.14) * (1 - smooth((cycle - 0.46 - delay * 0.16) / 0.12));
@@ -323,7 +340,29 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
     }
 
     bubblePoints.filter((b) => b.world[2] >= 0).forEach((b) => drawBubble(b.projected, b.size, b.alpha));
+
+    // Bubbles popped out by a tap.
+    bursts = bursts.filter((burst) => time - burst.born < 0.9);
+    for (const burst of bursts) {
+      const age = (time - burst.born) / 0.9;
+      for (let k = 0; k < 9; k += 1) {
+        const angle = (k / 9) * Math.PI * 2 + burst.x;
+        const reach = (26 + (k % 3) * 16) * smooth(age * 1.6);
+        const r = (4 + (k % 4) * 2.2) * (1 - age * 0.4);
+        const x = burst.x + Math.cos(angle) * reach;
+        const y = burst.y + Math.sin(angle) * reach - age * 26;
+        context.beginPath();
+        context.arc(x, y, r, 0, Math.PI * 2);
+        context.fillStyle = `rgba(200, 230, 255, ${0.16 * (1 - age)})`;
+        context.fill();
+        context.strokeStyle = `rgba(240, 248, 255, ${0.9 * (1 - age)})`;
+        context.lineWidth = 1.2;
+        context.stroke();
+      }
+    }
   };
+
+  const redrawIfIdle = () => { if (!running) draw(lastTime); };
 
   const loop = (now: number) => {
     if (!running) return;
@@ -342,5 +381,12 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
     stop: () => { running = false; cancelAnimationFrame(frame); },
     drawStill: () => draw(CYCLE * 0.82),
     drawAt: draw,
+    rotateBy: (radians) => { userTurn += radians; redrawIfIdle(); },
+    jumpTo: (phase) => {
+      const target = [0.02, 0.44, 0.74][Math.max(0, Math.min(2, phase))] * CYCLE;
+      washOffset = target - lastTime;
+      redrawIfIdle();
+    },
+    burst: (x, y) => { if (running) bursts.push({ x, y, born: lastTime }); },
   };
 }
