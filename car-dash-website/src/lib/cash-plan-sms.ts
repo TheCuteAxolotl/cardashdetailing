@@ -2,7 +2,7 @@ import {syncPlanBookings} from "@/lib/cash-bookings";
 import {prisma} from "@/lib/prisma";
 import {sendCustomerSmsWithHistory} from "@/lib/customer-sms-history";
 import {bookingPhoneWasReleased} from "@/lib/phone-release";
-import {chicagoDay,nextService,prettyDay,type CashPlan} from "@/lib/cash-maintenance";
+import {chicagoDay,nextPlanService,prettyDay,type CashPlan} from "@/lib/cash-maintenance";
 export const cashPrefix="owner:cash-maintenance:";
 type Kind="activation"|"reminder";
 export function smsKey(plan:CashPlan,kind:Kind,date:string){
@@ -10,7 +10,7 @@ export function smsKey(plan:CashPlan,kind:Kind,date:string){
 }
 export async function notifyPlan(plan:CashPlan,kind:Kind,date:string){
   const schedule=plan.schedule;
-  if(plan.ended||!schedule)return "off";
+  if(plan.ended||plan.pausedAt||!schedule)return "off";
   const key=smsKey(plan,kind,date);
   const existing=await prisma.siteContent.findUnique({where:{key}});
   if(existing){
@@ -23,7 +23,7 @@ export async function notifyPlan(plan:CashPlan,kind:Kind,date:string){
   }
   const row=await prisma.siteContent.findUnique({where:{key:cashPrefix+plan.id}});
   const current:CashPlan|undefined=row&&JSON.parse(row.value);
-  if(!current||current.ended||current.schedule?.enabledAt!==schedule.enabledAt||await bookingPhoneWasReleased(schedule.phone,schedule.enabledAt)){
+  if(!current||current.ended||current.pausedAt||current.skipped?.includes(date.slice(0,7))||current.schedule?.enabledAt!==schedule.enabledAt||await bookingPhoneWasReleased(schedule.phone,schedule.enabledAt)){
     await prisma.siteContent.update({where:{key},data:{value:"suppressed"}});return "suppressed";
   }
   const amount=(plan.cents/100).toLocaleString("en-US",{style:"currency",currency:"USD"});
@@ -45,8 +45,8 @@ export async function runCashNotifications(){
     const plan:CashPlan=JSON.parse(row.value);if(!plan.schedule)continue;
     try{
       await syncPlanBookings(plan.id);
-      if(plan.ended)continue;
-      const date=nextService(plan.schedule,today);
+      if(plan.ended||plan.pausedAt)continue;
+      const date=nextPlanService(plan,today);
       const activation=await notifyPlan(plan,"activation",date);
       const days=Math.round((Date.parse(date)-Date.parse(today))/86400000);
       if(activation.startsWith("sent:")&&days>=1&&days<=plan.schedule.lead){

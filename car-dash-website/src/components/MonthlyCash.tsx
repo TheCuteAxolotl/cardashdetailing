@@ -1,10 +1,10 @@
 "use client";
 import {useEffect,useState,type FormEvent} from "react";
-import {chicagoDay,nextCashDue,nextService,prettyDay,weekdays,ordinals,type CashPlan,type ServiceSchedule} from "@/lib/cash-maintenance";
+import {chicagoDay,nextCashDue,nextPlanService,nextService,prettyDay,weekdays,ordinals,type CashPlan,type ServiceSchedule} from "@/lib/cash-maintenance";
 const usd=(n:number)=>(n/100).toLocaleString("en-US",{style:"currency",currency:"USD"});
 const field="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-black/20 bg-white px-3 text-base text-black";
 const button="rounded-xl bg-[#d6b779] px-4 py-3 font-semibold text-[#171411] disabled:opacity-50";
-type DisplayPlan=CashPlan&{activationStatus?:string};
+type DisplayPlan=CashPlan&{bookings?:{id:string;preferredDate:string|null;status:string}[];activationStatus?:string};
 function ScheduleFields({existing}:{existing?:ServiceSchedule}){
   const [ordinal,setOrdinal]=useState(existing?.ordinal||1),[weekday,setWeekday]=useState(existing?.weekday??6),[startMonth,setMonth]=useState(existing?.startMonth||chicagoDay().slice(0,7));
   return <fieldset className="my-4 space-y-3"><legend className="font-semibold">Recurring detail</legend>
@@ -14,18 +14,21 @@ function ScheduleFields({existing}:{existing?:ServiceSchedule}){
     <label>Starting month<input className={field} name="startMonth" type="month" required value={startMonth} onChange={e=>setMonth(e.target.value)}/></label>
     <label>Reminder<select className={field} name="lead" defaultValue={existing?.lead||2}><option value={2}>2 days before</option><option value={1}>1 day before</option></select></label>
     {(["year","make","model"] as const).map(key=><label key={key}>Vehicle {key}<input className={field} name={key} required defaultValue={existing?.[key]} maxLength={key==="year"?4:80} pattern={key==="year"?"[0-9]{4}":undefined}/></label>)}<label>Customer mobile number<input className={field} type="tel" name="phone" defaultValue={existing?.phone} autoComplete="tel" required/></label></div>
+    <label>Service address<input className={field} name="address" defaultValue={existing?.address}/></label><label>Appointment time<input type="time" className={field} name="time" defaultValue={existing?.time}/></label><label>Service notes<textarea className={field} name="notes" defaultValue={existing?.notes}/></label>
     {/^\d{4}-(0[1-9]|1[0-2])$/.test(startMonth)&&<p>Next detail: <strong>{prettyDay(nextService({ordinal,weekday,startMonth},chicagoDay()))}</strong></p>}
     <label className="flex items-start gap-2"><input type="checkbox" name="consent" required className="mt-1"/>Customer agreed to receive plan and appointment texts at this number.</label>
   </fieldset>
 }
 function scheduleFrom(form:HTMLFormElement){
   const data=new FormData(form);
-  return {make:data.get("make"),model:data.get("model"),year:data.get("year"),ordinal:data.get("ordinal"),weekday:data.get("weekday"),startMonth:data.get("startMonth"),lead:data.get("lead"),phone:data.get("phone"),consent:data.has("consent")};
+  return {address:data.get("address"),notes:data.get("notes"),time:data.get("time"),make:data.get("make"),model:data.get("model"),year:data.get("year"),ordinal:data.get("ordinal"),weekday:data.get("weekday"),startMonth:data.get("startMonth"),lead:data.get("lead"),phone:data.get("phone"),consent:data.has("consent")};
 }
 export default function MonthlyCash(){
   const [plans,setPlans]=useState<DisplayPlan[]>([]),[ready,setReady]=useState(false),[busy,setBusy]=useState(false),[notice,setNotice]=useState("");
+  type SavedVehicle={id:string;year:string;make:string;model:string;user:{name:string};bookings:{customerPhone:string}[]};
+  const [vehicles,setVehicles]=useState<SavedVehicle[]>([]);
   const [createId,setCreateId]=useState("");
-  async function refresh(){const r=await fetch("/api/maintenance/cash",{cache:"no-store"});if(!r.ok)throw Error("Cash plans could not be loaded.");setPlans((await r.json()).plans);setReady(true)}
+  async function refresh(){const r=await fetch("/api/maintenance/cash",{cache:"no-store"});if(!r.ok)throw Error("Cash plans could not be loaded.");const data=await r.json();setPlans(data.plans);setVehicles(data.vehicles||[]);setReady(true)}
   useEffect(()=>{setCreateId(crypto.randomUUID());refresh().catch(e=>setNotice(e.message))},[]);
   async function write(body:Record<string,unknown>,message:string,after?:()=>void){
     setBusy(true);setNotice("");
@@ -34,10 +37,17 @@ export default function MonthlyCash(){
     }catch(e){setNotice(e instanceof Error?e.message:"Could not save cash plan.")}finally{setBusy(false)}
   }
   function create(e:FormEvent<HTMLFormElement>){e.preventDefault();const form=e.currentTarget,data=new FormData(form);
-    void write({action:"create",id:createId,customer:data.get("customer"),schedule:scheduleFrom(form),cents:Math.round(Number(data.get("amount"))*100)},"Cash plan created.",()=>{setCreateId(crypto.randomUUID());form.reset()})}
+    void write({action:"create",id:createId,vehicleId:data.get("vehicleId"),customer:data.get("customer"),schedule:scheduleFrom(form),cents:Math.round(Number(data.get("amount"))*100)},"Cash plan created.",()=>{setCreateId(crypto.randomUUID());form.reset()})}
   return <section id="monthly-cash" className="my-6 rounded-2xl border border-black/15 bg-white p-5 text-[#171411]">
     <h2 className="text-2xl font-semibold">Monthly cash payments</h2><p className="mt-1 text-sm">Track monthly maintenance payments collected in person.</p>
     <details className="mt-4 rounded-xl border border-black/15 p-4"><summary className="cursor-pointer font-semibold">Add monthly cash plan</summary><form onSubmit={create} className="my-4 grid items-end gap-3 sm:grid-cols-2">
+      <label>Saved customer and vehicle<select name="vehicleId" className={field} onChange={e=>{
+        const v=vehicles.find(v=>v.id===e.target.value),form=e.currentTarget.form;
+        if(!v||!form)return;
+        for(const [name,value] of Object.entries({customer:v.user.name,year:v.year,make:v.make,model:v.model,phone:v.bookings[0]?.customerPhone||""})){
+          const input=form.elements.namedItem(name);if(input instanceof HTMLInputElement)input.value=value;
+        }
+      }}><option value="">Enter manually</option>{vehicles.map(v=><option key={v.id} value={v.id}>{v.user.name} · {v.year} {v.make} {v.model}</option>)}</select></label>
       <label>Customer name<input className={field} name="customer" required maxLength={120}/></label>
       <label>Monthly cash amount ($)<input className={field} name="amount" type="number" inputMode="decimal" min=".01" max="10000" step=".01" defaultValue="60" required/></label>
       <div className="sm:col-span-2"><ScheduleFields key={createId}/></div>
@@ -46,14 +56,19 @@ export default function MonthlyCash(){
     {ready&&!plans.length&&<p>No cash plans yet.</p>}
     {[...plans].sort((a,b)=>Number(a.ended)-Number(b.ended)||nextCashDue(a).localeCompare(nextCashDue(b))).map(plan=>{const due=nextCashDue(plan);return <article key={plan.id} className="mt-4 space-y-3 rounded-xl border border-black/15 p-4">
       <h3 className="font-bold">{plan.customer} · {usd(plan.cents)} / month</h3>
-      {plan.schedule&&!plan.ended&&<p>{ordinals[plan.schedule.ordinal-1]} {weekdays[plan.schedule.weekday]} each month · Next detail <strong>{prettyDay(nextService(plan.schedule,chicagoDay()))}</strong><br/><small>{[plan.schedule.year,plan.schedule.make,plan.schedule.model].filter(Boolean).join(" ")} · {plan.schedule.phone} · Reminder {plan.schedule.lead} day{plan.schedule.lead===1?"":"s"} before · Activation SMS: {plan.activationStatus}</small></p>}
-      <p>{plan.ended?"Plan ended":(due<chicagoDay()?"Overdue since ":due===chicagoDay()?"Due today · ": "Next cash payment ")+due}</p>
-      {!plan.ended&&<details><summary className="cursor-pointer font-semibold">Record cash payment</summary><form className="flex flex-wrap items-end gap-3" onSubmit={e=>{e.preventDefault();void write({id:plan.id,action:"receive",month:due.slice(0,7),received:new FormData(e.currentTarget).get("received")},"Cash payment recorded.")}}>
+      {plan.schedule&&!plan.ended&&!plan.pausedAt&&<p>{ordinals[plan.schedule.ordinal-1]} {weekdays[plan.schedule.weekday]} each month · Next detail <strong>{prettyDay(nextPlanService(plan,chicagoDay()))}</strong><br/><small>{[plan.schedule.year,plan.schedule.make,plan.schedule.model].filter(Boolean).join(" ")} · {plan.schedule.phone} · Reminder {plan.schedule.lead} day{plan.schedule.lead===1?"":"s"} before · Activation SMS: {plan.activationStatus}</small></p>}
+      <p>{plan.ended?"Plan ended":plan.pausedAt?"Paused since "+plan.pausedAt:(due<chicagoDay()?"Overdue since ":due===chicagoDay()?"Due today · ": "Next cash payment ")+due}</p>
+      {!plan.ended&&!plan.pausedAt&&<details><summary className="cursor-pointer font-semibold">Record cash payment</summary><form className="flex flex-wrap items-end gap-3" onSubmit={e=>{e.preventDefault();void write({id:plan.id,action:"receive",month:due.slice(0,7),received:new FormData(e.currentTarget).get("received")},"Cash payment recorded.")}}>
         <label>Cash received date<input className={field} name="received" type="date" required defaultValue={chicagoDay()} max={chicagoDay()}/></label>
         <button className={button} disabled={busy}>Record {usd(plan.cents)} cash for {due.slice(0,7)}</button>
       </form></details>}
+      {plan.schedule&&!plan.ended&&<div className="flex flex-wrap gap-2">
+        <button className={button} disabled={busy} onClick={()=>void write({id:plan.id,action:plan.pausedAt?"resume":"pause"},plan.pausedAt?"Plan resumed.":"Plan paused.")}>{plan.pausedAt?"Resume plan":"Pause plan"}</button>
+        {!plan.pausedAt&&<button className={button} disabled={busy} onClick={()=>{const date=nextPlanService(plan,chicagoDay());if(window.confirm("Skip the detail on "+prettyDay(date)+"?"))void write({id:plan.id,action:"skip",date},"Visit skipped.")}}>Skip next visit</button>}
+      </div>}
+      <details><summary>Calendar bookings ({plan.bookings?.length||0})</summary>{plan.bookings?.map(b=><p key={b.id}>{b.preferredDate} · {b.status}</p>)}</details>
       <details><summary>Payment history ({plan.payments.length})</summary>{plan.payments.length?plan.payments.slice().reverse().map(p=><p key={p.month}>{p.month} · {usd(p.cents)} cash · Received {p.received}</p>):<p>No payments recorded.</p>}</details>
-      {!plan.ended&&<details><summary>{plan.schedule?"Edit service schedule":"Set up recurring details and texts"}</summary><form onSubmit={e=>{e.preventDefault();void write({action:"schedule",id:plan.id,schedule:scheduleFrom(e.currentTarget)},"Schedule saved.")}}><ScheduleFields existing={plan.schedule}/><button className={button} disabled={busy}>Save schedule and notify customer</button></form></details>}
+      {!plan.ended&&<details><summary>{plan.schedule?"Edit service schedule":"Set up recurring details and texts"}</summary><form onSubmit={e=>{e.preventDefault();void write({action:"schedule",id:plan.id,cents:Math.round(Number(new FormData(e.currentTarget).get("amount"))*100),schedule:scheduleFrom(e.currentTarget)},"Schedule saved.")}}><label>Monthly cash price ($)<input name="amount" className={field} type="number" min=".01" max="10000" step=".01" defaultValue={plan.cents/100} required/></label><ScheduleFields existing={plan.schedule}/><button className={button} disabled={busy}>Save schedule and notify customer</button></form></details>}
       {!plan.ended&&<details><summary>End plan</summary><button disabled={busy} onClick={()=>void write({id:plan.id,action:"end"},"Cash plan ended.")}>End monthly payments and keep history</button></details>}
     </article>})}</section>
 }

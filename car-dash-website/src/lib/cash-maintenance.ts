@@ -1,9 +1,11 @@
 export type CashPayment = { month: string; received: string; cents: number; staffId: string };
-export type ServiceSchedule = { make?: string; model?: string; year?: string; ordinal: number; weekday: number; startMonth: string; phone: string; lead: number; enabledAt: string };
-export type CashPlan = { schedule?: ServiceSchedule; id: string; customer: string; cents: number; firstDue: string; ended: boolean; payments: CashPayment[] };
+export type ServiceSchedule = { address?: string; notes?: string; time?: string; make?: string; model?: string; year?: string; ordinal: number; weekday: number; startMonth: string; phone: string; lead: number; enabledAt: string };
+export type CashPlan = { vehicleId?: string; userId?: string; pausedAt?: string; pausedBookings?: string[]; skipped?: string[]; schedule?: ServiceSchedule; id: string; customer: string; cents: number; firstDue: string; ended: boolean; payments: CashPayment[] };
 export function nextCashDue(plan: CashPlan) {
   const [year, month, day] = plan.firstDue.split("-").map(Number);
-  const next = new Date(Date.UTC(year, month - 1 + plan.payments.length, 1));
+  const next = new Date(Date.UTC(year, month - 1, 1));
+  const excluded = new Set([...(plan.skipped || []), ...plan.payments.map(p => p.month)]);
+  while (excluded.has(next.toISOString().slice(0,7))) next.setUTCMonth(next.getUTCMonth()+1);
   const lastDay = new Date(Date.UTC(next.getUTCFullYear(), next.getUTCMonth() + 1, 0)).getUTCDate();
   next.setUTCDate(Math.min(day, lastDay));
   const due = next.toISOString().slice(0, 10);
@@ -30,3 +32,15 @@ export function nextService(s:Pick<ServiceSchedule,"startMonth"|"ordinal"|"weekd
   return serviceInMonth(next.toISOString().slice(0,7),s.ordinal,s.weekday);
 }
 export function prettyDay(date:string){return new Date(date+"T12:00:00Z").toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric",timeZone:"UTC"})}
+
+export function nextPlanService(plan:CashPlan, today:string) {
+  const schedule=plan.schedule;
+  if (!schedule) throw new Error("A service schedule is required.");
+  let date=nextService(schedule,today);
+  while (plan.skipped?.includes(date.slice(0,7))) {
+    const next=new Date(date.slice(0,7)+"-01T12:00:00Z");
+    next.setUTCMonth(next.getUTCMonth()+1);
+    date=nextService(schedule,next.toISOString().slice(0,10));
+  }
+  return date;
+}
