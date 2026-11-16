@@ -13,6 +13,7 @@ import type { MediaItem } from "@/lib/media";
 import PageMediaBand from "@/components/PageMediaBand";
 import Hero360Viewer from "@/components/Hero360Viewer";
 import SitePhoto from "@/components/SitePhoto";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 type Props = {
   initialContent: SiteContent;
@@ -150,6 +151,8 @@ export default function HomeExperience({
           <p className={styles.quickBookSteps} data-reveal>Choose a detail <span>›</span> Pick a date <span>›</span> Enter your address <span>›</span> Send your request</p>
         </div>
       </section>
+
+      <BeforeAfterSlider />
 
       <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
         <div className="mx-auto max-w-[1320px]">
