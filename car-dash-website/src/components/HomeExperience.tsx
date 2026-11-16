@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import styles from "./HomeExperience.module.css";
 import type { SiteContent } from "@/lib/site-defaults";
 import { SERVICE_AREAS } from "@/lib/seo";
@@ -30,12 +30,21 @@ export default function HomeExperience({
   hero360Frames = [],
 }: Props) {
   const [heroInteracting, setHeroInteracting] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // On a full page load the hero waits for the brand intro curtain. When the
+  // intro has already played (client-side navigation home), start right away.
+  useLayoutEffect(() => {
+    if ((window as Window & { __carDashIntroDone?: boolean }).__carDashIntroDone) {
+      rootRef.current?.classList.add(styles.introSkipped);
+    }
+  }, []);
 
   return (
-    <div className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
+    <div ref={rootRef} className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
       <section className={styles.hero}>
         <div className="home-hero-shell relative mx-auto min-h-[520px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
-          <div className="absolute inset-0">
+          <div className={`${styles.heroMedia} absolute inset-0`}>
             {hero360Frames.length > 0 ? (
               <Hero360Viewer
                 frames={hero360Frames}
@@ -55,14 +64,16 @@ export default function HomeExperience({
           </div>
 
           <div className={`home-hero-content relative z-10 flex min-h-[520px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
-            <div className="flex items-start justify-between gap-5 text-white">
+            <div className={`${styles.heroEyebrow} flex items-start justify-between gap-5 text-white`}>
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
             </div>
 
             <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
               <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">We come to you. No shop drop-off.</p>
               <h1 className="max-w-[14ch] text-[clamp(3.2rem,7.2vw,6.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
-                <>Your car.<br />Cleaned at<br />your door.</>
+                <span className={styles.heroLine}><span>Your car.</span></span>{" "}
+                <span className={styles.heroLine}><span>Cleaned at</span></span>{" "}
+                <span className={styles.heroLine}><span>your door.</span></span>
               </h1>
               <p className="mt-6 max-w-[540px] text-sm leading-6 text-white/80 sm:hidden">Choose your service. See the price. Pick a time. We come to you.</p>
               <p className="mt-7 hidden max-w-[650px] text-sm leading-7 text-white/68 sm:block sm:text-base sm:leading-8">{content.heroBody}</p>
@@ -85,7 +96,7 @@ export default function HomeExperience({
 
       <section id="choose-detail" aria-labelledby="quick-book-heading" className={styles.quickBook}>
         <div className={styles.quickBookInner}>
-          <div className={styles.quickBookIntro}>
+          <div className={styles.quickBookIntro} data-reveal>
             <SitePhoto
               category="hero"
               fallbackCategory="home-showcase-primary"
@@ -102,7 +113,7 @@ export default function HomeExperience({
             <p className={styles.quickBookIntroNote}>Mobile detailing. We come to you.</p>
           </div>
 
-          <div className={styles.quickBookGrid}>
+          <div className={styles.quickBookGrid} data-stagger>
             {[
               { href: "/?pricingPage=packages#book", title: "Inside + outside", detail: "Full car detail", mark: "01", image: "pricing-car-packages-hero", fallback: "home-showcase-primary", featured: true },
               { href: "/?pricingPage=interior#book", title: "Interior only", detail: "Seats, carpets, dash", mark: "02", image: "pricing-interior-hero", fallback: "home-showcase-secondary" },
@@ -136,7 +147,7 @@ export default function HomeExperience({
               </a>
             ))}
           </div>
-          <p className={styles.quickBookSteps}>Choose a detail <span>›</span> Pick a date <span>›</span> Enter your address <span>›</span> Send your request</p>
+          <p className={styles.quickBookSteps} data-reveal>Choose a detail <span>›</span> Pick a date <span>›</span> Enter your address <span>›</span> Send your request</p>
         </div>
       </section>
 
@@ -156,16 +167,16 @@ export default function HomeExperience({
       <section className={styles.manifesto} aria-labelledby="care-heading">
         <div data-reveal><p className={styles.eyebrow}>Care you can see. A difference you can feel.</p><h2 id="care-heading">Some details change<br />how your car looks.<br /><em>Ours change how it feels.</em></h2><p>A fresh interior. A finish that catches the light. Thoughtful care, brought to your driveway.</p></div>
         <div className={styles.locations} aria-label="Communities within about 20 miles of South Elgin">
-          <p className={styles.locationsHeading}>Mobile detailing within 20 miles of South Elgin</p>
-          <div className={styles.locationList}>
+          <p className={styles.locationsHeading} data-reveal>Mobile detailing within 20 miles of South Elgin</p>
+          <div className={styles.locationList} data-stagger>
             {SERVICE_AREAS.map((area) => <span key={area}>{area.replace(", Illinois", "")}</span>)}
           </div>
-          <p className={styles.locationsNote}>Service availability depends on your exact address and appointment schedule.</p>
+          <p className={styles.locationsNote} data-reveal>Service availability depends on your exact address and appointment schedule.</p>
         </div>
       </section>
 
       <section className={styles.proof}>
-        <div className="home-proof-grid mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
+        <div data-stagger className="home-proof-grid mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
             ["01", "Mobile service", "We come to your home or work."],
             ["02", "Clear pricing", "You’ll see the price before you book."],
@@ -186,13 +197,13 @@ export default function HomeExperience({
           <div><p className={styles.eyebrow}>The Car Dash approach</p><h2 id="craft-heading">Every surface.<br /><span>Every detail.</span></h2></div>
           <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Request a Quote</a></div>
         </div>
-        <div className={styles.serviceGrid}>
+        <div className={styles.serviceGrid} data-stagger>
           {[
             { number: "01", title: "A fresh start inside.", label: "Interior detailing", href: "/interior-detailing", image: "pricing-interior-hero", fallback: "home-showcase-secondary", text: "Seats, carpets, vents, and the little places everyday life leaves its mark." },
             { number: "02", title: "Make an entrance.", label: "Exterior detailing", href: "/exterior-detailing", image: "pricing-exterior-hero", fallback: "home-showcase-primary", text: "Careful cleaning and finishing for paint, wheels, glass, and trim." },
             { number: "03", title: "Protect the finish.", label: "Ceramic coatings", href: "/ceramic-coatings", image: "ceramic-coatings-hero", fallback: "hero", text: "Explore coating options and preparation tailored to your vehicle." },
           ].map((service) => (
-            <a key={service.number} href={service.href} className={styles.serviceCard} data-reveal>
+            <a key={service.number} href={service.href} className={styles.serviceCard}>
               <div className={styles.cardPhoto}><SitePhoto category={service.image} fallbackCategory={service.fallback} className="absolute inset-0 h-full w-full" alt={service.label} /><span className={styles.cardNumber}>{service.number}</span></div>
               <div className={styles.cardCopy}><p className={styles.eyebrow}>{service.label}</p><h3>{service.title}</h3><p>{service.text}</p></div>
             </a>

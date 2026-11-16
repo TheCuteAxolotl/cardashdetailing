@@ -37,9 +37,9 @@ export default function ScrollReveal() {
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     const register = () => {
-      root.querySelectorAll<HTMLElement>("section, [data-reveal], [data-scroll-reveal]").forEach(element => {
+      root.querySelectorAll<HTMLElement>("section, [data-reveal], [data-scroll-reveal], [data-stagger]").forEach(element => {
         if (element.closest("[data-no-scroll-reveal]")) return;
-        if (element.matches("section") && element.querySelector("[data-reveal], [data-scroll-reveal]")) {
+        if (element.matches("section") && element.querySelector("[data-reveal], [data-scroll-reveal], [data-stagger]")) {
           observed.delete(element);
           element.classList.remove("scroll-reveal", "is-revealed", "is-above", "is-below");
           return;
