@@ -7,7 +7,9 @@ import { SERVICE_AREAS } from "@/lib/seo";
 import type { PromotionSettings } from "@/lib/promotions";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import DynamicGallery from "@/components/DynamicGallery";
-import ReviewCards from "@/components/ReviewCards";
+import ReviewMarquee from "@/components/ReviewMarquee";
+import CarWash3D from "@/components/CarWash3D";
+import { useGoogleReviews } from "@/lib/use-google-reviews";
 import HomePackagePricing from "@/components/HomePackagePricing";
 import type { MediaItem } from "@/lib/media";
 import PageMediaBand from "@/components/PageMediaBand";
@@ -32,6 +34,7 @@ export default function HomeExperience({
 }: Props) {
   const [heroInteracting, setHeroInteracting] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const { data: reviewData } = useGoogleReviews();
 
   // On a full page load the hero waits for the brand intro curtain. When the
   // intro has already played (client-side navigation home), start right away.
@@ -67,6 +70,13 @@ export default function HomeExperience({
           <div className={`home-hero-content relative z-10 flex min-h-[520px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
             <div className={`${styles.heroEyebrow} flex items-start justify-between gap-5 text-white`}>
               <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
+              {reviewData && reviewData.rating !== null && (
+                <a href="#reviews" className={styles.heroRating} aria-label={`Rated ${reviewData.rating.toFixed(1)} out of 5${reviewData.reviewCount !== null ? ` from ${reviewData.reviewCount} Google reviews` : ""}. Jump to reviews.`}>
+                  <span className={styles.heroRatingStars} aria-hidden="true">★★★★★</span>
+                  <strong>{reviewData.rating.toFixed(1)}</strong>
+                  {reviewData.reviewCount !== null && <span>{reviewData.reviewCount} Google reviews</span>}
+                </a>
+              )}
             </div>
 
             <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
@@ -154,20 +164,18 @@ export default function HomeExperience({
 
       <BeforeAfterSlider />
 
-      <section className="bg-[#f5f4f1] px-5 py-16 sm:px-8 sm:py-24 lg:py-28">
+      <section id="reviews" className="scroll-mt-24 overflow-hidden bg-[#f5f4f1] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1320px]">
-          <div className="mb-9 flex items-end justify-between gap-5 border-b border-black/[.08] pb-6">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
-            </div>
-            <a href="/reviews" className="hidden text-sm font-semibold text-black/50 hover:text-black sm:block">All reviews</a>
+          <div className="mb-7 border-b border-black/[.08] pb-6" data-reveal>
+            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
+            <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
           </div>
-          <ReviewCards />
+          <div data-reveal><ReviewMarquee /></div>
         </div>
       </section>
 
       <section className={styles.manifesto} aria-labelledby="care-heading">
+        <div className={styles.washStage} data-reveal><CarWash3D /></div>
         <div data-reveal><p className={styles.eyebrow}>Care you can see. A difference you can feel.</p><h2 id="care-heading">Some details change<br />how your car looks.<br /><em>Ours change how it feels.</em></h2><p>A fresh interior. A finish that catches the light. Thoughtful care, brought to your driveway.</p></div>
         <div className={styles.locations} aria-label="Communities within about 20 miles of South Elgin">
           <p className={styles.locationsHeading} data-reveal>Mobile detailing within 20 miles of South Elgin</p>

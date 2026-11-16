@@ -18,13 +18,13 @@ function cropStyle([left, top, right, bottom]: CropBox): CSSProperties {
 
 const clamp = (value: number) => Math.min(100, Math.max(0, value));
 
-function CompareCard({ pair, hint, onFail }: { pair: BeforeAfterPair; hint: boolean; onFail: () => void }) {
+function CompareCard({ pair, index, onFail }: { pair: BeforeAfterPair; index: number; onFail: () => void }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const position = useRef(50);
   const pending = useRef<number | null>(null);
   const frameId = useRef(0);
   const dragging = useRef(false);
-  const touched = useRef(false);
+  const resumeTimer = useRef(0);
 
   // The handle position is written straight to a CSS variable (once per
   // animation frame) instead of React state, so dragging never re-renders.
@@ -50,26 +50,40 @@ function CompareCard({ pair, hint, onFail }: { pair: BeforeAfterPair; hint: bool
 
   useEffect(() => () => cancelAnimationFrame(frameId.current), []);
 
-  // One gentle nudge on the first card so it is clear the handle can be dragged.
+  // The wipe plays on its own. Touching a card hands control to the visitor,
+  // and it picks back up a few seconds after they let go.
+  const takeOver = () => {
+    window.clearTimeout(resumeTimer.current);
+    frameRef.current?.classList.remove(styles.auto);
+  };
+  const resumeSoon = () => {
+    window.clearTimeout(resumeTimer.current);
+    resumeTimer.current = window.setTimeout(() => {
+      apply(18, true);
+      resumeTimer.current = window.setTimeout(() => {
+        const frame = frameRef.current;
+        if (!frame) return;
+        frame.classList.remove(styles.glide);
+        frame.style.setProperty("--delay", "0s");
+        frame.classList.add(styles.auto);
+      }, 480);
+    }, 3500);
+  };
+
+  // Pause the animation while the card is off screen.
   useEffect(() => {
     const frame = frameRef.current;
-    if (!hint || !frame || typeof IntersectionObserver === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timers: number[] = [];
+    if (!frame || typeof IntersectionObserver === "undefined") return;
     const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      [[500, 70], [1300, 32], [2100, 50]].forEach(([delay, value]) => {
-        timers.push(window.setTimeout(() => { if (!touched.current) apply(value, true); }, delay));
-      });
-    }, { threshold: 0.7 });
+      frame.classList.toggle(styles.paused, !entries.some((entry) => entry.isIntersecting));
+    }, { rootMargin: "80px" });
     observer.observe(frame);
-    return () => { observer.disconnect(); timers.forEach(clearTimeout); };
-  }, [hint]);
+    return () => { observer.disconnect(); window.clearTimeout(resumeTimer.current); };
+  }, []);
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    touched.current = true;
+    takeOver();
     dragging.current = true;
     event.currentTarget.setPointerCapture(event.pointerId);
     event.currentTarget.classList.add(styles.dragging);
@@ -83,6 +97,7 @@ function CompareCard({ pair, hint, onFail }: { pair: BeforeAfterPair; hint: bool
     queue(event.clientX);
   };
   const endDrag = () => {
+    if (dragging.current) resumeSoon();
     dragging.current = false;
     frameRef.current?.classList.remove(styles.dragging);
   };
@@ -96,8 +111,9 @@ function CompareCard({ pair, hint, onFail }: { pair: BeforeAfterPair; hint: bool
     else if (event.key === "End") next = 100;
     if (next === null) return;
     event.preventDefault();
-    touched.current = true;
+    takeOver();
     apply(next, true);
+    resumeSoon();
   };
 
   const src = `/api/images/${pair.imageId}/file`;
@@ -106,7 +122,8 @@ function CompareCard({ pair, hint, onFail }: { pair: BeforeAfterPair; hint: bool
     <figure className={styles.card}>
       <div
         ref={frameRef}
-        className={styles.frame}
+        className={`${styles.frame} ${styles.auto}`}
+        style={{ "--delay": `${index * -1.3}s` } as CSSProperties}
         role="slider"
         tabIndex={0}
         aria-label={`Before and after: ${pair.caption}`}
@@ -154,10 +171,10 @@ export default function BeforeAfterSlider() {
         <div className={styles.header} data-reveal>
           <div>
             <p className={styles.eyebrow}>Before &amp; after</p>
-            <h2 id="before-after-heading" className={styles.heading}>Slide to see <span>the difference.</span></h2>
+            <h2 id="before-after-heading" className={styles.heading}>See <span>the difference.</span></h2>
           </div>
           <div className={styles.headerSide}>
-            <p className={styles.body}>Real vehicles we’ve detailed. Drag any handle to compare.</p>
+            <p className={styles.body}>Real vehicles we’ve detailed, before and after. Each one plays on its own, or drag a handle to compare yourself.</p>
             <a href="/gallery" className={styles.link}>View full gallery <span aria-hidden="true">→</span></a>
           </div>
         </div>
@@ -166,7 +183,7 @@ export default function BeforeAfterSlider() {
             <CompareCard
               key={pair.key}
               pair={pair}
-              hint={index === 0}
+              index={index}
               onFail={() => setFailed((current) => ({ ...current, [pair.imageId]: true }))}
             />
           ))}

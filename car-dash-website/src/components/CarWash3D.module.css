@@ -1,0 +1,6 @@
+.wrap { width: 100%; max-width: 680px; margin: 0 auto; }
+.canvas { display: block; width: 100%; aspect-ratio: 16 / 10; }
+.steps { display: flex; justify-content: center; gap: 10px; margin: 6px 0 0; padding: 0; list-style: none; }
+.steps li { padding: 7px 16px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: #8f8b84; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; transition: color .5s, background .5s, border-color .5s; }
+.steps .stepActive { color: #151515; background: #d6b779; border-color: #d6b779; }
+@media (prefers-reduced-motion: reduce) { .steps li { transition: none; } }

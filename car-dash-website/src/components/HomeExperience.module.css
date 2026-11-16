@@ -429,3 +429,16 @@
   .goldButton, .goldButton::after, .serviceCard, .hero :global(.home-hero-actions) a:first-child, .hero :global(.home-hero-actions) a:first-child::after { transition: none; }
   .goldButton:hover, .serviceCard:hover, .hero :global(.home-hero-actions) a:first-child:hover { translate: none; }
 }
+
+/* Live Google rating in the hero. */
+.heroRating { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(0,0,0,.32); color: rgba(255,255,255,.82); font-size: 12px; white-space: nowrap; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: heroFadeUp 700ms cubic-bezier(.16,1,.3,1) both; transition: border-color .25s, background .25s; }
+.heroRating:hover { border-color: rgba(214,183,121,.8); background: rgba(0,0,0,.5); }
+.heroRating strong { color: #fff; font-size: 14px; font-weight: 700; }
+.heroRatingStars { color: #e4c587; font-size: 13px; letter-spacing: .1em; }
+.washStage { margin: 0 auto clamp(28px, 5vw, 56px); }
+.manifesto > .washStage > p:last-child { max-width: none; }
+@media (max-width: 640px) {
+  .hero .heroEyebrow { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .manifesto { padding-top: 48px; }
+}
+@media (prefers-reduced-motion: reduce) { .heroRating { animation: none; } }
