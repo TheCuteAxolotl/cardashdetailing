@@ -1,6 +1,6 @@
 import {syncPlanBookings} from "@/lib/cash-bookings";
 import {NextRequest, NextResponse} from "next/server";
-import {getCurrentAccountFromRequest, hasStaffPermission} from "@/lib/permissions";
+import {getCurrentAccountFromRequest, isOwnerAccount} from "@/lib/permissions";
 import {prisma} from "@/lib/prisma";
 import {nextCashDue,chicagoDay,type CashPlan} from "@/lib/cash-maintenance";
 import {normalizePhoneNumber} from "@/lib/twilio-sms";
@@ -25,7 +25,7 @@ async function activate(plan:CashPlan){
 const prefix="owner:cash-maintenance:";
 const reply=(data:unknown,status=200)=>NextResponse.json(data,{status,headers:{"Cache-Control":"private, no-store"}});
 export async function GET(request:NextRequest){
-  if(!hasStaffPermission(await getCurrentAccountFromRequest(request),"maintenance"))return reply({error:"Maintenance access required."},403);
+  if(!isOwnerAccount(await getCurrentAccountFromRequest(request)))return reply({error:"Owner access required."},403);
   const rows=await prisma.siteContent.findMany({where:{key:{startsWith:prefix}},orderBy:{updatedAt:"desc"}});
   const plans=await Promise.all(rows.map(async row=>{
     const plan:CashPlan=JSON.parse(row.value);
@@ -38,7 +38,7 @@ export async function GET(request:NextRequest){
 function validDate(date:unknown){return typeof date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date}
 export async function POST(request:NextRequest){
   const account=await getCurrentAccountFromRequest(request);
-  if(!account||!hasStaffPermission(account,"maintenance"))return reply({error:"Maintenance access required."},403);
+  if(!account||!isOwnerAccount(account))return reply({error:"Owner access required."},403);
   if(request.headers.get("sec-fetch-site")==="cross-site")return reply({error:"Invalid origin."},403);
   const b=await request.json().catch(()=>null);
   if(!b||typeof b.id!=="string"||!/^[-a-f0-9]{36}$/i.test(b.id))return reply({error:"Invalid plan ID."},400);
