@@ -167,7 +167,7 @@ export default function HomeExperience({
       <section id="reviews" className="scroll-mt-24 overflow-hidden bg-[#f5f4f1] px-5 py-14 sm:px-8 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1320px]">
           <div className="mb-7 border-b border-black/[.08] pb-6" data-reveal>
-            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Customer feedback</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#d6b779]">Customer feedback</p>
             <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
           </div>
           <div data-reveal><ReviewMarquee /></div>
@@ -234,7 +234,7 @@ export default function HomeExperience({
         <div className="mx-auto max-w-[1320px]">
           <div className="grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Recent work</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#d6b779]">Recent work</p>
               <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">A closer look at the details.</h2>
             </div>
             <div className="flex items-end justify-between gap-5">
@@ -250,18 +250,18 @@ export default function HomeExperience({
         <div className="mx-auto max-w-[1320px]">
           <div className="mb-10 grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-black/38">Pricing</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#d6b779]">Pricing</p>
               <h2 className="mt-3 max-w-xl text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Simple packages. You’ll know the price before you book.</h2>
             </div>
             <p className="max-w-2xl text-sm leading-7 text-black/48">Choose your vehicle size and the level of detail you want. If it needs paint correction, a coating, heavy cleanup, or something out of the ordinary, send us a few photos and we’ll quote it exactly.</p>
           </div>
           <HomePackagePricing config={pricingConfig} mediaItems={pricingMedia} promotions={promotions} />
-          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 border-t border-black/[.08] pt-6 text-sm font-medium text-black/52">
-            <a href="/interior-detailing" className="hover:text-black">Interior only</a>
-            <a href="/exterior-detailing" className="hover:text-black">Exterior only</a>
-            <a href="/paint-correction" className="hover:text-black">Paint correction</a>
-            <a href="/ceramic-coatings" className="hover:text-black">Ceramic coating</a>
-            <a href="/maintenance" className="hover:text-black">Monthly maintenance</a>
+          <div className={`${styles.chipRow} mt-8 border-t border-black/[.08] pt-6`}>
+            <a href="/interior-detailing">Interior only</a>
+            <a href="/exterior-detailing">Exterior only</a>
+            <a href="/paint-correction">Paint correction</a>
+            <a href="/ceramic-coatings">Ceramic coating</a>
+            <a href="/maintenance">Monthly maintenance</a>
           </div>
         </div>
       </section>
@@ -272,10 +272,10 @@ export default function HomeExperience({
             <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-white/36">Ceramic maintenance membership</p>
             <h2 className="mt-4 max-w-3xl text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Keep your coating maintained every month.</h2>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/48">A simple recurring maintenance plan for ceramic-coated vehicles. Set up billing once and keep your monthly maintenance with Car Dash.</p>
-            <a href="/maintenance" className="mt-7 inline-flex rounded-full bg-white px-5 py-3 text-sm font-semibold text-[#171411]">Join monthly maintenance</a>
+            <a href="/maintenance" className={styles.goldButton}>Join monthly maintenance</a>
           </div>
           <div className="border-t border-white/10 pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-            <div className="flex items-end gap-2"><span className="text-6xl font-semibold tracking-[-.07em]">$60</span><span className="pb-2 text-sm text-white/38">/ month</span></div>
+            <div className="flex items-end gap-2"><span className="text-6xl font-semibold tracking-[-.07em] text-[#e5c995]">$60</span><span className="pb-2 text-sm text-white/38">/ month</span></div>
             <p className="mt-3 text-xs leading-5 text-white/32">Recurring billing through Stripe. Customers can manage or cancel future renewals themselves.</p>
           </div>
         </div>

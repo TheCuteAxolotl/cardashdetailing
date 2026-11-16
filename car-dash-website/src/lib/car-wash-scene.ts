@@ -35,13 +35,13 @@ function makeRandom(seed: number) {
 // [x, half width, floor, shoulder height, roof height, roof half width]
 const STATIONS: number[][] = [
   [-2.12, 0.62, 0.3, 0.5, 0.52, 0.5],
-  [-1.92, 0.84, 0.24, 0.57, 0.61, 0.66],
+  [-1.92, 0.72, 0.24, 0.57, 0.61, 0.66],
   [-1.3, 0.92, 0.22, 0.65, 0.71, 0.7],
   [-0.62, 0.94, 0.22, 0.72, 0.78, 0.72],
   [-0.05, 0.94, 0.22, 0.76, 1.15, 0.6],
   [0.5, 0.94, 0.22, 0.78, 1.18, 0.62],
   [1.25, 0.95, 0.22, 0.81, 0.97, 0.66],
-  [1.8, 0.92, 0.24, 0.8, 0.84, 0.7],
+  [1.8, 0.92, 0.24, 0.8, 0.72, 0.7],
   [2.12, 0.76, 0.32, 0.7, 0.72, 0.58],
 ];
 const GLASS_FROM = 3; // station intervals 3..5 carry the cabin glass
@@ -126,16 +126,26 @@ export type CarWashScene = {
   jumpTo: (phase: number) => void;
   /** Pop a burst of bubbles at a point on the canvas (CSS pixels). */
   burst: (x: number, y: number) => void;
+  /** "auto" plays the wash by itself; "play" lets the visitor wash a dirty car. */
+  setMode: (mode: "auto" | "play") => void;
+  /** Tool used in play mode: 0 foam, 1 rinse, 2 shine. */
+  setTool: (tool: number) => void;
+  /** Where the visitor's finger or mouse is on the canvas (CSS pixels). */
+  setPointer: (x: number, y: number, down: boolean, inside: boolean) => void;
+  /** Turn the idle spin and floating bubbles off for reduced-motion visitors. */
+  setMotion: (enabled: boolean) => void;
 };
 
-export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: number) => void): CarWashScene {
+export type WashProgress = { foam: number; rinse: number; shine: number; done: boolean };
+
+export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: number) => void, onProgress?: (progress: WashProgress) => void): CarWashScene {
   const context = canvas.getContext("2d");
   const faces = buildCar();
   const random = makeRandom(7);
 
   // Spots on the bodywork where foam gathers and where sparkles appear.
   const bodyFaces = faces.filter((face) => face.kind === "paint" || face.kind === "glass");
-  const anchors = Array.from({ length: 70 }, () => {
+  const anchors = Array.from({ length: 130 }, () => {
     const face = bodyFaces[Math.floor(random() * bodyFaces.length)];
     const u = random();
     const v = random();
@@ -161,6 +171,18 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
   let washOffset = 0;
   let lastTime = CYCLE * 0.82;
   let bursts: Array<{ x: number; y: number; born: number }> = [];
+  let mode: "auto" | "play" = "auto";
+  let tool = 0;
+  let motion = true;
+  let autoTurn = 0;
+  let previousTime: number | null = null;
+  let rinseGlow = 0;
+  let finished = false;
+  let reportedAt = -1;
+  let sprayAt = 0;
+  const pointer = { x: 0, y: 0, down: false, inside: false };
+  const surface = anchors.map(() => ({ dirt: 0, foam: 0, shine: 0 }));
+  let drops: Array<{ x: number; y: number; vx: number; vy: number; born: number; life: number; kind: number }> = [];
 
   const resize = () => {
     const rect = canvas.getBoundingClientRect();
@@ -174,11 +196,15 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
 
   const draw = (time: number) => {
     if (!context || width < 2) return;
+    const dt = previousTime === null ? 0 : Math.min(0.05, Math.max(0, time - previousTime));
+    previousTime = time;
     lastTime = time;
+    const playing = mode === "play";
+    if (motion) autoTurn += dt * ((Math.PI * 2) / SPIN) * (playing ? (pointer.down ? 0.7 : 1.15) : 1);
     const focal = Math.min(width * 1.2, height * 1.85);
     const centerX = width / 2;
     const centerY = height * 0.56;
-    const turn = (time / SPIN) * Math.PI * 2 + 0.7 + userTurn;
+    const turn = autoTurn + 0.7 + userTurn;
     const cosTurn = Math.cos(turn);
     const sinTurn = Math.sin(turn);
     const cosPitch = Math.cos(PITCH);
@@ -194,11 +220,16 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
 
     const cycle = (((time + washOffset) % CYCLE) + CYCLE) % CYCLE / CYCLE;
     const phase = cycle < 0.42 ? 0 : cycle < 0.7 ? 1 : 2;
-    if (phase !== lastPhase) { lastPhase = phase; onPhase?.(phase); }
-    const foamLevel = (delay: number) => smooth((cycle - delay * 0.16) / 0.14) * (1 - smooth((cycle - 0.46 - delay * 0.16) / 0.12));
-    const rinse = smooth((cycle - 0.42) / 0.05) * (1 - smooth((cycle - 0.68) / 0.05));
-    const shine = smooth((cycle - 0.7) / 0.06) * (1 - smooth((cycle - 0.95) / 0.05));
-    const bubbleLevel = 0.3 + 0.7 * (1 - smooth((cycle - 0.5) / 0.15)) + 0.7 * smooth((cycle - 0.97) / 0.03);
+    if (!playing && phase !== lastPhase) { lastPhase = phase; onPhase?.(phase); }
+    const autoFoam = (delay: number) => smooth((cycle - delay * 0.16) / 0.14) * (1 - smooth((cycle - 0.46 - delay * 0.16) / 0.12));
+    const count = surface.length;
+    const dirtAverage = playing ? surface.reduce((sum, spot) => sum + spot.dirt, 0) / count : 0;
+    const foamAverage = playing ? surface.reduce((sum, spot) => sum + spot.foam, 0) / count : 0;
+    const shineAverage = playing ? surface.reduce((sum, spot) => sum + spot.shine, 0) / count : 0;
+    rinseGlow += ((playing && pointer.down && tool === 1 ? 1 : 0) - rinseGlow) * Math.min(1, dt * 6);
+    const rinse = playing ? rinseGlow : smooth((cycle - 0.42) / 0.05) * (1 - smooth((cycle - 0.68) / 0.05));
+    const shine = playing ? shineAverage : smooth((cycle - 0.7) / 0.06) * (1 - smooth((cycle - 0.95) / 0.05));
+    const bubbleLevel = !motion ? 0 : playing ? 0.2 + foamAverage * 0.9 : 0.3 + 0.7 * (1 - smooth((cycle - 0.5) / 0.15)) + 0.7 * smooth((cycle - 0.97) / 0.03);
 
     context.clearRect(0, 0, width, height);
 
@@ -275,8 +306,9 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
       const diffuse = Math.max(0, dot(item.normal, LIGHT));
       const half = normalize([LIGHT[0], LIGHT[1] + sinPitch, LIGHT[2] + cosPitch]);
       const gloss = item.face.kind === "tire" || item.face.kind === "dark" ? 0 : Math.pow(Math.max(0, dot(item.normal, half)), 18);
-      const lit = item.face.kind === "light" || item.face.kind === "tail" ? 1 : 0.42 + 0.62 * diffuse;
-      const boost = gloss * (item.face.kind === "glass" ? 150 : 95) * (0.75 + shine * 0.6);
+      const body = item.face.kind === "paint" || item.face.kind === "glass";
+      const lit = (item.face.kind === "light" || item.face.kind === "tail" ? 1 : 0.42 + 0.62 * diffuse) * (body ? 1 - dirtAverage * 0.3 : 1);
+      const boost = gloss * (item.face.kind === "glass" ? 150 : 95) * (0.75 + shine * 0.6) * (1 - dirtAverage * 0.8);
       const wet = item.face.kind === "paint" ? rinse * 10 : 0;
       const color = base.map((channel, index) => Math.round(Math.min(255, channel * lit + boost + (index === 2 ? wet : 0))));
       tracePath(item.projected);
@@ -287,17 +319,39 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
       context.stroke();
     }
 
-    // Foam and sparkles sit on the surfaces that face the viewer.
-    for (const anchor of anchors) {
+    // Dirt, foam and sparkles sit on the surfaces that face the viewer. In play
+    // mode the visitor's tool changes the spots under their finger.
+    const brush = Math.max(40, width * 0.14);
+    anchors.forEach((anchor, index) => {
       const world = spin(anchor.point);
       const outward = normalize(sub(world, [world[0] * 0.5, 0.45, 0]));
       const facing = outward[1] * sinPitch + outward[2] * cosPitch;
-      if (facing < 0.12) continue;
+      if (facing < 0.12) return;
       const p = project(world);
-      const level = foamLevel(anchor.delay);
+      const spot = surface[index];
+      if (playing && pointer.down && Math.hypot(p.x - pointer.x, p.y - pointer.y) < brush) {
+        if (tool === 0) {
+          spot.foam = Math.min(1, spot.foam + dt * 9);
+          if (spot.foam > 0.2) spot.dirt = Math.max(0, spot.dirt - dt * 9);
+        } else if (tool === 1) {
+          spot.foam = Math.max(0, spot.foam - dt * 9);
+        } else if (spot.dirt < 0.05 && spot.foam < 0.05) {
+          spot.shine = Math.min(1, spot.shine + dt * 8);
+        }
+      }
+      if (playing && spot.dirt > 0.02) {
+        const r = (focal * 0.12 * anchor.size) / p.depth;
+        context.fillStyle = `rgba(74, 56, 38, ${0.5 * spot.dirt})`;
+        for (const [dx, dy, scale] of [[0, 0, 1], [0.7, 0.3, 0.75], [-0.6, -0.2, 0.8]]) {
+          context.beginPath();
+          context.arc(p.x + dx * r, p.y + dy * r, r * scale, 0, Math.PI * 2);
+          context.fill();
+        }
+      }
+      const level = playing ? spot.foam : index < 70 ? autoFoam(anchor.delay) : 0;
       if (level > 0.02) {
         const r = (focal * 0.11 * anchor.size * level) / p.depth;
-        const drip = rinse * anchor.delay * r * 2.4;
+        const drip = playing ? 0 : rinse * anchor.delay * r * 2.4;
         context.fillStyle = `rgba(255, 255, 255, ${0.92 * Math.min(1, level * 1.4)})`;
         for (const [dx, dy, scale] of [[0, 0, 1], [0.8, 0.2, 0.7], [-0.75, 0.25, 0.72], [0.15, -0.55, 0.62]]) {
           context.beginPath();
@@ -305,8 +359,9 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
           context.fill();
         }
       }
-      if (shine > 0.02 && anchor.delay > 0.55) {
-        const pulse = Math.max(0, Math.sin(time * 3.2 + anchor.twinkle)) * shine;
+      const sparkle = playing ? (index % 3 === 0 ? spot.shine : 0) : anchor.delay > 0.55 && index < 70 ? shine : 0;
+      if (sparkle > 0.02) {
+        const pulse = (playing ? 0.3 + 0.7 * Math.max(0, Math.sin(time * 3.2 + anchor.twinkle)) : Math.max(0, Math.sin(time * 3.2 + anchor.twinkle))) * sparkle;
         const r = (focal * 0.13 * pulse) / p.depth;
         if (r > 0.6) {
           context.fillStyle = `rgba(255, 250, 232, ${0.95 * pulse})`;
@@ -319,10 +374,73 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
           context.fill();
         }
       }
+    });
+
+    if (playing) {
+      // Finish each step once nearly everything is covered, so nobody has to
+      // hunt for the last hidden spot.
+      const foamProgress = 1 - dirtAverage;
+      if (foamProgress > 0.72) surface.forEach((spot) => { spot.dirt = 0; });
+      const rinsed = surface.filter((spot) => spot.dirt < 0.1 && spot.foam < 0.1).length / count;
+      if (foamProgress > 0.72 && rinsed > 0.72) surface.forEach((spot) => { spot.foam = 0; });
+      if (shineAverage > 0.72 && !finished) {
+        finished = true;
+        surface.forEach((spot) => { spot.shine = 1; });
+        for (let k = 0; k < 7; k += 1) bursts.push({ x: width * (0.2 + 0.1 * k), y: height * (0.35 + 0.12 * (k % 3)), born: time + k * 0.08 });
+        reportedAt = -1;
+      }
+      if (Math.abs(time - reportedAt) > 0.12 || reportedAt < 0) {
+        reportedAt = time;
+        onProgress?.({ foam: clamp01(foamProgress / 0.72), rinse: foamProgress > 0.72 ? clamp01(rinsed / 0.72) : 0, shine: clamp01(shineAverage / 0.72), done: finished });
+      }
+
+      // Spray from the tool: suds, water or a glint.
+      if (pointer.down && Math.abs(time - sprayAt) > 0.035) {
+        sprayAt = time;
+        const jitter = () => (Math.sin(time * 91.7 + drops.length * 12.9) * 0.5 + Math.cos(time * 47.3 + drops.length * 7.1) * 0.5);
+        drops.push({ x: pointer.x + jitter() * brush * 0.7, y: pointer.y + jitter() * brush * 0.4, vx: jitter() * 26, vy: tool === 1 ? 190 : tool === 0 ? -34 : -8, born: time, life: tool === 1 ? 0.5 : 0.8, kind: tool });
+      }
+      drops = drops.filter((drop) => time - drop.born < drop.life);
+      context.lineCap = "round";
+      for (const drop of drops) {
+        const age = (time - drop.born) / drop.life;
+        const x = drop.x + drop.vx * (time - drop.born);
+        const y = drop.y + drop.vy * (time - drop.born);
+        if (drop.kind === 1) {
+          context.strokeStyle = `rgba(170, 215, 255, ${0.8 * (1 - age)})`;
+          context.lineWidth = 2;
+          context.beginPath();
+          context.moveTo(x, y);
+          context.lineTo(x - drop.vx * 0.03, y - 12);
+          context.stroke();
+        } else if (drop.kind === 0) {
+          context.beginPath();
+          context.arc(x, y, 3 + age * 5, 0, Math.PI * 2);
+          context.strokeStyle = `rgba(240, 248, 255, ${0.85 * (1 - age)})`;
+          context.lineWidth = 1.1;
+          context.stroke();
+        } else {
+          const r = 5 * (1 - age);
+          context.fillStyle = `rgba(255, 244, 205, ${0.9 * (1 - age)})`;
+          context.fillRect(x - r / 2, y - r * 1.5, r, r * 3);
+          context.fillRect(x - r * 1.5, y - r / 2, r * 3, r);
+        }
+      }
+      // A ring shows where the tool reaches.
+      if (pointer.inside || pointer.down) {
+        const tint = tool === 0 ? "255, 255, 255" : tool === 1 ? "150, 205, 255" : "229, 201, 149";
+        context.beginPath();
+        context.arc(pointer.x, pointer.y, brush, 0, Math.PI * 2);
+        context.fillStyle = `rgba(${tint}, ${pointer.down ? 0.12 : 0.05})`;
+        context.fill();
+        context.strokeStyle = `rgba(${tint}, ${pointer.down ? 0.9 : 0.45})`;
+        context.lineWidth = 1.5;
+        context.stroke();
+      }
     }
 
     // Rinse water falling across the car.
-    if (rinse > 0.02) {
+    if (!playing && rinse > 0.02) {
       context.lineCap = "round";
       for (const streak of streaks) {
         const fall = ((time * streak.speed + streak.offset) % 3) / 3;
@@ -344,6 +462,7 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
     // Bubbles popped out by a tap.
     bursts = bursts.filter((burst) => time - burst.born < 0.9);
     for (const burst of bursts) {
+      if (time < burst.born) continue;
       const age = (time - burst.born) / 0.9;
       for (let k = 0; k < 9; k += 1) {
         const angle = (k / 9) * Math.PI * 2 + burst.x;
@@ -375,7 +494,8 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
     start: () => {
       if (running) return;
       running = true;
-      if (!startedAt) startedAt = performance.now();
+      // Carry on from the last drawn moment so time never runs backwards.
+      startedAt = performance.now() - lastTime * 1000;
       frame = requestAnimationFrame(loop);
     },
     stop: () => { running = false; cancelAnimationFrame(frame); },
@@ -388,5 +508,18 @@ export function createCarWashScene(canvas: HTMLCanvasElement, onPhase?: (phase: 
       redrawIfIdle();
     },
     burst: (x, y) => { if (running) bursts.push({ x, y, born: lastTime }); },
+    setMode: (next) => {
+      mode = next;
+      lastPhase = -1;
+      finished = false;
+      reportedAt = -1;
+      drops = [];
+      pointer.down = false;
+      surface.forEach((spot) => { spot.dirt = next === "play" ? 1 : 0; spot.foam = 0; spot.shine = 0; });
+      redrawIfIdle();
+    },
+    setTool: (next) => { tool = next; },
+    setPointer: (x, y, down, inside) => { pointer.x = x; pointer.y = y; pointer.down = down; pointer.inside = inside; redrawIfIdle(); },
+    setMotion: (enabled) => { motion = enabled; },
   };
 }

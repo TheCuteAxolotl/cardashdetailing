@@ -442,3 +442,21 @@
   .manifesto { padding-top: 48px; }
 }
 @media (prefers-reduced-motion: reduce) { .heroRating { animation: none; } }
+
+/* Professional polish: one button shape, clearer price rows, tidy link chips. */
+.experience .hero :global(.home-hero-actions) a { border-radius: 999px; }
+.experience :global(.package-card) { border-radius: 18px !important; background: linear-gradient(180deg, #1f1f1f, #181818) !important; }
+.experience :global(.package-card-featured) { border-color: rgba(214,183,121,.55) !important; }
+.experience :global(.price-row) { transition: background .25s; }
+.experience :global(.price-row):hover { background: rgba(214,183,121,.08); }
+.experience :global(.price-row) strong { color: #f4efe5; font-variant-numeric: tabular-nums; }
+.experience :global(.price-row-book) { display: inline-flex; align-items: center; min-height: 34px; padding: 6px 16px; border: 1px solid rgba(214,183,121,.6); border-radius: 999px; color: #e5c995; font-size: 12px; font-weight: 700; transition: background .25s, color .25s; }
+.experience :global(.price-row):hover :global(.price-row-book), .experience :global(.price-row):active :global(.price-row-book) { background: #d6b779; color: #101010; }
+.chipRow { display: flex; flex-wrap: wrap; gap: 10px; }
+.chipRow a { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 16px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; color: #dcd7cd; font-size: 13px; font-weight: 600; transition: border-color .25s, color .25s, background .25s; }
+.chipRow a:hover { border-color: #d6b779; color: #fff; background: rgba(214,183,121,.08); }
+.proof :global(.home-proof-card) { transition: background .3s; }
+.proof :global(.home-proof-card):hover { background: #1f1f1f !important; }
+.quickBookSteps { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 2px; }
+@media (hover: hover) { .experience :global(.package-card):hover { border-color: rgba(214,183,121,.5) !important; box-shadow: 0 24px 50px rgba(0,0,0,.35); } }
+@media (prefers-reduced-motion: reduce) { .chipRow a { transition: none; } }

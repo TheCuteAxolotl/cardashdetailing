@@ -21,7 +21,7 @@ export default function HomePackagePricing({ config, mediaItems = [], promotions
     <section id="prices-packages" className="scroll-mt-24">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-black/36">Detail packages</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[.16em] text-[#d6b779]">Detail packages</p>
           <h3 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#111] sm:text-3xl">{config.eyebrow}</h3>
         </div>
         <p className="max-w-lg text-sm leading-6 text-black/42">Interior and exterior in one appointment.</p>
@@ -30,27 +30,27 @@ export default function HomePackagePricing({ config, mediaItems = [], promotions
       <div className="home-package-grid grid gap-4 lg:grid-cols-3 lg:items-stretch">
         {config.packages.map((pkg) => (
           <article key={pkg.id} className={`package-card relative border border-black/[.08] bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "package-card-featured" : ""}`}>
-            <div className="flex min-h-[72px] items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-3 lg:min-h-[72px]">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-black/34">{pkg.tier}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-[#d6b779]">{pkg.tier}</p>
                 <h4 className="mt-2 text-2xl font-semibold tracking-[-.035em] text-[#111]">{pkg.name}</h4>
               </div>
               {pkg.badge && <span className="rounded-full bg-[#171411] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[.1em] text-white">{pkg.badge}</span>}
             </div>
 
-            <p className="mt-3 min-h-[72px] text-sm leading-6 text-black/48">{pkg.description}</p>
+            <p className="mt-3 text-sm leading-6 text-black/48 lg:min-h-[72px]">{pkg.description}</p>
 
-            <div className="mt-6 overflow-hidden rounded-xl border border-black/[.08] bg-[#f8f7f4]">
+            <div className="mt-5 overflow-hidden rounded-xl border border-black/[.08] bg-[#f8f7f4]">
               {(Object.keys(VEHICLE_LABELS) as VehicleClass[]).map((vehicleClass, index) => (
                 <a
                   key={vehicleClass}
                   href={packageBookHref(pkg.id, vehicleClass)}
-                  className={`group flex min-h-14 items-center justify-between gap-4 px-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}
+                  className={`price-row group flex min-h-14 items-center justify-between gap-4 px-4 py-3 ${index ? "border-t border-black/[.07]" : ""}`}
                 >
                   <span className="text-sm font-medium text-black/50">{VEHICLE_LABELS[vehicleClass]}</span>
                   <span className="flex items-center gap-3">
                     {(() => { const original=Number(pkg.prices[vehicleClass] || 0); const sale=promotions?matchingPromotion(promotions,"packages",pkg.id,"package"):null; const final=promotionalPrice(original,sale); return <span className="flex flex-wrap items-baseline gap-2">{final<original&&<span className="text-xs text-black/40 line-through">${original.toFixed(2)}</span>}<strong className={`text-lg font-semibold ${final<original?"text-red-700":"text-[#111]"}`}>${final.toFixed(2)}</strong></span>; })()}
-                    <span className="text-xs font-semibold text-black/36 transition group-hover:translate-x-0.5 group-hover:text-black">Book</span>
+                    <span className="price-row-book">Book</span>
                   </span>
                 </a>
               ))}
