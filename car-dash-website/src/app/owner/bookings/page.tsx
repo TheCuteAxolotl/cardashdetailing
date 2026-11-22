@@ -172,7 +172,7 @@ export default function OwnerBookings() {
           if (!name || name === "New lead") continue;
           const id = String(customer.id || "");
           if (!id) continue;
-          const key = [name.toLowerCase(), phone.replace(/\\D/g, ""), email.toLowerCase()].join("|");
+          const key = [name.toLowerCase(), phone.replace(/\D/g, ""), email.toLowerCase()].join("|");
           if (!unique.has(key)) unique.set(key, { id, name, phone, email });
         }
         setSavedClients([...unique.values()].sort((a, b) => a.name.localeCompare(b.name)));
