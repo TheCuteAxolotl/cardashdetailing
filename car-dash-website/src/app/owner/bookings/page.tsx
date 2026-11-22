@@ -37,6 +37,13 @@ type Booking = {
   updatedAt?: string;
 };
 
+type SavedClient = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+};
+
 type ManualBookingForm = {
   customerName: string;
   customerEmail: string;
@@ -84,6 +91,11 @@ export default function OwnerBookings() {
   const [showManual, setShowManual] = useState(false);
   const [manual, setManual] = useState<ManualBookingForm>(EMPTY_MANUAL);
   const [manualSaving, setManualSaving] = useState(false);
+  const [savedClients, setSavedClients] = useState<SavedClient[]>([]);
+  const [savedClientsLoading, setSavedClientsLoading] = useState(false);
+  const [savedClientsError, setSavedClientsError] = useState("");
+  const [clientSearch, setClientSearch] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState("");
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [receiptBooking, setReceiptBooking] = useState<Booking | null>(null);
   const [reminderBooking, setReminderBooking] = useState<Booking | null>(null);
@@ -130,6 +142,71 @@ export default function OwnerBookings() {
     setShowManual(true);
   }, []);
 
+  // Existing bookings, quotes, and CRM profiles all contribute to the saved client list.
+  // The CRM endpoint is owner-only and prevents private customer data being exposed publicly.
+  useEffect(() => {
+    if (!showManual) return;
+    const controller = new AbortController();
+    setSavedClientsLoading(true);
+    setSavedClientsError("");
+    setSavedClients([]);
+    fetch("/api/crm", { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("CRM unavailable");
+        return response.json();
+      })
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        const raw = (Array.isArray(data.customers) ? data.customers : []) as Array<{
+          id: string;
+          name: string;
+          phone: string;
+          email: string;
+          profile?: { name?: string; phone?: string; email?: string };
+        }>;
+        const unique = new Map<string, SavedClient>();
+        for (const customer of raw) {
+          const name = String(customer.profile?.name || customer.name || "").trim();
+          const phone = String(customer.profile?.phone || customer.phone || "").trim();
+          const email = String(customer.profile?.email || customer.email || "").trim();
+          if (!name || name === "New lead") continue;
+          const id = String(customer.id || "");
+          if (!id) continue;
+          const key = [name.toLowerCase(), phone.replace(/\\D/g, ""), email.toLowerCase()].join("|");
+          if (!unique.has(key)) unique.set(key, { id, name, phone, email });
+        }
+        setSavedClients([...unique.values()].sort((a, b) => a.name.localeCompare(b.name)));
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setSavedClientsError("Saved clients could not be loaded. You can still enter a new customer below.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSavedClientsLoading(false);
+      });
+    return () => controller.abort();
+  }, [showManual]);
+
+  const selectSavedClient = (id: string) => {
+    setSelectedClientId(id);
+    setClientSearch("");
+    const client = savedClients.find((item) => item.id === id);
+    if (client) {
+      setManual((current) => ({
+        ...current,
+        customerName: client.name,
+        customerPhone: client.phone,
+        customerEmail: client.email,
+      }));
+    } else {
+      setManual((current) => ({
+        ...current,
+        customerName: "",
+        customerPhone: "",
+        customerEmail: "",
+      }));
+    }
+  };
+
   const load = async () => {
     const response = await fetch("/api/bookings", { cache: "no-store" });
     if (!response.ok) throw new Error("Failed to load bookings");
@@ -171,6 +248,8 @@ export default function OwnerBookings() {
       }
       setConvertingId(null);
       setManual(EMPTY_MANUAL);
+      setSelectedClientId("");
+      setClientSearch("");
       setShowManual(false);
       if (convertingId) {
         setMessage("Booking request confirmed and added to the schedule.");
@@ -289,7 +368,7 @@ export default function OwnerBookings() {
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/owner/booking-settings" className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium">Availability</a>
-            <button type="button" onClick={() => { setConvertingId(null); setManual(EMPTY_MANUAL); setShowManual((value) => !value); }} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-sm font-semibold text-[#6EAEC6]">{showManual ? "Close form" : "+ Add outside booking"}</button>
+            <button type="button" onClick={() => { setConvertingId(null); setManual(EMPTY_MANUAL); setSelectedClientId(""); setClientSearch(""); setShowManual((value) => !value); }} className="rounded-lg border border-[#6EAEC6]/30 bg-[#6EAEC6]/10 px-4 py-2 text-sm font-semibold text-[#6EAEC6]">{showManual ? "Close form" : "+ Add outside booking"}</button>
             <a href="/owner/dashboard" className="rounded-lg bg-[#6EAEC6] px-4 py-2 text-sm font-medium text-[#0B1822]">Back</a>
           </div>
         </div>
@@ -299,7 +378,7 @@ export default function OwnerBookings() {
         <OwnerBookingModal
           open={showManual}
           title={convertingId ? "Confirm booking request" : "New manual booking"}
-          onClose={() => { if (manualSaving) return; setShowManual(false); setConvertingId(null); setManual(EMPTY_MANUAL); }}
+          onClose={() => { if (manualSaving) return; setShowManual(false); setConvertingId(null); setManual(EMPTY_MANUAL); setSelectedClientId(""); setClientSearch(""); }}
         >
           <form id="owner-manual-booking" onSubmit={submitManualBooking} className="rounded-2xl border border-white/10 bg-[#1e1e1e] p-4 sm:p-6">
             <div>
@@ -309,8 +388,25 @@ export default function OwnerBookings() {
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <label className="text-sm text-white/55">Customer name<input className={`${input} mt-2`} value={manual.customerName} onChange={(e) => setManual((current) => ({ ...current, customerName: e.target.value }))} required /></label>
-              <label className="text-sm text-white/55">Phone<input className={`${input} mt-2`} value={manual.customerPhone} onChange={(e) => setManual((current) => ({ ...current, customerPhone: e.target.value }))} /></label>
+              <div className="rounded-xl border border-[#d6b779]/30 bg-[#d6b779]/[.06] p-4 md:col-span-2 lg:col-span-3">
+                <p className="text-sm font-semibold text-[#e8d5af]">Choose a saved client</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <label className="text-xs text-white/65">Search by name or phone
+                    <input type="search" autoComplete="off" className={`${input} mt-2`} placeholder="Search saved clients…" value={clientSearch} onChange={(e) => setClientSearch(e.target.value)} />
+                  </label>
+                  <label className="text-xs text-white/65">Existing client
+                    <select className={`${input} mt-2`} value={selectedClientId} onChange={(e) => selectSavedClient(e.target.value)}>
+                      <option value="">New client / enter manually</option>
+                      {savedClients.filter((client) => client.id === selectedClientId || [client.name, client.phone, client.email].some((value) => value.toLowerCase().includes(clientSearch.trim().toLowerCase()))).map((client) => (
+                        <option key={client.id} value={client.id}>{client.name}{client.phone ? ` · ${client.phone}` : ""}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <p className="mt-2 text-xs text-white/55">{savedClientsLoading ? "Loading saved clients…" : savedClientsError || (savedClients.length ? "Selecting a client fills in their name, phone, and email. You can edit any field below." : "No saved clients yet. Add a new customer below; they will be available for future bookings.")}</p>
+              </div>
+              <label className="text-sm text-white/55">Customer name<input className={`${input} mt-2`} value={manual.customerName} onChange={(e) => { setSelectedClientId(""); setManual((current) => ({ ...current, customerName: e.target.value })); }} required /></label>
+              <label className="text-sm text-white/55">Phone<input className={`${input} mt-2`} value={manual.customerPhone} onChange={(e) => { setSelectedClientId(""); setManual((current) => ({ ...current, customerPhone: e.target.value })); }} /></label>
               {!convertingId && <label className="flex items-start gap-3 rounded-xl border border-[#d6b779]/35 bg-[#d6b779]/10 p-3 text-xs leading-5 text-[#e8d5af] md:col-span-2">
                 <input type="checkbox" checked={manual.sendConfirmationSms}
                   onChange={(e) => setManual(current => ({ ...current, sendConfirmationSms: e.target.checked }))}
@@ -320,7 +416,7 @@ export default function OwnerBookings() {
                   Keep this on only when the customer provided their number and agreed to receive appointment updates.
                   Without a phone number, the booking will be saved but no text will be sent.</span>
               </label>}
-              <label className="text-sm text-white/55">Email<input type="email" className={`${input} mt-2`} value={manual.customerEmail} onChange={(e) => setManual((current) => ({ ...current, customerEmail: e.target.value }))} /></label>
+              <label className="text-sm text-white/55">Email<input type="email" className={`${input} mt-2`} value={manual.customerEmail} onChange={(e) => { setSelectedClientId(""); setManual((current) => ({ ...current, customerEmail: e.target.value })); }} /></label>
               <label className="text-sm text-white/55">Service<input className={`${input} mt-2`} value={manual.serviceName} onChange={(e) => setManual((current) => ({ ...current, serviceName: e.target.value }))} required /></label>
               <label className="text-sm text-white/55">Price (optional)<NumberInput type="number" min="0" step="0.01" className={`${input} mt-2`} value={manual.quotedPrice} onChange={(e) => setManual((current) => ({ ...current, quotedPrice: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Vehicle year<input className={`${input} mt-2`} value={manual.vehicleYear} onChange={(e) => setManual((current) => ({ ...current, vehicleYear: e.target.value }))} /></label>
@@ -334,7 +430,7 @@ export default function OwnerBookings() {
             <label className="mt-4 block text-sm text-white/55">Notes<textarea className={`${input} mt-2 min-h-24`} value={manual.notes} onChange={(e) => setManual((current) => ({ ...current, notes: e.target.value }))} placeholder="Anything you want saved with this booking" /></label>
             <div className="mt-5 flex flex-wrap gap-3">
               <button type="submit" disabled={manualSaving} className="rounded-full bg-[#6EAEC6] px-6 py-3 font-semibold text-[#0B1822] disabled:opacity-50">{manualSaving ? "Saving…" : convertingId ? "Confirm & Add to Schedule" : "Add & Block Time"}</button>
-              <button type="button" onClick={() => { setShowManual(false); setManual(EMPTY_MANUAL); }} className="rounded-full border border-white/10 px-6 py-3 text-sm text-white/60">Cancel</button>
+              <button type="button" onClick={() => { setShowManual(false); setManual(EMPTY_MANUAL); setSelectedClientId(""); setClientSearch(""); }} className="rounded-full border border-white/10 px-6 py-3 text-sm text-white/60">Cancel</button>
             </div>
           </form>
         </OwnerBookingModal>
