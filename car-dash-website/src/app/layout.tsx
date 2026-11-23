@@ -4,6 +4,7 @@ import "./globals.css";
 import "./scroll-reveal.css";
 import "./editorial-theme.css";
 import "./owner-command-center.css";
+import "./graphite-theme.css";
 import SiteChrome from "@/components/SiteChrome";
 import StructuredData from "@/components/StructuredData";
 import { localBusinessSchema, SITE_URL } from "@/lib/seo";

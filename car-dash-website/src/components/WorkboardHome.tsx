@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import BookingDetailsEditor, { type EditableBooking } from "./BookingDetailsEditor";
 import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 import "./workboard.css";
+import FeatureGrid from "./FeatureGrid";
 
 function chicagoDate(){return new Intl.DateTimeFormat("en-CA",{timeZone:"America/Chicago",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date())}
 const dateOf=(value:string)=>new Date(value+"T12:00:00");
@@ -58,8 +59,17 @@ export default function WorkboardHome({owner,light,recording,permissions,onMore}
   function moveMonth(amount:number){setSelected(dayOf(new Date(year,month+amount,1)))}
   return <><div className={"cd-workboard"+(light?" light":"")}>
     <div className="daily-overview">
+      <header className="cd-hero">
+        <p className="cap">{dateOf(today).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})} · {owner?"Owner workspace":"Staff workspace"}</p>
+        <h1>Run your <mark>{owner?"mobile detailing":"detailing day"}</mark> {owner?"business":""} as clean as your work</h1>
+        <p className="cd-hero-sub">{owner?"Bookings, payments, customers and your team — all in one Car Dash workspace.":"Your jobs, customers and messages — all in one place."}</p>
+        <div className="cd-hero-actions">
+          {canBook&&<a className="cd-hero-cta" href={owner?"/owner/bookings?create=1":bookingsPath}><span aria-hidden="true">→</span>{owner?"New booking":"Open bookings"}</a>}
+          {canQuote&&<a className="cd-hero-ghost" href={owner?"/owner/quotes":"/admin/quotes"}>Quotes &amp; Estimates</a>}
+        </div>
+      </header>
       <div className="daily-heading">
-        <div><p className="cap">{dateOf(today).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</p>
+        <div><p className="cap">Schedule</p>
           <h2>{calendar ? "Booking calendar" : "Daily overview"}</h2></div>
         <div className="daily-switch" aria-label="Schedule view">
           <button aria-pressed={!calendar} onClick={()=>{setCalendar(false);setSelected(today)}}>Overview</button>
@@ -77,6 +87,8 @@ export default function WorkboardHome({owner,light,recording,permissions,onMore}
       ].filter((label):label is string=>typeof label==="string");
       return <button key={key} aria-pressed={key===selected} aria-label={[dateOf(key).toLocaleDateString("en-US",{month:"long",day:"numeric"}),...labels].join(", ")} className={key===selected?"on":""} onClick={()=>setSelected(key)}>{i+1}{labels.map(label=><small key={label} style={{display:"block",fontSize:"clamp(9px,1.2vw,12px)",lineHeight:1.2,whiteSpace:"normal",overflowWrap:"anywhere",color:"inherit"}}>{label}</small>)}</button>})}</div><h3>{dateOf(selected).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</h3>{rows(scheduled,dailyTasks.length?"":"No bookings scheduled.")}{privateRows}<button onClick={onMore}>Open detailed dashboard</button></section>:<><div className="stats">{[["Active jobs",active.length],["Today’s bookings",todays.length],["Today’s booked value",money(todays.reduce((sum,b)=>sum+Number(b.quotedPrice||0),0))]].map(([title,value])=><div className="stat" key={title}><span className="cap">{title}</span><b>{notice?"—":value}</b></div>)}</div>
     <div className="grid"><div><section className="box"><div className="head"><h2>Job schedule</h2><button onClick={()=>setCalendar(true)}>Calendar</button></div><div className="week">{Array.from({length:7},(_,i)=>{const date=new Date(start);date.setDate(date.getDate()+i);const key=dayOf(date);return <button key={key} className={key===selected?"on":""} onClick={()=>setSelected(key)}><small>{date.toLocaleDateString("en-US",{weekday:"short"})}</small>{date.getDate()}</button>})}</div><div className="cap">{dateOf(selected).toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})}</div>{rows(scheduled,dailyTasks.length?"":"No jobs scheduled. Choose a date or add a booking.")}{privateRows}</section><br/><section className="box"><h2>Active jobs</h2>{rows(active,"Jobs marked in progress will appear here.")}</section></div>
-    <section className="box" style={{alignSelf:"start"}}><h2>Quick actions</h2>{canQuote&&quick(owner?"Create estimate":"Quotes",owner?"Price a detail and estimate profit":"Review customer quotes",()=>visit(owner?"/owner/detail-builder":"/admin/quotes"))}{owner&&quick("Find a customer","Vehicles and job history",()=>visit("/owner/crm"))}{canBook&&quick("Previous bookings","View past jobs and customer details",()=>visit(bookingsPath))}{!owner&&permissions.includes("loyalty")&&quick("Loyalty cards","Record visits and redeem rewards",()=>visit("/owner/loyalty"))}{(owner || permissions.includes("maintenance")) && quick("Monthly plans","Record cash payments and review the next visit",()=>visit("/owner/maintenance/cash"))}{quick("Detailed dashboard","Open the full schedule and workspace overview",onMore)}</section></div></>}</div></div>
+    <section className="box" style={{alignSelf:"start"}}><h2>Quick actions</h2>{canQuote&&quick(owner?"Create estimate":"Quotes",owner?"Price a detail and estimate profit":"Review customer quotes",()=>visit(owner?"/owner/detail-builder":"/admin/quotes"))}{owner&&quick("Find a customer","Vehicles and job history",()=>visit("/owner/crm"))}{canBook&&quick("Previous bookings","View past jobs and customer details",()=>visit(bookingsPath))}{!owner&&permissions.includes("loyalty")&&quick("Loyalty cards","Record visits and redeem rewards",()=>visit("/owner/loyalty"))}{(owner || permissions.includes("maintenance")) && quick("Monthly plans","Record cash payments and review the next visit",()=>visit("/owner/maintenance/cash"))}{quick("Detailed dashboard","Open the full schedule and workspace overview",onMore)}</section></div></>}
+    <FeatureGrid owner={owner} permissions={permissions} title={owner?"Everything you need to run Car Dash":"Everything for your shift"}/>
+    </div></div>
     {editor&&!recording&&canBook&&<BookingDetailsEditor booking={editor} onClose={()=>setEditor(null)} onSaved={load}/>}</>
 }

@@ -1,5 +1,6 @@
 "use client";
 import FieldOverview from "@/components/FieldOverview";
+import FeatureGrid from "@/components/FeatureGrid";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import OwnerAppIcon, { type OwnerIconName } from "@/components/OwnerAppIcon";
@@ -10,20 +11,6 @@ import type { OwnerScheduleTask } from "@/lib/owner-schedule";
 
 type Activity={id:string;kind:string;title:string;detail:string;href:string;time:string};
 type DashboardData={bookings:EditableBooking[];tasks:OwnerScheduleTask[];activity:Activity[];unread:number};
-const actions:{title:string;detail:string;href:string;icon:OwnerIconName}[]=[
- {title:"Jobs & inspections",detail:"Track progress and quality",href:"/owner/jobs",icon:"calendar"},
- {title:"Customers",detail:"Records and service history",href:"/owner/crm",icon:"users"},
- {title:"Quotes",detail:"Respond and convert leads",href:"/owner/quotes",icon:"quote"},
- {title:"Payments",detail:"Invoices and balances",href:"/owner/invoices",icon:"receipt"},
- {title:"Subscriptions",detail:"Maintenance plans",href:"/owner/maintenance",icon:"activity"},
- {title:"Inventory",detail:"Supplies and reorder levels",href:"/owner/inventory",icon:"calculator"},
- {title:"Employees",detail:"Staff and access",href:"/owner/admins",icon:"users"},
- {title:"Products & services",detail:"Manage service catalog",href:"/owner/services",icon:"book"},
- {title:"Promo codes",detail:"Marketing and coupons",href:"/owner/promo-codes",icon:"gift"},
- {title:"Gift cards",detail:"Sales and redemptions",href:"/owner/gift-cards",icon:"gift"},
- {title:"Loyalty cards",detail:"Repeat-customer rewards",href:"/owner/loyalty",icon:"check"},
- {title:"Analytics",detail:"Business performance",href:"/owner/analytics",icon:"chart"},
-];
 const cash=(value:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(value);
 function chicagoToday(){
  const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
@@ -195,19 +182,7 @@ export default function OwnerDashboard(){
          </section>
        </aside>
      </div>
-     <section className="rounded-2xl border border-white/10 bg-[#1d1c1a] p-4 sm:p-5">
-       <div className="flex flex-wrap items-end justify-between gap-3">
-         <div><p className="text-[10px] font-bold uppercase tracking-[.19em] text-[#d6b779]">Business management</p><h3 className="mt-1 text-xl font-semibold tracking-tight">Everything you need to run Car Dash</h3></div>
-         <a href="/owner/analytics" className="text-xs font-semibold text-[#d6b779]">Business analytics</a>
-       </div>
-       <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
-         {actions.map(a=><a key={a.href} href={a.href} className="group rounded-xl border border-white/10 bg-[#272521] p-3.5 transition hover:border-[#d6b779]/50 hover:bg-[#302b22]">
-           <span className="grid h-9 w-9 place-items-center rounded-lg border border-[#d6b779]/20 text-[#d6b779]"><OwnerAppIcon name={a.icon} className="h-4.5 w-4.5"/></span>
-           <p className="mt-3 text-xs font-semibold leading-5 text-[#f1e7d9]">{a.title}</p>
-           <p className="mt-1 text-[10px] leading-4 text-[#a9a092]">{a.detail}</p>
-         </a>)}
-       </div>
-     </section>
+     <FeatureGrid owner title="Everything you need to run Car Dash" eyebrow="Business management"/>
      <p className="pb-4 text-[10px] text-[#8f877c]">Scheduled values are estimates from booking records, not verified payments. Manage invoices and actual collection in Payments.</p>
    </div>
  </div>
