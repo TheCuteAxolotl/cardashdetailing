@@ -3,15 +3,14 @@
 import type { ReactNode } from "react";
 
 /*
- * Glass tool grid for the owner + staff home screens, styled after the
- * "Online Booking / Quotes & Estimates / Invoices…" feature board.
+ * Glass tool grid for the owner + staff home screens.
  * Every tile links to the real workspace page that handles it.
  */
 
 type GlyphName =
   | "booking" | "quote" | "invoice" | "card" | "deposit" | "sync" | "bell" | "camera"
   | "megaphone" | "car" | "star" | "tip" | "wallet" | "chat" | "timer" | "people"
-  | "repeat" | "earnings" | "gift" | "loyalty" | "team" | "website" | "box" | "phone" | "shield";
+  | "repeat" | "earnings" | "book" | "gift" | "loyalty" | "team" | "website" | "box" | "phone" | "shield";
 
 type Feature = {
   label: string;
@@ -24,30 +23,30 @@ type Feature = {
 };
 
 export const FEATURES: Feature[] = [
-  { label: "Online Booking", detail: "Requests, confirmations & the calendar", href: "/owner/bookings", adminHref: "/admin/bookings", glyph: "booking", permissions: ["bookings"] },
-  { label: "Quotes & Estimates", detail: "Reply to quote chats and price jobs", href: "/owner/quotes", adminHref: "/admin/quotes", glyph: "quote", permissions: ["quoteChats"] },
-  { label: "Invoices", detail: "Send, track and collect balances", href: "/owner/invoices", glyph: "invoice", permissions: ["invoices"] },
-  { label: "Card Payments", detail: "Online card checkout on every invoice", href: "/owner/invoices", glyph: "card", permissions: ["invoices"] },
-  { label: "Deposits", detail: "Booking rules, holds and deposits", href: "/owner/booking-settings", glyph: "deposit", permissions: ["pricing", "bookings"] },
-  { label: "Calendar Sync", detail: "Planner + subscribe from your phone", href: "/owner/schedule", glyph: "sync", ownerOnly: true },
-  { label: "Reminders", detail: "Appointment reminder texts", href: "/owner/bookings", adminHref: "/admin/bookings", glyph: "bell", permissions: ["bookings"] },
-  { label: "Before & After Photos", detail: "Job photos and the public gallery", href: "/owner/gallery", glyph: "camera", permissions: ["gallery"] },
-  { label: "Marketing Studio", detail: "Automatic promotions and campaigns", href: "/owner/promotions", glyph: "megaphone", ownerOnly: true },
-  { label: "Price per Vehicle", detail: "Sedan, SUV, truck and add-on pricing", href: "/owner/pricing-pages", glyph: "car", permissions: ["pricing"] },
-  { label: "Reviews", detail: "Customer reviews shown on your site", href: "/owner/website", glyph: "star", permissions: ["website"] },
-  { label: "Tips", detail: "Tips collected with invoice payments", href: "/owner/invoices", glyph: "tip", permissions: ["invoices"] },
-  { label: "Other Ways to Pay", detail: "Cash, Zelle, Venmo & Cash App", href: "/owner/invoices", glyph: "wallet", permissions: ["invoices"] },
-  { label: "“On My Way” Texts", detail: "Text customers from the inbox", href: "/owner/messages", adminHref: "/admin/messages", glyph: "chat", permissions: ["smsInbox"] },
-  { label: "Job Timer", detail: "Track job progress and quality", href: "/owner/jobs", glyph: "timer", permissions: ["assignedJobs"] },
-  { label: "Customer List", detail: "Vehicles, history and notes", href: "/owner/crm", glyph: "people", ownerOnly: true },
-  { label: "Rebooking", detail: "Maintenance plans and repeat visits", href: "/owner/maintenance", glyph: "repeat", permissions: ["maintenance"] },
-  { label: "Earnings", detail: "Revenue by service and trends", href: "/owner/revenue", glyph: "earnings", ownerOnly: true },
-  { label: "Gift Cards", detail: "Sales and redemptions", href: "/owner/gift-cards", glyph: "gift", ownerOnly: true },
-  { label: "Loyalty Cards", detail: "Repeat-customer rewards", href: "/owner/loyalty", glyph: "loyalty", permissions: ["loyalty"] },
-  { label: "Supply Inventory", detail: "Products and reorder levels", href: "/owner/inventory", glyph: "box", permissions: ["inventory", "assignedJobs"] },
-  { label: "Business Phone", detail: "Calls and voicemail", href: "/owner/calls", glyph: "phone", permissions: ["businessPhone"] },
-  { label: "Team & Access", detail: "Employees, teams and permissions", href: "/owner/admins", glyph: "team", ownerOnly: true },
-  { label: "Add to Your Website", detail: "Edit pages, content and services", href: "/owner/website", glyph: "website", permissions: ["website"] },
+  { label: "Bookings", detail: "Requests, confirmations and reminders", href: "/owner/bookings", adminHref: "/admin/bookings", glyph: "booking", permissions: ["bookings"] },
+  { label: "Schedule", detail: "Planner and calendar", href: "/owner/schedule", glyph: "sync", ownerOnly: true },
+  { label: "Jobs & Quality", detail: "Track progress and quality", href: "/owner/jobs", glyph: "timer", permissions: ["assignedJobs"] },
+  { label: "Final inspection", detail: "Review finished jobs", href: "/owner/inspection", glyph: "shield", permissions: ["assignedJobs"] },
+  { label: "Quote requests", detail: "Respond and convert leads", href: "/owner/quotes", adminHref: "/admin/quotes", glyph: "quote", permissions: ["quoteChats"] },
+  { label: "Build a Detail", detail: "Price a detail and estimate profit", href: "/owner/detail-builder", glyph: "car", permissions: ["estimateTools"] },
+  { label: "Customers", detail: "Records and service history", href: "/owner/crm", glyph: "people", ownerOnly: true },
+  { label: "Messages", detail: "Customer conversations", href: "/owner/messages", adminHref: "/admin/messages", glyph: "chat", permissions: ["smsInbox"] },
+  { label: "Business phone", detail: "Calls and voicemail", href: "/owner/calls", glyph: "phone", permissions: ["businessPhone"] },
+  { label: "Invoices", detail: "Payments and balances", href: "/owner/invoices", glyph: "invoice", permissions: ["invoices"] },
+  { label: "Subscriptions", detail: "Maintenance plans", href: "/owner/maintenance", glyph: "repeat", permissions: ["maintenance"] },
+  { label: "Revenue by service", detail: "What's earning the most", href: "/owner/revenue", glyph: "earnings", ownerOnly: true },
+  { label: "Analytics", detail: "Business performance", href: "/owner/analytics", glyph: "earnings", permissions: ["analytics"] },
+  { label: "Products & services", detail: "Manage service catalog", href: "/owner/services", glyph: "star", permissions: ["services"] },
+  { label: "Pricing", detail: "Pricing pages", href: "/owner/pricing-pages", glyph: "card", permissions: ["pricing"] },
+  { label: "Promo codes", detail: "Marketing and coupons", href: "/owner/promo-codes", glyph: "megaphone", permissions: ["pricing"] },
+  { label: "Gift cards", detail: "Sales and redemptions", href: "/owner/gift-cards", glyph: "gift", ownerOnly: true },
+  { label: "Loyalty cards", detail: "Repeat-customer rewards", href: "/owner/loyalty", glyph: "loyalty", permissions: ["loyalty"] },
+  { label: "Photos & media", detail: "Gallery and site photos", href: "/owner/gallery", glyph: "camera", permissions: ["gallery"] },
+  { label: "Inventory", detail: "Supplies and reorder levels", href: "/owner/inventory", glyph: "box", permissions: ["inventory", "assignedJobs"] },
+  { label: "Employees", detail: "Staff and access", href: "/owner/admins", glyph: "team", ownerOnly: true },
+  { label: "Support inbox", detail: "Help requests from customers", href: "/owner/support", adminHref: "/admin/support", glyph: "bell", permissions: ["support"] },
+  { label: "Staff guide", detail: "How-tos and training", href: "/staff-guide", adminHref: "/admin/staff-guide", glyph: "book", permissions: ["staffGuide"] },
+  { label: "Website content", detail: "Edit your public site", href: "/owner/website", glyph: "website", permissions: ["website"] },
 ];
 
 const glyphs: Record<GlyphName, ReactNode> = {
@@ -76,6 +75,7 @@ const glyphs: Record<GlyphName, ReactNode> = {
   box: <><path d="m12 3 8 4v10l-8 4-8-4V7z"/><path d="m4 7 8 4 8-4M12 11v10"/></>,
   phone: <><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></>,
   shield: <><path d="M12 3 5 6v5c0 4.6 2.6 8 7 10 4.4-2 7-5.4 7-10V6z"/></>,
+  book: <><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v17H6.5A2.5 2.5 0 0 0 4 22.5zM20 5.5A2.5 2.5 0 0 0 17.5 3H12v17h5.5a2.5 2.5 0 0 1 2.5 2.5z"/></>,
 };
 
 export function FeatureGlyph({ name, className = "h-[18px] w-[18px]" }: { name: GlyphName; className?: string }) {
