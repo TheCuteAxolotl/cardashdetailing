@@ -5,6 +5,7 @@ import PackageMediaEvidence from "@/components/PackageMediaEvidence";
 import type { MediaItem } from "@/lib/media";
 import PackageConditionGuide from "@/components/PackageConditionGuide";
 import { getPackageConditionGuide } from "@/lib/package-condition-guide";
+import PackageTabs from "@/components/PackageTabs";
 
 type Props = {
   config: PricingPageConfig;
@@ -27,7 +28,9 @@ export default function HomePackagePricing({ config, mediaItems = [], promotions
         <p className="max-w-lg text-sm leading-6 text-black/42">Interior and exterior in one appointment.</p>
       </div>
 
-      <div className="home-package-grid grid gap-4 lg:grid-cols-3 lg:items-stretch">
+      <PackageTabs targetId="home-package-grid" labels={config.packages.map((pkg) => pkg.name)} />
+
+      <div id="home-package-grid" className="home-package-grid grid gap-4 lg:grid-cols-3 lg:items-stretch">
         {config.packages.map((pkg) => (
           <article key={pkg.id} className={`package-card relative border border-black/[.08] bg-white p-5 sm:p-6 lg:p-7 ${pkg.featured ? "package-card-featured" : ""}`}>
             <div className="flex items-start justify-between gap-3 lg:min-h-[72px]">

@@ -76,11 +76,12 @@ export default function SiteChrome({ children, footerBlurb, initialSiteContent }
 
   return (
     <>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <BrandIntro />
       <PromotionBanner />
       <SiteHeader />
       <ScrollReveal />
-      <div className="public-clean flex-1">{children}</div>
+      <div id="main-content" tabIndex={-1} className="public-clean flex-1 outline-none">{children}</div>
       <SiteFooter blurb={footerBlurb} />
       <SupportWidget />
       <PublicBookingModal initialSiteContent={initialSiteContent} />

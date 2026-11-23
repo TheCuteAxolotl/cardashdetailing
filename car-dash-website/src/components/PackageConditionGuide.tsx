@@ -22,7 +22,7 @@ export default function PackageConditionGuide({
         <summary className="cursor-pointer list-none text-sm font-semibold text-[#111] [&::-webkit-details-marker]:hidden">
           <span className="flex items-center justify-between gap-3">
             <span>When should I get this detail?</span>
-            <span className="grid h-7 w-7 place-items-center rounded-full border border-black/8 text-[#7B5C4B] transition group-open:rotate-45">+</span>
+            <span className="grid h-7 w-7 place-items-center rounded-full border border-black/8 text-[#7B5C4B] transition-transform duration-300 group-open:rotate-45" aria-hidden="true">+</span>
           </span>
         </summary>
         <div className="mt-3 border-t border-black/8 pt-3">

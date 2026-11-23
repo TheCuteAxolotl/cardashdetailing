@@ -460,3 +460,13 @@
 .quickBookSteps { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 2px; }
 @media (hover: hover) { .experience :global(.package-card):hover { border-color: rgba(214,183,121,.5) !important; box-shadow: 0 24px 50px rgba(0,0,0,.35); } }
 @media (prefers-reduced-motion: reduce) { .chipRow a { transition: none; } }
+
+/* Touch screens: no "stuck" hover lift after a tap, and a quick press response instead. */
+@media (hover: none) {
+  .quickBookCard:hover, .serviceCard:hover { transform: none; translate: none; }
+  .quickBookCard:hover .quickBookCardPhoto { transform: none; }
+  .quickBookCard:active, .serviceCard:active { transform: scale(.98); transition-duration: .12s; }
+  .quickBookCard:active .quickBookArrow { background: #f1d8a4; }
+}
+.serviceCard:focus-visible { outline: 3px solid #e4c587; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .quickBookCard:active, .serviceCard:active { transform: none; } }

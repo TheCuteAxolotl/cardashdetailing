@@ -91,6 +91,24 @@ export default function SiteHeader() {
     closeTimer.current = setTimeout(() => setDesktopMenu(null), 120);
   };
 
+  // Escape closes whichever menu is open and returns focus to its button.
+  useEffect(() => {
+    if (!desktopMenu && !menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (desktopMenu) {
+        document.getElementById(`desktop-${desktopMenu}-button`)?.focus();
+        setDesktopMenu(null);
+      }
+      if (menuOpen) {
+        setMenuOpen(false);
+        document.getElementById("mobile-menu-button")?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [desktopMenu, menuOpen]);
+
   const openSupport = () => {
     window.dispatchEvent(new Event("open-support"));
     setMenuOpen(false);
@@ -113,12 +131,12 @@ export default function SiteHeader() {
               <a key={href} href={href} className="border-b border-transparent py-2 hover:border-black hover:text-black">{label}</a>
             ))}
 
-            <div className="relative" onMouseEnter={() => openMenu("service")} onMouseLeave={closeMenu}>
-              <button type="button" onClick={() => setDesktopMenu(desktopMenu === "service" ? null : "service")} className="flex items-center gap-1.5 border-b border-transparent py-2 hover:border-black hover:text-black">
+            <div className="relative" onMouseEnter={() => openMenu("service")} onMouseLeave={closeMenu} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMenu(); }}>
+              <button id="desktop-service-button" type="button" aria-expanded={desktopMenu === "service"} aria-controls="desktop-service-menu" onClick={() => setDesktopMenu(desktopMenu === "service" ? null : "service")} className="flex items-center gap-1.5 border-b border-transparent py-2 hover:border-black hover:text-black">
                 Services
                 <svg viewBox="0 0 20 20" fill="none" className={`h-3.5 w-3.5 transition-transform ${desktopMenu === "service" ? "rotate-180" : ""}`}><path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <div className={`absolute left-1/2 top-full w-[390px] -translate-x-1/2 pt-5 transition ${desktopMenu === "service" ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0"}`}>
+              <div id="desktop-service-menu" className={`absolute left-1/2 top-full w-[390px] -translate-x-1/2 pt-5 transition-[opacity,transform,visibility] duration-200 ${desktopMenu === "service" ? "visible pointer-events-auto translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-1 opacity-0"}`}>
                 <div className="rounded-2xl border border-black/[.08] bg-white/96 p-2 shadow-[0_22px_60px_rgba(23,20,17,.14)] backdrop-blur-xl">
                   <p className="px-3 pb-2 pt-2 text-[9px] font-semibold uppercase tracking-[.16em] text-black/35">Detailing</p>
                   {[...detailingLinks, ...specialtyLinks].map(([href, label, description]) => (
@@ -131,12 +149,12 @@ export default function SiteHeader() {
               </div>
             </div>
 
-            <div className="relative" onMouseEnter={() => openMenu("more")} onMouseLeave={closeMenu}>
-              <button type="button" onClick={() => setDesktopMenu(desktopMenu === "more" ? null : "more")} className="flex items-center gap-1.5 border-b border-transparent py-2 hover:border-black hover:text-black">
+            <div className="relative" onMouseEnter={() => openMenu("more")} onMouseLeave={closeMenu} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMenu(); }}>
+              <button id="desktop-more-button" type="button" aria-expanded={desktopMenu === "more"} aria-controls="desktop-more-menu" onClick={() => setDesktopMenu(desktopMenu === "more" ? null : "more")} className="flex items-center gap-1.5 border-b border-transparent py-2 hover:border-black hover:text-black">
                 More
                 <svg viewBox="0 0 20 20" fill="none" className={`h-3.5 w-3.5 transition-transform ${desktopMenu === "more" ? "rotate-180" : ""}`}><path d="m5.5 7.5 4.5 4.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              <div className={`absolute left-1/2 top-full w-[330px] -translate-x-1/2 pt-5 transition ${desktopMenu === "more" ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0"}`}>
+              <div id="desktop-more-menu" className={`absolute left-1/2 top-full w-[330px] -translate-x-1/2 pt-5 transition-[opacity,transform,visibility] duration-200 ${desktopMenu === "more" ? "visible pointer-events-auto translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-1 opacity-0"}`}>
                 <div className="rounded-2xl border border-black/[.08] bg-white/96 p-2 shadow-[0_22px_60px_rgba(23,20,17,.14)] backdrop-blur-xl">
                   {moreLinks.map(([href, label, description]) => (
                     <a key={href} href={href} className="block rounded-md px-3 py-3 hover:bg-black/[.035]">
@@ -164,7 +182,7 @@ export default function SiteHeader() {
           <div className="flex items-center gap-2 lg:hidden">
             <a href="/quote" className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-[#d6b779]/60 px-3 text-xs font-semibold text-[#e5c995] hover:border-[#e5c995]">Request a Quote</a>
             <a href="/#book" className="rounded-full bg-[#171411] px-4 py-2.5 text-xs font-bold text-white">Book now</a>
-            <button type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="car-dash-mobile-menu" className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm" aria-label={menuOpen ? "Close menu" : "Open menu"}>
+            <button id="mobile-menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="car-dash-mobile-menu" className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm" aria-label={menuOpen ? "Close menu" : "Open menu"}>
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
             </button>
           </div>

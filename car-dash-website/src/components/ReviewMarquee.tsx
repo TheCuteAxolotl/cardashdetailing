@@ -59,6 +59,8 @@ export default function ReviewMarquee() {
     const onLeave = () => { hovering.current = false; hold(600); };
 
     const tick = (now: number) => {
+      // Sleep while the row is off screen; the observer below wakes it up.
+      if (!visible) { frame = 0; last = 0; return; }
       frame = requestAnimationFrame(tick);
       const elapsed = Math.min(64, now - (last || now));
       last = now;
@@ -74,7 +76,10 @@ export default function ReviewMarquee() {
       requestAnimationFrame(() => { drifting = false; });
     };
 
-    const observer = new IntersectionObserver((entries) => { visible = entries.some((entry) => entry.isIntersecting); });
+    const observer = new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting);
+      if (visible && !frame) frame = requestAnimationFrame(tick);
+    });
     observer.observe(viewport);
     viewport.addEventListener("touchstart", onTouch, { passive: true });
     viewport.addEventListener("touchmove", onTouch, { passive: true });
@@ -84,7 +89,6 @@ export default function ReviewMarquee() {
     viewport.addEventListener("mouseleave", onLeave);
     viewport.addEventListener("focusin", onEnter);
     viewport.addEventListener("focusout", onLeave);
-    frame = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();

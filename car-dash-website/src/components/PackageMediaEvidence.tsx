@@ -33,8 +33,8 @@ export default function PackageMediaEvidence({ packageMedia, features }: { packa
         </div>
       )}
 
-      <details className="package-detail-panel mt-4 border border-black/[.08] bg-black/[.018] px-4 py-3">
-        <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold text-black/65"><span>What’s included</span><span className="text-[#7B5C4B]">+</span></summary>
+      <details className="group package-detail-panel mt-4 border border-black/[.08] bg-black/[.018] px-4 py-3">
+        <summary className="flex min-h-8 cursor-pointer list-none items-center justify-between text-sm font-semibold text-black/65 [&::-webkit-details-marker]:hidden"><span>What’s included</span><span className="grid h-7 w-7 place-items-center rounded-full border border-black/8 text-[#7B5C4B] transition-transform duration-300 group-open:rotate-45" aria-hidden="true">+</span></summary>
         <ul className="mt-3 space-y-2 pb-1 text-sm leading-5 text-black/48">
           {features.map((feature, index) => (
             <li key={`${index}-${feature}`} className="flex min-h-8 items-center gap-2">
