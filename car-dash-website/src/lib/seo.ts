@@ -111,9 +111,10 @@ export function pageMetadata({
 
 export const localBusinessSchema = {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
+  "@type": "AutomotiveBusiness",
   "@id": `${SITE_URL}/#business`,
   name: BUSINESS_NAME,
+  alternateName: "Car Dash Mobile Detailing",
   url: SITE_URL,
   logo: absoluteUrl("/brand-logo.png?v=20261006"),
   image: absoluteUrl("/brand-logo.png?v=20261006"),
@@ -121,11 +122,12 @@ export const localBusinessSchema = {
   email: BUSINESS_EMAIL,
   priceRange: "$$",
   description:
-    "Mobile auto and marine detailing based in South Elgin, Illinois, including interior detailing, exterior detailing, paint correction, ceramic coatings, and marine detailing.",
+    "Fully mobile car and boat detailing based in South Elgin, Illinois, serving St. Charles, Elgin, Bartlett, Geneva, Wayne and nearby towns. Interior and exterior detailing, paint correction, ceramic coatings, a ceramic maintenance membership and marine detailing, with our own water and power, paint-safe methods and prices shown before you book.",
   address: {
     "@type": "PostalAddress",
     addressLocality: "South Elgin",
     addressRegion: "IL",
+    postalCode: "60177",
     addressCountry: "US",
   },
   areaServed: SERVICE_AREAS.map((name) => ({ "@type": "City", name })),
@@ -143,6 +145,7 @@ export const localBusinessSchema = {
       "Full Car Detailing",
       "Paint Correction",
       "Ceramic Coating",
+      "Ceramic Maintenance Membership",
       "Marine Detailing",
     ].map((name) => ({
       "@type": "Offer",

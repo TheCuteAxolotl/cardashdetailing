@@ -80,13 +80,13 @@ export default function HomeExperience({
             </div>
 
             <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
-              <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">We come to you. No shop drop-off.</p>
+              <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">Fully mobile. We bring our own water and power.</p>
               <h1 className="max-w-[14ch] text-[clamp(3.2rem,7.2vw,6.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
                 <span className={styles.heroLine}><span>Your car.</span></span>{" "}
-                <span className={styles.heroLine}><span>Cleaned at</span></span>{" "}
-                <span className={styles.heroLine}><span>your door.</span></span>
+                <span className={styles.heroLine}><span>Detailed in</span></span>{" "}
+                <span className={styles.heroLine}><span>your driveway.</span></span>
               </h1>
-              <p className="mt-6 max-w-[540px] text-sm leading-6 text-white/80 sm:hidden">Choose your service. See the price. Pick a time. We come to you.</p>
+              <p className="mt-6 max-w-[540px] text-sm leading-6 text-white/80 sm:hidden">See the price, pick a time, and we bring everything to you, water and power included.</p>
               <p className="mt-7 hidden max-w-[650px] text-sm leading-7 text-white/68 sm:block sm:text-base sm:leading-8">{content.heroBody}</p>
               <p className="mt-5 max-w-[650px] border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 tracking-[-.01em] text-white/90 sm:text-base">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>
               <div className="home-hero-actions mt-8 flex flex-wrap gap-3">
@@ -116,7 +116,7 @@ export default function HomeExperience({
               </h2>
               <p className={styles.quickBookHelp}>Tap one option. We’ll guide you through the rest.</p>
             </div>
-            <p className={styles.quickBookIntroNote}>Mobile detailing. We come to you.</p>
+            <p className={styles.quickBookIntroNote}>Fully mobile. No hose or outlet needed.</p>
           </div>
 
           <div className={styles.quickBookGrid} data-stagger>
@@ -171,9 +171,9 @@ export default function HomeExperience({
 
       <section className={styles.manifesto} aria-labelledby="care-heading">
         <div className={styles.washStage} data-reveal><CarWash3D /></div>
-        <div data-reveal><p className={styles.eyebrow}>Care you can see. A difference you can feel.</p><h2 id="care-heading">Some details change<br />how your car looks.<br /><em>Ours change how it feels.</em></h2><p>A fresh interior. A finish that catches the light. Thoughtful care, brought to your driveway.</p></div>
+        <div data-reveal><p className={styles.eyebrow}>Mobile detailing, done properly</p><h2 id="care-heading">Everything we need<br />comes with us.<br /><em>Your day stays the same.</em></h2><p>We carry our own water tank and generator, so we never need your hose or an outlet. Work from home, run errands or stay with the kids while we work in your driveway.</p></div>
         <div className={styles.locations} aria-label="Communities within about 20 miles of South Elgin">
-          <p className={styles.locationsHeading} data-reveal>Mobile detailing within 20 miles of South Elgin</p>
+          <p className={styles.locationsHeading} data-reveal>Based in South Elgin, serving St. Charles, Elgin, Bartlett, Geneva, Wayne and nearby towns</p>
           <div className={styles.locationList} data-stagger>
             {SERVICE_AREAS.map((area) => <span key={area}>{area.replace(", Illinois", "")}</span>)}
           </div>
@@ -184,10 +184,10 @@ export default function HomeExperience({
       <section className={styles.proof}>
         <div data-stagger className="home-proof-grid mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-y divide-black/[.07] border-x border-black/[.07] sm:grid-cols-4 sm:divide-y-0">
           {[
-            ["01", "Mobile service", "We come to your home or work."],
-            ["02", "Clear pricing", "You’ll see the price before you book."],
-            ["03", "Paint correction", "We match the correction to what your paint actually needs."],
-            ["04", "Protection that lasts", "Ceramic coating and maintenance options when you want them."],
+            ["01", "Fully self-sufficient", "Our own water tank and generator. No hose or outlet needed."],
+            ["02", "Transparent pricing", "Prices are on the site before you book. Custom work gets an exact quote first."],
+            ["03", "Paint-safe methods", "Foam pre-wash, careful hand washing and products matched to your paint."],
+            ["04", "Protection that lasts", "Ceramic coatings, plus a $60 monthly plan to keep them performing."],
           ].map(([number, title, body]) => (
             <div key={number} className="home-proof-card min-h-[148px] p-5 sm:p-6 lg:p-7">
               <p className="text-[10px] font-semibold tracking-[.12em] text-black/28">{number}</p>
@@ -201,13 +201,13 @@ export default function HomeExperience({
       <section className={styles.services} aria-labelledby="craft-heading">
         <div className={styles.sectionHeading} data-reveal>
           <div><p className={styles.eyebrow}>The Car Dash approach</p><h2 id="craft-heading">Every surface.<br /><span>Every detail.</span></h2></div>
-          <div><p>From the seat you settle into to the finish that catches the light. Give your vehicle the attention it deserves, right in your driveway.</p><a href="/quote" className={styles.goldButton}>Request a Quote</a></div>
+          <div><p>Interior, exterior, paint correction and ceramic protection, each priced by vehicle size and condition. Not sure what you need? Send photos and we’ll recommend the right level, not the biggest one.</p><a href="/quote" className={styles.goldButton}>Request a Quote</a></div>
         </div>
         <div className={styles.serviceGrid} data-stagger>
           {[
-            { number: "01", title: "A fresh start inside.", label: "Interior detailing", href: "/interior-detailing", image: "pricing-interior-hero", fallback: "home-showcase-secondary", text: "Seats, carpets, vents, and the little places everyday life leaves its mark." },
-            { number: "02", title: "Make an entrance.", label: "Exterior detailing", href: "/exterior-detailing", image: "pricing-exterior-hero", fallback: "home-showcase-primary", text: "Careful cleaning and finishing for paint, wheels, glass, and trim." },
-            { number: "03", title: "Protect the finish.", label: "Ceramic coatings", href: "/ceramic-coatings", image: "ceramic-coatings-hero", fallback: "hero", text: "Explore coating options and preparation tailored to your vehicle." },
+            { number: "01", title: "Clean down to the seat rails.", label: "Interior detailing", href: "/interior-detailing", image: "pricing-interior-hero", fallback: "home-showcase-secondary", text: "Seats, carpets, vents, cupholders and crevices, with extraction and stain treatment when the cabin needs it." },
+            { number: "02", title: "Washed the safe way.", label: "Exterior detailing", href: "/exterior-detailing", image: "pricing-exterior-hero", fallback: "home-showcase-primary", text: "Foam pre-wash and hand washing for paint, wheels, glass and trim, with decontamination and sealant on deeper levels." },
+            { number: "03", title: "Protection measured in years.", label: "Ceramic coatings", href: "/ceramic-coatings", image: "ceramic-coatings-hero", fallback: "hero", text: "GYEON and Gtechniq coatings rated for 3 to 8+ years, installed after full decontamination and paint prep." },
           ].map((service) => (
             <a key={service.number} href={service.href} className={styles.serviceCard}>
               <div className={styles.cardPhoto}><SitePhoto category={service.image} fallbackCategory={service.fallback} className="absolute inset-0 h-full w-full" alt={service.label} /><span className={styles.cardNumber}>{service.number}</span></div>
@@ -222,7 +222,7 @@ export default function HomeExperience({
 
       <section className={styles.transformation} aria-labelledby="finish-heading">
         <div className={styles.transformPhoto}><SitePhoto category="paint-correction-hero" fallbackCategory="home-showcase-primary" className="absolute inset-0 h-full w-full" alt="Vehicle finish from Car Dash Detailing’s work gallery" /></div>
-        <div className={styles.transformCopy} data-reveal><p className={styles.eyebrow}>Paint correction · South Elgin & nearby suburbs</p><h2 id="finish-heading">Bring back<br />the brilliance.</h2><p>Swirls and dullness can hide what’s underneath. Explore paint correction matched to your paint’s condition, then choose the protection that fits.</p><a href="/paint-correction" className={styles.goldButton}>Explore paint correction</a></div>
+        <div className={styles.transformCopy} data-reveal><p className={styles.eyebrow}>Paint correction · South Elgin and the Fox Valley</p><h2 id="finish-heading">Remove the swirls.<br />Don’t hide them.</h2><p>Machine polishing removes swirl marks, haze and water spots instead of filling them in. We inspect your paint first, go only as far as it’s safe, then help you choose protection that fits.</p><a href="/paint-correction" className={styles.goldButton}>Explore paint correction</a></div>
       </section>
 
       <section className={styles.portfolio}>
@@ -266,7 +266,7 @@ export default function HomeExperience({
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[.22em] text-white/36">Ceramic maintenance membership</p>
             <h2 className="mt-4 max-w-3xl text-4xl font-semibold leading-[.98] tracking-[-.055em] sm:text-5xl">Keep your coating maintained every month.</h2>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/48">A simple recurring maintenance plan for ceramic-coated vehicles. Set up billing once and keep your monthly maintenance with Car Dash.</p>
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-white/48">A ceramic coating keeps its gloss and water beading when it’s washed the right way. We take care of that every month with coating-safe products, so road salt and pollen never get the chance to build up. One monthly charge, and you can cancel future renewals yourself anytime.</p>
             <a href="/maintenance" className={styles.goldButton}>Join monthly maintenance</a>
           </div>
           <div className="border-t border-white/10 pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">

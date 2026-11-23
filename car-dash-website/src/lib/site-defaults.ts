@@ -2,9 +2,9 @@ import { DEFAULT_PRICING_PAGES } from "@/lib/pricing-config";
 import { DEFAULT_BOOKING_PRICING } from "@/lib/booking-pricing";
 
 export const SITE_DEFAULTS = {
-  heroEyebrow: "South Elgin, IL · Mobile car detailing",
+  heroEyebrow: "South Elgin, IL · Mobile car and boat detailing",
   heroTitle: "Professional detailing, right in your driveway.",
-  heroBody: "You don’t have to drop your car off or wait around at a shop. We come to your home or work for interior details, exterior details, paint correction, and ceramic coatings. Pick a package online, or send us a few photos and we’ll give you an exact quote.",
+  heroBody: "We detail cars, SUVs, trucks and boats at homes and offices across South Elgin, St. Charles, Elgin, Bartlett, Geneva and Wayne. We bring our own water and power, use paint-safe wash methods, and show you the price before you book. Need something custom? Send a few photos and we’ll quote the exact job.",
   heroPrimaryCta: "Request a Quote",
   heroSecondaryCta: "See Services",
 
@@ -66,7 +66,7 @@ export const SITE_DEFAULTS = {
   pricingInteriorConfig: JSON.stringify(DEFAULT_PRICING_PAGES.interior),
   bookingPricingConfig: JSON.stringify(DEFAULT_BOOKING_PRICING),
 
-  footerBlurb: "Mobile detailing based in South Elgin. We do interior and exterior details, paint correction, ceramic protection, and select marine work.",
+  footerBlurb: "Mobile detailing based in South Elgin, serving St. Charles, Elgin, Bartlett, Geneva, Wayne and nearby towns. Interior and exterior detailing, paint correction, ceramic coatings and marine work, with our own water and power.",
 } as const;
 
 export type SiteContentKey = keyof typeof SITE_DEFAULTS;
@@ -75,6 +75,9 @@ export type SiteContent = Record<SiteContentKey, string>;
 // Only replace copy that exactly matches an older Car Dash default. Owner-written custom
 // content is left untouched, so upgrading the site never silently overwrites a custom edit.
 const LEGACY_COPY_REPLACEMENTS: Record<string, string> = {
+  "South Elgin, IL · Mobile car detailing": SITE_DEFAULTS.heroEyebrow,
+  "You don’t have to drop your car off or wait around at a shop. We come to your home or work for interior details, exterior details, paint correction, and ceramic coatings. Pick a package online, or send us a few photos and we’ll give you an exact quote.": SITE_DEFAULTS.heroBody,
+  "Mobile detailing based in South Elgin. We do interior and exterior details, paint correction, ceramic protection, and select marine work.": SITE_DEFAULTS.footerBlurb,
   "We price the work your vehicle actually needs.": SITE_DEFAULTS.introTitle,
   "Size matters, but condition matters too. Send us the vehicle, what you want done, and a few photos if you can. We’ll look it over and quote the work instead of automatically charging the biggest package.": SITE_DEFAULTS.introBody,
   "You do not have to arrange a ride or leave the vehicle somewhere all day. We bring the detailing setup to your home or location and handle the service there.": SITE_DEFAULTS.storyBody,
@@ -166,18 +169,27 @@ const LEGACY_COPY_REPLACEMENTS: Record<string, string> = {
 };
 
 const LEGACY_PRICING_COPY_REPLACEMENTS: Record<string, string> = {
+  "A solid inside-and-out clean for cars that are already kept up pretty well.": "Inside and out for cars that are already kept up: a full vacuum, wiped-down surfaces and glass, then a foam and hand wash with a gloss finish.",
+  "A deeper inside-and-out detail for everyday buildup, crumbs, kid mess, and cars that need more attention.": "For daily drivers with real life inside. Carpets and mats deep cleaned, light stains treated and surfaces disinfected, plus a two-stage wash and spray protection outside.",
+  "Our most complete detail. You get the full interior and exterior reset, paint decontamination, and a one-step polish for more gloss and clarity.": "Our most complete detail. Everything in the Full Detail, plus iron and clay decontamination, a one-step machine polish and ceramic sealant protection.",
+  "A lighter clean for interiors that are already kept up pretty well.": "A thorough clean for cabins already in good shape: vacuum, dash and console, cupholders and touch points, interior glass and mats.",
+  "A full interior detail when the cabin needs more than a quick cleanup.": "When the cabin needs more than a tidy-up. Seats, carpets, mats, door panels and vents brushed and cleaned, with protection on compatible surfaces.",
+  "A deeper clean for stains, neglected interiors, and heavier buildup.": "For stains, odors and heavy buildup. Carpet extraction, seat shampoo where it applies, and the extra time a neglected interior needs.",
+  "A safe maintenance wash for cars that are already in good shape.": "A paint-safe foam and hand wash with wheels, tires, bug removal and glass. The right choice between full details.",
+  "A deeper exterior clean with decontamination and protection for the paint.": "Everything in the Maintenance Wash, plus iron decontamination, clay where needed, and a paint sealant that adds gloss and makes the next wash easier.",
+  "Full exterior prep plus a one-step polish to bring back more gloss and clarity.": "Full decontamination, then a one-step machine polish that reduces light swirls and haze, finished with a protective sealant.",
   "Choose the detail your vehicle needs.": "Pick the detail that fits your car.",
   "Three straightforward inside-and-out packages. Choose your vehicle size, compare what is included, and book the level that matches its condition.": "Choose your vehicle size, compare what’s included, and pick the level your car actually needs.",
   "Standard pricing covers normal vehicle conditions. Extreme pet hair, biohazards, excessive adhesive or sticker removal, severe staining, or unusual restoration work is quoted separately before service begins.": "These prices cover normal vehicle conditions. If there’s extreme pet hair, biohazards, heavy stains, lots of adhesive, or restoration work, we’ll quote that separately before we start.",
-  "A complete maintenance-style interior and exterior detail for vehicles that are already kept up fairly well.": "A solid inside-and-out clean for cars that are already kept up pretty well.",
-  "A deeper interior and exterior reset for everyday buildup, kids, crumbs, moderate mess, and vehicles that need more attention.": "A deeper inside-and-out detail for everyday buildup, crumbs, kid mess, and cars that need more attention.",
-  "Our most complete detail: a full interior and exterior reset plus paint decontamination and a one-step machine polish for more gloss and clarity.": "Our most complete detail. You get the full interior and exterior reset, paint decontamination, and a one-step polish for more gloss and clarity.",
+  "A complete maintenance-style interior and exterior detail for vehicles that are already kept up fairly well.": "Inside and out for cars that are already kept up: a full vacuum, wiped-down surfaces and glass, then a foam and hand wash with a gloss finish.",
+  "A deeper interior and exterior reset for everyday buildup, kids, crumbs, moderate mess, and vehicles that need more attention.": "For daily drivers with real life inside. Carpets and mats deep cleaned, light stains treated and surfaces disinfected, plus a two-stage wash and spray protection outside.",
+  "Our most complete detail: a full interior and exterior reset plus paint decontamination and a one-step machine polish for more gloss and clarity.": "Our most complete detail. Everything in the Full Detail, plus iron and clay decontamination, a one-step machine polish and ceramic sealant protection.",
   "Exterior detailing from a maintenance wash to paint enhancement.": "From a maintenance wash to a full paint enhancement.",
   "Choose your vehicle size, then pick anything from a maintenance wash to a full exterior detail or paint enhancement.": "Choose your vehicle size, then pick how far you want to take the exterior.",
   "Prices shown are fixed for the selected vehicle class. Severe tar, overspray, oxidation, sanding, or correction beyond the listed package is quoted separately.": "These prices cover the listed work for your vehicle size. Heavy tar, overspray, oxidation, sanding, or extra correction will need a separate quote.",
-  "A maintenance wash for vehicles that are already in good condition.": "A safe maintenance wash for cars that are already in good shape.",
-  "A deeper exterior clean with decontamination and paint protection.": "A deeper exterior clean with decontamination and protection for the paint.",
-  "Full exterior prep plus a one-step machine polish for more gloss and clarity.": "Full exterior prep plus a one-step polish to bring back more gloss and clarity.",
+  "A maintenance wash for vehicles that are already in good condition.": "A paint-safe foam and hand wash with wheels, tires, bug removal and glass. The right choice between full details.",
+  "A deeper exterior clean with decontamination and paint protection.": "Everything in the Maintenance Wash, plus iron decontamination, clay where needed, and a paint sealant that adds gloss and makes the next wash easier.",
+  "Full exterior prep plus a one-step machine polish for more gloss and clarity.": "Full decontamination, then a one-step machine polish that reduces light swirls and haze, finished with a protective sealant.",
   "Interior detailing from a quick refresh to a deep clean.": "From a quick interior refresh to a deep clean.",
   "Choose your vehicle size and how much cleaning the interior needs.": "Choose your vehicle size, then pick how much cleaning the interior actually needs.",
   "Prices shown are fixed for the selected vehicle class. Extreme pet hair, mold, biohazards, heavy bodily-fluid contamination, or excessive personal-item removal require a custom quote.": "These prices cover normal conditions for your vehicle size. Extreme pet hair, mold, biohazards, heavy contamination, or lots of personal-item removal will need a custom quote.",
@@ -195,9 +207,9 @@ const LEGACY_PRICING_COPY_REPLACEMENTS: Record<string, string> = {
   "Reserve Paint Enhancement": "Book Paint Enhancement",
   "Interior packages from a clean refresh to a deep reset.": "Interior detailing from a quick refresh to a deep clean.",
   "Choose the vehicle type, compare the level of cleaning, and book with the exact package price shown.": "Choose your vehicle size and how much cleaning the interior needs.",
-  "A clean-up for regularly maintained interiors that need the basics handled well.": "A lighter clean for interiors that are already kept up pretty well.",
-  "A thorough interior detail for vehicles that need more than a maintenance clean.": "A full interior detail when the cabin needs more than a quick cleanup.",
-  "A more intensive reset for neglected interiors, stains, and heavier buildup.": "A deeper clean for stains, neglected interiors, and heavier buildup.",
+  "A clean-up for regularly maintained interiors that need the basics handled well.": "A thorough clean for cabins already in good shape: vacuum, dash and console, cupholders and touch points, interior glass and mats.",
+  "A thorough interior detail for vehicles that need more than a maintenance clean.": "When the cabin needs more than a tidy-up. Seats, carpets, mats, door panels and vents brushed and cleaned, with protection on compatible surfaces.",
+  "A more intensive reset for neglected interiors, stains, and heavier buildup.": "For stains, odors and heavy buildup. Carpet extraction, seat shampoo where it applies, and the extra time a neglected interior needs.",
   "Reserve Deep Interior Reset": "Book Deep Interior Reset",
 };
 
