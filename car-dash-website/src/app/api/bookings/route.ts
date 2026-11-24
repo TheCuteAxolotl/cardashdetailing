@@ -1,3 +1,4 @@
+import { CONDITION_TAG_IDS, conditionTagLabels } from "@/lib/booking-conditions";
 import { readTeams } from "@/lib/detailer-teams";
 import { ensureBookingReference } from "@/lib/booking-reference";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
@@ -151,6 +152,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: "Enter the full address where we should detail your vehicle." }, { status: 400 });
     }
     const customerNotes = String(form.get("serviceNotes") || "None").trim();
+    // Only tags from the known list are saved; they never change the price.
+    const conditionTags = parseStringArray(form.get("conditionTags")).filter((tag) => CONDITION_TAG_IDS.includes(tag));
     const smsConsent = String(form.get("smsConsent") || "false") === "true";
     if (smsConsent && !normalizePhoneNumber(phone)) return NextResponse.json({ success: false, message: "Enter a valid mobile number to receive SMS updates." }, { status: 400 });
 
@@ -330,6 +333,7 @@ export async function POST(request: NextRequest) {
       `Preferred time: ${preferredTime || "Not specified"}`,
       `Service address: ${serviceAddress || "Not specified"}`,
       `Interior condition: ${String(form.get("interiorCondition") || "Not specified")}`,
+      `Condition notes: ${conditionTags.length ? conditionTagLabels(conditionTags).join(", ") : "None"}`,
       `Exterior condition: ${String(form.get("exteriorCondition") || "Not specified")}`,
       `SMS consent: ${smsConsent ? "Yes" : "No"}`,
       `Customer notes: ${customerNotes}`,

@@ -17,6 +17,8 @@ import {
   parseBookingPricingConfig,
 } from "@/lib/booking-pricing";
 import { DEFAULT_PROMOTIONS, matchingPromotion, parsePromotions, promotionalPrice, type PromotionSettings } from "@/lib/promotions";
+import { AddOnCards, ConditionTags } from "@/components/BookingExtras";
+import { conditionTagLabels } from "@/lib/booking-conditions";
 import type { SiteContent } from "@/lib/site-defaults";
 import SitePhoto from "@/components/SitePhoto";
 import BookingDatePicker from "@/components/BookingDatePicker";
@@ -48,6 +50,7 @@ type FormState = {
   interiorCondition: string;
   exteriorCondition: string;
   addOns: string[];
+  conditionTags: string[];
   smsConsent: boolean;
   policyAgreed: boolean;
 };
@@ -114,6 +117,7 @@ const initialState: FormState = {
   interiorCondition: "Light",
   exteriorCondition: "Light",
   addOns: [],
+  conditionTags: [],
   smsConsent: false,
   policyAgreed: false,
 };
@@ -475,6 +479,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
     selectPackage(packageSelection.pricingPage, packageSelection.packageId, vehicleClass);
   };
 
+  const addOnPrice = (item: { id: string; price: number }) => ({ price: item.price, sale: promotionalPrice(item.price, matchingPromotion(promotions, "addon", item.id, "addon")) });
   const toggleAddOn = (id: string) => {
     const current = form.addOns;
     if (current.includes(id)) { set("addOns", current.filter((value) => value !== id)); return; }
@@ -712,18 +717,33 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
         )}
       </section>
 
+      {allowCarAddOns && activeAddOns.length > 0 && (
+        <section className="border-t border-white/8 pt-6" aria-labelledby="booking-addons-title">
+          <div className="mb-3 flex items-baseline justify-between gap-3"><h3 id="booking-addons-title" className="font-semibold">Add-ons</h3><span className="text-xs text-white/40">Optional</span></div>
+          <AddOnCards addOns={activeAddOns} selected={form.addOns} onToggle={toggleAddOn} priceFor={addOnPrice} />
+        </section>
+      )}
+
+      {serviceReady && (
+        <section className="border-t border-white/8 pt-6" aria-labelledby="booking-condition-title">
+          <div className="flex items-baseline justify-between gap-3"><h3 id="booking-condition-title" className="font-semibold">Anything else we should know?</h3><span className="text-xs text-white/40">Optional</span></div>
+          <p className="mb-3 mt-1 text-xs text-white/45">Tap anything that applies so we bring the right tools. This doesn&apos;t change your price.</p>
+          <ConditionTags
+            value={form.conditionTags}
+            onChange={(tags) => set("conditionTags", tags)}
+            addOns={activeAddOns}
+            selectedAddOns={form.addOns}
+            onAddAddOn={allowCarAddOns ? (id) => { if (!form.addOns.includes(id)) toggleAddOn(id); } : null}
+            priceFor={addOnPrice}
+          />
+        </section>
+      )}
+
       {(allowCarAddOns || baseTotal != null) && (
         <section className="border-t border-white/8 pt-6">
-          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">+</span><div><h3 className="font-semibold">Optional extras</h3><p className="text-xs text-white/35">Personalize your detail with add-ons, photos or a discount code.</p></div></div>
+          <div className="mb-3 flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/14 bg-white/8 text-xs font-semibold text-white">+</span><div><h3 className="font-semibold">Optional extras</h3><p className="text-xs text-white/35">Photos, a discount code or a note.</p></div></div>
 
           <div className="space-y-3">
-            {allowCarAddOns && (
-              <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
-                <summary className="cursor-pointer text-sm font-semibold">Add-ons <span className="ml-2 text-xs font-normal text-white/35">Pet hair, shampoo, wax, engine bay, etc.</span></summary>
-                <div className="mt-4 grid gap-2 sm:grid-cols-2">{activeAddOns.map((item) => <label key={item.id} className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-3 text-sm ${form.addOns.includes(item.id) ? "border-[#d6b779]/35 bg-[#d6b779]/8 text-white" : "border-white/10 bg-[#07131B]/20 text-white/52"}`}><span className="flex items-center gap-3"><input type="checkbox" checked={form.addOns.includes(item.id)} onChange={() => toggleAddOn(item.id)} /><span>{item.name}{item.quoteRequired ? <span className="mt-1 block text-[10px] text-amber-200">Inspection and custom quote required</span> : null}{item.durationMinutes ? <span className="mt-0.5 block text-[10px] text-white/30">Approx. {item.durationMinutes} min</span> : null}</span></span><strong className="text-white">+${item.price.toFixed(0)}{item.quoteRequired ? "+" : ""}</strong></label>)}</div>
-              </details>
-            )}
-
             {baseTotal != null && (
               <details className="booking-option-panel border border-white/10 bg-white/[.02] p-4">
                 <summary className="cursor-pointer text-sm font-semibold">Have a discount code?</summary>
@@ -808,6 +828,7 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
                 <div><dt className="text-xs text-[#aaa399]">Time</dt><dd className="mt-1">{form.preferredDate} at {form.preferredTime}</dd></div>
                 <div className="sm:col-span-2"><dt className="text-xs text-[#aaa399]">Service address</dt><dd className="mt-1">{form.serviceAddress}</dd></div>
                 <div><dt className="text-xs text-[#aaa399]">Customer</dt><dd className="mt-1">{form.name}</dd></div>
+                {form.conditionTags.length > 0 && <div className="sm:col-span-2"><dt className="text-xs text-[#aaa399]">You told us about</dt><dd className="mt-1">{conditionTagLabels(form.conditionTags).join(", ")}</dd></div>}
                 <div><dt className="text-xs text-[#aaa399]">Est. duration</dt><dd className="mt-1">{Math.floor(estimatedDuration / 60)} hr {estimatedDuration % 60 ? estimatedDuration % 60 + " min" : ""}</dd></div>
               </dl>
               <button type="button" onClick={() => setStep(1)} className="mt-4 text-xs font-semibold text-[#e5c995] underline">Edit your details</button>
@@ -837,6 +858,12 @@ export default function BookingForm({ prefill, onClose, initialSiteContent, book
           {status === "error" && <p role="alert" className="rounded-xl border border-red-400/30 bg-red-900/20 p-4 text-sm text-red-100">{message}</p>}
           <nav aria-label="Booking step navigation" className="sticky bottom-0 z-20 -mx-4 mt-6 flex items-center gap-3 border-t border-white/15 bg-[#161616]/95 px-4 py-4 shadow-[0_-12px_35px_#101010cc] backdrop-blur-xl sm:-mx-8 sm:px-8">
             {step > 0 && <button type="button" onClick={previous} disabled={status === "submitting"} className="rounded-xl border border-white/20 px-5 py-3.5 text-sm font-semibold">Back</button>}
+            {step === 0 && serviceReady && (
+              <div className="min-w-0 text-sm" aria-live="polite">
+                <p className="text-white/55">{1 + selectedAddOns.length} selected</p>
+                {bookingTotal != null && <p className="font-semibold tabular-nums text-[#ead5a8]">${bookingTotal.toFixed(2)}</p>}
+              </div>
+            )}
             {step < 2 ? (
               <button type="button" onClick={advance} disabled={status === "submitting" || (step === 0 && !serviceReady) || (step === 1 && !scheduleReady) || (step === 1 && !detailsReady)}
                 className="ml-auto flex-1 rounded-xl bg-[#d6b779] px-5 py-3.5 text-sm font-bold text-[#171717] hover:bg-[#e8cf9e] disabled:cursor-not-allowed disabled:opacity-40 sm:max-w-[245px]">
