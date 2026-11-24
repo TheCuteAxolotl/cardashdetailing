@@ -1513,3 +1513,33 @@ img { display: block; }
   .mobile-menu-panel[data-state], .mobile-menu-panel[data-state="open"] > div > * { animation: none !important; }
   .mobile-sub, .mobile-sub-inner, .menu-icon path, .plus-minus-bar { transition: none !important; }
 }
+
+/* ---- Owner & staff "More" menu motion ---- */
+/* Tablet: drawer slides in from the left. Phone: sheet rises from the bottom. */
+.owner-mobile-menu .owner-menu-backdrop { animation: ownerFadeIn .28s ease backwards; }
+.owner-mobile-menu[data-state="closed"] .owner-menu-backdrop { animation: ownerFadeOut .24s ease forwards; }
+.owner-mobile-menu[data-state="open"] .owner-mobile-drawer { animation: ownerDrawerIn .4s cubic-bezier(.22,1,.36,1) backwards; }
+.owner-mobile-menu[data-state="closed"] .owner-mobile-drawer { animation: ownerDrawerOut .24s cubic-bezier(.4,0,1,1) forwards; }
+.owner-mobile-menu[data-state="closed"] { pointer-events: none; }
+@keyframes ownerFadeIn { from { opacity: 0; } }
+@keyframes ownerFadeOut { to { opacity: 0; } }
+@keyframes ownerDrawerIn { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes ownerDrawerOut { to { transform: translateX(-100%); } }
+@media (max-width: 767px) {
+  .owner-mobile-menu[data-state="open"] .owner-mobile-drawer { animation-name: ownerSheetIn; }
+  .owner-mobile-menu[data-state="closed"] .owner-mobile-drawer { animation-name: ownerSheetOut; }
+}
+@keyframes ownerSheetIn { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes ownerSheetOut { to { transform: translateY(100%); } }
+/* Contents follow a beat behind, top to bottom. */
+.owner-mobile-menu[data-state="open"] .owner-mobile-drawer > * { animation: menuItemIn .42s cubic-bezier(.22,1,.36,1) backwards; }
+.owner-mobile-menu[data-state="open"] .owner-mobile-drawer > :nth-child(1) { animation-delay: .08s; }
+.owner-mobile-menu[data-state="open"] .owner-mobile-drawer > :nth-child(2) { animation-delay: .13s; }
+.owner-mobile-menu[data-state="open"] .owner-mobile-drawer > :nth-child(3) { animation-delay: .18s; }
+.owner-mobile-menu[data-state="open"] .owner-mobile-drawer > :nth-child(4) { animation-delay: .23s; }
+/* Tool groups ease open instead of snapping. */
+.owner-mobile-drawer details[open] > div { animation: menuItemIn .3s cubic-bezier(.22,1,.36,1); }
+.owner-mobile-drawer details > summary { transition: color .2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .owner-mobile-menu *, .owner-mobile-menu .owner-mobile-drawer { animation: none !important; }
+}
