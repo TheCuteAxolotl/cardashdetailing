@@ -12,6 +12,7 @@ import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { manualBookingConfirmationText } from "@/lib/manual-booking-confirmation";
 import { resolveOwnerPricing } from "@/lib/booking-catalog";
 import { loadCatalogSource } from "@/lib/booking-catalog-source";
+import { cleanConditionTags, withConditionNotes } from "@/lib/booking-conditions";
 
 function clean(value: unknown, max = 300) {
   return String(value || "").trim().slice(0, max);
@@ -70,7 +71,8 @@ export async function POST(request: NextRequest) {
       "SMS consent: " + (sendConfirmationSms && normalizedPhone ? "Yes" : "No"),
       "SMS consent source: Manually booked by staff (appointment updates only)",
     ].filter(Boolean).join("\n");
-    const notes = replaceBookingOwnerDetails(baseNotes, clean(body.serviceAddress, 500), ownerNotes);
+    const conditionTags = cleanConditionTags(body.conditionTags);
+    const notes = replaceBookingOwnerDetails(conditionTags.length ? withConditionNotes(baseNotes, conditionTags) : baseNotes, clean(body.serviceAddress, 500), ownerNotes);
 
     const booking = await createBookingWithSlotProtection({
       userId: null,

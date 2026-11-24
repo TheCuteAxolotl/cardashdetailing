@@ -1,6 +1,7 @@
 "use client";
 
 import NumberInput from "@/components/NumberInput";
+import { AddOnCards, ConditionTags } from "@/components/BookingExtras";
 import { VEHICLE_LABELS, type VehicleClass } from "@/lib/pricing-config";
 import {
   CUSTOM_SERVICE_KEY,
@@ -19,6 +20,7 @@ export type ServicePricingValue = {
   pricingMode: "listed" | "custom";
   customPrice: string;
   addOnIds: string[];
+  conditionTags: string[];
   /** Used only when keeping a booking request's original service. */
   serviceName: string;
   quotedPrice: string;
@@ -47,6 +49,7 @@ export default function OwnerServicePricing({ value, onChange, source, loading, 
   const custom = value.serviceKey === CUSTOM_SERVICE_KEY;
   const selected = services.find((item) => item.key === value.serviceKey) || null;
   const preview = source && !keeping && value.serviceKey ? resolveOwnerPricing(value, source) : null;
+  const listPrice = (addOn: { price: number }) => ({ price: addOn.price, sale: addOn.price });
   const toggleAddOn = (id: string) =>
     onChange({ addOnIds: value.addOnIds.includes(id) ? value.addOnIds.filter((item) => item !== id) : [...value.addOnIds, id] });
 
@@ -129,17 +132,7 @@ export default function OwnerServicePricing({ value, onChange, source, loading, 
             {addOns.length === 0 ? (
               <p className="mt-2 text-xs text-white/40">{loading ? "Loading add-ons…" : "No active add-ons. Add them in Booking settings."}</p>
             ) : (
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                {addOns.map((addOn) => {
-                  const on = value.addOnIds.includes(addOn.id);
-                  return (
-                    <label key={addOn.id} className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2 text-sm ${on ? "border-[#6EAEC6]/60 bg-[#6EAEC6]/10 text-white" : "border-white/10 text-white/70"}`}>
-                      <span className="flex items-center gap-3"><input type="checkbox" className="h-4 w-4 accent-[#6EAEC6]" checked={on} onChange={() => toggleAddOn(addOn.id)} />{addOn.name}</span>
-                      <span className="whitespace-nowrap font-semibold">+{money(addOn.price)}</span>
-                    </label>
-                  );
-                })}
-              </div>
+              <div className="mt-2"><AddOnCards addOns={addOns} selected={value.addOnIds} onToggle={toggleAddOn} priceFor={listPrice} /></div>
             )}
           </div>
 
@@ -158,6 +151,19 @@ export default function OwnerServicePricing({ value, onChange, source, loading, 
           </div>
         </>
       )}
+
+      <div className="mt-5 border-t border-white/10 pt-4">
+        <p className="text-sm font-semibold text-white">Anything else to know?</p>
+        <p className="mb-3 mt-0.5 text-xs text-white/45">Vehicle condition for whoever does the job. Doesn&apos;t change the price.</p>
+        <ConditionTags
+          value={value.conditionTags}
+          onChange={(conditionTags) => onChange({ conditionTags })}
+          addOns={addOns}
+          selectedAddOns={value.addOnIds}
+          onAddAddOn={keeping ? null : (id) => { if (!value.addOnIds.includes(id)) toggleAddOn(id); }}
+          priceFor={listPrice}
+        />
+      </div>
     </fieldset>
   );
 }

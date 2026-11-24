@@ -14,6 +14,7 @@ import BusinessCallButton from "@/components/BusinessCallButton";
 import { bookingServiceAddress } from "@/lib/booking-owner-details";
 import OwnerServicePricing from "@/components/OwnerServicePricing";
 import { KEEP_SERVICE_KEY, type CatalogSource } from "@/lib/booking-catalog";
+import { conditionTagsFromNotes } from "@/lib/booking-conditions";
 import type { VehicleClass } from "@/lib/pricing-config";
 
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#6EAEC6]/60";
@@ -68,6 +69,7 @@ type ManualBookingForm = {
   pricingMode: "listed" | "custom";
   customPrice: string;
   addOnIds: string[];
+  conditionTags: string[];
 };
 
 const EMPTY_MANUAL: ManualBookingForm = {
@@ -92,6 +94,7 @@ const EMPTY_MANUAL: ManualBookingForm = {
   pricingMode: "listed",
   customPrice: "",
   addOnIds: [],
+  conditionTags: [],
 };
 
 export default function OwnerBookings() {
@@ -543,7 +546,7 @@ export default function OwnerBookings() {
                         <button onClick={() => sendArrivalUpdate(booking, "eta")} disabled={arrivalSendingId === booking.id} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 disabled:opacity-50">Send arrival time</button>
                       </>
                     )}
-                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,serviceKey:KEEP_SERVICE_KEY,vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
+                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,serviceKey:KEEP_SERVICE_KEY,conditionTags:conditionTagsFromNotes(booking.notes),vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
                     <button onClick={() => updateStatus(booking.id, "completed")} className="rounded-lg bg-green-700 px-4 py-2 text-sm">Complete</button>
                     <button onClick={() => updateStatus(booking.id, "cancelled")} className="rounded-lg bg-red-800 px-4 py-2 text-sm">Cancel</button>
 

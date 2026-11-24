@@ -29,3 +29,20 @@ export const CONDITION_TAG_IDS = CONDITION_TAGS.map((tag) => tag.id);
 export function conditionTagLabels(ids: string[]) {
   return CONDITION_TAGS.filter((tag) => ids.includes(tag.id)).map((tag) => tag.label);
 }
+
+/** Tags saved on a booking's "Condition notes:" line, as ids. */
+export function conditionTagsFromNotes(notes: string | null | undefined) {
+  const line = String(notes || "").match(/^Condition notes:\s*(.*)$/m)?.[1] || "";
+  const labels = line.split(/,\s*/).map((item) => item.trim().toLowerCase());
+  return CONDITION_TAGS.filter((tag) => labels.includes(tag.label.toLowerCase())).map((tag) => tag.id);
+}
+
+export function cleanConditionTags(value: unknown) {
+  return Array.isArray(value) ? [...new Set(value.map(String))].filter((id) => CONDITION_TAG_IDS.includes(id)) : [];
+}
+
+/** Sets the booking's "Condition notes:" line, keeping every other note. */
+export function withConditionNotes(notes: string, ids: string[]) {
+  const line = `Condition notes: ${ids.length ? conditionTagLabels(ids).join(", ") : "None"}`;
+  return /^Condition notes:.*$/m.test(notes) ? notes.replace(/^Condition notes:.*$/m, line) : [notes, line].filter(Boolean).join("\n");
+}

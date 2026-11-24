@@ -1,5 +1,6 @@
 import { KEEP_SERVICE_KEY, replacePricingNoteLines, resolveOwnerPricing } from "@/lib/booking-catalog";
 import { loadCatalogSource } from "@/lib/booking-catalog-source";
+import { cleanConditionTags, withConditionNotes } from "@/lib/booking-conditions";
 import { archiveBooking } from "@/lib/field-history";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { bookingPhoneWasReleased } from "@/lib/phone-release";
@@ -155,6 +156,7 @@ export async function PUT(
         price=priced.quotedPrice;
         notes=replacePricingNoteLines(notes,priced.noteLines);
       }
+      if(body.conditionTags!==undefined) notes=withConditionNotes(notes,cleanConditionTags(body.conditionTags));
       const extra=String(body.notes||"").trim().slice(0,2000);
       const updatedNotes = replaceBookingOwnerDetails(
         extra && extra !== notes ? notes + "\nOwner scheduling notes: " + extra : notes,
