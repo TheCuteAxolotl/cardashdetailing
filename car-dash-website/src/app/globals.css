@@ -1479,3 +1479,37 @@ img { display: block; }
   form:has(textarea) { min-width: 0; max-width: 100%; }
   form:has(textarea) > button { flex-shrink: 0; }
 }
+
+/* ---- Phone menu motion ---- */
+/* The panel drops open from the header and lifts away when closed. */
+.mobile-menu-panel { transform-origin: top center; }
+.mobile-menu-panel[data-state="open"] { animation: menuDrop .38s cubic-bezier(.22,1,.36,1) backwards; }
+.mobile-menu-panel[data-state="closed"] { animation: menuLift .22s cubic-bezier(.4,0,1,1) forwards; pointer-events: none; }
+@keyframes menuDrop { from { opacity: 0; transform: translateY(-10px) scale(.985); clip-path: inset(0 0 82% 0); } to { opacity: 1; transform: none; clip-path: inset(0); } }
+@keyframes menuLift { to { opacity: 0; transform: translateY(-8px) scale(.985); } }
+/* Its sections follow a beat behind, top to bottom. */
+.mobile-menu-panel[data-state="open"] > div > * { animation: menuItemIn .42s cubic-bezier(.22,1,.36,1) backwards; }
+.mobile-menu-panel[data-state="open"] > div > :nth-child(1) { animation-delay: .06s; }
+.mobile-menu-panel[data-state="open"] > div > :nth-child(2) { animation-delay: .11s; }
+.mobile-menu-panel[data-state="open"] > div > :nth-child(3) { animation-delay: .16s; }
+.mobile-menu-panel[data-state="open"] > div > :nth-child(4) { animation-delay: .2s; }
+@keyframes menuItemIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* Services and More slide open instead of snapping. */
+.mobile-sub { display: grid; grid-template-rows: 0fr; border-width: 0 !important; transition: grid-template-rows .32s cubic-bezier(.22,1,.36,1); }
+.mobile-sub[data-open="true"] { grid-template-rows: 1fr; }
+.mobile-sub-inner { min-height: 0; overflow: hidden; opacity: 0; transition: opacity .2s ease; }
+.mobile-sub[data-open="true"] .mobile-sub-inner { opacity: 1; transition: opacity .28s ease .06s; }
+
+/* Hamburger turns into a close icon; plus folds into a minus. */
+.menu-icon path { transform-box: fill-box; transform-origin: center; transition: transform .32s cubic-bezier(.22,1,.36,1), opacity .2s ease; }
+.menu-icon[data-open="true"] .menu-icon-top { transform: translateY(5px) rotate(45deg); }
+.menu-icon[data-open="true"] .menu-icon-mid { opacity: 0; transform: scaleX(.2); }
+.menu-icon[data-open="true"] .menu-icon-bottom { transform: translateY(-5px) rotate(-45deg); }
+.plus-minus-bar { transform-box: fill-box; transform-origin: center; transition: transform .3s cubic-bezier(.22,1,.36,1); }
+.plus-minus[data-open="true"] .plus-minus-bar { transform: scaleY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-panel[data-state], .mobile-menu-panel[data-state="open"] > div > * { animation: none !important; }
+  .mobile-sub, .mobile-sub-inner, .menu-icon path, .plus-minus-bar { transition: none !important; }
+}

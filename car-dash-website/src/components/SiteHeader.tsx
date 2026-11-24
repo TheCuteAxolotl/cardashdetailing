@@ -43,6 +43,14 @@ export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileServiceOpen, setMobileServiceOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  // Keeps the menu on screen while its closing animation plays.
+  const [menuMounted, setMenuMounted] = useState(false);
+  useEffect(() => {
+    if (menuOpen) { setMenuMounted(true); return; }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = window.setTimeout(() => { setMenuMounted(false); setMobileServiceOpen(false); setMobileMoreOpen(false); }, reduce ? 0 : 240);
+    return () => window.clearTimeout(timer);
+  }, [menuOpen]);
   const [desktopMenu, setDesktopMenu] = useState<"service" | "more" | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
@@ -183,7 +191,7 @@ export default function SiteHeader() {
             <a href="/quote" className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-[#d6b779]/60 px-3 text-xs font-semibold text-[#e5c995] hover:border-[#e5c995]">Request a Quote</a>
             <a href="/#book" className="rounded-full bg-[#171411] px-4 py-2.5 text-xs font-bold text-white">Book now</a>
             <button id="mobile-menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="car-dash-mobile-menu" className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white shadow-sm" aria-label={menuOpen ? "Close menu" : "Open menu"}>
-            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">{menuOpen ? <><path d="m6 6 12 12"/><path d="M18 6 6 18"/></> : <><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></>}</svg>
+            <svg viewBox="0 0 24 24" fill="none" className="menu-icon h-5 w-5" data-open={menuOpen} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true"><path className="menu-icon-top" d="M4 7h16"/><path className="menu-icon-mid" d="M4 12h16"/><path className="menu-icon-bottom" d="M4 17h16"/></svg>
             </button>
           </div>
         </div>
@@ -197,8 +205,8 @@ export default function SiteHeader() {
           </div>
         </div>
 
-        {menuOpen && (
-          <div id="car-dash-mobile-menu" className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
+        {menuMounted && (
+          <div id="car-dash-mobile-menu" data-state={menuOpen ? "open" : "closed"} inert={!menuOpen} className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
             <div className="mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
               <div className="mb-5">
                 <p className="mb-2 text-xs font-bold uppercase tracking-[.1em] text-black/45">Quick booking</p>
@@ -217,10 +225,10 @@ export default function SiteHeader() {
                 {mainLinks.map(([href, label]) => (
                   <a key={href} href={href} className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>{label}</a>
                 ))}
-                <button onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><span>{mobileServiceOpen ? "−" : "+"}</span></button>
-                {mobileServiceOpen && <div className="pb-4 pl-4">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}</div>}
-                <button onClick={() => { setMobileMoreOpen(!mobileMoreOpen); setMobileServiceOpen(false); }} className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>More</span><span>{mobileMoreOpen ? "−" : "+"}</span></button>
-                {mobileMoreOpen && <div className="pb-4 pl-4">{moreLinks.map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}<button onClick={openSupport} className="block py-2.5 text-sm text-black/55">Support</button></div>}
+                <button onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} aria-expanded={mobileServiceOpen} aria-controls="mobile-services-links" className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><PlusMinus open={mobileServiceOpen} /></button>
+                <div id="mobile-services-links" className="mobile-sub" data-open={mobileServiceOpen} inert={!mobileServiceOpen}><div className="mobile-sub-inner"><div className="pb-4 pl-4">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}</div></div></div>
+                <button onClick={() => { setMobileMoreOpen(!mobileMoreOpen); setMobileServiceOpen(false); }} aria-expanded={mobileMoreOpen} aria-controls="mobile-more-links" className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>More</span><PlusMinus open={mobileMoreOpen} /></button>
+                <div id="mobile-more-links" className="mobile-sub" data-open={mobileMoreOpen} inert={!mobileMoreOpen}><div className="mobile-sub-inner"><div className="pb-4 pl-4">{moreLinks.map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}<button onClick={openSupport} className="block py-2.5 text-sm text-black/55">Support</button></div></div></div>
               </nav>
               <div className="mt-5 grid grid-cols-2 gap-2">
                 <a href={user ? "/dashboard" : "/login"} className="rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">My bookings</a>
@@ -232,5 +240,15 @@ export default function SiteHeader() {
         )}
       </header>
     </>
+  );
+}
+
+/** A plus whose upright bar folds away into a minus when its section opens. */
+function PlusMinus({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 16 16" className="plus-minus h-4 w-4" data-open={open} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+      <path d="M3 8h10" />
+      <path className="plus-minus-bar" d="M8 3v10" />
+    </svg>
   );
 }
