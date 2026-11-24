@@ -1,3 +1,5 @@
+import { KEEP_SERVICE_KEY, replacePricingNoteLines, resolveOwnerPricing } from "@/lib/booking-catalog";
+import { loadCatalogSource } from "@/lib/booking-catalog-source";
 import { archiveBooking } from "@/lib/field-history";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { bookingPhoneWasReleased } from "@/lib/phone-release";
@@ -139,12 +141,20 @@ export async function PUT(
     if (body.action === "confirmWithDetails") {
       const date=String(body.preferredDate||"").trim(), time=String(body.preferredTime||"").trim();
       if(!isDateString(date)||!normalizeBookingTime(time)||!String(body.customerName||"").trim()||!String(body.serviceName||"").trim()) return NextResponse.json({error:"Name, service, date and time are required."},{status:400});
-      const price=body.quotedPrice===""||body.quotedPrice==null?null:Number(body.quotedPrice);
+      let price=body.quotedPrice===""||body.quotedPrice==null?null:Number(body.quotedPrice);
       if(price!==null&&(!Number.isFinite(price)||price<0)) return NextResponse.json({error:"Enter a valid price."},{status:400});
       const details: Record<string,string>={};
       for(const field of ["customerName","customerEmail","customerPhone","vehicleMake","vehicleModel","vehicleYear","vehicleTrim","serviceName"]) details[field]=String(body[field]??existing[field as keyof typeof existing]??"").trim().slice(0,240);
-      // Preserve original consent, evidence and duration metadata.
-      const notes=existing.notes||"";
+      // Preserve original consent, evidence and duration metadata. Choosing a new
+      // service, add-ons or price replaces only the saved price lines.
+      let notes=existing.notes||"";
+      if(body.serviceKey!==undefined&&body.serviceKey!==KEEP_SERVICE_KEY){
+        const priced=resolveOwnerPricing(body,await loadCatalogSource());
+        if(!priced.ok) return NextResponse.json({error:priced.error},{status:400});
+        details.serviceName=priced.serviceName;
+        price=priced.quotedPrice;
+        notes=replacePricingNoteLines(notes,priced.noteLines);
+      }
       const extra=String(body.notes||"").trim().slice(0,2000);
       const updatedNotes = replaceBookingOwnerDetails(
         extra && extra !== notes ? notes + "\nOwner scheduling notes: " + extra : notes,

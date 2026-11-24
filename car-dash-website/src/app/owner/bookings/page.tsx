@@ -1,6 +1,5 @@
 "use client";
 
-import NumberInput from "@/components/NumberInput";
 
 import { useEffect, useState } from "react";
 import { normalizeBookingTime } from "@/lib/booking-availability";
@@ -13,6 +12,9 @@ import BookingPaidReceiptDialog from "@/components/BookingPaidReceiptDialog";
 import BookingReminderDialog from "@/components/BookingReminderDialog";
 import BusinessCallButton from "@/components/BusinessCallButton";
 import { bookingServiceAddress } from "@/lib/booking-owner-details";
+import OwnerServicePricing from "@/components/OwnerServicePricing";
+import { KEEP_SERVICE_KEY, type CatalogSource } from "@/lib/booking-catalog";
+import type { VehicleClass } from "@/lib/pricing-config";
 
 const input = "w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-white outline-none focus:border-[#6EAEC6]/60";
 
@@ -60,6 +62,12 @@ type ManualBookingForm = {
   quotedPrice: string;
   serviceAddress: string;
   notes: string;
+  vehicleClass: VehicleClass;
+  serviceKey: string;
+  customServiceName: string;
+  pricingMode: "listed" | "custom";
+  customPrice: string;
+  addOnIds: string[];
 };
 
 const EMPTY_MANUAL: ManualBookingForm = {
@@ -78,6 +86,12 @@ const EMPTY_MANUAL: ManualBookingForm = {
   quotedPrice: "",
   serviceAddress: "",
   notes: "",
+  vehicleClass: "coupe",
+  serviceKey: "",
+  customServiceName: "",
+  pricingMode: "listed",
+  customPrice: "",
+  addOnIds: [],
 };
 
 export default function OwnerBookings() {
@@ -88,6 +102,8 @@ export default function OwnerBookings() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [arrivalSendingId, setArrivalSendingId] = useState<string | null>(null);
   const [convertingId, setConvertingId] = useState<string | null>(null);
+  const [catalogSource, setCatalogSource] = useState<CatalogSource | null>(null);
+  const [catalogLoading, setCatalogLoading] = useState(false);
   const [showManual, setShowManual] = useState(false);
   const [manual, setManual] = useState<ManualBookingForm>(EMPTY_MANUAL);
   const [manualSaving, setManualSaving] = useState(false);
@@ -184,6 +200,18 @@ export default function OwnerBookings() {
         if (!controller.signal.aborted) setSavedClientsLoading(false);
       });
     return () => controller.abort();
+  }, [showManual]);
+
+  useEffect(() => {
+    if (!showManual) return;
+    let cancelled = false;
+    setCatalogLoading(true);
+    fetch("/api/site-content", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => { if (!cancelled && data) setCatalogSource(data as CatalogSource); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setCatalogLoading(false); });
+    return () => { cancelled = true; };
   }, [showManual]);
 
   const selectSavedClient = (id: string) => {
@@ -417,8 +445,13 @@ export default function OwnerBookings() {
                   Without a phone number, the booking will be saved but no text will be sent.</span>
               </label>}
               <label className="text-sm text-white/55">Email<input type="email" className={`${input} mt-2`} value={manual.customerEmail} onChange={(e) => { setSelectedClientId(""); setManual((current) => ({ ...current, customerEmail: e.target.value })); }} /></label>
-              <label className="text-sm text-white/55">Service<input className={`${input} mt-2`} value={manual.serviceName} onChange={(e) => setManual((current) => ({ ...current, serviceName: e.target.value }))} required /></label>
-              <label className="text-sm text-white/55">Price (optional)<NumberInput type="number" min="0" step="0.01" className={`${input} mt-2`} value={manual.quotedPrice} onChange={(e) => setManual((current) => ({ ...current, quotedPrice: e.target.value }))} /></label>
+              <OwnerServicePricing
+                value={manual}
+                onChange={(patch) => setManual((current) => ({ ...current, ...patch }))}
+                source={catalogSource}
+                loading={catalogLoading}
+                allowKeep={Boolean(convertingId)}
+              />
               <label className="text-sm text-white/55">Vehicle year<input className={`${input} mt-2`} value={manual.vehicleYear} onChange={(e) => setManual((current) => ({ ...current, vehicleYear: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Vehicle make<input className={`${input} mt-2`} value={manual.vehicleMake} onChange={(e) => setManual((current) => ({ ...current, vehicleMake: e.target.value }))} /></label>
               <label className="text-sm text-white/55">Vehicle model<input className={`${input} mt-2`} value={manual.vehicleModel} onChange={(e) => setManual((current) => ({ ...current, vehicleModel: e.target.value }))} /></label>
@@ -510,7 +543,7 @@ export default function OwnerBookings() {
                         <button onClick={() => sendArrivalUpdate(booking, "eta")} disabled={arrivalSendingId === booking.id} className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 disabled:opacity-50">Send arrival time</button>
                       </>
                     )}
-                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
+                    <button onClick={() => { setConvertingId(booking.id); setManual({...EMPTY_MANUAL,...booking,serviceKey:KEEP_SERVICE_KEY,vehicleTrim:booking.vehicleTrim||"",preferredDate:booking.preferredDate||"",preferredTime:normalizeBookingTime(booking.preferredTime)||"",quotedPrice:booking.quotedPrice==null?"":String(booking.quotedPrice),notes:booking.notes||""}); setShowManual(true); }} disabled={booking.status!=="pending"} className="rounded-lg bg-blue-700 px-4 py-2 text-sm disabled:opacity-40">Convert to booking</button>
                     <button onClick={() => updateStatus(booking.id, "completed")} className="rounded-lg bg-green-700 px-4 py-2 text-sm">Complete</button>
                     <button onClick={() => updateStatus(booking.id, "cancelled")} className="rounded-lg bg-red-800 px-4 py-2 text-sm">Cancel</button>
 

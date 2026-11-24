@@ -10,6 +10,8 @@ import { replaceBookingOwnerDetails } from "@/lib/booking-owner-details";
 import { normalizePhoneNumber } from "@/lib/twilio-sms";
 import { sendCustomerSmsWithHistory } from "@/lib/customer-sms-history";
 import { manualBookingConfirmationText } from "@/lib/manual-booking-confirmation";
+import { resolveOwnerPricing } from "@/lib/booking-catalog";
+import { loadCatalogSource } from "@/lib/booking-catalog-source";
 
 function clean(value: unknown, max = 300) {
   return String(value || "").trim().slice(0, max);
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const customerName = clean(body.customerName, 120);
-    const serviceName = clean(body.serviceName, 160) || "Outside Booking";
+    let serviceName = clean(body.serviceName, 160) || "Outside Booking";
     const preferredDate = clean(body.preferredDate, 10);
     const preferredTime = clean(body.preferredTime, 30);
     const normalizedTime = normalizeBookingTime(preferredTime);
@@ -37,9 +39,19 @@ export async function POST(request: NextRequest) {
     }
 
     const quotedPriceRaw = body.quotedPrice === "" || body.quotedPrice == null ? null : Number(body.quotedPrice);
-    const quotedPrice = quotedPriceRaw != null && Number.isFinite(quotedPriceRaw)
+    let quotedPrice = quotedPriceRaw != null && Number.isFinite(quotedPriceRaw)
       ? Math.max(0, Math.round(quotedPriceRaw * 100) / 100)
       : null;
+    // The dashboard form sends a service from the price list (or a custom one),
+    // add-ons and a listed or custom price. Older callers still send a plain name and price.
+    let priceLines: string[] = [];
+    if (body.serviceKey !== undefined) {
+      const priced = resolveOwnerPricing(body, await loadCatalogSource());
+      if (!priced.ok) return NextResponse.json({ error: priced.error }, { status: 400 });
+      serviceName = priced.serviceName;
+      quotedPrice = priced.quotedPrice;
+      priceLines = priced.noteLines;
+    }
     const ownerNotes = clean(body.notes, 2000);
     const customerPhone = clean(body.customerPhone, 60);
     const normalizedPhone = normalizePhoneNumber(customerPhone);
@@ -52,6 +64,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     const baseNotes = [
+      ...priceLines,
       "Booking source: Added manually from the Car Dash dashboard",
       `Scheduled: ${preferredDate} at ${formatBookingTime(normalizedTime)}`,
       "SMS consent: " + (sendConfirmationSms && normalizedPhone ? "Yes" : "No"),

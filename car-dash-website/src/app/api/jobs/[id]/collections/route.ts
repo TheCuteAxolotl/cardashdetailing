@@ -1,3 +1,4 @@
+import { invoiceItemsForBooking } from "@/lib/booking-catalog";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hasJobAccess, jobAccount, JobError, jobResponseError, lockedJob, noStore } from "@/lib/jobs";
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest, context: Context) {
         const saved=await tx.siteContent.findUnique({where:{key:refKey}});
         const number=saved?.value || newBookingReference();
         if(!saved)await tx.siteContent.createMany({data:[{key:refKey,value:number},{key:"booking-lookup:"+number,value:id}]});
-        invoice=sanitizeInvoiceInput({id:invoiceId,invoiceNumber:number,customerName:booking.customerName,customerEmail:booking.customerEmail,customerPhone:booking.customerPhone,serviceDate:booking.preferredDate,source:"booking-paid:"+id,lineItems:[{id:"service",description:booking.serviceName,quantity:1,rate:booking.quotedPrice}]});
+        invoice=sanitizeInvoiceInput({id:invoiceId,invoiceNumber:number,customerName:booking.customerName,customerEmail:booking.customerEmail,customerPhone:booking.customerPhone,serviceDate:booking.preferredDate,source:"booking-paid:"+id,...invoiceItemsForBooking(booking.serviceName,booking.notes,Number(booking.quotedPrice))});
         invoice.createdById=actor.id; invoice.createdByName=actor.name;
       }
       const shown=calculateInvoiceTotals(invoice).balance;

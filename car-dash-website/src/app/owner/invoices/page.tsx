@@ -3,6 +3,8 @@
 import NumberInput from "@/components/NumberInput";
 
 import { useEffect, useMemo, useState } from "react";
+import { VEHICLE_CLASSES, catalogAddOns, catalogServices, type CatalogSource } from "@/lib/booking-catalog";
+import { VEHICLE_LABELS, type VehicleClass } from "@/lib/pricing-config";
 
 type LineItem = { id: string; description: string; quantity: number; rate: number };
 type Payment = { tipAmount?: number; id: string; amount: number; method: string; reference?: string; note?: string; paidAt: string };
@@ -142,6 +144,19 @@ export default function OwnerInvoicesPage() {
   const [isOwner, setIsOwner] = useState(false);
   const [message, setMessage] = useState("");
   const [paymentDraft, setPaymentDraft] = useState({ amount: "", method: "Check", reference: "" });
+  const [catalogSource, setCatalogSource] = useState<CatalogSource | null>(null);
+  const [vehicleClass, setVehicleClass] = useState<VehicleClass>("coupe");
+  const catalog = useMemo(() => catalogSource ? catalogServices(catalogSource, vehicleClass) : [], [catalogSource, vehicleClass]);
+  const addOnList = useMemo(() => catalogSource ? catalogAddOns(catalogSource) : [], [catalogSource]);
+
+  // Adds a priced line from the current menu. The line stays fully editable.
+  function addCatalogLine(description: string, rate: number) {
+    setForm((current) => {
+      const onlyBlank = current.lineItems.length === 1 && !current.lineItems[0].rate && ["", "Detailing service"].includes(current.lineItems[0].description.trim());
+      const line = { id: uid(), description, quantity: 1, rate };
+      return { ...current, lineItems: onlyBlank ? [line] : [...current.lineItems, line] };
+    });
+  }
 
   const totals = useMemo(() => localTotals(form), [form]);
   const selected = useMemo(() => invoices.find((item) => item.id === form.id) || null, [invoices, form.id]);
@@ -162,6 +177,10 @@ export default function OwnerInvoicesPage() {
 
   useEffect(() => {
     loadInvoices();
+    fetch("/api/site-content", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => { if (data) setCatalogSource(data as CatalogSource); })
+      .catch(() => {});
     fetch("/api/auth/me", {cache:"no-store"})
       .then(response => response.json())
       .then(data => {
@@ -345,6 +364,21 @@ export default function OwnerInvoicesPage() {
                 <h3 className="font-semibold">Line items</h3>
                 <button onClick={() => setForm({ ...form, lineItems: [...form.lineItems, { id: uid(), description: "", quantity: 1, rate: 0 }] })} className="text-sm font-semibold text-[#8EC5D8] hover:text-white">+ Add item</button>
               </div>
+              {catalogSource && (
+                <div className="mb-4 grid gap-3 rounded-2xl border border-white/7 bg-white/[0.02] p-3 sm:grid-cols-[auto_1fr_1fr]">
+                  <select value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value as VehicleClass)} className="input" aria-label="Vehicle size for service prices">
+                    {VEHICLE_CLASSES.map((key) => <option key={key} value={key}>{VEHICLE_LABELS[key]}</option>)}
+                  </select>
+                  <select value="" onChange={(e) => { const service = catalog.find((item) => item.key === e.target.value); if (service) addCatalogLine(service.serviceName, service.price); }} className="input" aria-label="Add a service from the price list">
+                    <option value="">+ Add service</option>
+                    {catalog.map((item) => <option key={item.key} value={item.key}>{item.label} · {currency.format(item.price)}</option>)}
+                  </select>
+                  <select value="" onChange={(e) => { const addOn = addOnList.find((item) => item.id === e.target.value); if (addOn) addCatalogLine(`Add-on: ${addOn.name}`, addOn.price); }} className="input" aria-label="Add an add-on from the price list">
+                    <option value="">+ Add add-on</option>
+                    {addOnList.map((item) => <option key={item.id} value={item.id}>{item.name} · {currency.format(item.price)}</option>)}
+                  </select>
+                </div>
+              )}
               <div className="space-y-3">
                 {form.lineItems.map((item, index) => (
                   <div key={item.id} className="grid gap-3 rounded-2xl border border-white/7 bg-white/[0.025] p-3 sm:grid-cols-[1fr_90px_120px_38px]">

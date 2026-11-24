@@ -1,3 +1,4 @@
+import { invoiceItemsForBooking } from "@/lib/booking-catalog";
 import { ensureBookingReference } from "@/lib/booking-reference";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -127,8 +128,8 @@ export async function POST(request: Request, context: Context) {
             timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit",
           }).format(new Date()),
           dueDate: Math.round(amount * 100) < Math.round(totalAmount * 100) ? dueDate : "",
-          lineItems: [{ id: "detail-service", description: booking.serviceName, quantity: 1, rate: totalAmount }],
-          discountAmount: 0,
+          // Service and each add-on on their own line, adding up to the total charged.
+          ...invoiceItemsForBooking(booking.serviceName, booking.notes, totalAmount),
           taxRate: 0,
           notes: "Thank you for choosing Car Dash Detailing.",
           internalInspectionNotes: `Owner reported offline payment received and SMS permission on ${new Date().toISOString()}. Not an independently verified bank transaction.`,
