@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import styles from "./HomeExperience.module.css";
 import type { SiteContent } from "@/lib/site-defaults";
 import { SERVICE_AREAS } from "@/lib/seo";
@@ -13,7 +13,7 @@ import { useGoogleReviews } from "@/lib/use-google-reviews";
 import HomePackagePricing from "@/components/HomePackagePricing";
 import type { MediaItem } from "@/lib/media";
 import PageMediaBand from "@/components/PageMediaBand";
-import Hero360Viewer from "@/components/Hero360Viewer";
+import HomeHeroGlass from "@/components/HomeHeroGlass";
 import SitePhoto from "@/components/SitePhoto";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
@@ -32,7 +32,6 @@ export default function HomeExperience({
   pricingMedia = [],
   hero360Frames = [],
 }: Props) {
-  const [heroInteracting, setHeroInteracting] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const { data: reviewData } = useGoogleReviews();
 
@@ -46,59 +45,13 @@ export default function HomeExperience({
 
   return (
     <div ref={rootRef} className={`${styles.experience} bg-[#f5f4f1] text-[#111]`}>
-      <section className={styles.hero}>
-        <div className="home-hero-shell relative mx-auto min-h-[520px] max-w-[1440px] overflow-hidden bg-[#111] sm:min-h-[740px] lg:min-h-[780px]">
-          <div className={`${styles.heroMedia} absolute inset-0`}>
-            {hero360Frames.length > 0 ? (
-              <Hero360Viewer
-                frames={hero360Frames}
-                className="absolute inset-0 h-full w-full"
-                onInteractionChange={setHeroInteracting}
-              />
-            ) : (
-              <SitePhoto
-                category="hero"
-                fallbackCategory="home-showcase-primary"
-                className="absolute inset-0 h-full w-full object-cover"
-                alt="Car Dash Detailing"
-              />
-            )}
-            <div className={`home-hero-side-gradient pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.84)_0%,rgba(0,0,0,.56)_38%,rgba(0,0,0,.18)_72%,rgba(0,0,0,.08)_100%)] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
-            <div className={`home-hero-bottom-gradient pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.18),transparent_38%,rgba(0,0,0,.7))] transition-opacity duration-300 ${heroInteracting ? "opacity-0" : "opacity-100"}`} />
-          </div>
-
-          <div className={`home-hero-content relative z-10 flex min-h-[520px] flex-col justify-between px-5 py-7 transition-opacity duration-300 sm:min-h-[740px] sm:px-9 sm:py-9 lg:min-h-[780px] lg:px-14 lg:py-12 ${heroInteracting ? "pointer-events-none opacity-0" : "opacity-100"}`}>
-            <div className={`${styles.heroEyebrow} flex items-start justify-between gap-5 text-white`}>
-              <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-white/64"><span className="h-px w-8 bg-white/35" />{content.heroEyebrow}</p>
-              {reviewData && reviewData.rating !== null && (
-                <a href="#reviews" className={styles.heroRating} aria-label={`Rated ${reviewData.rating.toFixed(1)} out of 5${reviewData.reviewCount !== null ? ` from ${reviewData.reviewCount} Google reviews` : ""}. Jump to reviews.`}>
-                  <span className={styles.heroRatingStars} aria-hidden="true">★★★★★</span>
-                  <strong>{reviewData.rating.toFixed(1)}</strong>
-                  {reviewData.reviewCount !== null && <span>{reviewData.reviewCount} Google reviews</span>}
-                </a>
-              )}
-            </div>
-
-            <div className="home-hero-copy max-w-[900px] pb-5 text-white sm:pb-9">
-              <p className="mb-5 text-sm font-medium tracking-[.01em] text-white/62">Fully mobile. We bring our own water and power.</p>
-              <h1 className="max-w-[14ch] text-[clamp(3.2rem,7.2vw,6.8rem)] font-semibold leading-[.84] tracking-[-.075em]">
-                <span className={styles.heroLine}><span>Your car.</span></span>{" "}
-                <span className={styles.heroLine}><span>Detailed in</span></span>{" "}
-                <span className={styles.heroLine}><span>your driveway.</span></span>
-              </h1>
-              <p className="mt-6 max-w-[540px] text-sm leading-6 text-white/80 sm:hidden">See the price, pick a time, and we bring everything to you, water and power included.</p>
-              <p className="mt-7 hidden max-w-[650px] text-sm leading-7 text-white/68 sm:block sm:text-base sm:leading-8">{content.heroBody}</p>
-              <p className="mt-5 max-w-[650px] border-l-2 border-[#d6b779] pl-4 text-sm font-medium leading-6 tracking-[-.01em] text-white/90 sm:text-base">We’re not satisfied until <span className="font-semibold text-[#d6b779]">YOU’RE satisfied.</span></p>
-              <div className="home-hero-actions mt-8 flex flex-wrap gap-3">
-                <a href="#choose-detail" className="rounded-full bg-[#d6b779] px-6 py-3.5 text-sm font-bold text-[#111] shadow-[0_12px_32px_rgba(0,0,0,.12)] hover:bg-[#ead09b]">Choose a detail</a>
-                <a href="/quote" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">Request a Quote</a>
-                <a href="#prices" className="rounded-full border border-white/24 bg-black/10 px-5 py-3 text-sm font-medium text-white backdrop-blur-sm hover:border-white/55 hover:bg-white/8">View pricing</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <HomeHeroGlass
+        content={content}
+        pricingConfig={pricingConfig}
+        hero360Frames={hero360Frames}
+        reviewData={reviewData}
+        towns={["South Elgin", "St. Charles", "Elgin", "Bartlett", "Geneva", "Wayne"]}
+      />
 
       <section id="choose-detail" aria-labelledby="quick-book-heading" className={styles.quickBook}>
         <div className={styles.quickBookInner}>
