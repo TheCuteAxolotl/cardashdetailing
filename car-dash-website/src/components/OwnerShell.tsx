@@ -158,6 +158,13 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
   const pathname = usePathname();
   const [fullWorkspace, setFullWorkspace] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuMounted, setMenuMounted] = useState(false);
+  useEffect(() => {
+    if (mobileOpen) { setMenuMounted(true); return; }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = window.setTimeout(() => setMenuMounted(false), reduce ? 0 : 260);
+    return () => window.clearTimeout(timer);
+  }, [mobileOpen]);
   const [phoneViewport,setPhoneViewport] = useState(false);
   useEffect(()=>{
     const query=window.matchMedia("(max-width: 767px)");
@@ -376,9 +383,9 @@ export default function OwnerShell({ children, user, permissions = [] }: { child
         </div>
       )}
 
-      {mobileOpen && (
-        <div className="owner-mobile-menu fixed inset-0 z-[90] xl:hidden">
-          <button aria-label="Close navigation" className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+      {menuMounted && (
+        <div className="owner-mobile-menu fixed inset-0 z-[90] xl:hidden" data-state={mobileOpen ? "open" : "closed"} inert={!mobileOpen}>
+          <button aria-label="Close navigation" className="owner-menu-backdrop absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
           <aside role="dialog" aria-modal="true" aria-label="More workspace tools" className="owner-mobile-drawer relative h-full w-[310px] max-w-[88vw] overflow-y-auto overscroll-contain border-r border-white/10 bg-[#1c1c1b] px-4 pb-10 pt-5 text-[#f4efe5] shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <a href={homeHref} className="flex items-center gap-3">
