@@ -7,7 +7,7 @@ import { SERVICE_AREAS } from "@/lib/seo";
 import type { PromotionSettings } from "@/lib/promotions";
 import type { PricingPageConfig } from "@/lib/pricing-config";
 import DynamicGallery from "@/components/DynamicGallery";
-import ReviewMarquee from "@/components/ReviewMarquee";
+import ReviewList from "@/components/ReviewList";
 import CarWash3D from "@/components/CarWash3D";
 import { useGoogleReviews } from "@/lib/use-google-reviews";
 import HomePackagePricing from "@/components/HomePackagePricing";
@@ -118,7 +118,7 @@ export default function HomeExperience({
             <p className="text-[11px] font-semibold uppercase tracking-[.16em] text-[#d6b779]">Customer feedback</p>
             <h2 className="mt-3 text-4xl font-semibold tracking-[-.055em] sm:text-5xl">See what customers are saying.</h2>
           </div>
-          <div data-reveal><ReviewMarquee /></div>
+          <div data-reveal><ReviewList /></div>
         </div>
       </section>
 

@@ -1,0 +1,66 @@
+.wrap { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 56px; align-items: start; color: #f4efe5; }
+.side { display: grid; gap: 34px; }
+
+.summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 22px 26px; border: 1px solid rgba(255,255,255,.12); border-radius: 20px; background: rgba(255,255,255,.025);
+}
+.score { display: flex; align-items: center; gap: 6px; }
+.laurel { width: 30px; height: 62px; color: rgba(244,239,229,.55); flex-shrink: 0; }
+.scoreText { display: grid; justify-items: center; gap: 4px; padding: 0 4px; }
+.rating { margin: 0; font-size: 40px; line-height: 1; font-weight: 500; letter-spacing: -.02em; color: #f8f3ea; font-family: var(--font-geist-sans), Arial, sans-serif; }
+.count { margin: 2px 0 0; font-size: 14px; color: rgba(244,239,229,.78); }
+.write {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 22px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.28); color: #f8f3ea !important; font-size: 15px; font-weight: 500; white-space: nowrap;
+  transition: border-color .2s ease, background .2s ease;
+}
+.write:hover { border-color: #d6b779; background: rgba(214,183,121,.08); }
+.write:focus-visible, .author a:focus-visible, .source:focus-visible, .all:focus-visible, .more:focus-visible { outline: 2px solid #d6b779; outline-offset: 3px; border-radius: 6px; }
+
+.stars { display: inline-flex; gap: 2px; vertical-align: middle; }
+.stars svg { display: block; }
+.on { fill: #f4efe5; }
+.off { fill: none; stroke: rgba(244,239,229,.4); stroke-width: 1.4; }
+
+.bars { margin: 0; padding: 0 4px; list-style: none; display: grid; gap: 14px; }
+.bars li { display: grid; grid-template-columns: auto 1fr 28px; align-items: center; gap: 18px; }
+.track { height: 6px; border-radius: 999px; background: rgba(255,255,255,.09); overflow: hidden; }
+.track span { display: block; height: 100%; border-radius: inherit; background: #f4efe5; transform-origin: left; animation: grow 1.1s cubic-bezier(.22,1,.36,1) .2s backwards; }
+.barCount { text-align: right; font-size: 15px; font-variant-numeric: tabular-nums; color: rgba(244,239,229,.85); }
+
+.list { display: grid; }
+.review { padding: 26px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+.review:first-child { padding-top: 4px; }
+.author { margin: 0; font-family: var(--font-geist-sans), Arial, sans-serif !important; font-size: 18px !important; font-weight: 500 !important; letter-spacing: -.01em !important; color: #f8f3ea; }
+.author a { color: inherit; }
+.author a:hover { color: #d6b779; }
+.meta { margin: 8px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14.5px; color: rgba(244,239,229,.82); }
+.meta > span[aria-hidden] { color: rgba(244,239,229,.4); }
+.source { color: rgba(244,239,229,.5) !important; }
+.source:hover { color: #d6b779 !important; }
+.text { margin: 14px 0 0; font-size: 16px; line-height: 1.65; color: rgba(244,239,229,.9); white-space: pre-line; }
+.text[data-clamped] { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.more { margin-top: 8px; padding: 0; border: 0; background: none; color: #d6b779; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+.footer { padding-top: 24px; display: grid; gap: 10px; }
+.all { justify-self: start; color: #d6b779 !important; font-size: 15px; font-weight: 600; }
+.all:hover { color: #ead09b !important; }
+.attribution { margin: 0; font-size: 12px; color: rgba(244,239,229,.45); }
+
+.notice { display: grid; gap: 14px; justify-items: start; padding: 26px; border: 1px solid rgba(255,255,255,.12); border-radius: 18px; color: rgba(244,239,229,.75); }
+
+@keyframes grow { from { transform: scaleX(0); } }
+
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; gap: 34px; }
+  .side { position: static; }
+}
+@media (max-width: 480px) {
+  .summary { padding: 18px 16px; gap: 12px; }
+  .laurel { width: 24px; height: 52px; }
+  .rating { font-size: 34px; }
+  .write { padding: 0 16px; font-size: 14px; min-height: 42px; }
+  .bars li { gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .track span { animation: none; } }
