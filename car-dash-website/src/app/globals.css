@@ -1543,3 +1543,53 @@ img { display: block; }
 @media (prefers-reduced-motion: reduce) {
   .owner-mobile-menu *, .owner-mobile-menu .owner-mobile-drawer { animation: none !important; }
 }
+
+/* ---- Phone menu: calm dark layout ---- */
+.mobile-menu-panel .mm-scroll { display: grid; gap: 14px; }
+.mobile-menu-panel .mm-label { margin: 0 2px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(244,239,229,.5); }
+.mobile-menu-panel .mm-quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.mobile-menu-panel .mm-tile {
+  position: relative; display: flex; flex-direction: column; gap: 3px; min-height: 86px; padding: 13px 12px 12px;
+  border: 1px solid rgba(255,255,255,.1) !important; border-radius: 14px !important;
+  background: #1f1f1f !important; color: #f4efe5 !important; box-shadow: none !important;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.mobile-menu-panel .mm-tile:hover, .mobile-menu-panel .mm-tile:focus-visible { border-color: rgba(214,183,121,.6) !important; background: #232120 !important; }
+.mobile-menu-panel .mm-tile:active { transform: scale(.98); }
+.mobile-menu-panel .mm-tile-title { font-size: 14.5px; font-weight: 600; letter-spacing: -.01em; }
+.mobile-menu-panel .mm-tile-note { font-size: 11.5px; color: rgba(244,239,229,.5); }
+.mobile-menu-panel .mm-tile-arrow { position: absolute; right: 11px; bottom: 11px; width: 16px; height: 16px; color: #d6b779; }
+.mobile-menu-panel .mm-quote { display: block; margin: 12px 2px 0; font-size: 13px; color: rgba(244,239,229,.6) !important; }
+.mobile-menu-panel .mm-quote span { color: #d6b779; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(214,183,121,.4); }
+
+.mobile-menu-panel .mm-nav { border: 1px solid rgba(255,255,255,.1); border-radius: 16px; background: #1b1b1b; padding: 0 16px; }
+.mobile-menu-panel .mm-row {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; min-height: 54px;
+  padding: 0 !important; border: 0 !important; border-top: 1px solid rgba(255,255,255,.07) !important; border-radius: 0 !important;
+  background: transparent !important; color: #f4efe5 !important; font-size: 15.5px !important; font-weight: 500; text-align: left;
+}
+.mobile-menu-panel .mm-nav > .mm-row:first-child { border-top: 0 !important; }
+.mobile-menu-panel .mm-row:hover { color: #ead09b !important; }
+.mobile-menu-panel .mm-chevron { width: 16px; height: 16px; color: rgba(244,239,229,.35); }
+.mobile-menu-panel .mm-row .plus-minus { color: rgba(244,239,229,.6); }
+.mobile-menu-panel .mm-sub { display: grid; padding: 0 0 12px 12px; border-left: 1px solid rgba(214,183,121,.35); margin: 0 0 4px 2px; }
+.mobile-menu-panel .mm-sub-link {
+  display: block; padding: 9px 0 !important; border: 0 !important; background: transparent !important;
+  font-size: 14px !important; color: rgba(244,239,229,.66) !important; text-align: left;
+}
+.mobile-menu-panel .mm-sub-link:hover { color: #f4efe5 !important; }
+
+.mobile-menu-panel .mm-actions { display: grid; gap: 8px; }
+.mobile-menu-panel .mm-primary {
+  display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 999px !important;
+  background: #d6b779 !important; color: #17140f !important; font-size: 15px; font-weight: 700; border: 0 !important;
+}
+.mobile-menu-panel .mm-primary:hover { background: #e2c58e !important; }
+.mobile-menu-panel .mm-secondary-row { display: flex; gap: 8px; }
+.mobile-menu-panel .mm-secondary {
+  flex: 1; display: flex; align-items: center; justify-content: center; min-height: 46px; border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.18) !important; background: transparent !important; color: #f4efe5 !important;
+  font-size: 14px; font-weight: 500;
+}
+.mobile-menu-panel .mm-secondary:hover { border-color: rgba(214,183,121,.6) !important; }
+.mobile-menu-panel :is(.mm-tile,.mm-row,.mm-sub-link,.mm-primary,.mm-secondary,.mm-quote):focus-visible { outline: 2px solid #d6b779; outline-offset: 2px; }

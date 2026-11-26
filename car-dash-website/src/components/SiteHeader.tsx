@@ -207,34 +207,44 @@ export default function SiteHeader() {
 
         {menuMounted && (
           <div id="car-dash-mobile-menu" data-state={menuOpen ? "open" : "closed"} inert={!menuOpen} className="mobile-menu-panel border-t border-black/[.08] bg-[#faf9f7] lg:hidden">
-            <div className="mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
-              <div className="mb-5">
-                <p className="mb-2 text-xs font-bold uppercase tracking-[.1em] text-black/45">Quick booking</p>
-                <div className="grid grid-cols-2 gap-2">
+            <div className="mm-scroll mx-auto max-h-[calc(100vh-105px)] max-w-[1440px] overflow-y-auto px-5 py-5 sm:px-8">
+              <section className="mm-quick" aria-labelledby="mm-quick-title">
+                <p id="mm-quick-title" className="mm-label">Quick book</p>
+                <div className="mm-quick-grid">
                   {[
-                    ["/?pricingPage=packages#book", "Full detail"],
-                    ["/?pricingPage=interior#book", "Interior only"],
-                    ["/?pricingPage=exterior#book", "Exterior only"],
-                    ["/quote", "Request a Quote"],
-                  ].map(([href, label]) => (
-                    <a key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-[#171411] hover:border-[#a9874f]">{label}</a>
+                    ["/?pricingPage=packages#book", "Full detail", "Inside + out"],
+                    ["/?pricingPage=interior#book", "Interior", "Cabin only"],
+                    ["/?pricingPage=exterior#book", "Exterior", "Wash + protect"],
+                  ].map(([href, label, note]) => (
+                    <a key={href} href={href} onClick={() => setMenuOpen(false)} className="mm-tile">
+                      <span className="mm-tile-title">{label}</span>
+                      <span className="mm-tile-note">{note}</span>
+                      <svg viewBox="0 0 20 20" className="mm-tile-arrow" aria-hidden="true"><path d="M5 10h10M11 6l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </a>
                   ))}
                 </div>
-              </div>
-              <nav className="mobile-menu-nav divide-y divide-black/[.07] border-y border-black/[.07]" aria-label="Mobile navigation">
+                <a href="/quote" onClick={() => setMenuOpen(false)} className="mm-quote">Not sure what you need? <span>Request a quote</span></a>
+              </section>
+              <nav className="mm-nav" aria-label="Mobile navigation">
                 {mainLinks.map(([href, label]) => (
-                  <a key={href} href={href} className="block py-4 text-sm font-medium" onClick={() => setMenuOpen(false)}>{label}</a>
+                  <a key={href} href={href} className="mm-row" onClick={() => setMenuOpen(false)}>
+                    <span>{label}</span>
+                    <svg viewBox="0 0 20 20" className="mm-chevron" aria-hidden="true"><path d="m8 5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
                 ))}
-                <button onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} aria-expanded={mobileServiceOpen} aria-controls="mobile-services-links" className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>Services</span><PlusMinus open={mobileServiceOpen} /></button>
-                <div id="mobile-services-links" className="mobile-sub" data-open={mobileServiceOpen} inert={!mobileServiceOpen}><div className="mobile-sub-inner"><div className="pb-4 pl-4">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}</div></div></div>
-                <button onClick={() => { setMobileMoreOpen(!mobileMoreOpen); setMobileServiceOpen(false); }} aria-expanded={mobileMoreOpen} aria-controls="mobile-more-links" className="flex w-full items-center justify-between py-4 text-left text-sm font-medium"><span>More</span><PlusMinus open={mobileMoreOpen} /></button>
-                <div id="mobile-more-links" className="mobile-sub" data-open={mobileMoreOpen} inert={!mobileMoreOpen}><div className="mobile-sub-inner"><div className="pb-4 pl-4">{moreLinks.map(([href,label]) => <a key={href} href={href} className="block py-2.5 text-sm text-black/55" onClick={() => setMenuOpen(false)}>{label}</a>)}<button onClick={openSupport} className="block py-2.5 text-sm text-black/55">Support</button></div></div></div>
+                <button type="button" onClick={() => { setMobileServiceOpen(!mobileServiceOpen); setMobileMoreOpen(false); }} aria-expanded={mobileServiceOpen} aria-controls="mobile-services-links" className="mm-row"><span>Services</span><PlusMinus open={mobileServiceOpen} /></button>
+                <div id="mobile-services-links" className="mobile-sub" data-open={mobileServiceOpen} inert={!mobileServiceOpen}><div className="mobile-sub-inner"><div className="mm-sub">{[...detailingLinks, ...specialtyLinks].map(([href,label]) => <a key={href} href={href} className="mm-sub-link" onClick={() => setMenuOpen(false)}>{label}</a>)}</div></div></div>
+                <button type="button" onClick={() => { setMobileMoreOpen(!mobileMoreOpen); setMobileServiceOpen(false); }} aria-expanded={mobileMoreOpen} aria-controls="mobile-more-links" className="mm-row"><span>More</span><PlusMinus open={mobileMoreOpen} /></button>
+                <div id="mobile-more-links" className="mobile-sub" data-open={mobileMoreOpen} inert={!mobileMoreOpen}><div className="mobile-sub-inner"><div className="mm-sub">{moreLinks.map(([href,label]) => <a key={href} href={href} className="mm-sub-link" onClick={() => setMenuOpen(false)}>{label}</a>)}<button type="button" onClick={openSupport} className="mm-sub-link">Support chat</button></div></div></div>
               </nav>
-              <div className="mt-5 grid grid-cols-2 gap-2">
-                <a href={user ? "/dashboard" : "/login"} className="rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">My bookings</a>
-                <a href="/#book" className="rounded-full bg-[#111] px-4 py-3 text-center text-sm font-semibold text-white" onClick={() => setMenuOpen(false)}>Book a detail</a>
+              <div className="mm-actions">
+                <a href="/#book" className="mm-primary" onClick={() => setMenuOpen(false)}>Book a detail</a>
+                <div className="mm-secondary-row">
+                  <a href={user ? "/dashboard" : "/login"} className="mm-secondary">My bookings</a>
+                  {staff && <a href="/admin/dashboard" className="mm-secondary">Staff</a>}
+                  {owner && <a href="/owner/dashboard" className="mm-secondary">Owner</a>}
+                </div>
               </div>
-              {owner && <a href="/owner/dashboard" className="mt-2 block rounded-md border border-black/10 bg-white px-4 py-3 text-center text-sm font-medium">Owner console</a>}
             </div>
           </div>
         )}
